@@ -441,13 +441,13 @@ public abstract class lr_parser {
      * We need this Method in order to resolve names for symbol IDs
      * @return the class that keeps all the symbols
      */
-    public Class getSymbolContainer() {
+    public Class<?> getSymbolContainer() {
         return null;
     };
 
     protected void report_expected_token_ids() {
         List<Integer> ids = expected_token_ids();
-        LinkedList<String> list = new LinkedList<String>();
+        LinkedList<String> list = new LinkedList<>();
         for (Integer expected : ids) {
             list.add(symbl_name_from_id(expected));
         }
@@ -480,7 +480,7 @@ public abstract class lr_parser {
      * @return list of integer (non)temrinal ids
      */
     public List<Integer> expected_token_ids() {
-        List<Integer> ret = new LinkedList<Integer>();
+        List<Integer> ret = new LinkedList<>();
         int parse_state = stack.peek().parse_state;
         short[] row = action_tab[parse_state];
         for (int i = 0; i < row.length; i += 2) {
@@ -772,7 +772,7 @@ public abstract class lr_parser {
      */
     public void debug_reduce(int prod_num, int nt_num, int rhs_size) {
         debug_message("# Reduce with prod #" + prod_num + " [NT=" + nt_num
-                      + ", " + "SZ=" + rhs_size + "]");
+                + ", " + "SZ=" + rhs_size + "]");
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -1043,7 +1043,7 @@ public abstract class lr_parser {
         act = get_action(stack.peek().parse_state, error_sym());
         if (debug) {
             debug_message("# Recover state found (#" + stack.peek().parse_state
-                          + ")");
+                    + ")");
             debug_message("# Shifting on error to state #" + (act - 1));
         }
 

@@ -8,7 +8,7 @@ import java.util.Iterator;
  *  (i.e., ignoring differences in their lookahead sets).<p>
  *
  *  This class provides fairly conventional set-oriented operations (union,
- *  sub/super-set tests, etc.), as well as an LALR "closure" operation (see 
+ *  sub/super-set tests, etc.), as well as an LALR "closure" operation (see
  *  compute_closure()).
  *
  * @see     java_cup.lalr_item
@@ -29,7 +29,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Constructor for cloning from another set. 
+    /** Constructor for cloning from another set.
      * @param other indicates set we should copy from.
      */
     @SuppressWarnings("unchecked")
@@ -43,7 +43,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
     /*-----------------------------------------------------------*/
 
     /** A hash table to implement the set.  We store the items using themselves
-     *  as keys. 
+     *  as keys.
      */
     protected HashMap<lalr_item, lalr_item> _all = new HashMap<>(11);
 
@@ -69,7 +69,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
     /*--- Set Operation Methods ---------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Does the set contain a particular item? 
+    /** Does the set contain a particular item?
      * @param itm the item in question.
      */
     public boolean contains(lalr_item itm) {
@@ -78,8 +78,8 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Return the item in the set matching a particular item (or null if not 
-     *  found) 
+    /** Return the item in the set matching a particular item (or null if not
+     *  found)
      *  @param itm the item we are looking for.
      */
     public lalr_item find(lalr_item itm) {
@@ -88,7 +88,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Is this set an (improper) subset of another? 
+    /** Is this set an (improper) subset of another?
      * @param other the other set in question.
      */
     public boolean is_subset_of(lalr_item_set other) throws internal_error {
@@ -104,7 +104,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Is this set an (improper) superset of another? 
+    /** Is this set an (improper) superset of another?
      * @param other the other set in question.
      */
     public boolean is_superset_of(lalr_item_set other) throws internal_error {
@@ -114,8 +114,8 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Add a singleton item, merging lookahead sets if the item is already 
-     *  part of the set.  returns the element of the set that was added or 
+    /** Add a singleton item, merging lookahead sets if the item is already
+     *  part of the set.  returns the element of the set that was added or
      *  merged into.
      * @param itm the item being added.
      */
@@ -144,7 +144,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Remove a single item if it is in the set. 
+    /** Remove a single item if it is in the set.
      * @param itm the item to remove.
      */
     public void remove(lalr_item itm) throws internal_error {
@@ -159,8 +159,8 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Add a complete set, merging lookaheads where items are already in 
-     *  the set 
+    /** Add a complete set, merging lookaheads where items are already in
+     *  the set
      * @param other the set to be added.
      */
     public void add(lalr_item_set other) throws internal_error {
@@ -173,7 +173,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Remove (set subtract) a complete set. 
+    /** Remove (set subtract) a complete set.
      * @param other the set to remove.
      */
     public void remove(lalr_item_set other) throws internal_error {
@@ -189,7 +189,6 @@ public class lalr_item_set implements Iterable<lalr_item> {
     /** Remove and return one item from the set (done in hash order).
      *  Return null if there are no items in the set. */
     public lalr_item get_one() throws internal_error {
-        Iterator<lalr_item> the_set;
         lalr_item result;
         if (_all.values().size() == 0) return null;
 
@@ -215,17 +214,17 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /** Compute the closure of the set using the LALR closure rules.  Basically
      *  for every item of the form: <pre>
-     *    [L ::= a *N alpha, l] 
+     *    [L ::= a *N alpha, l]
      *  </pre>
-     *  (where N is a a non terminal and alpha is a string of symbols) make 
+     *  (where N is a a non terminal and alpha is a string of symbols) make
      *  sure there are also items of the form:  <pre>
-     *    [N ::= *beta, first(alpha l)] 
+     *    [N ::= *beta, first(alpha l)]
      *  </pre>
-     *  corresponding to each production of N.  Items with identical cores but 
-     *  differing lookahead sets are merged by creating a new item with the same 
-     *  core and the union of the lookahead sets (the LA in LALR stands for 
-     *  "lookahead merged" and this is where the merger is).  This routine 
-     *  assumes that nullability and first sets have been computed for all 
+     *  corresponding to each production of N.  Items with identical cores but
+     *  differing lookahead sets are merged by creating a new item with the same
+     *  core and the union of the lookahead sets (the LA in LALR stands for
+     *  "lookahead merged" and this is where the merger is).  This routine
+     *  assumes that nullability and first sets have been computed for all
      *  productions before it is called.
      */
     public void compute_closure() throws internal_error {

@@ -21,6 +21,14 @@ public class ComplexSymbolFactory implements SymbolFactory {
         private int line, column, offset = -1;
 
         /**
+         * Copy Constructor for other ComplexSymbolFactory based Locations
+         * @param other
+         */
+        public Location(Location other) {
+            this(other.unit, other.line, other.column, other.offset);
+        }
+
+        /**
          * Location Object
          * stores compilation unit, line, column and offset to the file start
          * @param unit      compilation unit, e.g. file name
@@ -83,6 +91,27 @@ public class ComplexSymbolFactory implements SymbolFactory {
          */
         public int getLine() {
             return line;
+        }
+
+        /**
+         * move moves this Location by the given differences.
+         * @param linediff
+         * @param coldiff
+         * @param offsetdiff
+         */
+        public void move(int linediff, int coldiff, int offsetdiff) {
+            if (line >= 0) line += linediff;
+            if (column >= 0) column += coldiff;
+            if (offset >= 0) offset += offsetdiff;
+        }
+
+        /**
+         * Cloning factory method
+         * @param other
+         * @return new cloned Location
+         */
+        public static Location clone(Location other) {
+            return new Location(other);
         }
 
         /**
@@ -191,6 +220,15 @@ public class ComplexSymbolFactory implements SymbolFactory {
             xright = right;
         }
 
+        public ComplexSymbol(String name, int id, Symbol left, Object value) {
+            super(id, left.right, left.right, value);
+            this.name = name;
+            if (left != null) {
+                xleft = ((ComplexSymbol) left).xright;
+                xright = ((ComplexSymbol) left).xright;
+            }
+        }
+
         public Location getLeft() {
             return xleft;
         }
@@ -218,6 +256,11 @@ public class ComplexSymbolFactory implements SymbolFactory {
      */
     public Symbol newSymbol(String name, int id, Location left, Location right) {
         return new ComplexSymbol(name, id, left, right);
+    }
+
+    @Override
+    public Symbol newSymbol(String name, int id, Symbol left, Object value) {
+        return new ComplexSymbol(name, id, left, value);
     }
 
     @Override

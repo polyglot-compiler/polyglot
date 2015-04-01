@@ -458,8 +458,8 @@
 		<dependset>
 			<srcfileset dir="${parser.dir}">
 				<include name="${ppg.file}" />
-				<include name="${base-parser}" />
 			</srcfileset>
+      <srcfileset file="${base-parser}" />
 			<targetfileset dir="${parser.dir}">
 				<include name="${cup.file}" />
 				<include name="${parser.class}.java" />
@@ -543,6 +543,7 @@
         <antcall target="ppg-parser">
             <param name="parser.dir" value="${src}/polyglot/ext/jl5/parse" />
             <param name="ppg.file" value="jl5.ppg" />
+            <param name="base-parser" value="${src}/polyglot/parse/java12.cup" />
             <param name="cup.file" value="jl5_ppg.cup" />
             <param name="parser.class" value="Grm" />
             <param name="symbol.class" value="sym" />
@@ -558,6 +559,7 @@
         <antcall target="ppg-parser">
             <param name="parser.dir" value="${src}/polyglot/ext/jl5/qq" />
             <param name="ppg.file" value="qq.ppg" />
+            <param name="base-parser" value="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup" />
             <param name="cup.file" value="qq_ppg.cup" />
             <param name="parser.class" value="Grm" />
             <param name="symbol.class" value="sym" />
@@ -577,6 +579,7 @@
             <param name="parser.dir" value="${src}/polyglot/ext/jl7/parse" />
             <param name="ppg.file" value="jl7.ppg" />
             <param name="cup.file" value="jl7_ppg.cup" />
+            <param name="base-parser" value="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup" />
             <param name="parser.class" value="Grm" />
             <param name="symbol.class" value="sym" />
         </antcall>

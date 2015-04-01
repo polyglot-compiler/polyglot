@@ -185,14 +185,28 @@ action code {:
       }
     }
   }
+  
+  private int cur_debug_id = 0;
+  public int get_new_debug_id() {
+    return cur_debug_id++;
+  }
+   
+  public String attach_debug_symbol(int id, String code) {
+  if (!parser.debugSymbols)
+    return code;
+  return "//@@CUPDBG" + id + "\n" + code;
+  }
 :};
 
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
 parser code {:
-
  /* override error routines */
   protected Lexer lexer;
+  public boolean debugSymbols;
+  public void setDebugSymbols(boolean debugSymbols){
+    this.debugSymbols = debugSymbols;
+  }
   public void report_fatal_error(
     String   message,
     Object   info)
@@ -352,7 +366,7 @@ action_code_part ::=
 	  if (emit.action_code!=null)
 	    ErrorManager.getManager().emit_warning("Redundant action code (skipping)");
 	  else /* save the user included code string */
-	    emit.action_code = user_code;
+      emit.action_code = attach_debug_symbol(get_new_debug_id(),user_code);
 	:}
 	;
 
@@ -364,7 +378,7 @@ parser_code_part ::=
 	  if (emit.parser_code!=null)
 	    ErrorManager.getManager().emit_warning("Redundant parser code (skipping)");
 	  else /* save the user included code string */
-	    emit.parser_code = user_code;
+      emit.parser_code = attach_debug_symbol(get_new_debug_id(),user_code);
 	:}
 /* CupEx extension starts here */
     |   PARSER ID:classname extendsimpls:e CODE_STRING:user_code opt_semi
@@ -408,7 +422,7 @@ init_code ::=
 	  if (emit.init_code!=null)
 	    ErrorManager.getManager().emit_warning("Redundant init code (skipping)");
 	  else /* save the user code */
-	    emit.init_code = user_code;
+      emit.init_code = attach_debug_symbol(get_new_debug_id(),user_code);
 	:}
 	;
 
@@ -420,7 +434,7 @@ scan_code ::=
 	  if (emit.scan_code!=null)
 	    ErrorManager.getManager().emit_warning("Redundant scan code (skipping)");
 	  else /* save the user code */
-	    emit.scan_code = user_code;
+      emit.scan_code = attach_debug_symbol(get_new_debug_id(),user_code);
 	:}
 	;
 
@@ -744,7 +758,7 @@ prod_part ::=
 	CODE_STRING:code_str
 	{: 
 	  /* add a new production part */
-	  add_rhs_part(new action_part(code_str));
+    add_rhs_part(new action_part(attach_debug_symbol(get_new_debug_id(),code_str)));
 	:}
 	;
 

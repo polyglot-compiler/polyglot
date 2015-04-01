@@ -330,7 +330,7 @@ public class emit {
 
         /* class header */
         out.println("/** CUP generated " + class_or_interface
-                    + " containing symbol constants. */");
+                + " containing symbol constants. */");
         out.println("public " + class_or_interface + " "
                 + symbol_const_class_name + " {");
 
@@ -408,14 +408,14 @@ public class emit {
         /* field for parser object */
         /* TUM changes; proposed by Henning Niss 20050628: added typeArgument */
         out.println("    private final " + parser_class_name + typeArgument()
-                    + " parser;");
+                + " parser;");
 
         /* constructor */
         out.println();
         out.println("    /** Constructor */");
         /* TUM changes; proposed by Henning Niss 20050628: added typeArgument */
         out.println("    " + pre("actions") + "(" + parser_class_name
-                    + typeArgument() + " parser) {");
+                + typeArgument() + " parser) {");
         out.println("        this.parser = parser;");
         out.println("    }");
 
@@ -464,7 +464,7 @@ public class emit {
         emit_do_action_signature(out);
         out.println("            /* Symbol object for return from actions */");
         out.println("            java_cup.runtime.Symbol " + pre("result")
-                    + ";");
+                + ";");
         out.println();
     }
 
@@ -527,11 +527,11 @@ public class emit {
             if (lastResult != -1) {
                 result =
                         emit.pre("stack")
-                        +
-                        // TUM 20050917
-                        (lastResult == 1 ? ".peek()" : ".elementAt("
-                                + emit.pre("top") + "-"
-                                + (lastResult - 1) + ")") + ".<"
+                                +
+                                // TUM 20050917
+                                (lastResult == 1 ? ".peek()" : ".elementAt("
+                                        + emit.pre("top") + "-"
+                                        + (lastResult - 1) + ")") + ".<"
                                 + prod.lhs().the_symbol().stack_type()
                                 + "> value()";
             }
@@ -542,7 +542,7 @@ public class emit {
           and be changed by action code
           6/13/96 frankf */
         out.println("                " + prod.lhs().the_symbol().stack_type()
-                    + " RESULT = " + result + ";");
+                + " RESULT = " + result + ";");
 
         /* Add code to propagate RESULT assignments that occur in
          * action code embedded in a production (ie, non-rightmost
@@ -578,7 +578,7 @@ public class emit {
                     // TUM 20050917
                     (index == 0 ? ".peek()" : ".elementAt(" + emit.pre("top")
                             + "-" + index + ")") + ".<"
-                            + prod.lhs().the_symbol().stack_type() + "> value();");
+                    + prod.lhs().the_symbol().stack_type() + "> value();");
             break;
         }
 
@@ -599,11 +599,11 @@ public class emit {
             // TUM 20050917
             //int roffset = 0;
             rightstring = emit.pre("stack") +
-                    // TUM 20050917
-                    //".elementAt(" + emit.pre("top") + "-" + roffset + "))"+
+            // TUM 20050917
+            //".elementAt(" + emit.pre("top") + "-" + roffset + "))"+
                     ".peek()"
-                    // TUM 20060327 removed .right
-                    ;
+            // TUM 20060327 removed .right
+            ;
             if (prod.rhs_length() == 0)
                 leftstring = rightstring;
             else {
@@ -611,22 +611,23 @@ public class emit {
                 leftstring =
                         emit.pre("stack") +
                         // TUM 20050917
-                        (loffset == 0 ? ".peek()" : ".elementAt("
-                                + emit.pre("top") + "-" + loffset + ")")
-                                // TUM 20060327 removed .left
-                                ;
+                                (loffset == 0 ? ".peek()" : ".elementAt("
+                                        + emit.pre("top") + "-" + loffset + ")")
+                // TUM 20060327 removed .left
+                ;
             }
             out.println("                " + pre("result")
-                        + " = parser.getSymbolFactory().newSymbol(" + "\""
-                        + prod.lhs().the_symbol().name() + "\","
-                        + prod.lhs().the_symbol().index() + ", " + leftstring
-                        + ", " + rightstring + ", RESULT);");
+                    + " = parser.getSymbolFactory().newSymbol(" + "\""
+                    + prod.lhs().the_symbol().name() + "\","
+                    + prod.lhs().the_symbol().index() + ", " + leftstring
+                    + (prod.rhs_length() == 0 ? "" : ", " + rightstring)
+                    + ", RESULT);");
         }
         else {
             out.println("                " + pre("result")
-                        + " = parser.getSymbolFactory().newSymbol(" + "\""
-                        + prod.lhs().the_symbol().name() + "\","
-                        + prod.lhs().the_symbol().index() + ", RESULT);");
+                    + " = parser.getSymbolFactory().newSymbol(" + "\""
+                    + prod.lhs().the_symbol().name() + "\","
+                    + prod.lhs().the_symbol().index() + ", RESULT);");
         }
 
         /* end of their block */
@@ -647,7 +648,7 @@ public class emit {
         /* switch top */
         out.println("        /* select the action handler based on the action number */");
         out.println("        switch (" + pre("act_num") + " / " + max_actions
-                    + ") {");
+                + ") {");
 
         /* emit action code for each production as a separate case */
         for (int instancecounter = 0, numInstances =
@@ -666,7 +667,7 @@ public class emit {
 
     protected static void emit_do_action_call(PrintWriter out, int suffix) {
         out.println("            return " + pre("do_action_part")
-                    + String.format("%08d", new Integer(suffix)) + "(");
+                + String.format("%08d", new Integer(suffix)) + "(");
         out.println("                           " + pre("act_num,"));
         out.println("                           " + pre("parser,"));
         out.println("                           " + pre("stack,"));
@@ -725,7 +726,7 @@ public class emit {
      */
     protected static void do_action_table(PrintWriter out,
             parse_action_table act_tab, boolean compact_reduces, int max_actions)
-                    throws internal_error {
+            throws internal_error {
         parse_action_row row;
         parse_action act;
         int red;
@@ -763,7 +764,7 @@ public class emit {
                         temp_table[nentries++] = (short) j;
                         temp_table[nentries++] =
                                 (short) (((shift_action) act).shift_to()
-                                        .index() + 1);
+                                                             .index() + 1);
                     }
 
                     /* reduce actions get negated entries of production# + 1 */
@@ -984,22 +985,25 @@ public class emit {
         else out.print(extendsimpls);
         out.println(" {");
 
-        out.println();
-        out.println(" public final Class getSymbolContainer() {");
-        out.println("    return " + symbol_const_class_name + ".class;");
-        out.println("}");
+        if (extendsimpls.equals("")) {
+            out.println();
+            out.println(" public final Class getSymbolContainer() {");
+            out.println("    return " + symbol_const_class_name + ".class;");
+            out.println("}");
+        }
 
         /* constructors [CSA/davidm, 24-jul-99] */
         out.println();
         if (extendsimpls.equals("")) {
             out.println("  /** Default constructor. */");
+            out.println("  @Deprecated");
             out.println("  public " + parser_class_name + "() {super();}");
             if (!suppress_scanner) {
                 out.println();
                 out.println("  /** Constructor which sets the default scanner. */");
                 out.println("  @Deprecated");
                 out.println("  public " + parser_class_name
-                            + "(java_cup.runtime.Scanner s) {super(s);}");
+                        + "(java_cup.runtime.Scanner s) {super(s);}");
                 // TUM 20060327 added SymbolFactory aware constructor
                 out.println();
                 out.println("  /** Constructor which sets the default scanner and a SymbolFactory. */");
@@ -1026,7 +1030,7 @@ public class emit {
         out.println("    {");
         /* TUM changes; proposed by Henning Niss 20050628: added typeArgument */
         out.println("      action_obj = new " + pre("actions") + typeArgument()
-                    + "(this);");
+                + "(this);");
         out.println("    }");
         out.println();
 
@@ -1042,7 +1046,7 @@ public class emit {
         out.println("  {");
         out.println("    /* call code in generated class */");
         out.println("    return action_obj." + pre("do_action(")
-                    + "act_num, parser, stack, top);");
+                + "act_num, parser, stack, top);");
         out.println("  }");
         out.println("");
 
@@ -1062,7 +1066,7 @@ public class emit {
         out.println("  /** {@code EOF} Symbol index. */");
         out.println("  @Override");
         out.println("  public int EOF_sym() {return " + terminal.EOF.index()
-                    + ";}");
+                + ";}");
         out.println();
         out.println("  /** {@code error} Symbol index. */");
         out.println("  @Override");

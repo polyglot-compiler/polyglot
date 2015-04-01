@@ -840,15 +840,18 @@ public class lalr_state {
         terminal cs = terminal.find(conflict_sym);
         /* end CupEx extension */
 
+        int relevancecounter = 0;
         /* find and report on all items that shift under our conflict symbol */
         for (lalr_item itm : items()) {
 
             /* only look if its not the same item and not a reduce */
             if (itm != red_itm && !itm.dot_at_end()) {
+
                 /* is it a shift on our conflicting terminal */
                 shift_sym = itm.symbol_after_dot();
                 if (!shift_sym.is_non_term()
                         && shift_sym.index() == conflict_sym) {
+                    relevancecounter++;
                     /* yes, report on it */
                     message.append("\n  between reduction on ");
                     message.append(red_itm.to_simple_string());
@@ -907,6 +910,7 @@ public class lalr_state {
             }
         }
         message.append("\n  Resolved in favor of shifting.\n");
+        if (relevancecounter == 0) return;
 
         ErrorManager.getManager().emit_warning(message.toString());
     }
