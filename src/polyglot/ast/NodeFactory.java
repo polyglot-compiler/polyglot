@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -226,6 +226,10 @@ public interface NodeFactory {
     ClassDecl ClassDecl(Position pos, Flags flags, Id name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body);
 
+    ClassDecl ClassDecl(Position pos, Flags flags, Id name,
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body,
+            Javadoc javadoc);
+
     /** @deprecated */
     @Deprecated
     ClassDecl ClassDecl(Position pos, Flags flags, String name,
@@ -253,6 +257,10 @@ public interface NodeFactory {
     ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body);
 
+    ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+            Javadoc javadoc);
+
     /** @deprecated */
     @Deprecated
     ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name,
@@ -262,6 +270,9 @@ public interface NodeFactory {
 
     FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name,
             Expr init);
+
+    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name,
+            Expr init, Javadoc javadoc);
 
     /** @deprecated */
     @Deprecated
@@ -344,6 +355,10 @@ public interface NodeFactory {
     MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
             Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body);
 
+    MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes,
+            Block body, Javadoc javadoc);
+
     /** @deprecated */
     @Deprecated
     MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
@@ -416,6 +431,6 @@ public interface NodeFactory {
     Unary Unary(Position pos, Expr expr, Unary.Operator op);
 
     While While(Position pos, Expr cond, Stmt body);
-    
+
     Javadoc Javadoc(Position pos, String text);
 }

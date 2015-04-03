@@ -52,7 +52,7 @@ import java.util.Set;
 %line
 %column
 
-%state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT
+%state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT, JAVADOC_COMMENT
 
 %{
     StringBuffer sb = new StringBuffer();
@@ -333,11 +333,13 @@ OctalEscape = \\ [0-7]
 <YYINITIAL> {
     /* 3.7 Comments */
     "/*"    { yybegin(TRADITIONAL_COMMENT);
-              sb.setLength(0);
-              sb.append(yytext());
               commentBegin = pos(); }
     "//"    { yybegin(END_OF_LINE_COMMENT); }
-
+    "/**"	{ yybegin(JAVADOC_COMMENT);
+    		  sb.setLength(0);
+    		  sb.append(yytext());
+			  commentBegin = pos(); }
+			  
     /* 3.10.4 Character Literals */
     \'      { yybegin(CHARACTER); sb.setLength(0); }
 
@@ -427,20 +429,29 @@ OctalEscape = \\ [0-7]
 }
 
 <TRADITIONAL_COMMENT> {
+    "*/"                         { yybegin(YYINITIAL); }
+    <<EOF>>                      { yybegin(YYINITIAL);
+                                   eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+                                                  "Unclosed comment",
+                                                  commentBegin); }
+    [^]                          { /* ignore */ }
+}
+
+<END_OF_LINE_COMMENT> {
+    {LineTerminator}             { yybegin(YYINITIAL); }
+    .                            { /* ignore */ }
+}
+
+<JAVADOC_COMMENT> {
     "*/"                         { yybegin(YYINITIAL);
     							   sb.append(yytext()); 
     							   return javadoc_token(); }
 
     <<EOF>>                      { yybegin(YYINITIAL);
                                    eq.enqueue(ErrorInfo.LEXICAL_ERROR,
-                                                  "Unclosed comment",
+                                                  "Unclosed javadoc",
                                                   commentBegin); }
     [^]                          { sb.append(yytext()); }
-}
-
-<END_OF_LINE_COMMENT> {
-    {LineTerminator}             { yybegin(YYINITIAL); }
-    .							 { /* ignore */ }
 }
 
 <CHARACTER> {

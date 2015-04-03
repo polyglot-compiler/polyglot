@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -72,7 +72,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
             Id name, List<Formal> formals, List<TypeNode> throwTypes,
             Block body, Ext ext) {
         super(pos, flags, name, formals, throwTypes, body, ext);
-        assert (returnType != null);
+        assert returnType != null;
         this.returnType = returnType;
     }
 
@@ -88,7 +88,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
     @Override
     public TypeNode returnType() {
-        return this.returnType;
+        return returnType;
     }
 
     @Override
@@ -163,7 +163,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
             throwTypes.add(ts.unknownType(position()));
         }
 
-        Flags f = this.flags;
+        Flags f = flags;
 
         if (ct.flags().isInterface()) {
             f = f.Public().Abstract();
@@ -256,10 +256,10 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
             Type t = tn.type();
             if (!t.isThrowable()) {
                 throw new SemanticException("Type \""
-                                                    + t
-                                                    + "\" is not a subclass of \""
-                                                    + ts.Throwable() + "\".",
-                                            tn.position());
+                        + t
+                        + "\" is not a subclass of \""
+                        + ts.Throwable() + "\".",
+                        tn.position());
             }
         }
     }
@@ -360,13 +360,17 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.MethodDecl(this.position,
-                             this.flags,
-                             this.returnType,
-                             this.name,
-                             this.formals,
-                             this.throwTypes,
-                             this.body);
+        return nf.MethodDecl(position,
+                             flags,
+                             returnType,
+                             name,
+                             formals,
+                             throwTypes,
+                             body);
     }
 
+    @Override
+    public Javadoc javadoc() {
+        return javadoc;
+    }
 }

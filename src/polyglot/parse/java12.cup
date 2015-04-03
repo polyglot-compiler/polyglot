@@ -83,39 +83,17 @@ parser Grm extends BaseParser {:
     return l;
   }
   
-  public Documentable attachJavadoc(Documentable documentable, Pair<Integer, Integer> currPos, Pair<Integer, Integer> endPos) {
-  	Integer index = positionToTokenIndexMap.get(currPos);
-            		
-	if(index < 0 || index >= tokenStream.size())
-		return documentable;
-	
-	Token token = tokenStream.get(index);
-	if(token == null)
-		return documentable;
-	
-	int endLine = endPos.part1(), endCol = endPos.part2(); 
-	
-	while(true) {
-		Position currTokenPos = token.getPosition();
-		
-		if(currTokenPos.line() < endLine)
-			break;
-			
-		if(currTokenPos.line() == endLine && currTokenPos.column() <= endCol)
-			break;
-			
-		if(token instanceof JavadocToken)
-			return documentable.javadoc(nf.Javadoc(token.getPosition(), ((JavadocToken)token).getText()));
-		
-		if(index == 0)
-			break;
-			
-		index--;
-		token = tokenStream.get(index);	
-	}
+  public Javadoc javadocForNodeAt(Position pos) {
+    Integer index = positionToTokenIndexMap.get(new Pair<>(pos.line(), pos.column()));
 
-	return documentable;
-  }
+    if (index != null && index > 0 && index < tokenStream.size()) {
+        Token token = tokenStream.get(index - 1);
+        if (token instanceof JavadocToken)
+        	return nf.Javadoc(token.getPosition(), ((JavadocToken) token).getText());
+    }
+
+    return null;
+   }
 :};
 
 scan with {: return nextSymbol(); :};
@@ -457,33 +435,9 @@ compilation_unit ::=
         package_declaration_opt:a
         import_declarations_opt:b
         type_declarations_opt:c
-            {:  
-            	List<TopLevelDecl> c1 = new LinkedList<>();
-            	
-            	if(c != null && c.size() > 0) 
-            	{
-	            	Pair<Integer, Integer> endPos = new Pair<>(0, 0);
-	            	
-	            	if(b != null && b.size() > 0) {
-	            		Position position = b.get(b.size()-1).position();
-	            		endPos = new Pair<>(position.endLine(), position.endColumn());
-	            	}
-	            	else if(a != null) {
-	            		endPos = new Pair<>(a.position().endLine(), a.position().endColumn());
-	            	}
-	            		
-	            	for(TopLevelDecl topLevelDecl : c) {
-	            		Pair<Integer, Integer> currPos = new Pair<>(topLevelDecl.position().line(), topLevelDecl.position().column());
-	            		TopLevelDecl topLevelDeclWithJavadoc = (TopLevelDecl) parser.attachJavadoc(topLevelDecl, currPos, endPos);
-	            		c1.add(topLevelDeclWithJavadoc);
-	            		
-						endPos = new Pair<>(topLevelDecl.position().endLine(), topLevelDecl.position().endColumn());
-	            	}
-            	}
-            
-            	RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
-					     a, b, c1); 
-			:}
+            {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
+					     a, b, c);
+		:}
     |   error
         type_declarations_opt:c
             {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
@@ -582,28 +536,28 @@ modifiers ::=
     ;
 modifier ::=
                     // Flags
-        PUBLIC
-            {: RESULT = Flags.PUBLIC; :}
-    |   PROTECTED
-            {: RESULT = Flags.PROTECTED; :}
-    |   PRIVATE
-            {: RESULT = Flags.PRIVATE; :}
-    |   STATIC
-            {: RESULT = Flags.STATIC; :}
-    |   ABSTRACT
-            {: RESULT = Flags.ABSTRACT; :}
-    |   FINAL
-            {: RESULT = Flags.FINAL; :}
-    |   NATIVE
-            {: RESULT = Flags.NATIVE; :}
-    |   SYNCHRONIZED
-            {: RESULT = Flags.SYNCHRONIZED; :}
-    |   TRANSIENT
-            {: RESULT = Flags.TRANSIENT; :}
-    |   VOLATILE
-            {: RESULT = Flags.VOLATILE; :}
-    |   STRICTFP
-            {: RESULT = Flags.STRICTFP; :}
+        PUBLIC:a
+            {: RESULT = Flags.PUBLIC.position(a.getPosition()); :}
+    |   PROTECTED:a
+            {: RESULT = Flags.PROTECTED.position(a.getPosition());  :}
+    |   PRIVATE:a
+            {: RESULT = Flags.PRIVATE.position(a.getPosition()); :}
+    |   STATIC:a
+            {: RESULT = Flags.STATIC.position(a.getPosition()); :}
+    |   ABSTRACT:a
+            {: RESULT = Flags.ABSTRACT.position(a.getPosition()); :}
+    |   FINAL:a
+            {: RESULT = Flags.FINAL.position(a.getPosition()); :}
+    |   NATIVE:a
+            {: RESULT = Flags.NATIVE.position(a.getPosition()); :}
+    |   SYNCHRONIZED:a
+            {: RESULT = Flags.SYNCHRONIZED.position(a.getPosition()); :}
+    |   TRANSIENT:a
+            {: RESULT = Flags.TRANSIENT.position(a.getPosition()); :}
+    |   VOLATILE:a
+            {: RESULT = Flags.VOLATILE.position(a.getPosition()); :}
+    |   STRICTFP:a
+            {: RESULT = Flags.STRICTFP.position(a.getPosition()); :}
     ;
 // 19.8) Classes
 
@@ -612,8 +566,10 @@ class_declaration ::=
                     // ClassDecl
         modifiers_opt:a CLASS:n IDENTIFIER:b
                 super_opt:c interfaces_opt:d class_body:e
-            {: RESULT = parser.nf.ClassDecl(parser.pos(n, e),
-                a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e); :}
+            {: Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : n.getPosition();
+			   Javadoc javadoc = parser.javadocForNodeAt(pos);
+               RESULT = parser.nf.ClassDecl(parser.pos(n, e),
+                a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, javadoc); :}
     ;
 super ::=
                     // TypeNode
@@ -649,24 +605,7 @@ interface_type_list ::=
 class_body ::=
                     // ClassBody
         LBRACE:n class_body_declarations_opt:a RBRACE:b
-            {: 
-            	List<ClassMember> a1 = new LinkedList<>();
-            	if(a != null && a.size() > 0) {
-	    	   		Pair<Integer, Integer> endPos = new Pair<>(n.getPosition().endLine(), n.getPosition().endColumn());
-	    	   		
-	    	   		for(ClassMember classMember : a) {
-						if(classMember instanceof Documentable) {
-	    					Pair<Integer, Integer> currPos = new Pair<>(classMember.position().line(), classMember.position().column());
-	    					ClassMember classMemberWithJavadoc = (ClassMember) parser.attachJavadoc((Documentable) classMember, currPos, endPos);
-	    					a1.add(classMemberWithJavadoc);
-	    				}
-	    				
-	    				endPos = new Pair<>(classMember.position().endLine(), classMember.position().endColumn());
-	    			}
-	    		}
-            
-            	RESULT = parser.nf.ClassBody(parser.pos(n, b), a1); 
-            :}
+            {: RESULT = parser.nf.ClassBody(parser.pos(n, b), a); :}
     ;
 class_body_declarations_opt ::=
                     // List of ClassMember
@@ -720,8 +659,10 @@ class_member_declaration ::=
     |   modifiers_opt:a CLASS:n IDENTIFIER:b
                     super_opt:c interfaces_opt:d class_body:e
             {: List<ClassMember> l = new LinkedList<>();
+               Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : n.getPosition();
+			   Javadoc javadoc = parser.javadocForNodeAt(pos);
                l.add(parser.nf.ClassDecl(parser.pos(n, e),
-                        a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e));
+                        a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, javadoc));
                RESULT = l; :}
     |   interface_declaration:a
             {: List<ClassMember> l = new LinkedList<>();
@@ -735,9 +676,11 @@ field_declaration ::=
         modifiers_opt:a type:b variable_declarators:c SEMICOLON:e
             {: List<ClassMember> l = new LinkedList<>();
                for (VarDeclarator d : c) {
+               	   Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : b.position();
+				   Javadoc javadoc = parser.javadocForNodeAt(pos);
                    l.add(parser.nf.FieldDecl(parser.pos(b, e),
                                              a, parser.array(b, d.dims),
-                                             d.name, d.init));
+                                             d.name, d.init, javadoc));
                }
                RESULT = l; :}
     ;
@@ -786,14 +729,18 @@ method_header ::=
                     // MethodDecl
         modifiers_opt:a type:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:d RPAREN:g dims_opt:e throws_opt:f
-            {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
+            {: Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : b.position();
+			   Javadoc javadoc = parser.javadocForNodeAt(pos);
+               RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
                 parser.array(b, e.intValue()), parser.nf.Id(parser.pos(c), c.getIdentifier()),
-                d, f, null); :}
+                d, f, null, javadoc); :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:d RPAREN:g throws_opt:f
-            {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
+            {: Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : b.getPosition();
+			   Javadoc javadoc = parser.javadocForNodeAt(pos);
+               RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
                 parser.nf.CanonicalTypeNode(parser.pos(b),
-                parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, f, null); :}
+                parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, f, null, javadoc); :}
     ;
 formal_parameter_list_opt ::=
                     // List of Formal
@@ -861,8 +808,10 @@ constructor_declaration ::=
                     // ConstructorDecl
         modifiers_opt:m simple_name:a LPAREN formal_parameter_list_opt:b RPAREN
             throws_opt:c constructor_body:d
-            {: RESULT = parser.nf.ConstructorDecl(parser.pos(a, d), m, parser.nf.Id(parser.pos(a), a.toString()), b,
-                c, d); :}
+            {: Position pos = (m != null && !m.flags().isEmpty()) ? m.position() : a.pos;
+			   Javadoc javadoc = parser.javadocForNodeAt(pos);
+               RESULT = parser.nf.ConstructorDecl(parser.pos(a, d), m, parser.nf.Id(parser.pos(a), a.toString()), b,
+                c, d, javadoc); :}
     ;
 constructor_body ::=
                     // Block
@@ -901,9 +850,11 @@ interface_declaration ::=
                     // ClassDecl
         modifiers_opt:a INTERFACE:n IDENTIFIER:b
                 extends_interfaces_opt:c interface_body:d
-            {: RESULT = parser.nf.ClassDecl(
+            {: Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : n.getPosition();
+			   Javadoc javadoc = parser.javadocForNodeAt(pos);
+               RESULT = parser.nf.ClassDecl(
                     parser.pos(n, d), a.Interface(),
-                        parser.nf.Id(parser.pos(b), b.getIdentifier()), null, c, d); :}
+                        parser.nf.Id(parser.pos(b), b.getIdentifier()), null, c, d, javadoc); :}
     ;
 extends_interfaces_opt ::=
                     // List of TypeNode
@@ -924,23 +875,7 @@ extends_interfaces ::=
 interface_body ::=
                     // ClassBody
         LBRACE:n interface_member_declarations_opt:a RBRACE:d
-            {: 
-            	List<ClassMember> a1 = new LinkedList<>();
-            	if(a != null && a.size() > 0) {
-	    	   		Pair<Integer, Integer> endPos = new Pair<>(n.getPosition().endLine(), n.getPosition().endColumn());
-	    	   		
-	    	   		for(ClassMember classMember : a) {
-						if(classMember instanceof Documentable) {
-	    					Pair<Integer, Integer> currPos = new Pair<>(classMember.position().line(), classMember.position().column());
-	    					ClassMember classMemberWithJavadoc = (ClassMember) parser.attachJavadoc((Documentable) classMember, currPos, endPos);
-	    					a1.add(classMemberWithJavadoc);
-	    				}
-	    					
-	    				endPos = new Pair<>(classMember.position().endLine(), classMember.position().endColumn());
-	    			}
-	    		}
-            	RESULT = parser.nf.ClassBody(parser.pos(n, d), a1); 
-            :}
+            {: RESULT = parser.nf.ClassBody(parser.pos(n, d), a); :}
     ;
 interface_member_declarations_opt ::=
                     // List of ClassMember

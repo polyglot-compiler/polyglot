@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -61,17 +61,17 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     public final NodeFactory nf;
     protected Position prev_pos;
     protected Position position;
-    
+
     /**
      * Keeps track of every token seen by the Parser
      */
     public final List<Token> tokenStream;
-    
+
     /**
      * Mapping from Pos(Line#, Col#) -> Index into tokenStream
      */
     public final Map<Pair<Integer, Integer>, Integer> positionToTokenIndexMap;
-    
+
     public BaseParser(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
         lexer = l;
         eq = q;
@@ -79,11 +79,11 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
         nf = n;
         prev_pos = Position.compilerGenerated();
         position = Position.compilerGenerated();
-        
+
         tokenStream = new ArrayList<>();
         positionToTokenIndexMap = new HashMap<>();
     }
-    
+
     /**
      * The standard scanning routine for use in the CUP "scan with"
      * declaration. Should read:
@@ -91,20 +91,26 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
      */
     public Symbol nextSymbol() throws java.io.IOException {
         Token t = lexer.nextToken();
-        
-        while(t instanceof JavadocToken) {
-   	        tokenStream.add(t);
-   	        positionToTokenIndexMap.put(new Pair<>(t.getPosition().line(), t.getPosition().column()), tokenStream.size() - 1);
-        	t = lexer.nextToken();
+
+        while (t instanceof JavadocToken) {
+            updateInternal(t);
+            t = lexer.nextToken();
         }
-        
+
+        updateInternal(t);
+
+        return getSymbolFactory().newSymbol(t.toString(), t.symbol(), t);
+    }
+
+    private void updateInternal(Token t) {
         tokenStream.add(t);
-        positionToTokenIndexMap.put(new Pair<>(t.getPosition().line(), t.getPosition().column()), tokenStream.size() - 1);
-        
+        positionToTokenIndexMap.put(new Pair<>(t.getPosition().line(),
+                                               t.getPosition().column()),
+                                    tokenStream.size() - 1);
+
         // use two positions, since the parser does one token lookahead
         position = prev_pos;
         prev_pos = t.getPosition();
-        return getSymbolFactory().newSymbol(t.toString(), t.symbol(), t);
     }
 
     public Position position() {

@@ -860,4 +860,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     public Node copy(NodeFactory nf) {
         return nf.ClassDecl(position, flags, name, superClass, interfaces, body);
     }
+
+    @Override
+    public Javadoc javadoc() {
+        return javadoc;
+    }
 }

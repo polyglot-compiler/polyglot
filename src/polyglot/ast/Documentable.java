@@ -33,4 +33,10 @@ public interface Documentable {
      * @param javadoc
      */
     Documentable javadoc(Javadoc javadoc);
+
+    /**
+     * Get javadoc from a documentable node
+     * @return Documentable
+     */
+    Javadoc javadoc();
 }
