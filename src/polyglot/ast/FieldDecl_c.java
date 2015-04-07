@@ -72,20 +72,39 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     protected InitializerInstance ii;
     protected Javadoc javadoc;
 
-//    @Deprecated
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
+    @Deprecated
     public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init) {
-        this(pos, flags, type, name, init, null);
+        this(pos, flags, type, name, init, null, null);
+    }
+
+//  @Deprecated
+    public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
+            Expr init, Javadoc javadoc) {
+        this(pos, flags, type, name, init, javadoc, null);
+    }
+
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
+    @Deprecated
+    public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
+            Expr init, Ext ext) {
+        this(pos, flags, type, name, init, null, null);
     }
 
     public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
-            Expr init, Ext ext) {
+            Expr init, Javadoc javadoc, Ext ext) {
         super(pos, ext);
         assert flags != null && type != null && name != null; // init may be null
         this.flags = flags;
         this.type = type;
         this.name = name;
         this.init = init;
+        this.javadoc = javadoc;
     }
 
     @Override

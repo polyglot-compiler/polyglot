@@ -62,16 +62,60 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     protected TypeNode returnType;
     protected MethodInstance mi;
 
-//    @Deprecated
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
+    @Deprecated
     public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        this(pos, flags, returnType, name, formals, throwTypes, body, null);
+        this(pos,
+             flags,
+             returnType,
+             name,
+             formals,
+             throwTypes,
+             body,
+             null,
+             null);
+    }
+
+//    @Deprecated
+    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes,
+            Block body, Javadoc javadoc) {
+        this(pos,
+             flags,
+             returnType,
+             name,
+             formals,
+             throwTypes,
+             body,
+             javadoc,
+             null);
+    }
+
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
+    @Deprecated
+    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes,
+            Block body, Ext ext) {
+        this(pos,
+             flags,
+             returnType,
+             name,
+             formals,
+             throwTypes,
+             body,
+             null,
+             null);
     }
 
     public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
             Id name, List<Formal> formals, List<TypeNode> throwTypes,
-            Block body, Ext ext) {
-        super(pos, flags, name, formals, throwTypes, body, ext);
+            Block body, Javadoc javadoc, Ext ext) {
+        super(pos, flags, name, formals, throwTypes, body, javadoc, ext);
         assert returnType != null;
         this.returnType = returnType;
     }

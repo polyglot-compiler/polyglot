@@ -73,7 +73,7 @@ public class Position implements Serializable {
         StackTraceElement[] stack = new Exception().getStackTrace();
         if (depth < stack.length) {
             return new Position(stack[depth].getFileName()
-                                + " (compiler generated)",
+                                        + " (compiler generated)",
                                 stack[depth].getLineNumber(),
                                 true);
         }
@@ -316,6 +316,8 @@ public class Position implements Serializable {
 
     private static boolean isComparable(Position pos1, Position pos2) {
         if (pos1 == null || pos2 == null) return false;
+
+        if (pos1.compilerGenerated || pos2.compilerGenerated) return false;
 
         if (pos1.file == null || pos2.file == null
                 || !pos1.file.equals(pos2.file)) return false;

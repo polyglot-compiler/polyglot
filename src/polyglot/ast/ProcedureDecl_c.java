@@ -60,14 +60,34 @@ ProcedureDeclOps {
     protected Block body;
     protected Javadoc javadoc;
 
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
     @Deprecated
     public ProcedureDecl_c(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        this(pos, flags, name, formals, throwTypes, body, null);
+        this(pos, flags, name, formals, throwTypes, body, null, null);
+    }
+
+//    @Deprecated
+    public ProcedureDecl_c(Position pos, Flags flags, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+            Javadoc javadoc) {
+        this(pos, flags, name, formals, throwTypes, body, javadoc, null);
+    }
+
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
+    @Deprecated
+    public ProcedureDecl_c(Position pos, Flags flags, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body, Ext ext) {
+        this(pos, flags, name, formals, throwTypes, body, null, null);
     }
 
     public ProcedureDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body, Ext ext) {
+            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+            Javadoc javadoc, Ext ext) {
         super(pos, ext);
         assert flags != null && name != null && formals != null
                 && throwTypes != null; // body may be null
@@ -76,6 +96,7 @@ ProcedureDeclOps {
         this.formals = ListUtil.copy(formals, true);
         this.throwTypes = ListUtil.copy(throwTypes, true);
         this.body = body;
+        this.javadoc = javadoc;
     }
 
     @Override

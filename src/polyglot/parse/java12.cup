@@ -83,17 +83,23 @@ parser Grm extends BaseParser {:
     return l;
   }
   
-  public Javadoc javadocForNodeAt(Position pos) {
+  public Javadoc javadoc(Flags f, Object o) 
+  {
+    Position pos = pos(f);
+
+    if (pos == null) pos = posForObject(o);
+
+    if (pos == null) return null;
+
     Integer index = positionToTokenIndexMap.get(new Pair<>(pos.line(), pos.column()));
 
     if (index != null && index > 0 && index < tokenStream.size()) {
         Token token = tokenStream.get(index - 1);
         if (token instanceof JavadocToken)
-        	return nf.Javadoc(token.getPosition(), ((JavadocToken) token).getText());
+            return nf.Javadoc(token.getPosition(), ((JavadocToken) token).getText());
     }
-
     return null;
-   }
+  } 
 :};
 
 scan with {: return nextSymbol(); :};
@@ -146,7 +152,6 @@ terminal Token QUESTION; // conditional_expression
 terminal Token MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
 terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
 terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
-terminal Token JAVADOC;
 
 terminal polyglot.lex.IntegerLiteral INTEGER_LITERAL;
 terminal polyglot.lex.IntegerLiteral INTEGER_LITERAL_BD;
@@ -158,6 +163,7 @@ terminal polyglot.lex.BooleanLiteral BOOLEAN_LITERAL;
 terminal polyglot.lex.CharacterLiteral CHARACTER_LITERAL;
 terminal polyglot.lex.StringLiteral STRING_LITERAL;
 terminal polyglot.lex.NullLiteral NULL_LITERAL;
+terminal Token JAVADOC; // Javadoc comment
 
 // strictfp keyword, new in Java 1.2
 terminal Token STRICTFP;
@@ -566,10 +572,8 @@ class_declaration ::=
                     // ClassDecl
         modifiers_opt:a CLASS:n IDENTIFIER:b
                 super_opt:c interfaces_opt:d class_body:e
-            {: Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : n.getPosition();
-			   Javadoc javadoc = parser.javadocForNodeAt(pos);
-               RESULT = parser.nf.ClassDecl(parser.pos(n, e),
-                a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, javadoc); :}
+            {: RESULT = parser.nf.ClassDecl(parser.pos(n, e),
+                a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(a, n)); :}
     ;
 super ::=
                     // TypeNode
@@ -659,10 +663,8 @@ class_member_declaration ::=
     |   modifiers_opt:a CLASS:n IDENTIFIER:b
                     super_opt:c interfaces_opt:d class_body:e
             {: List<ClassMember> l = new LinkedList<>();
-               Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : n.getPosition();
-			   Javadoc javadoc = parser.javadocForNodeAt(pos);
                l.add(parser.nf.ClassDecl(parser.pos(n, e),
-                        a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, javadoc));
+                        a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(a, n)));
                RESULT = l; :}
     |   interface_declaration:a
             {: List<ClassMember> l = new LinkedList<>();
@@ -676,11 +678,9 @@ field_declaration ::=
         modifiers_opt:a type:b variable_declarators:c SEMICOLON:e
             {: List<ClassMember> l = new LinkedList<>();
                for (VarDeclarator d : c) {
-               	   Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : b.position();
-				   Javadoc javadoc = parser.javadocForNodeAt(pos);
                    l.add(parser.nf.FieldDecl(parser.pos(b, e),
                                              a, parser.array(b, d.dims),
-                                             d.name, d.init, javadoc));
+                                             d.name, d.init, parser.javadoc(a, b)));
                }
                RESULT = l; :}
     ;
@@ -729,18 +729,14 @@ method_header ::=
                     // MethodDecl
         modifiers_opt:a type:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:d RPAREN:g dims_opt:e throws_opt:f
-            {: Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : b.position();
-			   Javadoc javadoc = parser.javadocForNodeAt(pos);
-               RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
+            {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
                 parser.array(b, e.intValue()), parser.nf.Id(parser.pos(c), c.getIdentifier()),
-                d, f, null, javadoc); :}
+                d, f, null, parser.javadoc(a, b)); :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:d RPAREN:g throws_opt:f
-            {: Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : b.getPosition();
-			   Javadoc javadoc = parser.javadocForNodeAt(pos);
-               RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
+            {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
                 parser.nf.CanonicalTypeNode(parser.pos(b),
-                parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, f, null, javadoc); :}
+                parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, f, null, parser.javadoc(a, b)); :}
     ;
 formal_parameter_list_opt ::=
                     // List of Formal
@@ -808,10 +804,8 @@ constructor_declaration ::=
                     // ConstructorDecl
         modifiers_opt:m simple_name:a LPAREN formal_parameter_list_opt:b RPAREN
             throws_opt:c constructor_body:d
-            {: Position pos = (m != null && !m.flags().isEmpty()) ? m.position() : a.pos;
-			   Javadoc javadoc = parser.javadocForNodeAt(pos);
-               RESULT = parser.nf.ConstructorDecl(parser.pos(a, d), m, parser.nf.Id(parser.pos(a), a.toString()), b,
-                c, d, javadoc); :}
+            {: RESULT = parser.nf.ConstructorDecl(parser.pos(a, d), m, parser.nf.Id(parser.pos(a), a.toString()), b,
+                c, d, parser.javadoc(m, a)); :}
     ;
 constructor_body ::=
                     // Block
@@ -850,11 +844,9 @@ interface_declaration ::=
                     // ClassDecl
         modifiers_opt:a INTERFACE:n IDENTIFIER:b
                 extends_interfaces_opt:c interface_body:d
-            {: Position pos = (a != null && !a.flags().isEmpty()) ? a.position() : n.getPosition();
-			   Javadoc javadoc = parser.javadocForNodeAt(pos);
-               RESULT = parser.nf.ClassDecl(
+            {: RESULT = parser.nf.ClassDecl(
                     parser.pos(n, d), a.Interface(),
-                        parser.nf.Id(parser.pos(b), b.getIdentifier()), null, c, d, javadoc); :}
+                        parser.nf.Id(parser.pos(b), b.getIdentifier()), null, c, d, parser.javadoc(a, n)); :}
     ;
 extends_interfaces_opt ::=
                     // List of TypeNode

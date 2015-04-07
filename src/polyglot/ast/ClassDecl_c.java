@@ -85,14 +85,32 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     protected Javadoc javadoc;
 
-//    @Deprecated
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
+    @Deprecated
     public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
             List<TypeNode> interfaces, ClassBody body) {
-        this(pos, flags, name, superClass, interfaces, body, null);
+        this(pos, flags, name, superClass, interfaces, body, null, null);
+    }
+
+//    @Deprecated
+    public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
+            List<TypeNode> interfaces, ClassBody body, Javadoc javadoc) {
+        this(pos, flags, name, superClass, interfaces, body, javadoc, null);
+    }
+
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
+    @Deprecated
+    public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
+            List<TypeNode> interfaces, ClassBody body, Ext ext) {
+        this(pos, flags, name, superClass, interfaces, body, null, null);
     }
 
     public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
-            List<TypeNode> interfaces, ClassBody body, Ext ext) {
+            List<TypeNode> interfaces, ClassBody body, Javadoc javadoc, Ext ext) {
         super(pos, ext);
         assert flags != null && name != null && interfaces != null
                 && body != null; // superClass may be null, interfaces may be empty
@@ -101,6 +119,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         this.superClass = superClass;
         this.interfaces = ListUtil.copy(interfaces, true);
         this.body = body;
+        this.javadoc = javadoc;
     }
 
     @Override
@@ -381,8 +400,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                 }
                 if (methodNeeded)
                     implicitlyDeclaredMethods.add(mi.container(type)
-                                                  .flags(flags.Abstract()
-                                                         .clearFinal()));
+                                                    .flags(flags.Abstract()
+                                                                .clearFinal()));
             }
             for (MethodInstance mi : implicitlyDeclaredMethods)
                 type.addMethod(mi);
@@ -572,11 +591,11 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
                     if (name.equals(this.name.id())) {
                         throw new SemanticException("Cannot declare member "
-                                + "class \""
-                                + type
-                                + "\" inside class with the "
-                                + "same name.",
-                                position());
+                                                            + "class \""
+                                                            + type
+                                                            + "\" inside class with the "
+                                                            + "same name.",
+                                                    position());
                     }
                 }
                 if (container.isNested()) {
@@ -602,12 +621,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                             if (another.isClass()
                                     && another.toClass().isLocal()) {
                                 throw new SemanticException("Cannot declare local "
-                                        + "class \""
-                                        + type
-                                        + "\" within the same "
-                                        + "method, constructor or initializer as another "
-                                        + "local class of the same name.",
-                                        position());
+                                                                    + "class \""
+                                                                    + type
+                                                                    + "\" within the same "
+                                                                    + "method, constructor or initializer as another "
+                                                                    + "local class of the same name.",
+                                                            position());
                             }
                         }
                     }
@@ -646,10 +665,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
             if (type.equals(tc.typeSystem().Object())
                     || type.fullName().equals(tc.typeSystem()
-                                                .Object()
-                                                .fullName())) {
+                                              .Object()
+                                              .fullName())) {
                 throw new SemanticException("Class \"" + type
-                                            + "\" cannot have a superclass.", superClass.position());
+                        + "\" cannot have a superclass.", superClass.position());
             }
         }
 
@@ -664,10 +683,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
             if (type.equals(tc.typeSystem().Object())
                     || type.fullName().equals(tc.typeSystem()
-                                                .Object()
-                                                .fullName())) {
+                                              .Object()
+                                              .fullName())) {
                 throw new SemanticException("Class " + type
-                                            + " cannot have a superinterface.", tn.position());
+                        + " cannot have a superinterface.", tn.position());
             }
 
             if (superInterfaces.contains(t)) {

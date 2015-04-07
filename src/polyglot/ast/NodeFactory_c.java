@@ -375,25 +375,23 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
-        ClassDecl n =
-                new ClassDecl_c(pos,
-                                flags,
-                                name,
-                                superClass,
-                                CollectionUtil.nonNullList(interfaces),
-                                body);
-        n = ext(n, extFactory().extClassDecl());
-        n = del(n, delFactory().delClassDecl());
-        return n;
+        return ClassDecl(pos, flags, name, superClass, interfaces, body, null);
     }
 
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body,
             Javadoc javadoc) {
-
-        ClassDecl n = ClassDecl(pos, flags, name, superClass, interfaces, body);
-        n = (ClassDecl) n.javadoc(javadoc);
+        ClassDecl n =
+                new ClassDecl_c(pos,
+                                flags,
+                                name,
+                                superClass,
+                                CollectionUtil.nonNullList(interfaces),
+                                body,
+                                javadoc);
+        n = ext(n, extFactory().extClassDecl());
+        n = del(n, delFactory().delClassDecl());
         return n;
     }
 
@@ -430,16 +428,13 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        ConstructorDecl n =
-                new ConstructorDecl_c(pos,
-                                      flags,
-                                      name,
-                                      CollectionUtil.nonNullList(formals),
-                                      CollectionUtil.nonNullList(throwTypes),
-                                      body);
-        n = ext(n, extFactory().extConstructorDecl());
-        n = del(n, delFactory().delConstructorDecl());
-        return n;
+        return ConstructorDecl(pos,
+                               flags,
+                               name,
+                               formals,
+                               throwTypes,
+                               body,
+                               null);
     }
 
     @Override
@@ -447,25 +442,30 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
             Javadoc javadoc) {
         ConstructorDecl n =
-                ConstructorDecl(pos, flags, name, formals, throwTypes, body);
-        n = (ConstructorDecl) n.javadoc(javadoc);
+                new ConstructorDecl_c(pos,
+                                      flags,
+                                      name,
+                                      CollectionUtil.nonNullList(formals),
+                                      CollectionUtil.nonNullList(throwTypes),
+                                      body,
+                                      javadoc);
+        n = ext(n, extFactory().extConstructorDecl());
+        n = del(n, delFactory().delConstructorDecl());
         return n;
     }
 
     @Override
     public FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type,
             Id name, Expr init) {
-        FieldDecl n = new FieldDecl_c(pos, flags, type, name, init);
-        n = ext(n, extFactory().extFieldDecl());
-        n = del(n, delFactory().delFieldDecl());
-        return n;
+        return FieldDecl(pos, flags, type, name, init, null);
     }
 
     @Override
     public FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type,
             Id name, Expr init, Javadoc javadoc) {
-        FieldDecl n = FieldDecl(pos, flags, type, name, init);
-        n = (FieldDecl) n.javadoc(javadoc);
+        FieldDecl n = new FieldDecl_c(pos, flags, type, name, init, javadoc);
+        n = ext(n, extFactory().extFieldDecl());
+        n = del(n, delFactory().delFieldDecl());
         return n;
     }
 
@@ -608,17 +608,14 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
     public MethodDecl MethodDecl(Position pos, Flags flags,
             TypeNode returnType, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body) {
-        MethodDecl n =
-                new MethodDecl_c(pos,
-                                 flags,
-                                 returnType,
-                                 name,
-                                 CollectionUtil.nonNullList(formals),
-                                 CollectionUtil.nonNullList(throwTypes),
-                                 body);
-        n = ext(n, extFactory().extMethodDecl());
-        n = del(n, delFactory().delMethodDecl());
-        return n;
+        return MethodDecl(pos,
+                          flags,
+                          returnType,
+                          name,
+                          formals,
+                          throwTypes,
+                          body,
+                          null);
     }
 
     @Override
@@ -626,14 +623,16 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
             TypeNode returnType, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body, Javadoc javadoc) {
         MethodDecl n =
-                MethodDecl(pos,
-                           flags,
-                           returnType,
-                           name,
-                           formals,
-                           throwTypes,
-                           body);
-        n = (MethodDecl) n.javadoc(javadoc);
+                new MethodDecl_c(pos,
+                                 flags,
+                                 returnType,
+                                 name,
+                                 CollectionUtil.nonNullList(formals),
+                                 CollectionUtil.nonNullList(throwTypes),
+                                 body,
+                                 javadoc);
+        n = ext(n, extFactory().extMethodDecl());
+        n = del(n, delFactory().delMethodDecl());
         return n;
     }
 

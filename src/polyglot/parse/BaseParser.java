@@ -48,6 +48,7 @@ import polyglot.ast.TypeNode;
 import polyglot.lex.JavadocToken;
 import polyglot.lex.Lexer;
 import polyglot.lex.Token;
+import polyglot.types.Flags;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
@@ -65,12 +66,12 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     /**
      * Keeps track of every token seen by the Parser
      */
-    public final List<Token> tokenStream;
+    protected final List<Token> tokenStream;
 
     /**
      * Mapping from Pos(Line#, Col#) -> Index into tokenStream
      */
-    public final Map<Pair<Integer, Integer>, Integer> positionToTokenIndexMap;
+    protected final Map<Pair<Integer, Integer>, Integer> positionToTokenIndexMap;
 
     public BaseParser(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
         lexer = l;
@@ -193,6 +194,14 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
         }
         return null;
 
+    }
+
+    /**
+     * Return the position of the given Flags object
+     */
+    public Position pos(Flags f) {
+        if (f == null || f.flags().isEmpty()) return null;
+        return f.position();
     }
 
     /**
