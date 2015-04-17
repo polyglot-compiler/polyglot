@@ -39,6 +39,7 @@ import polyglot.ast.AmbTypeNode;
 import polyglot.ast.CanonicalTypeNode;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
+import polyglot.ast.Javadoc;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Prefix;
@@ -106,8 +107,8 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     private void updateInternal(Token t) {
         tokenStream.add(t);
         positionToTokenIndexMap.put(new Pair<>(t.getPosition().line(),
-                                               t.getPosition().column()),
-                                    tokenStream.size() - 1);
+                t.getPosition().column()),
+                tokenStream.size() - 1);
 
         // use two positions, since the parser does one token lookahead
         position = prev_pos;
@@ -370,6 +371,30 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
         }
 
         die(pos(e));
+        return null;
+    }
+
+    /**
+     * Returns the Javadoc just preceding the given Flags object.
+     * In case there are no flags, then returns the Javadoc just preceding the position specified by nextPos.
+     */
+    public Javadoc javadoc(Flags f, Position nextPos) {
+        Position pos = pos(f);
+
+        if (pos == null) pos = nextPos;
+
+        if (pos == null) return null;
+
+        Integer index =
+                positionToTokenIndexMap.get(new Pair<>(pos.line(), pos.column()));
+
+        if (index != null && index > 0 && index < tokenStream.size()) {
+            Token token = tokenStream.get(index - 1);
+            if (token instanceof JavadocToken)
+                return nf.Javadoc(token.getPosition(),
+                                  ((JavadocToken) token).getText());
+        }
+
         return null;
     }
 }

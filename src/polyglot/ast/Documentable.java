@@ -26,17 +26,18 @@
 
 package polyglot.ast;
 
-public interface Documentable {
+/**
+ * A Documentable is an AST Node to which a Javadoc comment can be attached.
+ */
+public interface Documentable extends Node {
+
     /**
-     * Set javadoc for a documentable node
-     *
-     * @param javadoc
+     * Returns a copy of this Documentable Node with the Javadoc set.
      */
     Documentable javadoc(Javadoc javadoc);
 
     /**
-     * Get javadoc from a documentable node
-     * @return Documentable
+     * Get the Javadoc.
      */
     Javadoc javadoc();
 }

@@ -28,6 +28,7 @@ package polyglot.lex;
 
 import polyglot.util.Position;
 
+/** A token class for javadoc comments. */
 public class JavadocToken extends Token {
     protected String text;
 

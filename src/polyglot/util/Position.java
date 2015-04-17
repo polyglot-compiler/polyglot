@@ -314,6 +314,11 @@ public class Position implements Serializable {
         return s;
     }
 
+    /**
+     * Check if 2 positions are comparable.
+     * Any 2 positions are comparable if they belong in the same file and represent
+     * valid positions in the respective files.
+     */
     private static boolean isComparable(Position pos1, Position pos2) {
         if (pos1 == null || pos2 == null) return false;
 
@@ -337,6 +342,10 @@ public class Position implements Serializable {
         return true;
     }
 
+    /**
+     * Returns the first of the given 2 positions i.e. if pos1 starts before pos2, then first(pos1, pos2) = pos1.
+     * Returns null if the given 2 positions are not comparable.
+     */
     public static Position first(Position pos1, Position pos2) {
         if (!isComparable(pos1, pos2)) return null;
 
@@ -347,6 +356,10 @@ public class Position implements Serializable {
         return pos2;
     }
 
+    /**
+     * Returns the last of the given 2 positions i.e. if pos1 ends after pos2, then last(pos1, pos2) = pos1.
+     * Returns null if the given 2 positions are not comparable.
+     */
     public static Position last(Position pos1, Position pos2) {
         if (!isComparable(pos1, pos2)) return null;
 

@@ -372,6 +372,10 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         return n;
     }
 
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
@@ -425,6 +429,10 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         return n;
     }
 
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
     @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body) {
@@ -454,6 +462,10 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         return n;
     }
 
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
     @Override
     public FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type,
             Id name, Expr init) {
@@ -604,6 +616,10 @@ public class NodeFactory_c extends AbstractNodeFactory_c {
         return n;
     }
 
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
     @Override
     public MethodDecl MethodDecl(Position pos, Flags flags,
             TypeNode returnType, Id name, List<Formal> formals,

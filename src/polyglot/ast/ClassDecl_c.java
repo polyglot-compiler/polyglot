@@ -574,7 +574,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                                    nf.Id(body().position().startOf(), name.id()),
                                    Collections.<Formal> emptyList(),
                                    Collections.<TypeNode> emptyList(),
-                                   block);
+                                   block);                                   
         cd = cd.constructorInstance(ci);
         return body(body.addMember(cd));
     }
@@ -877,7 +877,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ClassDecl(position, flags, name, superClass, interfaces, body);
+        return nf.ClassDecl(position,
+                            flags,
+                            name,
+                            superClass,
+                            interfaces,
+                            body,
+                            javadoc);
     }
 
     @Override

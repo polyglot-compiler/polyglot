@@ -224,11 +224,12 @@ public interface NodeFactory {
     ClassBody ClassBody(Position pos, List<ClassMember> members);
 
     ClassDecl ClassDecl(Position pos, Flags flags, Id name,
-            TypeNode superClass, List<TypeNode> interfaces, ClassBody body);
-
-    ClassDecl ClassDecl(Position pos, Flags flags, Id name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body,
             Javadoc javadoc);
+
+    @Deprecated
+    ClassDecl ClassDecl(Position pos, Flags flags, Id name,
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body);
 
     /** @deprecated */
     @Deprecated
@@ -255,11 +256,13 @@ public interface NodeFactory {
             Expr outer, List<Expr> args);
 
     ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body);
-
-    ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
             Javadoc javadoc);
+
+    /** @deprecated */
+    @Deprecated
+    ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body);
 
     /** @deprecated */
     @Deprecated
@@ -353,11 +356,13 @@ public interface NodeFactory {
             Expr init);
 
     MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body);
-
-    MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
             Id name, List<Formal> formals, List<TypeNode> throwTypes,
             Block body, Javadoc javadoc);
+
+    /** @deprecated */
+    @Deprecated
+    MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body);
 
     /** @deprecated */
     @Deprecated

@@ -449,7 +449,7 @@ OctalEscape = \\ [0-7]
 
     <<EOF>>                      { yybegin(YYINITIAL);
                                    eq.enqueue(ErrorInfo.LEXICAL_ERROR,
-                                                  "Unclosed javadoc",
+                                                  "Unclosed Javadoc comment",
                                                   commentBegin); }
     [^]                          { sb.append(yytext()); }
 }

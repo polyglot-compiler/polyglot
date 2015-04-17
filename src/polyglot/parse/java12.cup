@@ -82,24 +82,6 @@ parser Grm extends BaseParser {:
     }
     return l;
   }
-  
-  public Javadoc javadoc(Flags f, Object o) 
-  {
-    Position pos = pos(f);
-
-    if (pos == null) pos = posForObject(o);
-
-    if (pos == null) return null;
-
-    Integer index = positionToTokenIndexMap.get(new Pair<>(pos.line(), pos.column()));
-
-    if (index != null && index > 0 && index < tokenStream.size()) {
-        Token token = tokenStream.get(index - 1);
-        if (token instanceof JavadocToken)
-            return nf.Javadoc(token.getPosition(), ((JavadocToken) token).getText());
-    }
-    return null;
-  } 
 :};
 
 scan with {: return nextSymbol(); :};
@@ -573,7 +555,7 @@ class_declaration ::=
         modifiers_opt:a CLASS:n IDENTIFIER:b
                 super_opt:c interfaces_opt:d class_body:e
             {: RESULT = parser.nf.ClassDecl(parser.pos(n, e),
-                a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(a, n)); :}
+                a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(a, parser.pos(n))); :}
     ;
 super ::=
                     // TypeNode
@@ -664,7 +646,7 @@ class_member_declaration ::=
                     super_opt:c interfaces_opt:d class_body:e
             {: List<ClassMember> l = new LinkedList<>();
                l.add(parser.nf.ClassDecl(parser.pos(n, e),
-                        a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(a, n)));
+                        a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(a, parser.pos(n))));
                RESULT = l; :}
     |   interface_declaration:a
             {: List<ClassMember> l = new LinkedList<>();
@@ -680,7 +662,7 @@ field_declaration ::=
                for (VarDeclarator d : c) {
                    l.add(parser.nf.FieldDecl(parser.pos(b, e),
                                              a, parser.array(b, d.dims),
-                                             d.name, d.init, parser.javadoc(a, b)));
+                                             d.name, d.init, parser.javadoc(a, parser.pos(b))));
                }
                RESULT = l; :}
     ;
@@ -731,12 +713,12 @@ method_header ::=
                 formal_parameter_list_opt:d RPAREN:g dims_opt:e throws_opt:f
             {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
                 parser.array(b, e.intValue()), parser.nf.Id(parser.pos(c), c.getIdentifier()),
-                d, f, null, parser.javadoc(a, b)); :}
+                d, f, null, parser.javadoc(a, parser.pos(b))); :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:d RPAREN:g throws_opt:f
             {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
                 parser.nf.CanonicalTypeNode(parser.pos(b),
-                parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, f, null, parser.javadoc(a, b)); :}
+                parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, f, null, parser.javadoc(a, parser.pos(b))); :}
     ;
 formal_parameter_list_opt ::=
                     // List of Formal
@@ -805,7 +787,7 @@ constructor_declaration ::=
         modifiers_opt:m simple_name:a LPAREN formal_parameter_list_opt:b RPAREN
             throws_opt:c constructor_body:d
             {: RESULT = parser.nf.ConstructorDecl(parser.pos(a, d), m, parser.nf.Id(parser.pos(a), a.toString()), b,
-                c, d, parser.javadoc(m, a)); :}
+                c, d, parser.javadoc(m, parser.pos(a))); :}
     ;
 constructor_body ::=
                     // Block
@@ -846,7 +828,7 @@ interface_declaration ::=
                 extends_interfaces_opt:c interface_body:d
             {: RESULT = parser.nf.ClassDecl(
                     parser.pos(n, d), a.Interface(),
-                        parser.nf.Id(parser.pos(b), b.getIdentifier()), null, c, d, parser.javadoc(a, n)); :}
+                        parser.nf.Id(parser.pos(b), b.getIdentifier()), null, c, d, parser.javadoc(a, parser.pos(n))); :}
     ;
 extends_interfaces_opt ::=
                     // List of TypeNode
