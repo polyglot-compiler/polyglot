@@ -1,0 +1,5 @@
+import java.util.*;
+
+class Foo {}
+abstract class A implements List<Object>, List<Foo> {}
+// Should report an error: List cannot be inherited with different arguments
