@@ -258,6 +258,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Generics52.jl5;
         Generics53.jl5;
         Generics54.jl5 (Semantic, "Cannot extend non-class");
+        Generics55.jl5 (Semantic, "inherited with different arguments"),
+                       (Semantic, "inherited with different arguments");
         genmethod1.jl5 (Semantic);
         HexFloatingPoint.jl5;
         ImplicitCast01.jl5;
@@ -675,6 +677,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Generics52.jl5;
         Generics53.jl5;
         Generics54.jl5 (Semantic, "Cannot extend non-class");
+        Generics55.jl5 (Semantic, "inherited with different arguments"),
+                       (Semantic, "inherited with different arguments");
         genmethod1.jl5 (Semantic);
         HexFloatingPoint.jl5;
         ImplicitCast01.jl5;

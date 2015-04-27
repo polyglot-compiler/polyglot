@@ -15,7 +15,7 @@ class Derivation {
     /**
      * A special derivation indicating the dot within the parser state.
      */
-    public static final Derivation dot = new Derivation(new symbol("(*)") {
+    public static final Derivation dot = new Derivation(new symbol("•") {
         @Override
         public boolean is_non_term() {
             throw new UnsupportedOperationException();

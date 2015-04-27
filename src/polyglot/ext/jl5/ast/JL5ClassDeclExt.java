@@ -26,8 +26,11 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
@@ -39,7 +42,9 @@ import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5SubstType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.ext.jl5.visit.JL5Translator;
@@ -256,6 +261,47 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
                     throw new SemanticException("Duplicate type variable declaration.",
                                                 tj.position());
                 }
+            }
+        }
+
+        Map<Type, List<ReferenceType>> superInterfaces = new HashMap<>();
+        for (TypeNode tn : n.interfaces()) {
+            Type t = tn.type();
+
+            // JLS 3rd Ed. | 8.1.5
+            // A class may not at the same time be a subtype of two interface
+            // types which are different invocations of the same generic
+            // interface, or an invocation of a generic interface and a raw type
+            // naming that same generic interface.
+            if (t instanceof JL5SubstType) {
+                JL5SubstType st = (JL5SubstType) t;
+                Type base = st.base();
+                List<ReferenceType> actuals = st.actuals();
+                if (superInterfaces.containsKey(base)) {
+                    List<ReferenceType> inherited = superInterfaces.get(base);
+                    if (!inherited.equals(actuals))
+                        throw new SemanticException(t
+                                                            + " cannot be inherited with different arguments: "
+                                                            + inherited
+                                                            + " and " + actuals,
+                                                    tn.position());
+                }
+                superInterfaces.put(base, actuals);
+            }
+            else if (t instanceof RawClass) {
+                RawClass rc = (RawClass) t;
+                JL5ParsedClassType base = rc.base();
+                List<ReferenceType> actuals = Collections.emptyList();
+                if (superInterfaces.containsKey(base)) {
+                    List<ReferenceType> inherited = superInterfaces.get(base);
+                    if (!inherited.equals(actuals))
+                        throw new SemanticException(t
+                                                            + " cannot be inherited with different arguments: "
+                                                            + inherited
+                                                            + " and " + actuals,
+                                                    tn.position());
+                }
+                superInterfaces.put(base, actuals);
             }
         }
 

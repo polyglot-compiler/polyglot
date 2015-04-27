@@ -61,12 +61,12 @@ terminal QQNodeToken COMMA_DECL;
 terminal QQNodeToken COMMA_MEMB;
 terminal QQListToken COMMA_LIST;
 
-non terminal Node qq_expr;
-non terminal Node qq_stmt;
-non terminal Node qq_type;
-non terminal Node qq_decl;
-non terminal Node qq_file;
-non terminal Node qq_member;
+non terminal Expr qq_expr;
+non terminal Stmt qq_stmt;
+non terminal TypeNode qq_type;
+non terminal ClassDecl qq_decl;
+non terminal SourceFile qq_file;
+non terminal ClassMember qq_member;
 
 /* The 1st name is the non terminal; the 2nd is the name of the parse method. */
 start with qq_expr qq_expr;
@@ -158,7 +158,7 @@ extend statement ::=
 		{: RESULT = a; :}
 	;
 
-// now ambiguous	
+// now ambiguous
 drop {
     constructor_body ::= LBRACE explicit_constructor_invocation block_statements RBRACE
                        | LBRACE explicit_constructor_invocation RBRACE

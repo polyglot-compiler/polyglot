@@ -190,14 +190,14 @@ public class lalr_state {
             System.out.print(itm.the_production().lhs().the_symbol().name());
             System.out.print(" ::= ");
             for (int i = 0; i < itm.the_production().rhs_length(); i++) {
-                if (i == itm.dot_pos()) System.out.print("(*) ");
+                if (i == itm.dot_pos()) System.out.print("• ");
                 part = itm.the_production().rhs(i);
                 if (part.is_action())
                     System.out.print("{action} ");
                 else System.out.print(((symbol_part) part).the_symbol().name()
                         + " ");
             }
-            if (itm.dot_at_end()) System.out.print("(*) ");
+            if (itm.dot_at_end()) System.out.print("• ");
             System.out.println("]");
         }
         System.out.println("}");
