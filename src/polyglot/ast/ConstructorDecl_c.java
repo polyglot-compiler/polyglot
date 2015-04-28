@@ -55,7 +55,7 @@ import polyglot.visit.TypeChecker;
  * constructor declaration as part of a class body.
  */
 public class ConstructorDecl_c extends ProcedureDecl_c implements
-ConstructorDecl {
+        ConstructorDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected ConstructorInstance ci;
@@ -190,8 +190,8 @@ ConstructorDecl {
 
         if (!ctName.equals(name.id())) {
             throw new SemanticException("Constructor name \"" + name
-                                        + "\" does not match name of containing class \"" + ctName
-                                        + "\".", position());
+                    + "\" does not match name of containing class \"" + ctName
+                    + "\".", position());
         }
 
         try {
@@ -214,10 +214,10 @@ ConstructorDecl {
             Type t = tn.type();
             if (!t.isThrowable()) {
                 throw new SemanticException("Type \""
-                        + t
-                        + "\" is not a subclass of \""
-                        + ts.Throwable() + "\".",
-                        tn.position());
+                                                    + t
+                                                    + "\" is not a subclass of \""
+                                                    + ts.Throwable() + "\".",
+                                            tn.position());
             }
         }
 
@@ -302,7 +302,8 @@ ConstructorDecl {
                                   name,
                                   formals,
                                   throwTypes,
-                                  body);
+                                  body,
+                                  javadoc);
     }
 
     @Override

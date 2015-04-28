@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -34,6 +34,7 @@ import java.util.List;
 import polyglot.ast.ClassBody;
 import polyglot.ast.Expr;
 import polyglot.ast.Id;
+import polyglot.ast.Javadoc;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
@@ -72,14 +73,25 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     protected ConstructorInstance constructorInstance;
     protected ParsedClassType type;
     protected long ordinal;
+    protected Javadoc javadoc;
 
     public EnumConstantDecl_c(Position pos, Flags flags, Id name,
-            List<Expr> args, ClassBody body) {
+            List<Expr> args, ClassBody body, Javadoc javadoc) {
         super(pos);
         this.name = name;
         this.args = args;
         this.body = body;
         this.flags = flags;
+        this.javadoc = javadoc;
+    }
+
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
+    @Deprecated
+    public EnumConstantDecl_c(Position pos, Flags flags, Id name,
+            List<Expr> args, ClassBody body) {
+        this(pos, flags, name, args, body, null);
     }
 
     @Override
@@ -301,7 +313,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         JL5ParsedClassType ct = (JL5ParsedClassType) c.currentClass();
 
         List<Type> argTypes = new LinkedList<>();
-        for (Expr e : this.args) {
+        for (Expr e : args) {
             argTypes.add(e.type());
         }
 
@@ -309,12 +321,12 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
                 ts.findConstructor(ct, argTypes, c.currentClass(), false);
         EnumConstantDecl_c n = constructorInstance(this, ci);
 
-        if (n.flags() != Flags.NONE) {
+        if (!n.flags().isEmpty()) {
             throw new SemanticException("Cannot have modifier(s): " + flags
-                    + " on enum constant declaration", this.position());
+                                        + " on enum constant declaration", this.position());
         }
 
-        if (this.body != null) {
+        if (body != null) {
             ts.checkClassConformance(type);
         }
 
@@ -386,4 +398,20 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         return this;
     }
 
+    @Override
+    public EnumConstantDecl javadoc(Javadoc javadoc) {
+        return javadoc(this, javadoc);
+    }
+
+    protected <N extends EnumConstantDecl_c> N javadoc(N n, Javadoc javadoc) {
+        if (n.javadoc == javadoc) return n;
+        n = copyIfNeeded(n);
+        n.javadoc = javadoc;
+        return n;
+    }
+
+    @Override
+    public Javadoc javadoc() {
+        return javadoc;
+    }
 }

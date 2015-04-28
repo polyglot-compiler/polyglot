@@ -69,14 +69,25 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     protected Term defaultVal;
     protected Id name;
     protected AnnotationTypeElemInstance ai;
+    protected Javadoc javadoc;
 
     public AnnotationElemDecl_c(Position pos, Flags flags, TypeNode type,
-            Id name, Term defaultVal) {
+            Id name, Term defaultVal, Javadoc javadoc) {
         super(pos);
         this.type = type;
         this.flags = flags;
         this.defaultVal = defaultVal;
         this.name = name;
+        this.javadoc = javadoc;
+    }
+
+    /**
+     * @deprecated Use constructor with Javadoc
+     */
+    @Deprecated
+    public AnnotationElemDecl_c(Position pos, Flags flags, TypeNode type,
+            Id name, Term defaultVal) {
+        this(pos, flags, type, name, defaultVal, null);
     }
 
     @Override
@@ -249,11 +260,11 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         // enum, annotation or array or one of these
         if (!ts.isValidAnnotationValueType(type().type())) {
             throw new SemanticException("The type: "
-                    + this.type()
-                    + " for the annotation element declaration "
-                    + this.name()
-                    + " must be a primitive, String, Class, enum type, annotation type or an array of one of these.",
-                    type().position());
+                                                + this.type()
+                                                + " for the annotation element declaration "
+                                                + this.name()
+                                                + " must be a primitive, String, Class, enum type, annotation type or an array of one of these.",
+                                        type().position());
         }
 
         // an annotation element cannot have the same type as the
@@ -280,10 +291,10 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
             }
             else {
                 throw new InternalCompilerError("Don't know how to deal with default value ("
-                        + defaultVal
-                        + ") of kind "
-                        + defaultVal.getClass(),
-                        defaultVal.position());
+                                                        + defaultVal
+                                                        + ") of kind "
+                                                        + defaultVal.getClass(),
+                                                defaultVal.position());
             }
             if (defaultVal instanceof ElementValueArrayInit) {
                 ((ElementValueArrayInit) defaultVal).typeCheckElements(tc,
@@ -294,18 +305,18 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
                         && !ts.equals(defaultValType, type.type())
                         && !(defaultVal instanceof Expr && ts.numericConversionValid(type.type(),
                                                                                      tc.lang()
-                                                                                     .constantValue((Expr) defaultVal,
-                                                                                                    tc.lang())))
-                                                                                                    && !ts.isBaseCastValid(defaultValType, type.type())
-                                                                                                    && !(defaultVal instanceof Expr && ts.numericConversionBaseValid(type.type(),
-                                                                                                                                                                     tc.lang()
-                                                                                                                                                                     .constantValue((Expr) defaultVal,
-                                                                                                                                                                                    tc.lang())))) {
+                                                                                       .constantValue((Expr) defaultVal,
+                                                                                                      tc.lang())))
+                        && !ts.isBaseCastValid(defaultValType, type.type())
+                        && !(defaultVal instanceof Expr && ts.numericConversionBaseValid(type.type(),
+                                                                                         tc.lang()
+                                                                                           .constantValue((Expr) defaultVal,
+                                                                                                          tc.lang())))) {
                     throw new SemanticException("The type of the default value: "
-                            + defaultVal
-                            + " does not match the annotation element type: "
-                            + type.type() + " .",
-                            defaultVal.position());
+                                                        + defaultVal
+                                                        + " does not match the annotation element type: "
+                                                        + type.type() + " .",
+                                                defaultVal.position());
                 }
             }
         }
@@ -441,12 +452,18 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public AnnotationElemDecl javadoc(Javadoc javadoc) {
-        // No need to attach javadoc to an annotation
-        return this;
+        return javadoc(this, javadoc);
+    }
+
+    protected <N extends AnnotationElemDecl_c> N javadoc(N n, Javadoc javadoc) {
+        if (n.javadoc == javadoc) return n;
+        n = copyIfNeeded(n);
+        n.javadoc = javadoc;
+        return n;
     }
 
     @Override
     public Javadoc javadoc() {
-        return null;
+        return javadoc;
     }
 }

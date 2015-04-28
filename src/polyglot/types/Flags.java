@@ -585,4 +585,8 @@ public class Flags implements Serializable, Copy<Flags> {
     public boolean equals(Object o) {
         return o instanceof Flags && flags.equals(((Flags) o).flags);
     }
+
+    public boolean isEmpty() {
+        return flags.isEmpty();
+    }
 }

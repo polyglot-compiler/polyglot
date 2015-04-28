@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -41,6 +41,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
+import polyglot.ast.Javadoc;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
@@ -112,23 +113,62 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     @Override
     public AnnotationElemDecl AnnotationElemDecl(Position pos, Flags flags,
-            TypeNode type, Id name, Term defaultValue) {
+            TypeNode type, Id name, Term defaultValue, Javadoc javadoc) {
         AnnotationElemDecl n =
-                new AnnotationElemDecl_c(pos, flags, type, name, defaultValue);
+                new AnnotationElemDecl_c(pos,
+                                         flags,
+                                         type,
+                                         name,
+                                         defaultValue,
+                                         javadoc);
         n = ext(n, extFactory().extAnnotationElemDecl());
         return n;
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public AnnotationElemDecl AnnotationElemDecl(Position pos, Flags flags,
+            TypeNode type, Id name, Term defaultValue) {
+        return AnnotationElemDecl(pos, flags, type, name, defaultValue, null);
     }
 
     @Override
     public ClassDecl EnumDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
-            List<TypeNode> interfaces, ClassBody body) {
+            List<TypeNode> interfaces, ClassBody body, Javadoc javadoc) {
         ClassDecl n =
-                new ClassDecl_c(pos, flags, name, superType, interfaces, body);
+                new ClassDecl_c(pos,
+                                flags,
+                                name,
+                                superType,
+                                interfaces,
+                                body,
+                                javadoc);
         n = ext(n, extFactory().extEnumDecl());
         JL5EnumDeclExt ext = (JL5EnumDeclExt) JL5Ext.ext(n);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public ClassDecl EnumDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<TypeNode> interfaces, ClassBody body) {
+        return EnumDecl(pos,
+                        flags,
+                        annotations,
+                        name,
+                        superType,
+                        interfaces,
+                        body,
+                        null);
     }
 
     @Override
@@ -149,6 +189,25 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     @Override
     public final ClassDecl ClassDecl(Position pos, Flags flags, Id name,
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body,
+            Javadoc javadoc) {
+        return ClassDecl(pos,
+                         flags,
+                         null,
+                         name,
+                         superClass,
+                         interfaces,
+                         body,
+                         null,
+                         javadoc);
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public final ClassDecl ClassDecl(Position pos, Flags flags, Id name,
             TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
         return ClassDecl(pos,
                          flags,
@@ -157,9 +216,34 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
                          superClass,
                          interfaces,
                          body,
+                         null,
                          null);
     }
 
+    @Override
+    public ClassDecl ClassDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<TypeNode> interfaces, ClassBody body,
+            List<ParamTypeNode> paramTypes, Javadoc javadoc) {
+
+        ClassDecl n =
+                super.ClassDecl(pos,
+                                flags,
+                                name,
+                                superType,
+                                interfaces,
+                                body,
+                                javadoc);
+        JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
+        ext.paramTypes = CollectionUtil.nonNullList(paramTypes);
+        ext.annotations = CollectionUtil.nonNullList(annotations);
+        return n;
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
@@ -192,6 +276,27 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     @Override
     public final ConstructorDecl ConstructorDecl(Position pos, Flags flags,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes,
+            Block body, Javadoc javadoc) {
+        ConstructorDecl n =
+                ConstructorDecl(pos,
+                                flags,
+                                null,
+                                name,
+                                formals,
+                                throwTypes,
+                                body,
+                                null,
+                                javadoc);
+        return n;
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public final ConstructorDecl ConstructorDecl(Position pos, Flags flags,
             Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
         ConstructorDecl n =
                 ConstructorDecl(pos,
@@ -209,18 +314,39 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body,
-            List<ParamTypeNode> typeParams) {
+            List<ParamTypeNode> typeParams, Javadoc javadoc) {
         ConstructorDecl n =
                 super.ConstructorDecl(pos,
                                       flags,
                                       name,
                                       formals,
                                       throwTypes,
-                                      body);
+                                      body,
+                                      javadoc);
         JL5ConstructorDeclExt ext = (JL5ConstructorDeclExt) JL5Ext.ext(n);
         ext.typeParams = CollectionUtil.nonNullList(typeParams);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public ConstructorDecl ConstructorDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, List<Formal> formals,
+            List<TypeNode> throwTypes, Block body,
+            List<ParamTypeNode> typeParams) {
+        return ConstructorDecl(pos,
+                               flags,
+                               annotations,
+                               name,
+                               formals,
+                               throwTypes,
+                               body,
+                               typeParams,
+                               null);
     }
 
     @Override
@@ -254,13 +380,24 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     @Override
     public EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Expr> args,
-            ClassBody body) {
+            ClassBody body, Javadoc javadoc) {
         EnumConstantDecl n =
-                new EnumConstantDecl_c(pos, flags, name, args, body);
+                new EnumConstantDecl_c(pos, flags, name, args, body, javadoc);
         n = ext(n, extFactory().extEnumConstantDecl());
         EnumConstantDeclExt ext = (EnumConstantDeclExt) JL5Ext.ext(n);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, List<Expr> args,
+            ClassBody body) {
+        return EnumConstantDecl(pos, flags, annotations, name, args, body, null);
     }
 
     @Override
@@ -273,17 +410,38 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
 
     @Override
     public final FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type,
+            Id name, Expr init, Javadoc javadoc) {
+        return FieldDecl(pos, flags, null, type, name, init, javadoc);
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public final FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type,
             Id name, Expr init) {
         return FieldDecl(pos, flags, null, type, name, init);
     }
 
     @Override
     public FieldDecl FieldDecl(Position pos, Flags flags,
-            List<AnnotationElem> annotations, TypeNode type, Id name, Expr init) {
-        FieldDecl n = super.FieldDecl(pos, flags, type, name, init);
+            List<AnnotationElem> annotations, TypeNode type, Id name,
+            Expr init, Javadoc javadoc) {
+        FieldDecl n = super.FieldDecl(pos, flags, type, name, init, javadoc);
         JL5FieldDeclExt ext = (JL5FieldDeclExt) JL5Ext.ext(n);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public FieldDecl FieldDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode type, Id name, Expr init) {
+        return FieldDecl(pos, flags, annotations, type, name, init, null);
     }
 
     @Override
@@ -320,6 +478,28 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     @Override
     public final MethodDecl MethodDecl(Position pos, Flags flags,
             TypeNode returnType, Id name, List<Formal> formals,
+            List<TypeNode> throwTypes, Block body, Javadoc javadoc) {
+        MethodDecl n =
+                MethodDecl(pos,
+                           flags,
+                           null,
+                           returnType,
+                           name,
+                           formals,
+                           throwTypes,
+                           body,
+                           null,
+                           javadoc);
+        return n;
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public final MethodDecl MethodDecl(Position pos, Flags flags,
+            TypeNode returnType, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body) {
         MethodDecl n =
                 MethodDecl(pos,
@@ -338,7 +518,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     public MethodDecl MethodDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode returnType, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
-            List<ParamTypeNode> typeParams) {
+            List<ParamTypeNode> typeParams, Javadoc javadoc) {
         MethodDecl n =
                 super.MethodDecl(pos,
                                  flags,
@@ -346,11 +526,33 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
                                  name,
                                  formals,
                                  throwTypes,
-                                 body);
+                                 body,
+                                 javadoc);
         JL5MethodDeclExt ext = (JL5MethodDeclExt) JL5Ext.ext(n);
         ext.typeParams = CollectionUtil.nonNullList(typeParams);
         ext.annotations = CollectionUtil.nonNullList(annotations);
         return n;
+    }
+
+    /**
+     * @deprecated Use the method that takes in Javadoc.
+     */
+    @Deprecated
+    @Override
+    public MethodDecl MethodDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode returnType, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+            List<ParamTypeNode> typeParams) {
+        return MethodDecl(pos,
+                          flags,
+                          annotations,
+                          returnType,
+                          name,
+                          formals,
+                          throwTypes,
+                          body,
+                          typeParams,
+                          null);
     }
 
     @Override
@@ -392,7 +594,7 @@ public class JL5NodeFactory_c extends JL5AbstractNodeFactory_c {
     public AnnotationElem SingleElementAnnotationElem(Position pos,
             TypeNode name, Term value) {
         List<ElementValuePair> l = new LinkedList<>();
-        l.add(ElementValuePair(pos, this.Id(pos, "value"), value));
+        l.add(ElementValuePair(pos, Id(pos, "value"), value));
         return NormalAnnotationElem(pos, name, l);
     }
 

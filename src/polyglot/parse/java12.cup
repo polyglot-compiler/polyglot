@@ -555,7 +555,7 @@ class_declaration ::=
         modifiers_opt:a CLASS:n IDENTIFIER:b
                 super_opt:c interfaces_opt:d class_body:e
             {: RESULT = parser.nf.ClassDecl(parser.pos(n, e),
-                a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(a, parser.pos(n))); :}
+                a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(parser.pos(a), parser.pos(n))); :}
     ;
 super ::=
                     // TypeNode
@@ -646,7 +646,7 @@ class_member_declaration ::=
                     super_opt:c interfaces_opt:d class_body:e
             {: List<ClassMember> l = new LinkedList<>();
                l.add(parser.nf.ClassDecl(parser.pos(n, e),
-                        a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(a, parser.pos(n))));
+                        a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(parser.pos(a), parser.pos(n))));
                RESULT = l; :}
     |   interface_declaration:a
             {: List<ClassMember> l = new LinkedList<>();
@@ -662,7 +662,7 @@ field_declaration ::=
                for (VarDeclarator d : c) {
                    l.add(parser.nf.FieldDecl(parser.pos(b, e),
                                              a, parser.array(b, d.dims),
-                                             d.name, d.init, parser.javadoc(a, parser.pos(b))));
+                                             d.name, d.init, parser.javadoc(parser.pos(a), parser.pos(b))));
                }
                RESULT = l; :}
     ;
@@ -713,12 +713,12 @@ method_header ::=
                 formal_parameter_list_opt:d RPAREN:g dims_opt:e throws_opt:f
             {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
                 parser.array(b, e.intValue()), parser.nf.Id(parser.pos(c), c.getIdentifier()),
-                d, f, null, parser.javadoc(a, parser.pos(b))); :}
+                d, f, null, parser.javadoc(parser.pos(a), parser.pos(b))); :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:d RPAREN:g throws_opt:f
             {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
                 parser.nf.CanonicalTypeNode(parser.pos(b),
-                parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, f, null, parser.javadoc(a, parser.pos(b))); :}
+                parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, f, null, parser.javadoc(parser.pos(a), parser.pos(b))); :}
     ;
 formal_parameter_list_opt ::=
                     // List of Formal
@@ -787,7 +787,7 @@ constructor_declaration ::=
         modifiers_opt:m simple_name:a LPAREN formal_parameter_list_opt:b RPAREN
             throws_opt:c constructor_body:d
             {: RESULT = parser.nf.ConstructorDecl(parser.pos(a, d), m, parser.nf.Id(parser.pos(a), a.toString()), b,
-                c, d, parser.javadoc(m, parser.pos(a))); :}
+                c, d, parser.javadoc(parser.pos(m), parser.pos(a))); :}
     ;
 constructor_body ::=
                     // Block
@@ -828,7 +828,7 @@ interface_declaration ::=
                 extends_interfaces_opt:c interface_body:d
             {: RESULT = parser.nf.ClassDecl(
                     parser.pos(n, d), a.Interface(),
-                        parser.nf.Id(parser.pos(b), b.getIdentifier()), null, c, d, parser.javadoc(a, parser.pos(n))); :}
+                        parser.nf.Id(parser.pos(b), b.getIdentifier()), null, c, d, parser.javadoc(parser.pos(a), parser.pos(n))); :}
     ;
 extends_interfaces_opt ::=
                     // List of TypeNode

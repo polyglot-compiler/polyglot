@@ -73,7 +73,7 @@ public class Position implements Serializable {
         StackTraceElement[] stack = new Exception().getStackTrace();
         if (depth < stack.length) {
             return new Position(stack[depth].getFileName()
-                                        + " (compiler generated)",
+                                + " (compiler generated)",
                                 stack[depth].getLineNumber(),
                                 true);
         }
@@ -149,14 +149,10 @@ public class Position implements Serializable {
     }
 
     public Position(Position start, Position end) {
-        this(start.path(),
-             start.file(),
-             start.line,
-             start.column,
-             end.endLine,
-             end.endColumn,
-             start.offset,
-             end.endOffset);
+        this(start.path(), start.file(), start.line, start.column, end == null
+                ? start.endLine : end.endLine, end == null
+                ? start.endColumn : end.endColumn, start.offset, end == null
+                ? start.endOffset : end.endOffset);
     }
 
     public Position truncateEnd(int len) {

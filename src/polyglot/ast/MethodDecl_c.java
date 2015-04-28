@@ -300,10 +300,10 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
             Type t = tn.type();
             if (!t.isThrowable()) {
                 throw new SemanticException("Type \""
-                        + t
-                        + "\" is not a subclass of \""
-                        + ts.Throwable() + "\".",
-                        tn.position());
+                                                    + t
+                                                    + "\" is not a subclass of \""
+                                                    + ts.Throwable() + "\".",
+                                            tn.position());
             }
         }
     }
@@ -410,7 +410,8 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
                              name,
                              formals,
                              throwTypes,
-                             body);
+                             body,
+                             javadoc);
     }
 
     @Override

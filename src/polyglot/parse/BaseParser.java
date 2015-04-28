@@ -120,6 +120,13 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     }
 
     /**
+     * Returns the current position of the parser, representing the position of a null production.
+     */
+    public Position emptyTokenPos() {
+        return prev_pos.startOf();
+    }
+
+    /**
      * Override the default CUP routine.
      */
     @Override
@@ -375,14 +382,9 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     }
 
     /**
-     * Returns the Javadoc just preceding the given Flags object.
-     * In case there are no flags, then returns the Javadoc just preceding the position specified by nextPos.
+     * Returns the Javadoc associated with the node at the given Position.
      */
-    public Javadoc javadoc(Flags f, Position nextPos) {
-        Position pos = pos(f);
-
-        if (pos == null) pos = nextPos;
-
+    public Javadoc javadoc(Position pos) {
         if (pos == null) return null;
 
         Integer index =
@@ -396,5 +398,14 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
         }
 
         return null;
+    }
+
+    /**
+     *  Returns the Javadoc associated with the node at the first
+     *  non-null Position among the pair <pos1, pos2> in that order.
+     */
+    public Javadoc javadoc(Position pos1, Position pos2) {
+        Position pos = pos1 != null ? pos1 : pos2;
+        return javadoc(pos);
     }
 }

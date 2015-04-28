@@ -137,17 +137,15 @@ parser Grm extends polyglot.parse.Grm  {:
       }
       return l;
    }
-
-
 :};
 
 // ellipsis token for varargs, new in Java 1.5 (JSR-201)
-terminal ELLIPSIS;
+terminal Token ELLIPSIS;
 // enum keyword, new in Java 1.5 (JSR-201)
-terminal ENUM;
+terminal Token ENUM;
 
 // annotation keyword 
-terminal AT;
+terminal Token AT;
 
 non terminal Import static_single_type_import_declaration;
 non terminal Import static_type_import_on_demand_declaration;
@@ -473,7 +471,7 @@ override class_declaration ::=
         modifiers_or_annotations_opt:a CLASS:n IDENTIFIER:b type_parameters_opt:c
                 super_opt:d interfaces_opt:e class_body:f
             {: RESULT = parser.nf.ClassDecl(parser.pos(n, e),
-                a.flags(), a.annotations(), parser.nf.Id(parser.pos(b), b.getIdentifier()), d, e, f, c); :}
+                a.flags(), a.annotations(), parser.nf.Id(parser.pos(b), b.getIdentifier()), d, e, f, c, parser.javadoc(a.position(), parser.pos(n))); :}
     ;         
 class_body_opt ::=
         {: RESULT = null; :}
@@ -505,7 +503,7 @@ enum_declaration ::=
                    parser.nf.CanonicalTypeNode(parser.pos(b, e), parser.ts.Enum()), 
                    Collections.<TypeNode>singletonList(
                      parser.nf.AmbTypeNode(parser.pos(c), null, parser.nf.Id(parser.pos(c), c.getIdentifier())))), 
-                 d, e); :}
+                 d, e, parser.javadoc(a.position(), parser.pos(b))); :}
 	;
 enum_body ::=
 		LBRACE:n enum_constants_opt:a enum_body_declarations_opt:b RBRACE:c
@@ -535,9 +533,9 @@ enum_constants ::=
 	;
 enum_constant ::=
 		modifiers_or_annotations_opt:d IDENTIFIER:a enum_arguments_opt:b
-        {: RESULT = parser.nf.EnumConstantDecl(parser.pos(a), d.flags(), d.annotations(), parser.nf.Id(parser.pos(a), a.getIdentifier()), b); :}
+        {: RESULT = parser.nf.EnumConstantDecl(parser.pos(a), d.flags(), d.annotations(), parser.nf.Id(parser.pos(a), a.getIdentifier()), parser.javadoc(d.position(), parser.pos(a)), b); :}
 	|	modifiers_or_annotations_opt:d IDENTIFIER:a enum_arguments_opt:b class_body:c
-        {: RESULT = parser.nf.EnumConstantDecl(parser.pos(a), d.flags(), d.annotations(), parser.nf.Id(parser.pos(a), a.getIdentifier()), b, c); :}
+        {: RESULT = parser.nf.EnumConstantDecl(parser.pos(a), d.flags(), d.annotations(), parser.nf.Id(parser.pos(a), a.getIdentifier()), b, c, parser.javadoc(d.position(), parser.pos(a))); :}
 	;
 enum_arguments_opt ::=
         {: RESULT = new LinkedList<>(); :}
@@ -556,7 +554,7 @@ override field_declaration ::=
        for (VarDeclarator d : c) {
          l.add(parser.nf.FieldDecl(parser.pos(b, e),
                a.flags(), a.annotations(), parser.array(b, d.dims),
-               d.name, d.init));
+               d.name, d.init, parser.javadoc(a.position(), parser.pos(b))));
         }
         RESULT = l; :}
     ;
@@ -569,19 +567,19 @@ override method_header ::=
         // but it might still turn out to be a field declaration).
         modifiers_or_annotations_opt:a type:b IDENTIFIER:d LPAREN
                 formal_parameter_list_opt:e RPAREN dims_opt:g throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, d), a.flags(), a.annotations(), parser.array(b, g.intValue()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, new LinkedList<ParamTypeNode>()); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, d), a.flags(), a.annotations(), parser.array(b, g.intValue()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, new LinkedList<ParamTypeNode>(), parser.javadoc(a.position(), parser.pos(b))); :}
         |       
-    modifiers_or_annotations_opt:a LT type_parameter_list_1:c type:d IDENTIFIER:i LPAREN
+    modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c type:d IDENTIFIER:i LPAREN
                 formal_parameter_list_opt:e RPAREN dims_opt:g throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(d, g, i), a.flags(), a.annotations(), parser.array(d, g.intValue()), parser.nf.Id(parser.pos(i), i.getIdentifier()), e, h, null, c); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(d, g, i), a.flags(), a.annotations(), parser.array(d, g.intValue()), parser.nf.Id(parser.pos(i), i.getIdentifier()), e, h, null, c, parser.javadoc(a.position(), parser.pos(b))); :}
         |       
     modifiers_or_annotations_opt:a VOID:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:e RPAREN:f throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, c), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), e, h, null, new LinkedList<ParamTypeNode>()); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(b, f, c), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), e, h, null, new LinkedList<ParamTypeNode>(), parser.javadoc(a.position(), parser.pos(b))); :}
         |       
-    modifiers_or_annotations_opt:a LT type_parameter_list_1:c VOID:d IDENTIFIER:i LPAREN
+    modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c VOID:d IDENTIFIER:i LPAREN
                 formal_parameter_list_opt:e RPAREN:f throws_opt:h
-        {: RESULT = parser.nf.MethodDecl(parser.pos(d, f, i), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(d), parser.ts.Void()), parser.nf.Id(parser.pos(i), i.getIdentifier()), e, h, null, c); :}
+        {: RESULT = parser.nf.MethodDecl(parser.pos(d, f, i), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(d), parser.ts.Void()), parser.nf.Id(parser.pos(i), i.getIdentifier()), e, h, null, c, parser.javadoc(a.position(), parser.pos(b))); :}
         ;
 /*
 !@!extend method_header ::=
@@ -590,16 +588,16 @@ override method_header ::=
 	// or a method_declaration (the type_parameters_opt would have to
 	// be reduced when we see the 'type' if this was a method declaration,
 	// but it might still turn out to be a field declaration).
-    	modifiers_or_annotations_opt:a LT type_parameter_list_1:b type:c IDENTIFIER:d LPAREN
+    	modifiers_or_annotations_opt:a LT:l type_parameter_list_1:b type:c IDENTIFIER:d LPAREN
                 formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
         	{: RESULT = parser.nf.MethodDecl(parser.pos(c, f, d), a.flags(), a.annotations(), parser.array(c, g.intValue()), 
-        		parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, b); :}
+        		parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, b, parser.javadoc(a.position(), parser.pos(l))); :}
 	
-	|	modifiers_or_annotations_opt:a LT type_parameter_list_1:b VOID:c IDENTIFIER:d LPAREN
+	|	modifiers_or_annotations_opt:a LT:l type_parameter_list_1:b VOID:c IDENTIFIER:d LPAREN
                 formal_parameter_list_opt:e RPAREN:f throws_opt:h
         	{: RESULT = parser.nf.MethodDecl(parser.pos(c, f, d), a.flags(), a.annotations(),
                 parser.nf.CanonicalTypeNode(parser.pos(c),
-                parser.ts.Void()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, b); :}
+                parser.ts.Void()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, b, parser.javadoc(a.position(), parser.pos(l))); :}
 	;
 */	
 override formal_parameter ::=
@@ -626,10 +624,10 @@ override local_variable_declaration ::=
 // 19.8.5) Constructor Declarations
 override constructor_declaration ::=
         modifiers_or_annotations_opt:a  simple_name:d LPAREN formal_parameter_list_opt:e RPAREN  throws_opt:f constructor_body:g
-        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, new LinkedList<ParamTypeNode>()); :}
+        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, new LinkedList<ParamTypeNode>(), parser.javadoc(a.position(), parser.pos(d))); :}
         |       
-    modifiers_or_annotations_opt:a LT type_parameter_list_1:c simple_name:d LPAREN formal_parameter_list_opt:e RPAREN throws_opt:f constructor_body:g
-        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, c); :} 
+    modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c simple_name:d LPAREN formal_parameter_list_opt:e RPAREN throws_opt:f constructor_body:g
+        {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, c, parser.javadoc(a.position(), parser.pos(b))); :} 
 	;
     
 extend explicit_constructor_invocation ::=
@@ -658,15 +656,20 @@ extend explicit_constructor_invocation ::=
 // 19.9.1) Interface Declarations
 override interface_declaration ::=
 		modifiers_or_annotations_opt:a INTERFACE:b IDENTIFIER:c type_parameters_opt:d extends_interfaces_opt:e interface_body:f
-        {: RESULT = parser.nf.ClassDecl(parser.pos(b, f), a.setFlag(Flags.INTERFACE).flags(), a.annotations(), parser.nf.Id(parser.pos(c), c.getIdentifier()), null, e, f, d); :}
+        {: FlagAnnotations n = a.setFlag(Flags.INTERFACE.position(b.getPosition()));
+           RESULT = parser.nf.ClassDecl(parser.pos(b, f), n.flags(), a.annotations(), parser.nf.Id(parser.pos(c), c.getIdentifier()), null, e, f, d, parser.javadoc(a.position(), parser.pos(b))); :}
     | AT:a INTERFACE:b IDENTIFIER:c annotation_body:d
         {: List<TypeNode> superints = new LinkedList<>();
+           Flags n = JL5Flags.ANNOTATION.position(a.getPosition()); 
+           n = n.set(Flags.INTERFACE.position(b.getPosition()));
            superints.add(parser.nf.CanonicalTypeNode(parser.pos(b, d), parser.ts.Annotation()));
-           RESULT = parser.nf.ClassDecl(parser.pos(a, d), Flags.INTERFACE.set(JL5Flags.ANNOTATION), null, parser.nf.Id(parser.pos(c), c.getIdentifier()), null, superints, d, null); :}
-    | modifiers_or_annotations:a AT:b INTERFACE IDENTIFIER:d annotation_body:e
+           RESULT = parser.nf.ClassDecl(parser.pos(a, d), n, null, parser.nf.Id(parser.pos(c), c.getIdentifier()), null, superints, d, null, parser.javadoc(parser.pos(a))); :}
+    | modifiers_or_annotations:a AT:b INTERFACE:c IDENTIFIER:d annotation_body:e
         {: List<TypeNode> superints = new LinkedList<>();
+           FlagAnnotations n = a.setFlag(JL5Flags.ANNOTATION.position(b.getPosition())); 
+           n = n.setFlag(Flags.INTERFACE.position(c.getPosition()));
            superints.add(parser.nf.CanonicalTypeNode(parser.pos(b, e), parser.ts.Annotation()));
-           RESULT = parser.nf.ClassDecl(parser.pos(b, d), a.setFlag(Flags.INTERFACE.set(JL5Flags.ANNOTATION)).flags(), a.annotations(), parser.nf.Id(parser.pos(d), d.getIdentifier()), null, superints, e, null); :}
+           RESULT = parser.nf.ClassDecl(parser.pos(b, d), n.flags(), a.annotations(), parser.nf.Id(parser.pos(d), d.getIdentifier()), null, superints, e, null, parser.javadoc(a.position())); :}
 	;
 	
 extend interface_member_declaration ::=
@@ -1211,8 +1214,8 @@ expression_nn ::=	assignment_expression_nn:a
 
 modifiers_or_annotations_opt ::=
     /* empty */ 
-       {: FlagAnnotations fl = new FlagAnnotations();
-           RESULT = fl; :}
+       {: FlagAnnotations fl = new FlagAnnotations(parser.emptyTokenPos());
+          RESULT = fl; :}
     |
     modifiers_or_annotations:a
         {: RESULT = a; :}
@@ -1220,12 +1223,12 @@ modifiers_or_annotations_opt ::=
     
 modifiers_or_annotations ::=
     modifier:a
-        {: FlagAnnotations fl = new FlagAnnotations();
+        {: FlagAnnotations fl = new FlagAnnotations(parser.emptyTokenPos());
            RESULT = fl.flags(a);
         :}
     |
     annotation:a
-        {: FlagAnnotations fl = new FlagAnnotations();
+        {: FlagAnnotations fl = new FlagAnnotations(parser.emptyTokenPos());
            RESULT = fl.addAnnotation(a);
         :}
     |
@@ -1255,18 +1258,18 @@ annotation ::=
 
 
 marker_annotation ::=
-    AT name:b
-        {: RESULT = parser.nf.MarkerAnnotationElem(parser.pos(b), b.toType()); :}
+    AT:a name:b
+        {: RESULT = parser.nf.MarkerAnnotationElem(parser.pos(a, b), b.toType()); :}
 ;
 
 single_element_annotation ::=
-    AT name:b LPAREN element_value:c RPAREN
-       {: RESULT = parser.nf.SingleElementAnnotationElem(parser.pos(b), b.toType(), c); :}
+    AT:a name:b LPAREN element_value:c RPAREN
+       {: RESULT = parser.nf.SingleElementAnnotationElem(parser.pos(a, b), b.toType(), c); :}
 ;
 
 normal_annotation ::=
-    AT name:b LPAREN element_value_pairs_opt:c RPAREN
-        {:RESULT = parser.nf.NormalAnnotationElem(parser.pos(b), b.toType(), c); :}
+    AT:a name:b LPAREN element_value_pairs_opt:c RPAREN
+        {:RESULT = parser.nf.NormalAnnotationElem(parser.pos(a, b), b.toType(), c); :}
 ;
 
 element_value_pairs_opt ::=
@@ -1315,7 +1318,7 @@ annotation_type_element_declarations ::=
 annotation_type_element_declaration ::=
     modifiers_or_annotations_opt:a type:b IDENTIFIER:c LPAREN RPAREN default_value_opt:d SEMICOLON
         {: List<ClassMember> l = new LinkedList<>();
-           l.add(parser.nf.AnnotationElemDecl(parser.pos(b,d), a.flags(), parser.array(b, (new Integer(0)).intValue()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d));
+           l.add(parser.nf.AnnotationElemDecl(parser.pos(b,d), a.flags(), parser.array(b, (new Integer(0)).intValue()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, parser.javadoc(a.position(), parser.pos(b))));
            RESULT = l; :}
     | constant_declaration:a
         {: RESULT = a; :}

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -38,6 +38,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.FieldDecl;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
+import polyglot.ast.Javadoc;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
@@ -55,29 +56,68 @@ import polyglot.util.Position;
 public interface JL5NodeFactory extends NodeFactory {
     ClassDecl EnumDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<TypeNode> interfaces, ClassBody body, Javadoc javadoc);
+
+    /** @deprecated */
+    @Deprecated
+    ClassDecl EnumDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body);
 
+    EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, List<Expr> args,
+            ClassBody body, Javadoc javadoc);
+
+    /** @deprecated */
+    @Deprecated
     EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Expr> args,
             ClassBody body);
 
     EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, Javadoc javadoc,
+            List<Expr> args);
+
+    /** @deprecated */
+    @Deprecated
+    EnumConstantDecl EnumConstantDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Expr> args);
 
+    /** @deprecated */
+    @Deprecated
     ClassDecl ClassDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, TypeNode superType,
             List<TypeNode> interfaces, ClassBody body,
             List<ParamTypeNode> paramTypes);
 
+    ClassDecl ClassDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, TypeNode superType,
+            List<TypeNode> interfaces, ClassBody body,
+            List<ParamTypeNode> paramTypes, Javadoc javadoc);
+
+    /** @deprecated */
+    @Deprecated
     ConstructorDecl ConstructorDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, Id name, List<Formal> formals,
             List<TypeNode> throwTypes, Block body,
             List<ParamTypeNode> typeParams);
 
+    ConstructorDecl ConstructorDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, Id name, List<Formal> formals,
+            List<TypeNode> throwTypes, Block body,
+            List<ParamTypeNode> typeParams, Javadoc javadoc);
+
+    /** @deprecated */
+    @Deprecated
     MethodDecl MethodDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode returnType, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
             List<ParamTypeNode> typeParams);
+
+    MethodDecl MethodDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode returnType, Id name,
+            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+            List<ParamTypeNode> typeParams, Javadoc javadoc);
 
     Formal Formal(Position pos, Flags flags, List<AnnotationElem> annotations,
             TypeNode type, Id name, boolean var_args);
@@ -94,8 +134,14 @@ public interface JL5NodeFactory extends NodeFactory {
     FieldDecl FieldDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode type, Id name);
 
+    /** @deprecated */
+    @Deprecated
     FieldDecl FieldDecl(Position pos, Flags flags,
             List<AnnotationElem> annotations, TypeNode type, Id name, Expr init);
+
+    FieldDecl FieldDecl(Position pos, Flags flags,
+            List<AnnotationElem> annotations, TypeNode type, Id name,
+            Expr init, Javadoc javadoc);
 
     EnumConstant EnumConstant(Position pos, Receiver r, Id name);
 
@@ -146,6 +192,11 @@ public interface JL5NodeFactory extends NodeFactory {
     ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind,
             List<TypeNode> typeArgs, Expr outer, List<Expr> args);
 
+    AnnotationElemDecl AnnotationElemDecl(Position pos, Flags flags,
+            TypeNode type, Id name, Term def, Javadoc javadoc);
+
+    /** @deprecated */
+    @Deprecated
     AnnotationElemDecl AnnotationElemDecl(Position pos, Flags flags,
             TypeNode type, Id name, Term def);
 
