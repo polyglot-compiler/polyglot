@@ -50,7 +50,7 @@ import polyglot.visit.TypeBuilder;
  * constructor or method declaration as part of a class body.
  */
 public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
-ProcedureDeclOps {
+        ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Flags flags;
@@ -298,5 +298,10 @@ ProcedureDeclOps {
         n = copyIfNeeded(n);
         n.javadoc = javadoc;
         return n;
+    }
+
+    @Override
+    public Javadoc javadoc() {
+        return javadoc;
     }
 }
