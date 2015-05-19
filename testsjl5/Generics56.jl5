@@ -1,0 +1,6 @@
+import java.util.*;
+
+abstract class C<X,Y>  {
+	<T extends List<X> & Set<Y>> void f() {}
+	// error: Collection cannot be subclassed with different type arguments.
+}
