@@ -1,4 +1,7 @@
-<project name="polyglot" default="compile" basedir=".">
+<project name="polyglot" default="compile" basedir="."
+	xmlns:if="ant:if"
+	xmlns:unless="ant:unless"
+>
 	<description>
     Polyglot build file
   </description>
@@ -394,7 +397,7 @@
 	<!-- The following target builds a cup parser using the version of
        cup already sitting in the java_cup.jar file. This is needed to
        bootstrap the build of cup. -->
-	<target name="cup-parser-using-jar" depends="cup-parser-deps,serialuid" unless="cup-parser.up-to-date">
+	<target name="cup-parser-using-jar" depends="cup-parser-deps,serialuid" unless="cup-parser-using-jar.up-to-date">
 		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
 			<classpath refid="cup.jar.classpath" />
 			<arg value="-nopositions" />
@@ -425,12 +428,21 @@
 				<include name="${symbol.class}.java" />
 			</targetfileset>
 		</dependset>
-		<condition property="cup-parser.up-to-date">
-			<and>
-				<available file="${parser.dir}/${parser.class}.java" />
-				<available file="${parser.dir}/${symbol.class}.java" />
-			</and>
-		</condition>
+		<uptodate property="cup-parser.up-to-date">
+			<srcfiles dir="${cup.src}/java_cup" />
+			<srcfiles dir="${parser.dir}" includes="${cup.file}" />
+			<compositemapper>
+				<mergemapper to="${parser.dir}/${parser.class}.java" />
+				<mergemapper to="${parser.dir}/${symbol.class}.java" />
+			</compositemapper>
+		</uptodate>
+		<uptodate property="cup-parser-using-jar.up-to-date">
+			<srcfiles dir="${parser.dir}" includes="${cup.file}" />
+			<compositemapper>
+				<mergemapper to="${parser.dir}/${parser.class}.java" />
+				<mergemapper to="${parser.dir}/${symbol.class}.java" />
+			</compositemapper>
+		</uptodate>
 	</target>
 
 	<!-- Build a PPG parser based on parameters supplied to the target.
@@ -441,8 +453,8 @@
            @param parser.class  The name to be passed to CUP with -parser.
            @param symbol.class  The name to be passed to CUP with -symbols.
        -->
-	<target name="ppg-parser" depends="ppg-parser.deps,serialuid" unless="ppg-parser.up-to-date">
-		<java classname="ppg.PPG" fork="true" failonerror="true">
+	<target name="ppg-parser" depends="ppg-parser.deps,serialuid">
+		<java classname="ppg.PPG" fork="true" failonerror="true" unless:set="ppg-parser.up-to-date">
 			<classpath refid="standard.classpath" />
 			<arg value="${parser.dir}/${ppg.file}" />
 			<arg value="-o" />
@@ -466,13 +478,16 @@
 				<include name="${symbol.class}.java" />
 			</targetfileset>
 		</dependset>
-		<condition property="ppg-parser.up-to-date">
-			<and>
-				<available file="${parser.dir}/${cup.file}" />
-				<available file="${parser.dir}/${parser.class}.java" />
-				<available file="${parser.dir}/${symbol.class}.java" />
-			</and>
-		</condition>
+		<uptodate property="ppg-parser.up-to-date">
+			<srcfiles dir="${ppg.src}" />
+			<srcfiles file="${base-parser}" />
+			<srcfiles dir="${parser.dir}" includes="${ppg.file}" />
+			<compositemapper>
+				<mergemapper to="${parser.dir}/${cup.file}" />
+				<mergemapper to="${parser.dir}/${parser.class}.java" />
+				<mergemapper to="${parser.dir}/${symbol.class}.java" />
+			</compositemapper>
+		</uptodate>
 	</target>
 
 	<!-- Build a JFlex lexer based on parameters supplied to the target.
