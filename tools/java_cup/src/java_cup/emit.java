@@ -396,7 +396,6 @@ public class emit {
         /* class header */
         out.println();
         out.println("/** Cup generated class to encapsulate user supplied action code.*/");
-        out.println("@SuppressWarnings({\"rawtypes\", \"unchecked\", \"unused\"})");
         /* TUM changes; proposed by Henning Niss 20050628: added type argument */
         out.println("class " + pre("actions") + typeArgument() + " {");
         /* user supplied code */
@@ -971,13 +970,11 @@ public class emit {
             out.println("import " + import_list.elementAt(i) + ";");
         if (lr_values() && locations())
             out.println("import java_cup.runtime.ComplexSymbolFactory.Location;");
-        out.println("import java_cup.runtime.XMLElement;");
 
         /* class header */
         out.println();
         out.println("/** " + version.title_str + " generated parser.");
         out.println("  */");
-        out.println("@SuppressWarnings({\"rawtypes\"})");
         /* TUM changes; proposed by Henning Niss 20050628: added typeArgument */
         out.println("public class " + parser_class_name + typeArgument());
         if (extendsimpls.equals(""))
@@ -987,9 +984,10 @@ public class emit {
 
         if (extendsimpls.equals("")) {
             out.println();
-            out.println(" public final Class getSymbolContainer() {");
+            out.println("  @Override");
+            out.println("  public final Class<?> getSymbolContainer() {");
             out.println("    return " + symbol_const_class_name + ".class;");
-            out.println("}");
+            out.println("  }");
         }
 
         /* constructors [CSA/davidm, 24-jul-99] */
@@ -1128,7 +1126,6 @@ public class emit {
         /* class header */
         out.println();
         out.println("/** Cup generated class to encapsulate user supplied action code.*/");
-        out.println("@SuppressWarnings({\"rawtypes\", \"unchecked\", \"unused\"})");
         out.println("class " + pre("actions") + typeArgument() + " {");
         /* user supplied code */
         if (action_code != null) {

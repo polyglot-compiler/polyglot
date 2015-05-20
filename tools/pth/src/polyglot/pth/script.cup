@@ -115,7 +115,7 @@ command_line_args_opt ::=
     ;
 
 filetest_list_opt ::=
-        {: RESULT = Collections.emptyList(); :}
+        {: RESULT = new LinkedList<>(); :}
     |   filetest_list:a {: RESULT = a; :}
     ;
 
