@@ -984,9 +984,10 @@ public class emit {
 
         if (extendsimpls.equals("")) {
             out.println();
-            out.println(" public final Class getSymbolContainer() {");
+            out.println("  @Override");
+            out.println("  public final Class<?> getSymbolContainer() {");
             out.println("    return " + symbol_const_class_name + ".class;");
-            out.println("}");
+            out.println("  }");
         }
 
         /* constructors [CSA/davidm, 24-jul-99] */
