@@ -1,0 +1,13 @@
+import java.util.*;
+
+interface I1 {
+	<Y> Integer f(List<Y> l);
+}
+
+interface I2 {
+	<Z> String f(List<Z> l);
+}
+
+interface I3 extends I1, I2 {
+	// error: the two f's are incompatible.
+}
