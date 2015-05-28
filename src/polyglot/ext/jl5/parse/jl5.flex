@@ -34,6 +34,7 @@ import java.util.Set;
 
 %line
 %column
+%char
 
 %buffer 1048576
 

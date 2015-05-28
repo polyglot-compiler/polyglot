@@ -51,6 +51,7 @@ import java.util.Set;
 
 %line
 %column
+%char
 
 %state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT, JAVADOC_COMMENT
 
