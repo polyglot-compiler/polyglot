@@ -131,12 +131,13 @@ import java.util.Set;
 
     private Position pos() {
         return new Position(path, file, yyline+1, yycolumn, yyline+1,
-                            yycolumn + yytext().length());
+                            yycolumn + yytext().length(), yychar,
+                            yychar + yytext().length());
     }
 
     private Position pos(int len) {
         return new Position(path, file, yyline+1, yycolumn-len-1, yyline+1,
-                            yycolumn+1);
+                            yycolumn+1, yychar-len-1, yychar);
     }
 
     private Token key(int symbol) {
