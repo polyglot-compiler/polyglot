@@ -40,4 +40,9 @@ public interface Documentable extends Node {
      * Get the Javadoc.
      */
     Javadoc javadoc();
+
+    /**
+     * Returns the identifier for the Documentable Node.
+     */
+    Id id();
 }

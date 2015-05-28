@@ -130,6 +130,11 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public Id name() {
+        return id();
+    }
+
+    @Override
+    public Id id() {
         return name;
     }
 
@@ -323,7 +328,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
         if (!n.flags().isEmpty()) {
             throw new SemanticException("Cannot have modifier(s): " + flags
-                                        + " on enum constant declaration", this.position());
+                    + " on enum constant declaration", this.position());
         }
 
         if (body != null) {
