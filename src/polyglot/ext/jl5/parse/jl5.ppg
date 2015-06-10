@@ -137,6 +137,8 @@ parser Grm extends polyglot.parse.Grm  {:
       }
       return l;
    }
+
+
 :};
 
 // ellipsis token for varargs, new in Java 1.5 (JSR-201)
@@ -1215,7 +1217,7 @@ expression_nn ::=	assignment_expression_nn:a
 modifiers_or_annotations_opt ::=
     /* empty */ 
        {: FlagAnnotations fl = new FlagAnnotations(parser.emptyTokenPos());
-          RESULT = fl; :}
+           RESULT = fl; :}
     |
     modifiers_or_annotations:a
         {: RESULT = a; :}

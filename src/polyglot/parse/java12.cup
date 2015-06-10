@@ -425,7 +425,7 @@ compilation_unit ::=
         type_declarations_opt:c
             {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
 					     a, b, c);
-		:}
+	    :}
     |   error
         type_declarations_opt:c
             {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),

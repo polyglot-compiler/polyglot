@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- *
+ * 
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -107,7 +107,7 @@ public class Main {
                 i.remove();
                 ext =
                         loadExtension("polyglot.ext." + extName
-                                      + ".ExtensionInfo");
+                                + ".ExtensionInfo");
             }
             else if (s.equals("-extclass")) {
                 if (ext != null) {
@@ -160,7 +160,7 @@ public class Main {
             options.parseCommandLine(argv, source);
         }
         catch (UsageError ue) {
-            PrintStream out = ue.exitCode == 0 ? System.out : System.err;
+            PrintStream out = (ue.exitCode == 0 ? System.out : System.err);
             if (ue.getMessage() != null && ue.getMessage().length() > 0) {
                 out.println(ext.compilerName() + ": " + ue.getMessage());
             }
@@ -200,8 +200,8 @@ public class Main {
 
         if (Report.should_report(verbose, 1)) {
             reportTime("Finished compiling Java output files. time="
-                    + (System.currentTimeMillis() - start_time),
-                    1);
+                               + (System.currentTimeMillis() - start_time),
+                       1);
 
             reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
         }
@@ -234,7 +234,7 @@ public class Main {
                     ByteArrayOutputStream err = new ByteArrayOutputStream();
                     Writer javac_err = new OutputStreamWriter(err);
                     compiler.sourceExtension()
-                    .configureFileManagerForPostCompiler();
+                            .configureFileManagerForPostCompiler();
                     FileManager fileManager =
                             compiler.sourceExtension().extFileManager();
                     CompilationTask task =
@@ -263,7 +263,7 @@ public class Main {
                                 new QuotedStringTokenizer(options.post_compiler_opts);
                         javacCmd =
                                 new String[st.countTokens() + options_size
-                                           + compiler.outputFiles().size()];
+                                        + compiler.outputFiles().size()];
                         javacCmd[j++] = options.post_compiler;
                         while (st.hasMoreTokens())
                             javacCmd[j++] = st.nextToken();
@@ -271,7 +271,7 @@ public class Main {
                     else {
                         javacCmd =
                                 new String[options_size
-                                           + compiler.outputFiles().size()];
+                                        + compiler.outputFiles().size()];
                         javacCmd[j++] = options.post_compiler;
                     }
                     javacCmd[j++] = "-classpath";
@@ -285,7 +285,7 @@ public class Main {
 
                     for (JavaFileObject jfo : compiler.outputFiles()) {
                         URI jfoURI = jfo.toUri();
-                        // XXX: the JavaCompiler API spec says toURI() must be absolute,
+                        // XXX: the JavaCompiler API spec says toURI() must be absolute, 
                         //      but OSX does not put a scheme component on files.
                         File outfile;
                         if (!jfoURI.isAbsolute())
@@ -393,7 +393,7 @@ public class Main {
             }
             catch (ClassNotFoundException e) {
                 throw new TerminationException("Extension " + ext
-                                               + " not found: could not find class " + ext + ".");
+                        + " not found: could not find class " + ext + ".");
             }
 
             Object extobj;
@@ -402,17 +402,17 @@ public class Main {
             }
             catch (Exception e) {
                 throw new InternalCompilerError("Extension " + ext
-                                                + " could not be loaded: could not instantiate " + ext
-                                                + ".", e);
+                        + " could not be loaded: could not instantiate " + ext
+                        + ".", e);
             }
             try {
                 return (ExtensionInfo) extobj;
             }
             catch (ClassCastException e) {
                 throw new TerminationException(ext
-                                               + " is not a valid Polyglot extension:"
-                                               + " extension class " + ext
-                                               + " exists but is not a subclass of ExtensionInfo.");
+                        + " is not a valid Polyglot extension:"
+                        + " extension class " + ext
+                        + " exists but is not a subclass of ExtensionInfo.");
             }
         }
         return null;
@@ -444,12 +444,12 @@ public class Main {
         }
 
         public TerminationException(int exit) {
-            exitCode = exit;
+            this.exitCode = exit;
         }
 
         public TerminationException(String msg, int exit) {
             super(msg);
-            exitCode = exit;
+            this.exitCode = exit;
         }
     }
 }

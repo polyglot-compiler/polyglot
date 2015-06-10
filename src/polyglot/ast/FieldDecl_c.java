@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- *
+ * 
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -99,7 +99,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init, Javadoc javadoc, Ext ext) {
         super(pos, ext);
-        assert flags != null && type != null && name != null; // init may be null
+        assert (flags != null && type != null && name != null); // init may be null
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -110,7 +110,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     @Override
     public boolean isDisambiguated() {
         return fi != null && fi.isCanonical()
-                && (init == null || ii != null && ii.isCanonical())
+                && (init == null || (ii != null && ii.isCanonical()))
                 && super.isDisambiguated();
     }
 
@@ -315,13 +315,13 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (fi.isCanonical()) {
+        if (this.fi.isCanonical()) {
             // Nothing to do.
             return this;
         }
 
         if (declType().isCanonical()) {
-            fi.setType(declType());
+            this.fi.setType(declType());
         }
 
         return this;
@@ -353,11 +353,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                     Goal newGoal =
                             scheduler.FieldConstantsChecked(f.fieldInstance()
                                                              .orig());
-                    Goal myGoal = scheduler.FieldConstantsChecked(fi);
+                    Goal myGoal = scheduler.FieldConstantsChecked(this.fi);
 
                     for (Goal g : newGoal.prerequisiteGoals(scheduler)) {
                         if (scheduler.prerequisiteDependsOn(g, myGoal)) {
-                            fi.setNotConstant();
+                            this.fi.setNotConstant();
                             return n;
                         }
                     }
@@ -583,7 +583,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.FieldDecl(position, flags, type, name, init);
+        return nf.FieldDecl(this.position,
+                            this.flags,
+                            this.type,
+                            this.name,
+                            this.init);
     }
 
     @Override

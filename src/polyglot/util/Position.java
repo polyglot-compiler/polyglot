@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- *
+ * 
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -27,7 +27,6 @@
 package polyglot.util;
 
 import java.io.Serializable;
-
 import polyglot.main.Options;
 
 /**
@@ -73,7 +72,7 @@ public class Position implements Serializable {
         StackTraceElement[] stack = new Exception().getStackTrace();
         if (depth < stack.length) {
             return new Position(stack[depth].getFileName()
-                                + " (compiler generated)",
+                                        + " (compiler generated)",
                                 stack[depth].getLineNumber(),
                                 true);
         }
@@ -216,15 +215,15 @@ public class Position implements Serializable {
     }
 
     public int endLine() {
-        if (endLine == UNKNOWN || line != UNKNOWN && endLine < line) {
+        if (endLine == UNKNOWN || (line != UNKNOWN && endLine < line)) {
             return line;
         }
         return endLine;
     }
 
     public int endColumn() {
-        if (endColumn == UNKNOWN || column != UNKNOWN && endLine() == line()
-                && endColumn < column) {
+        if (endColumn == UNKNOWN
+                || (column != UNKNOWN && endLine() == line() && endColumn < column)) {
             return column;
         }
         return endColumn;
@@ -235,7 +234,7 @@ public class Position implements Serializable {
     }
 
     public int endOffset() {
-        if (endOffset == UNKNOWN || offset != UNKNOWN && endOffset < offset) {
+        if (endOffset == UNKNOWN || (offset != UNKNOWN && endOffset < offset)) {
             return offset;
         }
         return endOffset;

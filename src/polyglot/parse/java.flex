@@ -62,7 +62,7 @@ import java.util.Set;
     ErrorQueue eq;
     HashMap<String, Integer> keywords;
     Position commentBegin;
-    
+
     public Lexer_c(java.io.Reader reader, Source file, ErrorQueue eq) {
         this(reader);
         this.file = file.name();
@@ -81,7 +81,7 @@ import java.util.Set;
 	return Collections.unmodifiableSet(keywords.keySet());
     }
 
-	protected void init_keywords() {
+    protected void init_keywords() {
         keywords.put("abstract",      new Integer(sym.ABSTRACT));
         keywords.put("assert",        new Integer(sym.ASSERT));
         keywords.put("boolean",       new Integer(sym.BOOLEAN));
@@ -269,8 +269,8 @@ import java.util.Set;
 	
 	private Token javadoc_token() {
 		return new JavadocToken(pos(sb.length()), sb.toString(), sym.JAVADOC);
-	}
-	
+    }
+
     private String chop(int i, int j) {
         return yytext().substring(i,yylength()-j);
     }
@@ -340,7 +340,7 @@ OctalEscape = \\ [0-7]
     		  sb.setLength(0);
     		  sb.append(yytext());
 			  commentBegin = pos(); }
-			  
+
     /* 3.10.4 Character Literals */
     \'      { yybegin(CHARACTER); sb.setLength(0); }
 

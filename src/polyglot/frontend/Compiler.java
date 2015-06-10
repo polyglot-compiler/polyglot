@@ -142,7 +142,7 @@ public class Compiler {
             catch (FileNotFoundException e) {
                 eq.enqueue(ErrorInfo.IO_ERROR,
                            "Cannot find source file \"" + e.getMessage()
-                           + "\".");
+                                   + "\".");
                 eq.flush();
                 return false;
             }

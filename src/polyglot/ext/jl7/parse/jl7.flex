@@ -263,7 +263,7 @@ import java.util.Set;
     
     private Token javadoc_token() {
 		return new JavadocToken(pos(sb.length()), sb.toString(), sym.JAVADOC);
-	}
+    }
 
     private String chop(int i, int j) {
         return yytext().substring(i,yylength()-j);

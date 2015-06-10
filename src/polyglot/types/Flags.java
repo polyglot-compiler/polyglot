@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- *
+ * 
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -50,7 +50,7 @@ public class Flags implements Serializable, Copy<Flags> {
     protected Position position;
 
     protected static class FlagComparator implements Comparator<String>,
-    Serializable {
+            Serializable {
         private static final long serialVersionUID =
                 SerialVersionUID.generate();
         protected static final FlagComparator instance = new FlagComparator();
@@ -90,7 +90,7 @@ public class Flags implements Serializable, Copy<Flags> {
 
     /** All access flags. */
     protected static final Flags ACCESS_FLAGS = PUBLIC.set(PRIVATE)
-            .set(PROTECTED);
+                                                      .set(PROTECTED);
 
     /**
      * Return a new Flags object with a new name.  Should be called only once
@@ -138,7 +138,7 @@ public class Flags implements Serializable, Copy<Flags> {
      * Effects: returns a new access flags object with no access flags set.
      */
     protected Flags() {
-        flags = new TreeSet<>(FlagComparator.instance);
+        this.flags = new TreeSet<>(FlagComparator.instance);
         position = Position.compilerGenerated();
     }
 
@@ -148,7 +148,7 @@ public class Flags implements Serializable, Copy<Flags> {
     }
 
     public Set<String> flags() {
-        return flags;
+        return this.flags;
     }
 
     public Position position() {
@@ -187,7 +187,7 @@ public class Flags implements Serializable, Copy<Flags> {
      */
     public Flags set(Flags other) {
         Flags f = new Flags();
-        f.flags.addAll(flags);
+        f.flags.addAll(this.flags);
         f.flags.addAll(other.flags);
 
         Position start = Position.first(position, other.position);
@@ -208,7 +208,7 @@ public class Flags implements Serializable, Copy<Flags> {
      */
     public Flags clear(Flags other) {
         Flags f = new Flags();
-        f.flags.addAll(flags);
+        f.flags.addAll(this.flags);
         f.flags.removeAll(other.flags);
         f.position = Position.compilerGenerated();
         return f;
@@ -219,7 +219,7 @@ public class Flags implements Serializable, Copy<Flags> {
      */
     public Flags retain(Flags other) {
         Flags f = new Flags();
-        f.flags.addAll(flags);
+        f.flags.addAll(this.flags);
         f.flags.retainAll(other.flags);
         f.position = Position.compilerGenerated();
         return f;
@@ -229,7 +229,7 @@ public class Flags implements Serializable, Copy<Flags> {
      * Check if <i>any</i> flags in {@code other} are set.
      */
     public boolean intersects(Flags other) {
-        for (String name : flags) {
+        for (String name : this.flags) {
             if (other.flags.contains(name)) {
                 return true;
             }
@@ -241,7 +241,7 @@ public class Flags implements Serializable, Copy<Flags> {
      * Check if <i>all</i> flags in {@code other} are set.
      */
     public boolean contains(Flags other) {
-        return flags.containsAll(other.flags);
+        return this.flags.containsAll(other.flags);
     }
 
     /**
@@ -568,7 +568,7 @@ public class Flags implements Serializable, Copy<Flags> {
     public String translate() {
         StringBuffer sb = new StringBuffer();
 
-        for (String s : flags) {
+        for (String s : this.flags) {
             sb.append(s);
             sb.append(" ");
         }

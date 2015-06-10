@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- *
+ * 
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -143,7 +143,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public Id id() {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -160,7 +160,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public String name() {
-        return name.id();
+        return this.name.id();
     }
 
     @Override
@@ -197,15 +197,15 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     @Override
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = visitChild(this.type, v);
-        Term defVal = visitChild(defaultVal, v);
+        Term defVal = visitChild(this.defaultVal, v);
         return reconstruct(type, defVal);
     }
 
     @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         // this may not be necessary - I think this is for scopes for
-        // symbol checking? - in fields and methods there many anon inner
-        // classes and thus a scope is needed - but in annots there
+        // symbol checking? - in fields and methods there many anon inner 
+        // classes and thus a scope is needed - but in annots there 
         // cannot be ???
         return tb.pushCode();
     }
@@ -220,7 +220,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
             return this;
         }
 
-        Flags f = flags;
+        Flags f = this.flags;
         f = f.Public().Abstract();
 
         AnnotationTypeElemInstance ai =
@@ -237,7 +237,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (ai.isCanonical()) {
+        if (this.ai.isCanonical()) {
             // already done
             return this;
         }
@@ -256,7 +256,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
-        // check type - must be one of primitive, String, Class,
+        // check type - must be one of primitive, String, Class, 
         // enum, annotation or array or one of these
         if (!ts.isValidAnnotationValueType(type().type())) {
             throw new SemanticException("The type: "
@@ -267,7 +267,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
                                         type().position());
         }
 
-        // an annotation element cannot have the same type as the
+        // an annotation element cannot have the same type as the 
         // type it is declared in - direct
         // also need to check indirect cycles
         if (type().type().equals(tc.context().currentClass())) {
@@ -373,7 +373,7 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
     @Override
     public Term firstChild() {
-        return type;
+        return this.type;
     }
 
     @Override
