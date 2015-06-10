@@ -1,0 +1,33 @@
+//http://stackoverflow.com/questions/5176867/why-are-there-3-parsing-conflicts-in-my-tiny-grammar
+//(amb)
+
+terminal COMMENT, LDEL, RDEL, OP, DOLLAR, ID;
+
+non terminal start_, template, template_elements, tag, exp, value, variable;
+
+start with start_;
+
+//complete
+start_ ::= template;
+
+//template
+template ::= template_elements
+	| template template_elements
+	|;
+
+//template elements
+template_elements ::= COMMENT
+	| tag;
+
+//tag
+tag ::= LDEL exp RDEL;
+
+//exp
+exp ::= value 
+	| exp OP exp;
+
+//value
+value ::= variable;
+
+//variable
+variable ::= DOLLAR ID;

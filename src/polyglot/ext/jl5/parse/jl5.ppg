@@ -163,13 +163,10 @@ non terminal EnumConstantDecl enum_constant;
 non terminal List<Expr> enum_arguments_opt;
 non terminal List<ClassMember> enum_body_declarations_opt;
 non terminal comma_opt;
-// 19.8.3) Method Declarations
-
-// 19.8.5) Constructor Declarations
-
+// 19.11) Blocks and Statements
 non terminal Loop foreach_statement, foreach_statement_no_short_if;
-
-non terminal NewArray initialized_array_creation_expression;
+// 19.12) Expressions
+non terminal NewArray initialized_array_creation_expression;//**
 
 // JSR-14 2.1) Type Syntax 2.3) Handling Consecutive Type Brackets
 non terminal TypeNode class_or_interface;
@@ -256,7 +253,7 @@ override identifier_opt ::=
     IDENTIFIER:a
      {: RESULT = new JL5Name(parser.nf, parser.ts, parser.pos(a), parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
 ;
-                         
+
 type_variable ::=
 		IDENTIFIER:a
         {: RESULT = new Name(parser.nf, parser.ts, parser.pos(a), parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
@@ -277,15 +274,11 @@ override class_or_interface_type ::=
         {: RESULT = parser.nf.AmbTypeInstantiation(parser.pos(a, c), a, c); :}
 	;
 
-
-override array_type ::=	primitive_type:a dims:b
-        {: RESULT = parser.array(a, b.intValue()); :}
+extend array_type ::=
 	// we have class_or_interface_type here even though only unbounded
 	// wildcards are really allowed in the parameterization.
 	// we have to expand this to avoid lookahead problems.
-	|	name:a dims:b
-        {: RESULT = parser.array(a.toType(), b.intValue()); :}
-	|	class_or_interface:a LT type_argument_list_1:b DOT name:c dims:d
+		class_or_interface:a LT type_argument_list_1:b DOT name:c dims:d
    	 	// Instantiating type arguments
         {: TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(a, b), a, b);
            TypeNode aa = ((JL5Name) c).toType(tn);
@@ -397,7 +390,6 @@ type_argument_list_2 ::=
            l.add(a);
            RESULT = l; 
          :}
-		
 	|	type_argument_list:a COMMA type_argument_2:b
         {: RESULT = a;
            a.add(b);   
@@ -512,16 +504,11 @@ enum_body ::=
             {: a.addAll(b);
                RESULT = parser.nf.ClassBody(parser.pos(n, c), a); :}
 	;
-comma_opt ::=		
-    |	COMMA
-    ;
-
 enum_constants_opt ::=
         {: RESULT = new LinkedList<>(); :}
 	|	enum_constants:a comma_opt
         {: RESULT = a; :}
 	;
-
 enum_constants ::=
 		enum_constant:a
         {: List<ClassMember> l = new LinkedList<>();
@@ -549,7 +536,11 @@ enum_body_declarations_opt ::=
 	|	SEMICOLON class_body_declarations_opt:a
         {: RESULT = a; :}
 	;
+comma_opt ::=		
+    |	COMMA
+    ;
 
+// 19.8.2) Field Declarations
 override field_declaration ::=
     modifiers_or_annotations_opt:a type:b variable_declarators:c SEMICOLON:e
     {: List<ClassMember> l = new LinkedList<>();
@@ -561,6 +552,7 @@ override field_declaration ::=
         RESULT = l; :}
     ;
 
+// 19.8.3) Method Declarations
 override method_header ::=
         // have to expand type_parameters_opt here so that we don't
         // force an early decision of whether this is a field_declaration
@@ -583,45 +575,18 @@ override method_header ::=
                 formal_parameter_list_opt:e RPAREN:f throws_opt:h
         {: RESULT = parser.nf.MethodDecl(parser.pos(d, f, i), a.flags(), a.annotations(), parser.nf.CanonicalTypeNode(parser.pos(d), parser.ts.Void()), parser.nf.Id(parser.pos(i), i.getIdentifier()), e, h, null, c, parser.javadoc(a.position(), parser.pos(b))); :}
         ;
-/*
-!@!extend method_header ::=
-	// have to expand type_parameters_opt here so that we don't
-	// force an early decision of whether this is a field_declaration
-	// or a method_declaration (the type_parameters_opt would have to
-	// be reduced when we see the 'type' if this was a method declaration,
-	// but it might still turn out to be a field declaration).
-    	modifiers_or_annotations_opt:a LT:l type_parameter_list_1:b type:c IDENTIFIER:d LPAREN
-                formal_parameter_list_opt:e RPAREN:f dims_opt:g throws_opt:h
-        	{: RESULT = parser.nf.MethodDecl(parser.pos(c, f, d), a.flags(), a.annotations(), parser.array(c, g.intValue()), 
-        		parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, b, parser.javadoc(a.position(), parser.pos(l))); :}
-	
-	|	modifiers_or_annotations_opt:a LT:l type_parameter_list_1:b VOID:c IDENTIFIER:d LPAREN
-                formal_parameter_list_opt:e RPAREN:f throws_opt:h
-        	{: RESULT = parser.nf.MethodDecl(parser.pos(c, f, d), a.flags(), a.annotations(),
-                parser.nf.CanonicalTypeNode(parser.pos(c),
-                parser.ts.Void()), parser.nf.Id(parser.pos(d), d.getIdentifier()), e, h, null, b, parser.javadoc(a.position(), parser.pos(l))); :}
-	;
-*/	
 override formal_parameter ::=
                     // Formal
     modifiers_or_annotations_opt:a type:b variable_declarator_id:c
          {: RESULT = parser.nf.Formal(parser.pos(b, c, c), a.flags(), a.annotations(),
                      parser.array(b, c.dims), c.name); :}
     |
+    // careful, productions below allow varargs in non-final positions.
     modifiers_or_annotations_opt:a type:b ELLIPSIS IDENTIFIER:d
         {:
            RESULT = parser.nf.Formal(parser.pos(b, d, d), a.flags(), a.annotations(), parser.nf.ArrayTypeNode(parser.pos(b), b), parser.nf.Id(parser.pos(d), d.getIdentifier()), true);
         :}
     ;
-
-override local_variable_declaration ::=
-                    // List of LocalDecl
-    modifiers_or_annotations:a type:b variable_declarators:c
-            {: RESULT = parser.variableDeclarators(b, c, a.flags(), a.annotations()); :}
-    |
-    type:a variable_declarators:b
-            {: RESULT = parser.variableDeclarators(a, b, Flags.NONE); :}
-	;
 
 // 19.8.5) Constructor Declarations
 override constructor_declaration ::=
@@ -631,29 +596,30 @@ override constructor_declaration ::=
     modifiers_or_annotations_opt:a LT:b type_parameter_list_1:c simple_name:d LPAREN formal_parameter_list_opt:e RPAREN throws_opt:f constructor_body:g
         {: RESULT = parser.nf.ConstructorDecl(d.pos, a.flags(), a.annotations(), d.name, e, f, g, c, parser.javadoc(a.position(), parser.pos(b))); :} 
 	;
-    
 extend explicit_constructor_invocation ::=
-	//qualified constructor invocations?
-		name:a DOT SUPER LPAREN:d argument_list_opt:e RPAREN SEMICOLON:g
-        {: RESULT = parser.nf.SuperCall(parser.pos(a, g, d), a.toExpr(), e); :}
-    |	name:a DOT THIS LPAREN:d argument_list_opt:e RPAREN SEMICOLON:g
-        {: RESULT = parser.nf.ThisCall(parser.pos(a, g, d), a.toExpr(), e); :}
     //generic constructor invocations
-	|	type_arguments:a THIS LPAREN argument_list_opt:d RPAREN SEMICOLON:f
+		type_arguments:a THIS LPAREN argument_list_opt:d RPAREN SEMICOLON:f
         {: RESULT = parser.nf.ThisCall(parser.pos(a, f), a, d); :}
 	|	type_arguments:a SUPER LPAREN argument_list_opt:d RPAREN SEMICOLON:f
         {: RESULT = parser.nf.SuperCall(parser.pos(a, f), a, d); :}
 	|	primary:a DOT type_arguments:c SUPER:d
 			LPAREN argument_list_opt:f RPAREN SEMICOLON:h
         {: RESULT = parser.nf.SuperCall(parser.pos(a, h, d), c, a, f); :}
+	|	name:a DOT SUPER LPAREN:d argument_list_opt:e RPAREN SEMICOLON:g
+        {: RESULT = parser.nf.SuperCall(parser.pos(a, g, d), a.toExpr(), e); :}
 	|	name:a DOT type_arguments:c SUPER:d LPAREN argument_list_opt:f RPAREN SEMICOLON:h
         {: RESULT = parser.nf.SuperCall(parser.pos(a, h, d), c, a.toExpr(), f); :}
+
+	|	name:a DOT THIS LPAREN:d argument_list_opt:e RPAREN SEMICOLON:g
+        {: RESULT = parser.nf.ThisCall(parser.pos(a, g, d), a.toExpr(), e); :}
 	|	primary:a DOT type_arguments:c THIS:d
 			LPAREN argument_list_opt:f RPAREN SEMICOLON:h
         {: RESULT = parser.nf.ThisCall(parser.pos(a, h, d), c, a, f); :}
 	|	name:a DOT type_arguments:c THIS:d LPAREN argument_list_opt:f RPAREN SEMICOLON:h
         {: RESULT = parser.nf.ThisCall(parser.pos(a, h, d), c, a.toExpr(), f); :}
 	;
+
+// 19.9) Interfaces
 
 // 19.9.1) Interface Declarations
 override interface_declaration ::=
@@ -688,24 +654,24 @@ extend block_statement ::=
         {: List<Stmt> l = new LinkedList<>();
            l.add(parser.nf.LocalClassDecl(parser.pos(a), a));
            RESULT = l; :}
-	|	interface_declaration:a
-        {: List<Stmt> l = new LinkedList<>();
-           l.add(parser.nf.LocalClassDecl(parser.pos(a), a));
-           RESULT = l; :}
 	;
-
+override local_variable_declaration ::=
+                    // List<LocalDecl>
+    modifiers_or_annotations:a type:b variable_declarators:c
+            {: RESULT = parser.variableDeclarators(b, c, a.flags(), a.annotations()); :}
+    |
+    type:a variable_declarators:b//**
+            {: RESULT = parser.variableDeclarators(a, b, Flags.NONE); :}
+	;
 extend statement ::=	
 	foreach_statement:a
         {: RESULT = a; :}
 	;
-    
 extend statement_no_short_if ::=
     foreach_statement_no_short_if:a
         {: RESULT = a; :}
 	;
-
-//LocalDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init)
-foreach_statement ::=
+foreach_statement ::=//**
 		FOR:a LPAREN type:c variable_declarator_id:d COLON expression:f RPAREN statement:h
  	       {:
  	       LocalDecl ld = parser.nf.LocalDecl(parser.pos(c,d), Flags.NONE, c, d.name()); 
@@ -716,7 +682,7 @@ foreach_statement ::=
     	    LocalDecl ld = parser.nf.LocalDecl(parser.pos(d,e), c.flags(), c.annotations(), d, e.name(), null); 
     	    RESULT = parser.nf.ExtendedFor(parser.pos(a, i), ld, g, i); :}
 	;
-foreach_statement_no_short_if ::=
+foreach_statement_no_short_if ::=//**
 		FOR:a LPAREN type:c variable_declarator_id:d COLON expression:f RPAREN statement_no_short_if:h
         	{: 
         	LocalDecl ld = parser.nf.LocalDecl(parser.pos(c,d), Flags.NONE, c, d.name(), null);  
@@ -729,34 +695,18 @@ foreach_statement_no_short_if ::=
 	;
 
 // 19.12) Expressions
-override primary_no_new_array ::=
-		literal:a
-        {: RESULT = a; :}
-	|	THIS:a
-        {: RESULT = parser.nf.This(parser.pos(a)); :}
-	|	LPAREN name:a RPAREN
+drop { primary_no_new_array ::=
+		LPAREN expression RPAREN
+	| array_type DOT CLASS
+;}
+extend primary_no_new_array ::=
+		LPAREN name:a RPAREN
         {: RESULT = a.toExpr(); :}
 	|	LPAREN expression_nn:a RPAREN
         {: RESULT = a; :}
-	|	class_instance_creation_expression:a
-        {: RESULT = a; :}
-	|	field_access:a
-        {: RESULT = a; :}
-	|	method_invocation:a
-        {: RESULT = a; :}
-	|	array_access:a
-        {: RESULT = a; :}
-	|	name:a DOT THIS:c
-        {: RESULT = parser.nf.This(parser.pos(a, c, c), a.toType()); :}
-	|	VOID:a DOT CLASS:c
-        {: RESULT = parser.nf.ClassLit(parser.pos(a, c, c), parser.nf.CanonicalTypeNode(parser.pos(a), parser.ts.Void())); :}
-	// "Type DOT CLASS", but expanded
-	|	primitive_type:a DOT CLASS:c
-        {: RESULT = parser.nf.ClassLit(parser.pos(a, c, c), a); :}
+	// "array_type DOT CLASS", but expanded
 	|	primitive_type:a dims:b DOT CLASS:d
         {: RESULT = parser.nf.ClassLit(parser.pos(a, d, d), parser.array(a, b.intValue())); :}
-	|	name:a DOT CLASS:c
-        {: RESULT = parser.nf.ClassLit(parser.pos(a, c, c), a.toType()); :}
 	|	name:a dims:b DOT CLASS:d
         {: RESULT = parser.nf.ClassLit(parser.pos(a, d, d), parser.array(a.toType(), b.intValue())); :}
 //	the following two productions are part of the expansion of
@@ -767,7 +717,7 @@ override primary_no_new_array ::=
 	;
 // grammar distributed with prototype 2.2 is in error; the following is correct
 //  [ Neal Gafter, <3F2577E0.3090008@sun.com> ]
-override class_instance_creation_expression ::=
+override class_instance_creation_expression ::=//**
 		NEW:a class_or_interface_type:b LPAREN argument_list_opt:d RPAREN class_body_opt:f
         {: RESULT = parser.nf.New(parser.pos(a), b, d, f); :}
 	|	NEW:a type_arguments:b class_or_interface_type:c LPAREN argument_list_opt:e RPAREN class_body_opt:g
@@ -793,7 +743,7 @@ override class_instance_creation_expression ::=
            RESULT = parser.nf.New(parser.pos(a), a.toExpr(), d, tn, h, j); :}
 ;
 
-override array_creation_expression ::= 
+override array_creation_expression ::= //**
                     // NewArray
         NEW:n primitive_type:a dim_exprs:b dims_opt:c
             {: RESULT = parser.nf.NewArray(parser.pos(n, b), a, b,
@@ -805,7 +755,7 @@ override array_creation_expression ::=
 			{: RESULT = a; :}
 	;		
 
-initialized_array_creation_expression ::=
+initialized_array_creation_expression ::=//**
 		NEW:a primitive_type:b dims:c array_initializer:d
         {: RESULT = parser.nf.NewArray(parser.pos(a, d), b, Collections.<Expr> emptyList(), c.intValue(), d); :}
 	|	NEW:a class_or_interface_type:b dims:c array_initializer:d
@@ -813,7 +763,7 @@ initialized_array_creation_expression ::=
                 Collections.<Expr> emptyList(), c.intValue(), d); :}
 	;
 
-override array_access ::=
+override array_access ::=//**
               // ArrayAccess
     name:a LBRACK expression:b RBRACK:d
         {: RESULT = parser.nf.ArrayAccess(parser.pos(a, d), a.toExpr(), b); :}
@@ -826,6 +776,13 @@ override array_access ::=
 	;
 
 extend method_invocation ::=
+// the following production appeared in the prototype 2.2 spec, but it
+// introduces ambiguities in the grammar (consider the expression
+//          A((B)<C,D>E());
+// which could be either an invocation on E or two boolean comparisons).
+// Neal Gafter has assured me that this production should be removed
+// from the grammar. <3F256C06.7000600@sun.com>
+//	|	type_arguments name LPAREN argument_list_opt RPAREN
 	// Instantiating type arguments
     primary:a DOT type_arguments:c IDENTIFIER:d LPAREN argument_list_opt:f RPAREN:g
         {: RESULT = parser.nf.Call(parser.pos(a, g), a, c, parser.nf.Id(parser.pos(d), d.getIdentifier()), f); :}
@@ -848,29 +805,23 @@ extend method_invocation ::=
 //  is this going to be a cast_expression or a relational_expression?
 // canonically, this production is:
 //     cast_expression ::= LPAREN type RPAREN unary_expression_not_plus_minus
-override cast_expression ::=
-		LPAREN:a primitive_type:b dims_opt:c RPAREN unary_expression:e
-        {: RESULT = parser.nf.Cast(parser.pos(a, e, b), parser.array(b, c.intValue()), e); :}
-        
-	|	LPAREN:a name:b RPAREN unary_expression_not_plus_minus:d
+drop { cast_expression ::=
+		LPAREN expression RPAREN unary_expression_not_plus_minus
+;}
+extend cast_expression ::=
+		LPAREN:a name:b RPAREN unary_expression_not_plus_minus:d
         {: RESULT = parser.nf.Cast(parser.pos(a, d, b), b.toType(), d); :}
-
-	|	LPAREN:a name:b dims:c RPAREN unary_expression_not_plus_minus:e
-        {: RESULT = parser.nf.Cast(parser.pos(a, e, b), parser.array(b.toType(), c.intValue()), e); :}
-
 	|	LPAREN:a name:b LT type_argument_list_1:d dims_opt:e RPAREN
 			unary_expression_not_plus_minus:g
         {: 
           TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(b, d), b.toType(),d);
           RESULT = parser.nf.Cast(parser.pos(a, g, b), parser.array(tn, e.intValue()), g); :}
-
 	|	LPAREN:a name:b LT type_argument_list_1:d DOT
 			class_or_interface:f dims_opt:g RPAREN
-			unary_expression_not_plus_minus:i
+			unary_expression_not_plus_minus:i//**
         {: AmbTypeNode bb = (AmbTypeNode)f;
            TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(b, d), parser.exprToType(b.toExpr()),d);
            RESULT = parser.nf.Cast(parser.pos(a, i, b), parser.array(parser.nf.AmbTypeNode(parser.pos(b, f), tn, bb.id()), g.intValue()), i); :}
-
 	|	LPAREN:a name:b LT type_argument_list_1:d DOT
 			class_or_interface:f LT type_argument_list_1:h dims_opt:j RPAREN
 			unary_expression_not_plus_minus:i
@@ -879,18 +830,9 @@ override cast_expression ::=
            tn = parser.nf.AmbTypeInstantiation(parser.pos(b, h), parser.nf.AmbTypeNode(parser.pos(b, f), tn, bb.id()), h);
            RESULT = parser.nf.Cast(parser.pos(a, i, b), parser.array(tn, j.intValue()), i); :}
 	;
-override relational_expression ::=
-		shift_expression:a
-        {: RESULT = a; :}
-	|	relational_expression:a LT shift_expression:c
-        {: RESULT = parser.nf.Binary(parser.pos(a, c), a, Binary.LT, c); :}
-	|	relational_expression:a GT shift_expression:c
-        {: RESULT = parser.nf.Binary(parser.pos(a, c), a, Binary.GT, c); :}
-	|	relational_expression:a LTEQ shift_expression:c
-        {: RESULT = parser.nf.Binary(parser.pos(a, c), a, Binary.LE, c); :}
-	|	relational_expression:a GTEQ shift_expression:c
-        {: RESULT = parser.nf.Binary(parser.pos(a, c), a, Binary.GE, c); :}
-	;
+drop { relational_expression ::=
+		relational_expression INSTANCEOF reference_type
+;}
 // we lower the precendence of instanceof to resolve a grammar ambiguity.
 // semantics are unchanged, since relational expressions do not operate
 // on boolean.  Eric Blake had a different solution here, where he
@@ -910,6 +852,8 @@ override equality_expression ::=
 	|	equality_expression:a NOTEQ instanceof_expression:c
         {: RESULT = parser.nf.Binary(parser.pos(a, c), a, Binary.NE, c); :}
 	;
+// 'constant_expression' should include enumerated constants.
+// note that this constraint must be enforced during semantic checking
 
 // JLS-14 productions.
 type_parameters_opt ::= 
@@ -1191,14 +1135,6 @@ conditional_expression_nn ::=
         {: RESULT = parser.nf.Conditional(parser.pos(a, e), a, c, e); :}
             
 	;
-override conditional_expression ::=
-                    // Expr
-    conditional_or_expression:a
-    {: RESULT = a; :}
-    |   conditional_or_expression:a QUESTION expression:b
-        COLON conditional_expression:c
-    {: RESULT = parser.nf.Conditional(parser.pos(a, c), a, b, c); :}
-;
 
 assignment_expression_nn ::=
 		conditional_expression_nn:a

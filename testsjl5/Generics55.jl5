@@ -1,4 +1,6 @@
+import java.util.*;
 
-public interface Generics55  {
-	<T> boolean equals(Object obj);
-}
+class Foo {}
+abstract class A implements List<Object>, List<Foo> {}
+abstract class B implements List<Object>, List {}
+// Should report an error: List cannot be inherited with different arguments

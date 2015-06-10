@@ -1,0 +1,21 @@
+//http://cstheory.stackexchange.com/questions/22384/resolving-ambiguity-in-an-lalr-grammar-with-empty-productions
+//(unamb)
+
+terminal IDENTIFIER;
+terminal INT, BOOL, EQ;
+
+terminal Expression;
+
+non terminal Procedure, VariableList, VariableDef, Type, StatementList,
+Statement;
+
+start with Procedure;
+
+Procedure ::= VariableList StatementList;
+
+VariableList ::= VariableList VariableDef | ;
+VariableDef ::= Type IDENTIFIER;
+Type ::= INT | BOOL | IDENTIFIER;
+
+StatementList ::= StatementList Statement | ;
+Statement ::= IDENTIFIER EQ Expression;

@@ -1,10 +1,8 @@
 package java_cup;
 
-import polyglot.util.SerialVersionUID;
-
 /** Exception subclass for reporting internal errors in JavaCup. */
-public class internal_error extends Exception {
-    private static final long serialVersionUID = SerialVersionUID.generate();
+public class internal_error extends Error {
+    private static final long serialVersionUID = 0xdeadbeef;
 
     /** Constructor with a message */
     public internal_error(String msg) {

@@ -1,0 +1,123 @@
+terminal Token PLUS, TIMES, MOD, BAR, EQUALS, LT, LE, GT, GE, MINUS, X, Y, R, THETA, PI, E, VAR,
+    SUPTWO, SUPTHREE, REAL, DIV, POW, SQRT, COS, SIN, TAN, EXP, LN, LG, ACOS, ASIN, ATAN, ATAN2,
+    COSH, SINH, TANH, FLOOR, LPAREN, RPAREN, LBRACK, RBRACK, LBRACE, RBRACE, AND, OR, COMMA, WHERE,
+    IF, THEN, ELSE;
+
+non terminal Token Start, Formulas, Formula, Eqn, Expr, Exprs, Unop, Atom,
+    LFactor, RFactor, Formals, Defns, Definitions, Definition;
+
+precedence left ELSE;
+precedence left OR;
+precedence left AND;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV, MOD;
+precedence left LN, SIN, COS, EXP, SQRT, ACOS, ASIN, ATAN;
+precedence left ATAN2;
+precedence left POW;
+
+start with Start;
+
+Start ::= Formulas Defns
+      | Expr Defns   
+      ;
+
+Formulas ::= Formula
+         | Formulas COMMA Formula
+         ;
+
+Formula ::= Eqn		
+	| LPAREN Formula RPAREN         
+	| Formula AND Formula           
+	| Formula OR Formula            
+        ;
+
+Eqn   ::= Expr EQUALS Expr                 
+      | Expr LT Expr                     
+      | Expr LE Expr                     
+      | Expr GE Expr                     
+      | Expr GT Expr                     
+      ;
+
+Expr  ::= Expr PLUS Expr       	
+      | Expr MINUS Expr      	
+      | Expr TIMES Expr		
+      | Expr DIV Expr		
+      | Expr MOD Expr           
+      | IF Formula THEN Expr ELSE Expr   
+      | Unop		       	
+      ;
+
+Exprs ::= Expr                    
+      | Exprs COMMA Expr        
+      ;
+
+Unop  ::= MINUS Unop               
+      | BAR Expr BAR		
+      | RFactor                  
+      | LFactor                  
+      | LFactor RFactor          
+      | VAR LPAREN Exprs RPAREN
+      ;
+ 
+RFactor ::= SQRT Unop		
+      | COS Unop			
+      | SIN Unop			
+      | TAN Unop
+      | EXP Unop		
+      | ACOS Unop		
+      | ASIN Unop		
+      | ATAN Unop		
+      | ATAN2 LPAREN Expr COMMA Expr RPAREN 
+      | COSH Unop                
+      | SINH Unop                
+      | TANH Unop               
+      | LN Unop			
+      | LG Unop			
+      | FLOOR Unop              
+      ;
+
+LFactor ::= LFactor Atom
+      | Atom			
+      ;
+
+Atom  ::= LPAREN Expr RPAREN	
+      | LBRACK Expr RBRACK      
+      | LBRACE Expr RBRACE      
+      | X			
+      | Y 			
+      | R			
+      | THETA			
+      | PI			
+      | E			
+      | VAR
+      | REAL 			
+      | Atom POW Atom            
+      | Atom SUPTWO              
+      | Atom SUPTHREE            
+      ;
+
+Defns ::= WHERE Definitions        
+      | 
+      ;
+     
+Definitions ::= Definition                      
+      | Definitions COMMA Definition    
+      ;
+
+Definition ::= VAR LPAREN Formals RPAREN EQUALS Expr    
+        ;
+
+Formals ::= VAR                    
+     | Formals COMMA VAR      
+     ;
+
+/*
+Conflict:
+Atom ::= VAR (*)
+Unop ::= VAR (*) LPAREN Exprs RPAREN
+LPAREN
+Example:
+VAR LPAREN Expr RPAREN
+[Unop ::= [LFactor ::= [LFactor ::= [Atom ::= VAR (*)]] [Atom::= LPAREN Expr RPAREN]]]
+[Unop ::= VAR (*) LPAREN [Exprs ::= Expr] RPAREN]
+*/

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -36,6 +36,7 @@ import polyglot.ast.ConstructorCall_c;
 import polyglot.ast.Expr;
 import polyglot.ast.IntLit;
 import polyglot.ast.Node;
+import polyglot.ast.Precedence;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.JL5Options;
 import polyglot.ext.jl5.types.JL5Context;
@@ -78,7 +79,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
     protected boolean isEnumConstructorCall;
 
     public boolean isEnumConstructorCall() {
-        return this.isEnumConstructorCall;
+        return isEnumConstructorCall;
     }
 
     @Override
@@ -88,7 +89,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        ConstructorCall cc = this.node();
+        ConstructorCall cc = node();
         JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
         ClassType ct = ar.context().currentClass();
         if (ct != null && JL5Flags.isEnum(ct.flags())) {
@@ -106,12 +107,12 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
                 return superLang().disambiguate(cc, ar);
             }
         }
-        return superLang().disambiguate(this.node(), ar);
+        return superLang().disambiguate(node(), ar);
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ConstructorCall_c n = (ConstructorCall_c) this.node();
+        ConstructorCall_c n = (ConstructorCall_c) node();
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         Context c = tc.context();
@@ -181,13 +182,13 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             Expr q = qualifier;
 
             // If the super class is an inner class (i.e., has an enclosing
-            // instance of its container class), then either a qualifier 
+            // instance of its container class), then either a qualifier
             // must be provided, or ct must have an enclosing instance of the
             // super class's container class, or a subclass thereof.
             if (q == null && superType.isClass()
                     && superType.toClass().isInnerClass()) {
                 ClassType superContainer = superType.toClass().outer();
-                // ct needs an enclosing instance of superContainer, 
+                // ct needs an enclosing instance of superContainer,
                 // or a subclass of superContainer.
                 ClassType e = ct;
 
@@ -245,7 +246,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        ConstructorCall cc = this.node();
+        ConstructorCall cc = node();
         JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
 
         // are we a super call within an enum const decl?
@@ -267,7 +268,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
         }
 
         if (cc.qualifier() != null) {
-            print(cc.qualifier(), w, tr);
+            printSubExpr(cc.qualifier(), w, tr);
             w.write(".");
         }
 
@@ -275,5 +276,16 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
         super.prettyPrint(w, tr);
         printArgs(w, tr);
         w.write(";");
+    }
+
+    protected void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp) {
+        if (Precedence.LITERAL.isTighter(expr.precedence())) {
+            w.write("(");
+            printBlock(expr, w, pp);
+            w.write(")");
+        }
+        else {
+            print(expr, w, pp);
+        }
     }
 }

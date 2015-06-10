@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -53,7 +53,7 @@ import polyglot.visit.TypeChecker;
 /**
  * {@code Ext} is the super type of all node extension objects.
  * It contains a pointer back to the node it is extending and a possibly-null
- * pointer to another extension node. 
+ * pointer to another extension node.
  */
 public abstract class Ext_c implements Ext {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -67,7 +67,7 @@ public abstract class Ext_c implements Ext {
     }
 
     public Ext_c(Ext ext) {
-        this.node = null;
+        node = null;
         this.ext = ext;
     }
 
@@ -106,7 +106,7 @@ public abstract class Ext_c implements Ext {
         if (this.node != null)
             throw new InternalCompilerError("Already initialized.");
         this.node = node;
-        if (this.ext != null) this.ext.init(node);
+        if (ext != null) ext.init(node);
     }
 
     @Override
@@ -114,7 +114,7 @@ public abstract class Ext_c implements Ext {
         if (this.pred != null)
             throw new InternalCompilerError("Already initialized.");
         this.pred = pred;
-        if (this.ext != null) this.ext.initPred(this);
+        if (ext != null) ext.initPred(this);
     }
 
     @Override
@@ -266,6 +266,11 @@ public abstract class Ext_c implements Ext {
     @Override
     public Node extRewrite(ExtensionRewriter rw) throws SemanticException {
         return superLang().extRewrite(node(), rw);
+    }
+
+    @Override
+    public Node extRewriteOverride(ExtensionRewriter rw) {
+        return superLang().extRewriteOverride(node(), rw);
     }
 
     @Deprecated

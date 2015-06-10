@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -85,7 +85,7 @@ public class TypeSystem_c implements TypeSystem {
         // fully qualified names to instances of Named. A pass over a
         // compilation unit looks up classes first in its
         // import table and then in the system resolver.
-        this.systemResolver = new SystemResolver(loadedResolver, extInfo);
+        systemResolver = new SystemResolver(loadedResolver, extInfo);
 
         initEnums();
         initFlags();
@@ -105,7 +105,7 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     protected void initTypes() throws SemanticException {
         // FIXME: don't do this when rewriting a type system!
@@ -133,7 +133,7 @@ public class TypeSystem_c implements TypeSystem {
         systemResolver.find("java.lang.ArrayIndexOutOfBoundsException");
         systemResolver.find("java.lang.ArrayStoreException");
         systemResolver.find("java.lang.ArithmeticException");
-        */
+         */
     }
 
     @Override
@@ -148,17 +148,17 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public SystemResolver saveSystemResolver() {
-        SystemResolver r = this.systemResolver;
-        this.systemResolver = r.copy();
+        SystemResolver r = systemResolver;
+        systemResolver = r.copy();
         return r;
     }
 
     @Override
     public void restoreSystemResolver(SystemResolver r) {
-        if (r != this.systemResolver.previous()) {
+        if (r != systemResolver.previous()) {
             throw new InternalCompilerError("Inconsistent systemResolver.previous");
         }
-        this.systemResolver = r;
+        systemResolver = r;
     }
 
     @Deprecated
@@ -321,7 +321,7 @@ public class TypeSystem_c implements TypeSystem {
             ClassType container) {
         assert_(container);
 
-        // access for the default constructor is determined by the 
+        // access for the default constructor is determined by the
         // access of the containing class. See the JLS, 2nd Ed., 8.8.7.
         Flags access = Flags.NONE;
         if (container.flags().isPrivate()) {
@@ -1173,8 +1173,7 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     protected <I extends ProcedureInstance> I findProcedure(List<I> acceptable,
-            ReferenceType container, List<Type> argTypes, ClassType currClass)
-            throws SemanticException {
+            ReferenceType container, List<Type> argTypes, ClassType currClass) {
         Collection<I> maximal = findMostSpecificProcedures(acceptable);
 
         if (maximal.size() == 1) {
@@ -1184,14 +1183,13 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     protected <Instance extends ProcedureInstance> Collection<Instance> findMostSpecificProcedures(
-            List<Instance> acceptable) throws SemanticException {
-
+            List<Instance> acceptable) {
+        MostSpecificComparator<Instance> msc = mostSpecificComparator();
         // now, use JLS 15.12.2.2
         // First sort from most- to least-specific.
-        MostSpecificComparator<Instance> msc = new MostSpecificComparator<>();
         acceptable = new ArrayList<>(acceptable); // make into array list to sort
         Collections.sort(acceptable, msc);
 
@@ -1273,6 +1271,11 @@ public class TypeSystem_c implements TypeSystem {
         return maximal;
     }
 
+    @Override
+    public <T extends ProcedureInstance> MostSpecificComparator<T> mostSpecificComparator() {
+        return new MostSpecificComparator<>();
+    }
+
     /**
      * Class to handle the comparisons; dispatches to moreSpecific method.
      */
@@ -1311,7 +1314,7 @@ public class TypeSystem_c implements TypeSystem {
         // The list of acceptable methods. These methods are accessible from
         // currClass, the method call is valid, and they are not overridden
         // by an unacceptable method (which can occur with protected methods
-        // only). They include methods that are inherited from super classes 
+        // only). They include methods that are inherited from super classes
         // and interfaces but not overridden.
         List<MethodInstance> acceptable = new ArrayList<>();
 
@@ -1367,7 +1370,7 @@ public class TypeSystem_c implements TypeSystem {
                                     + mi.container());
                         }
 
-                        // Check that mi isn't overridden by something 
+                        // Check that mi isn't overridden by something
                         // already accepted
                         if (!overridden.contains(mi)) {
                             // mi isn't overridden by something already in acceptable
@@ -1664,6 +1667,14 @@ public class TypeSystem_c implements TypeSystem {
         assert_(m1);
         assert_(m2);
         return m1.isSameMethodImpl(m2);
+    }
+
+    @Override
+    public boolean isSameConstructor(ConstructorInstance c1,
+            ConstructorInstance c2) {
+        assert_(c1);
+        assert_(c2);
+        return c1.isSameConstructorImpl(c2);
     }
 
     @Override
@@ -2212,7 +2223,7 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public Flags legalConstructorFlags() {
-        // A constructor cannot be abstract, static, final, native, strictfp, 
+        // A constructor cannot be abstract, static, final, native, strictfp,
         // or synchronized.  See JLS 2nd Ed. | 8.8.3.
         return legalAccessFlags();
     }
@@ -2435,8 +2446,8 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public void checkClassConformance(ClassType ct) throws SemanticException {
-        // build up a list of superclasses and interfaces that ct 
-        // extends/implements that may contain abstract methods that 
+        // build up a list of superclasses and interfaces that ct
+        // extends/implements that may contain abstract methods that
         // ct inherits or must define.
         List<ReferenceType> superInterfaces = abstractSuperInterfaces(ct);
 
@@ -2530,37 +2541,33 @@ public class TypeSystem_c implements TypeSystem {
 
     @Override
     public MethodInstance findImplementingMethod(ClassType ct, MethodInstance mi) {
-        ReferenceType curr = ct;
-        while (curr != null) {
-            List<? extends MethodInstance> possible =
-                    curr.methods(mi.name(), mi.formalTypes());
-            for (MethodInstance mj : possible) {
-                if (isAccessible(mi, ct) && isAccessible(mj, ct)
-                        || isAccessible(mi, mj.container().toClass())) {
-                    if (!mj.flags().isAbstract()) {
-                        // The method mj may be a suitable implementation of mi.
-                        // mj is not abstract, and either mj's container 
-                        // can access mi (thus mj can really override mi), or
-                        // mi and mj are both accessible from ct (e.g.,
-                        // mi is declared in an interface that ct implements,
-                        // and mj is defined in a superclass of ct).
-                        return mj;
-                    }
-                    else if (curr == ct || curr == mi.container()) {
-                        // we've reached the definition of the abstract 
-                        // method. We don't want to look higher in the 
-                        // hierarchy; this is not an optimization, but is 
-                        // required for correctness. 
-                        return null;
-                    }
-                }
+        // Obtain a list of declared methods in ct.
+        List<? extends MethodInstance> declared =
+                ct.methods(mi.name(), mi.formalTypes());
+        for (MethodInstance mj : declared) {
+            if (mj.flags().isAbstract()) {
+                // We found a method that is declared abstract, so no
+                // implementation of mi can be found for ct.
+                return null;
             }
-
-            curr =
-                    curr.superType() == null ? null : curr.superType()
-                                                          .toReference();
+            if (mi.flags().isPublic() || mi.flags().isProtected()
+                    || isAccessible(mi, ct)) {
+                // If this method is implemented in ct and can override the
+                // desired method, we found an implementation.
+                return mj;
+            }
         }
-        return null;
+
+        // No method is declared and implemented in ct, so we must find an
+        // implementation of the method that is inherited from ct's superclass.
+        ClassType superClass =
+                ct.superType() == null ? null : ct.superType().toClass();
+        if (superClass == null) return null;
+
+        MethodInstance mj = findImplementingMethod(superClass, mi);
+        // Finally, check if mj is accessible from ct.
+        if (mj == null || !isAccessible(mj, ct)) return null;
+        return mj;
     }
 
     @Override

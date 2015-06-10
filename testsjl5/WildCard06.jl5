@@ -1,0 +1,8 @@
+import java.util.*;
+
+class L extends ArrayList<?> {
+    <X>void g() {
+        Object o = new ArrayList<?>();
+        this.<?> g();
+    }
+}

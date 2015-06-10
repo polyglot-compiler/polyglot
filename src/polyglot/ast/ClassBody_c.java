@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -65,13 +65,13 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     public ClassBody_c(Position pos, List<ClassMember> members, Ext ext) {
         super(pos, ext);
-        assert (members != null);
+        assert members != null;
         this.members = ListUtil.copy(members, true);
     }
 
     @Override
     public List<ClassMember> members() {
-        return this.members;
+        return members;
     }
 
     @Override
@@ -88,8 +88,8 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     @Override
     public ClassBody addMember(ClassMember member) {
-        List<ClassMember> l = new ArrayList<>(this.members.size() + 1);
-        l.addAll(this.members);
+        List<ClassMember> l = new ArrayList<>(members.size() + 1);
+        l.addAll(members);
         l.add(member);
         return members(l);
     }
@@ -134,7 +134,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
                 if (fi.name().equals(fj.name())) {
                     throw new SemanticException("Duplicate field \"" + fj
-                            + "\".", fj.position());
+                                                + "\".", fj.position());
                 }
             }
         }
@@ -143,6 +143,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
     protected void duplicateConstructorCheck(TypeChecker tc)
             throws SemanticException {
         ClassType type = tc.context().currentClass();
+        TypeSystem ts = tc.typeSystem();
 
         List<ConstructorInstance> l = new ArrayList<>(type.constructors());
 
@@ -152,9 +153,9 @@ public class ClassBody_c extends Term_c implements ClassBody {
             for (int j = i + 1; j < l.size(); j++) {
                 ConstructorInstance cj = l.get(j);
 
-                if (ci.hasFormals(cj.formalTypes())) {
+                if (isSameConstructor(ts, ci, cj)) {
                     throw new SemanticException("Duplicate constructor \"" + cj
-                            + "\".", cj.position());
+                                                + "\".", cj.position());
                 }
             }
         }
@@ -175,7 +176,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
                 if (isSameMethod(ts, mi, mj)) {
                     throw new SemanticException("Duplicate method \"" + mj
-                            + "\".", mj.position());
+                                                + "\".", mj.position());
                 }
             }
         }
@@ -195,7 +196,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
                 if (mi.name().equals(mj.name())) {
                     throw new SemanticException("Duplicate member type \"" + mj
-                            + "\".", mj.position());
+                                                + "\".", mj.position());
                 }
             }
         }
@@ -204,6 +205,11 @@ public class ClassBody_c extends Term_c implements ClassBody {
     protected boolean isSameMethod(TypeSystem ts, MethodInstance mi,
             MethodInstance mj) {
         return mi.isSameMethod(mj);
+    }
+
+    protected boolean isSameConstructor(TypeSystem ts, ConstructorInstance ci,
+            ConstructorInstance cj) {
+        return ci.isSameConstructor(cj);
     }
 
     @Override
@@ -231,8 +237,8 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
             for (Iterator<ClassMember> i = members.iterator(); i.hasNext();) {
                 ClassMember member = i.next();
-                if ((member instanceof polyglot.ast.CodeDecl)
-                        || (prev instanceof polyglot.ast.CodeDecl)) {
+                if (member instanceof polyglot.ast.CodeDecl
+                        || prev instanceof polyglot.ast.CodeDecl) {
                     w.newline(0);
                 }
                 prev = member;
@@ -260,7 +266,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ClassBody(this.position, this.members);
+        return nf.ClassBody(position, members);
     }
 
 }

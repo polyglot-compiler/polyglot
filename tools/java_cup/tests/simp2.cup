@@ -1,0 +1,72 @@
+terminal Integer DIGIT;
+terminal Token DOT, MEM, ASSIGN;
+non terminal Command goal, statement;
+non terminal Expr expr;
+non terminal Expr number ;
+
+start with goal;
+
+goal ::= statement ;
+
+number ::= DIGIT | number DIGIT ;
+
+statement ::= expr DOT DOT statement statement
+	   | MEM expr ASSIGN expr
+	   ;
+
+expr ::= number
+      ;
+
+/** The 'ideal' counterexample is:
+
+    expr DOT DOT MEM expr ASSIGN number (*) DIGIT DIGIT DOT DOT statement statement
+
+    parse 1: (REDUCE)
+
+    [goal::=
+      [statement::=
+        expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= [number::= number (*)]]]
+            [stmt::= [expr::= [number::= [number::= DIGIT] DIGIT]] DOT DOT statement statement]]]
+
+    parse 2: (SHIFT)
+
+    [goal::=
+      [statement::=
+        expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= [number::= number (*) DIGIT ]]]
+            [stmt::= [expr::= [number::= DIGIT] DOT DOT statement statement]]]]
+**/
+
+/**
+    Idea: for shift-reduce conflicts, we 'navigate' to the reduce item, giving us:
+
+    [goal::=
+    [statement::=
+        expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= number (*) ], DIGIT
+
+    Now, we prune away all productions on the last state to find a common ancestor and shifting some symbols to the right side:
+
+    [goal::=
+    [statement::=
+        expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= ,  number DIGIT
+
+    We search forward to find how to reach the shift item, while consuming all the symbols on the RHS but the lookahead:
+
+    [goal::= [statement::=
+        expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= [number::= number (*) DIGIT
+
+    We shift across the dot:
+
+    [goal::= [statement::=
+        expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= [number::= number DIGIT (*)
+
+    Now, we try to complete the parse, remembering where the dot was:
+
+    [goal::= [statement::=
+        expr DOT DOT [stmt::= MEM expr ASSIGN [expr::= [number::= number DIGIT (*)]
+            [statement::= [expr::= [number::= DIGIT]] DOT DOT statement statement]
+
+    removing the productions, we have a single example that could be parsed either way: (are we guaranteed it works for the reduce action too?)
+
+        expr DOT DOT MEM expr ASSIGN number (*) DIGIT DIGIT DOT DOT statement statement
+
+**/

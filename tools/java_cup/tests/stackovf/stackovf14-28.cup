@@ -1,0 +1,23 @@
+//http://stackoverflow.com/questions/22384530/bison-yacc-reduce-reduce-conflict-for-a-specific-grammar-example
+//(r/r, amb)
+
+terminal IDnum, INTnum, LBRACnum, RBRACnum, DOTnum;
+
+non terminal type, id_or_int, brackets_or_end, brackets, remainingpartboe;
+
+start with type;
+
+type    ::=   id_or_int   brackets_or_end
+        ;
+id_or_int   ::=   IDnum
+        |   INTnum
+        ;
+brackets_or_end ::=   brackets    remainingpartboe
+        |
+        ;
+brackets    ::=   LBRACnum    RBRACnum    brackets
+        |
+        ;
+remainingpartboe::=   DOTnum      type
+        |
+        ;   

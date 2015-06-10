@@ -1,0 +1,9 @@
+terminal a, b;
+non terminal S, T, X, Y;
+
+start with S;
+
+S ::= T | S T;
+T ::= X | Y;
+X ::= a;
+Y ::= a a b;

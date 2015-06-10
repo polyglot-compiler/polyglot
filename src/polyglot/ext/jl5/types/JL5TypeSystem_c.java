@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -194,7 +194,7 @@ public class JL5TypeSystem_c extends
     @Override
     public ClassType wrapperClassOfPrimitive(PrimitiveType t) {
         try {
-            return (ClassType) this.typeForName(t.wrapperTypeString(this));
+            return (ClassType) typeForName(t.wrapperTypeString(this));
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Couldn't find primitive wrapper "
@@ -206,24 +206,15 @@ public class JL5TypeSystem_c extends
     @Override
     public PrimitiveType primitiveTypeOfWrapper(Type l) {
         try {
-            if (l.equals(this.typeForName("java.lang.Boolean")))
-                return this.Boolean();
-            if (l.equals(this.typeForName("java.lang.Character")))
-                return this.Char();
-            if (l.equals(this.typeForName("java.lang.Byte")))
-                return this.Byte();
-            if (l.equals(this.typeForName("java.lang.Short")))
-                return this.Short();
-            if (l.equals(this.typeForName("java.lang.Integer")))
-                return this.Int();
-            if (l.equals(this.typeForName("java.lang.Long")))
-                return this.Long();
-            if (l.equals(this.typeForName("java.lang.Float")))
-                return this.Float();
-            if (l.equals(this.typeForName("java.lang.Double")))
-                return this.Double();
-            if (l.equals(this.typeForName("java.lang.Void")))
-                return this.Void();
+            if (l.equals(typeForName("java.lang.Boolean"))) return Boolean();
+            if (l.equals(typeForName("java.lang.Character"))) return Char();
+            if (l.equals(typeForName("java.lang.Byte"))) return Byte();
+            if (l.equals(typeForName("java.lang.Short"))) return Short();
+            if (l.equals(typeForName("java.lang.Integer"))) return Int();
+            if (l.equals(typeForName("java.lang.Long"))) return Long();
+            if (l.equals(typeForName("java.lang.Float"))) return Float();
+            if (l.equals(typeForName("java.lang.Double"))) return Double();
+            if (l.equals(typeForName("java.lang.Void"))) return Void();
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("Couldn't find wrapper class");
@@ -855,7 +846,7 @@ public class JL5TypeSystem_c extends
             // the actual args don't match the number of the formal args.
             if (!(mi.isVariableArity() && argTypes.size() >= mi.formalTypes()
                                                                .size() - 1)) {
-                // the last (variable) argument can consume 0 or more of the actual arguments. 
+                // the last (variable) argument can consume 0 or more of the actual arguments.
                 return null;
             }
 
@@ -917,6 +908,9 @@ public class JL5TypeSystem_c extends
             subst = inferTypeArgs(mi, argTypes, null);
         }
         else if (!mi.typeParams().isEmpty() && !actualTypeArgs.isEmpty()) {
+            // Number of actual type parameters must be equal to number of
+            // formal type parameters.
+            if (mi.typeParams().size() != actualTypeArgs.size()) return null;
             Map<TypeVariable, ReferenceType> m = new HashMap<>();
             Iterator<? extends ReferenceType> iter = actualTypeArgs.iterator();
             for (TypeVariable tv : mi.typeParams()) {
@@ -983,8 +977,8 @@ public class JL5TypeSystem_c extends
     @Override
     public ClassType instantiate(Position pos, JL5ParsedClassType clazz,
             List<? extends ReferenceType> actuals) throws SemanticException {
-        if (clazz.typeVariables().isEmpty()
-                || (actuals == null || actuals.isEmpty())) {
+        if (clazz.typeVariables().isEmpty() || actuals == null
+                || actuals.isEmpty()) {
             return clazz;
         }
         boolean allNull = true;
@@ -1087,14 +1081,26 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public boolean hasSameSignature(JL5MethodInstance mi, JL5MethodInstance mj) {
+    public boolean hasSameSignature(JL5ProcedureInstance mi,
+            JL5ProcedureInstance mj) {
         return hasSameSignature(mi, mj, false);
     }
 
-    protected boolean hasSameSignature(JL5MethodInstance mi,
-            JL5MethodInstance mj, boolean eraseMj) {
-        if (!mi.name().equals(mj.name())) {
-            return false;
+    protected boolean hasSameSignature(JL5ProcedureInstance mi,
+            JL5ProcedureInstance mj, boolean eraseMj) {
+        // JLS 3rd Ed. | 8.4.2
+        // Two methods have the same signature if they have the same name
+        // and argument types.
+        // Two methods have the same argument types if all of the following hold:
+        // - They have same number of formal parameters
+        // - They have same number of type parameters
+        // - After renaming type parameters to match, the bounds of type
+        //   variables and argument types are the same.
+        if (mi instanceof JL5MethodInstance && mj instanceof JL5MethodInstance) {
+            if (!((JL5MethodInstance) mi).name()
+                                         .equals(((JL5MethodInstance) mj).name())) {
+                return false;
+            }
         }
         if (mi.formalTypes().size() != mj.formalTypes().size()) {
             return false;
@@ -1118,13 +1124,25 @@ public class JL5TypeSystem_c extends
                 substm.put(mj.typeParams().get(i), mi.typeParams().get(i));
             }
             Subst<TypeVariable, ReferenceType> subst = this.subst(substm);
-            mj = subst.substMethod(mj);
+
+            // Check that bounds of type variables match
+            for (Iterator<? extends TypeVariable> typesi =
+                    mi.typeParams().iterator(), typesj =
+                    mj.typeParams().iterator(); typesi.hasNext();) {
+                TypeVariable ti = typesi.next();
+                TypeVariable tj = typesj.next();
+                if (!ti.upperBound().equals(subst.substType(tj.upperBound())))
+                    return false;
+            }
+
+            if (mj instanceof JL5MethodInstance)
+                mj = subst.substMethod((JL5MethodInstance) mj);
+            else mj = subst.substConstructor((JL5ConstructorInstance) mj);
         }
 
-        // now check that the types match
-        Iterator<? extends Type> typesi = mi.formalTypes().iterator();
-        Iterator<? extends Type> typesj = mj.formalTypes().iterator();
-        while (typesi.hasNext()) {
+        // Check that the argument types match
+        for (Iterator<? extends Type> typesi = mi.formalTypes().iterator(), typesj =
+                mj.formalTypes().iterator(); typesi.hasNext();) {
             Type ti = typesi.next();
             Type tj = typesj.next();
             if (eraseMj) {
@@ -1138,7 +1156,8 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public boolean isSubSignature(JL5MethodInstance m1, JL5MethodInstance m2) {
+    public boolean isSubSignature(JL5ProcedureInstance m1,
+            JL5ProcedureInstance m2) {
         if (hasSameSignature(m1, m2)) {
             return true;
         }
@@ -1147,8 +1166,8 @@ public class JL5TypeSystem_c extends
     }
 
     @Override
-    public boolean areOverrideEquivalent(JL5MethodInstance mi,
-            JL5MethodInstance mj) {
+    public boolean areOverrideEquivalent(JL5ProcedureInstance mi,
+            JL5ProcedureInstance mj) {
         return isSubSignature(mi, mj) || isSubSignature(mj, mi);
     }
 
@@ -1173,7 +1192,7 @@ public class JL5TypeSystem_c extends
             return ri.equals(rj);
         }
         else if (ri.isReference()) {
-            return ri.isSubtype(rj) || this.isUncheckedConversion(ri, rj)
+            return ri.isSubtype(rj) || isUncheckedConversion(ri, rj)
                     || ri.isSubtype(this.erasureType(rj));
         }
         else if (ri.isVoid()) {
@@ -1192,26 +1211,26 @@ public class JL5TypeSystem_c extends
                     curr.methodsNamed(mi.name());
             for (MethodInstance mj : possible) {
                 if (!mj.flags().isAbstract()
-                        && ((isAccessible(mi, ct) && isAccessible(mj, ct)) || isAccessible(mi,
-                                                                                           mj.container()
-                                                                                             .toClass()))) {
+                        && (mi.flags().isPublic() || mi.flags().isProtected() || isAccessible(mi,
+                                                                                              mj.container()
+                                                                                                .toClass()))) {
                     // The method mj may be a suitable implementation of mi.
-                    // mj is not abstract, and either mj's container 
+                    // mj is not abstract, and either mj's container
                     // can access mi (thus mj can really override mi), or
                     // mi and mj are both accessible from ct (e.g.,
                     // mi is declared in an interface that ct implements,
                     // and mj is defined in a superclass of ct).
-                    if (this.areOverrideEquivalent((JL5MethodInstance) mi,
-                                                   (JL5MethodInstance) mj)) {
+                    if (areOverrideEquivalent((JL5MethodInstance) mi,
+                                              (JL5MethodInstance) mj)) {
                         return mj;
                     }
                 }
             }
             if (curr == mi.container()) {
-                // we've reached the definition of the abstract 
-                // method. We don't want to look higher in the 
-                // hierarchy; this is not an optimization, but is 
-                // required for correctness. 
+                // we've reached the definition of the abstract
+                // method. We don't want to look higher in the
+                // hierarchy; this is not an optimization, but is
+                // required for correctness.
                 break;
             }
 
@@ -1237,7 +1256,7 @@ public class JL5TypeSystem_c extends
             if (!visitedTypeVariables.add(tv)) {
                 // tv was already in visitedTypeVariables
                 // whoops, we're in some kind of recursive type
-                return this.Object();
+                return Object();
             }
 
             ReferenceType upperBound = tv.upperBound();
@@ -1259,7 +1278,7 @@ public class JL5TypeSystem_c extends
             ClassType ct = null; // most specific class type so far
             ClassType iface = null; // most specific interface type so far
             boolean subtypes = true; // are all the interfaces in a subtype relation?
-            // Find the most specific class 
+            // Find the most specific class
             for (ReferenceType rt : it.bounds()) {
                 ReferenceType origRt = rt;
                 if (rt instanceof TypeVariable) {
@@ -1306,7 +1325,7 @@ public class JL5TypeSystem_c extends
         if (t instanceof WildCardType) {
             WildCardType tv = (WildCardType) t;
             if (tv.upperBound() == null) {
-                return this.Object();
+                return Object();
             }
             return this.erasureType(tv.upperBound(), visitedTypeVariables);
         }
@@ -1315,7 +1334,7 @@ public class JL5TypeSystem_c extends
             return this.erasureType(jst.base(), visitedTypeVariables);
         }
         if (t instanceof JL5ParsedClassType) {
-            return this.toRawType(t);
+            return toRawType(t);
         }
         return t;
     }
@@ -1385,7 +1404,7 @@ public class JL5TypeSystem_c extends
             return false;
         }
         else {
-            return this.typeEquals(fromType, toType);
+            return typeEquals(fromType, toType);
         }
 
     }
@@ -1548,11 +1567,10 @@ public class JL5TypeSystem_c extends
 
         // Optional support for widening conversion after unboxing for compatibility
         // with "javac -source 1.5"
-        JL5Options opts = (JL5Options) this.extensionInfo().getOptions();
+        JL5Options opts = (JL5Options) extensionInfo().getOptions();
         if (opts.morePermissiveCasts) {
             if (isPrimitiveWrapper(fromType) && toType.isPrimitive()) {
-                if (this.isImplicitCastValid(this.unboxingConversion(fromType),
-                                             toType)) {
+                if (isImplicitCastValid(unboxingConversion(fromType), toType)) {
                     return true;
                 }
             }
@@ -1580,8 +1598,7 @@ public class JL5TypeSystem_c extends
 
     protected boolean isCastValidFromClass(ClassType fromType, Type toType) {
         if (toType instanceof TypeVariable) {
-            return this.isCastValid(fromType,
-                                    ((TypeVariable) toType).upperBound());
+            return isCastValid(fromType, ((TypeVariable) toType).upperBound());
         }
         if (toType.isClass()) {
             if (!toType.toClass().flags().isInterface()) {
@@ -1591,13 +1608,13 @@ public class JL5TypeSystem_c extends
                 return (erasedFrom != fromType || erasedTo != toType)
                         && (erasedFrom.isSubtype(erasedTo) || erasedTo.isSubtype(erasedFrom));
                 // TODO: need to check whether there is a supertype X
-                // of this and Y of toType that have the same erasure 
+                // of this and Y of toType that have the same erasure
                 // and are provably distinct.
             }
             else {
                 // toType is an interface
                 // TODO: need to check whether there is a supertype X
-                // of this and Y of toType that have the same erasure 
+                // of this and Y of toType that have the same erasure
                 // and are provably distinct.
             }
         }
@@ -1612,7 +1629,7 @@ public class JL5TypeSystem_c extends
             // toType is final.
             if (fromType instanceof RawClass
                     || fromType instanceof JL5SubstClassType) {
-                // S is either a parameterized type that is an invocation of some generic type declaration G, or a raw type corresponding to a generic type declaration G. 
+                // S is either a parameterized type that is an invocation of some generic type declaration G, or a raw type corresponding to a generic type declaration G.
                 // Then there must exist a supertype X of T, such that X is an invocation of G, or a compile-time error occurs.
                 JL5ParsedClassType baseClass;
                 if (fromType instanceof RawClass) {
@@ -1647,13 +1664,11 @@ public class JL5TypeSystem_c extends
         }
         else {
             // T is a type that is not final (�8.1.1), and S is an interface
-            // if there exists a supertype X of T, and a supertype Y of S, such that both X and Y are provably distinct parameterized types, 
+            // if there exists a supertype X of T, and a supertype Y of S, such that both X and Y are provably distinct parameterized types,
             // and that the erasures of X and Y are the same, a compile-time error occurs.
             // Go through the supertypes of each.
-            List<ReferenceType> allY =
-                    this.allAncestorsOf(fromType.toReference());
-            List<ReferenceType> allX =
-                    this.allAncestorsOf(toType.toReference());
+            List<ReferenceType> allY = allAncestorsOf(fromType.toReference());
+            List<ReferenceType> allX = allAncestorsOf(toType.toReference());
             for (ReferenceType y : allY) {
                 for (ReferenceType x : allX) {
                     if (x instanceof JL5SubstClassType
@@ -1745,8 +1760,8 @@ public class JL5TypeSystem_c extends
 
     private static boolean areTypArgsProvablyDistinct(ReferenceType s,
             ReferenceType t) {
-        // JLS 3rd ed 4.5. "Two type arguments are provably distinct if 
-        // neither of the arguments is a type variable or wildcard, and 
+        // JLS 3rd ed 4.5. "Two type arguments are provably distinct if
+        // neither of the arguments is a type variable or wildcard, and
         // the two arguments are not the same type."
         return !(s instanceof TypeVariable) && !(t instanceof TypeVariable)
                 && !(s instanceof WildCardType) && !(t instanceof WildCardType)
@@ -1917,7 +1932,7 @@ public class JL5TypeSystem_c extends
     /**
      * Populates the list acceptable with those MethodInstances which are
      * Applicable and Accessible as defined by JLS 15.12.2
-     * @throws SemanticException 
+     * @throws SemanticException
      */
     protected List<ConstructorInstance> findAcceptableConstructors(
             ClassType container, List<? extends Type> argTypes,
@@ -1981,7 +1996,13 @@ public class JL5TypeSystem_c extends
                             new NoMemberException(NoMemberException.CONSTRUCTOR,
                                                   "Constructor "
                                                           + ci.signature()
-                                                          + " cannot be invoked with arguments "
+                                                          + " cannot be invoked with "
+                                                          + (!actualTypeArgs.isEmpty()
+                                                                  ? "type arguments <"
+                                                                          + listToString(actualTypeArgs)
+                                                                          + "> and "
+                                                                  : "")
+                                                          + "arguments "
                                                           + "("
                                                           + listToString(argTypes)
                                                           + ").");
@@ -2052,10 +2073,11 @@ public class JL5TypeSystem_c extends
                 rt = ct;
             }
             if (isSubtype(rt, targetClass)) {
+                // Class and static members are accessible.
+                if (mi instanceof ClassType || flags.isStatic()) return true;
                 // In addition, for expressions of the form E.Id or E.Id(...),
                 // access is permitted iff the type of E is S or a subclass of S.
-                // (Deferred to typeCheck in Call_c.)
-                return true;
+                return !fromClient || isSubtype(container, rt);
             }
         }
 
@@ -2093,7 +2115,7 @@ public class JL5TypeSystem_c extends
     public WildCardType wildCardType(Position position,
             ReferenceType upperBound, ReferenceType lowerBound) {
         if (upperBound == null) {
-            upperBound = this.Object();
+            upperBound = Object();
         }
         return new WildCardType_c(this, position, upperBound, lowerBound);
     }
@@ -2122,7 +2144,7 @@ public class JL5TypeSystem_c extends
                 ReferenceType si = ti;
                 if (ti instanceof WildCardType) {
                     CaptureConvertedWildCardType tv =
-                            this.captureConvertedWildCardType(ti.position());
+                            captureConvertedWildCardType(ti.position());
                     tv.setSyntheticOrigin();
                     si = tv;
                 }
@@ -2254,7 +2276,7 @@ public class JL5TypeSystem_c extends
                 }
                 if (!t1.toClass().flags().isInterface()
                         && !t2.toClass().flags().isInterface()) {
-                    if ((!isSubtype(t1, t2)) && (!isSubtype(t2, t1))) {
+                    if (!isSubtype(t1, t2) && !isSubtype(t2, t1)) {
                         if (!quiet)
                             throw new SemanticException("Error in intersection type. Types "
                                     + t1
@@ -2266,8 +2288,8 @@ public class JL5TypeSystem_c extends
                 }
                 if (t1.toClass().flags().isInterface()
                         && t2.toClass().flags().isInterface()
-                        && (t1 instanceof JL5SubstClassType)
-                        && (t2 instanceof JL5SubstClassType)) {
+                        && t1 instanceof JL5SubstClassType
+                        && t2 instanceof JL5SubstClassType) {
                     JL5SubstClassType j5t1 = (JL5SubstClassType) t1;
                     JL5SubstClassType j5t2 = (JL5SubstClassType) t2;
                     if (j5t1.base().equals(j5t2.base()) && !j5t1.equals(j5t2)) {
@@ -2333,20 +2355,20 @@ public class JL5TypeSystem_c extends
     protected ReferenceType glb(Position pos, List<ReferenceType> bounds,
             boolean performIntersectionCheck) {
         if (bounds == null || bounds.isEmpty()) {
-            return this.Object();
+            return Object();
         }
         try {
             // XXX also need to check that does not have two classes that are not in a subclass relation?
             if (performIntersectionCheck
-                    && !this.checkIntersectionBounds(bounds, true)) {
-                return this.Object();
+                    && !checkIntersectionBounds(bounds, true)) {
+                return Object();
             }
             else {
-                return this.intersectionType(pos, bounds);
+                return intersectionType(pos, bounds);
             }
         }
         catch (SemanticException e) {
-            return this.Object();
+            return Object();
         }
     }
 
@@ -2402,7 +2424,7 @@ public class JL5TypeSystem_c extends
         }
         if (t instanceof ArrayType) {
             ArrayType at = t.toArray();
-            Type b = this.toRawType(at.base());
+            Type b = toRawType(at.base());
             return at.base(b);
         }
         return t;
@@ -2443,7 +2465,7 @@ public class JL5TypeSystem_c extends
     @Override
     public Type boxingConversion(Type t) {
         if (t.isPrimitive()) {
-            return this.wrapperClassOfPrimitive(t.toPrimitive());
+            return wrapperClassOfPrimitive(t.toPrimitive());
         }
         return t;
     }
@@ -2777,7 +2799,7 @@ public class JL5TypeSystem_c extends
     @Override
     public boolean isRetainedAnnotation(Type annotationType) {
         if (annotationType.isClass()
-                && annotationType.toClass().isSubtype(this.Annotation())) {
+                && annotationType.toClass().isSubtype(Annotation())) {
             // well, it's an annotation type at least.
             // check if there is a retention policy on it.
             JL5ClassType ct = (JL5ClassType) annotationType.toClass();
@@ -2840,11 +2862,11 @@ public class JL5TypeSystem_c extends
             throws SemanticException {
         if (type1.isPrimitive() && (type2.isReference() || type2.isNull())) {
             // box type1, i.e. promote to an object
-            return leastCommonAncestor(this.boxingConversion(type1), type2);
+            return leastCommonAncestor(boxingConversion(type1), type2);
         }
         if (type2.isPrimitive() && (type1.isReference() || type1.isNull())) {
             // box type2, i.e. promote to an object
-            return leastCommonAncestor(type1, this.boxingConversion(type2));
+            return leastCommonAncestor(type1, boxingConversion(type2));
         }
         return super.leastCommonAncestor(type1, type2);
     }

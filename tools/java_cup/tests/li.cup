@@ -1,0 +1,19 @@
+terminal Token num, little, indians;
+non terminal Token goal, VERSE, NUM, LITTLE, INDIANS;
+
+start with goal;
+
+goal ::= VERSE | goal VERSE;
+VERSE ::= num | LITTLE | INDIANS;
+LITTLE ::= num num little;
+INDIANS ::= num num num little indians;
+
+/*
+Shift/Reduce conflict:
+R: VERSE ::= num (*)
+S: LITTLE ::= num (*) num little
+S: INDIANS ::= num (*) num num little indians
+
+However, this grammar is unambiguous.  It is LR(4), so there is a corresponding
+LR(1) grammar.
+*/

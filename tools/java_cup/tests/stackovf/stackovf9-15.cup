@@ -1,0 +1,22 @@
+//http://stackoverflow.com/questions/3373114/bison-shift-reduce-conflict-for-simple-grammar
+//(unamb)
+
+terminal TYPENAME;
+terminal VARNAME;
+terminal THIS;
+
+terminal DOT;
+
+non terminal start_, Expression;
+
+start with start_;
+
+start_::=
+    Expression
+    ;
+
+Expression::=
+    THIS
+    | THIS DOT VARNAME
+    | Expression DOT TYPENAME
+    ;

@@ -8,10 +8,12 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
 import java_cup.runtime.ComplexSymbolFactory;
+import parser.StateItem;
+import parser.UnifiedExample;
 
 /** This class serves as the main driver for the JavaCup system.
  *  It accepts user options and coordinates overall control flow.
- *  The main flow of control includes the following activities: 
+ *  The main flow of control includes the following activities:
  *  <ul>
  *    <li> Parse user supplied arguments and options.
  *    <li> Open output files.
@@ -24,41 +26,41 @@ import java_cup.runtime.ComplexSymbolFactory;
  *  </ul>
  *
  *  Options to the main program include: <dl>
- *   <dt> -package name  
+ *   <dt> -package name
  *   <dd> specify package generated classes go in [default none]
- *   <dt> -parser name   
+ *   <dt> -parser name
  *   <dd> specify parser class name [default "parser"]
- *   <dt> -symbols name  
+ *   <dt> -symbols name
  *   <dd> specify name for symbol constant class [default "sym"]
  *   <dt> -interface
  *   <dd> emit symbol constant <i>interface</i>, rather than class
- *   <dt> -nonterms      
+ *   <dt> -nonterms
  *   <dd> put non terminals in symbol constant class
- *   <dt> -expect #      
+ *   <dt> -expect #
  *   <dd> number of conflicts expected/allowed [default 0]
- *   <dt> -compact_red   
+ *   <dt> -compact_red
  *   <dd> compact tables by defaulting to most frequent reduce
  *   <dt> -max_actions #
  *   <dd> maximum number of actions per method in generated code
  *        (useful if javac complains about code size &gt;64K) [default 400]
- *   <dt> -nowarn        
+ *   <dt> -nowarn
  *   <dd> don't warn about useless productions, etc.
- *   <dt> -nosummary     
+ *   <dt> -nosummary
  *   <dd> don't print the usual summary of parse states, etc.
- *   <dt> -progress      
+ *   <dt> -progress
  *   <dd> print messages to indicate progress of the system
- *   <dt> -time          
+ *   <dt> -time
  *   <dd> print time usage summary
- *   <dt> -dump_grammar  
+ *   <dt> -dump_grammar
  *   <dd> produce a dump of the symbols and grammar
- *   <dt> -dump_states   
+ *   <dt> -dump_states
  *   <dd> produce a dump of parse state machine
- *   <dt> -dump_tables   
+ *   <dt> -dump_tables
  *   <dd> produce a dump of the parse tables
- *   <dt> -dump          
+ *   <dt> -dump
  *   <dd> produce a dump of all of the above
- *   <dt> -debug         
- *   <dd> turn on debugging messages within JavaCup 
+ *   <dt> -debug
+ *   <dd> turn on debugging messages within JavaCup
  *   <dt> -nopositions
  *   <dd> don't generate the positions code
  *   <dt> -locations
@@ -99,10 +101,12 @@ public class Main {
     protected static boolean opt_show_timing = false;
     /** User option -- do we run produce extra debugging messages */
     protected static boolean opt_do_debug = false;
-    /** User option -- do we compact tables by making most common reduce the 
+    /** User option -- do eclipse debug symbols */
+    protected static boolean opt_do_debugsymbols = false;
+    /** User option -- do we compact tables by making most common reduce the
         default action */
     protected static boolean opt_compact_red = false;
-    /** User option -- should we include non terminal symbol numbers in the 
+    /** User option -- should we include non terminal symbol numbers in the
         symbol constant class. */
     protected static boolean include_non_terms = false;
     /** User option -- do not print a summary. */
@@ -112,13 +116,21 @@ public class Main {
     /** User option -- number of conflicts to expect */
     protected static int expect_conflicts = 0;
     /** Whether to report counterexamples when conflicts are found.
-     * (ACM extension) */
+     * (CupEx extension) */
     public static boolean report_counterexamples = true;
+    /** Whether to report statistics about counterexample finding.
+     * (CupEx extension) */
+    public static boolean report_cex_stats = false;
+    /** Whether to report statistics about counterexample finding to standard output.
+     * (CupEx extension) */
+    public static boolean report_cex_stats_to_out = false;
 
     /* frankf added this 6/18/96 */
     /** User option -- should generator generate code for left/right values? */
     protected static boolean lr_values = true;
-    protected static boolean locations = true;
+    protected static boolean locations = false;
+    protected static boolean xmlactions = false;
+    protected static boolean genericlabels = false;
     /** User option -- should symbols be put in a class or an interface? [CSA]*/
     protected static boolean sym_interface = false;
 
@@ -162,7 +174,7 @@ public class Main {
     /*--- Main Program ------------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** The main driver for the system. 
+    /** The main driver for the system.
      * @param argv an array of strings containing command line arguments.
      */
     public static void main(String argv[]) throws internal_error,
@@ -174,12 +186,14 @@ public class Main {
         /** clean all static members, that contain remaining stuff from earlier calls */
         terminal.clear();
         production.clear();
-        production.clear();
         emit.clear();
         non_terminal.clear();
         parse_reduce_row.clear();
         parse_action_row.clear();
         lalr_state.clear();
+        ErrorManager.clear();
+        StateItem.clear();
+        System.gc();
 
         /* process user options and arguments */
         parse_args(argv);
@@ -188,7 +202,9 @@ public class Main {
         hackish, yes, but works */
         emit.set_lr_values(lr_values);
         emit.set_locations(locations);
-        /* open output files */
+        emit.set_xmlactions(xmlactions);
+        emit.set_genericlabels(genericlabels);
+        /* open output set_xmlactionsfiles */
         if (print_progress) System.err.println("Opening files...");
         /* use a buffered version of standard input */
         input_file = new BufferedInputStream(System.in);
@@ -246,6 +262,25 @@ public class Main {
         /* produce a summary if desired */
         if (!no_summary) emit_summary(did_output);
 
+//        for (lalr_state state : lalr_state.all_states()) {
+//            System.out.println(state);
+//        }
+
+        if (report_cex_stats) {
+            if (report_cex_stats_to_out) {
+                System.out.println("conflicts:\n" + emit.num_conflicts);
+                System.out.println("nonterminals:\n" + non_terminal.number());
+                System.out.println("productions:\n" + production.number());
+                System.out.println("states:\n" + lalr_state.number());
+                StateItem.report();
+                lalr_state.report();
+                System.out.println("Total time used for finding counterexamples:\n"
+                        + lalr_state.cumulativeCexTime);
+            }
+            else System.err.println("Total time used for finding counterexamples: "
+                    + lalr_state.cumulativeCexTime);
+        }
+
         /* If there were errors during the run,
          * exit with non-zero status (makefile-friendliness). --CSA */
         if (ErrorManager.getManager().getErrorCount() != 0) System.exit(100);
@@ -253,7 +288,7 @@ public class Main {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Print a "usage message" that described possible command line options, 
+    /** Print a "usage message" that described possible command line options,
      *  then exit.
      * @param message a specific error message to preface the usage message by.
      */
@@ -261,7 +296,9 @@ public class Main {
         System.err.println();
         System.err.println(message);
         System.err.println();
-        System.err.println("Usage: "
+        System.err.println(version.title_str
+                + "\n"
+                + "Usage: "
                 + version.program_name
                 + " [options] [filename]\n"
                 + "  and expects a specification file on standard input if no filename is given.\n"
@@ -282,6 +319,8 @@ public class Main {
                 + "    -nosummary     don't print the usual summary of parse states, etc.\n"
                 + "    -nopositions   don't propagate the left and right token position values\n"
                 + "    -locations     generate handles xleft/xright for symbol positions in actions\n"
+                + "    -xmlactions    make the generated parser yield its parse tree as XML\n"
+                + "    -genericlabels automatically generate labels to all symbols in XML mode\n"
                 + "    -noscanner     don't refer to java_cup.runtime.Scanner\n"
                 + "    -progress      print messages to indicate progress of the system\n"
                 + "    -time          print time usage summary\n"
@@ -289,14 +328,16 @@ public class Main {
                 + "    -dump_states   produce a dump of parse state machine\n"
                 + "    -dump_tables   produce a dump of the parse tables\n"
                 + "    -dump          produce a dump of all of the above\n"
-                + "    -version       print the version information for CUP and exit\n");
+                + "    -version       print the version information for CUP and exit\n"
+                + "    -noexamples    do not search for counterexamples in case of conflict\n"
+                + "    -extendedsearch do not use optimization when searching for counterexamples\n");
         System.exit(1);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Parse command line options and arguments to set various user-option
-     *  flags and variables. 
+     *  flags and variables.
      * @param argv the command line arguments to be parsed.
      */
     protected static void parse_args(String argv[]) {
@@ -395,11 +436,17 @@ public class Main {
                 opt_show_timing = true;
             else if (argv[i].equals("-debug"))
                 opt_do_debug = true;
+            else if (argv[i].equals("-debugsymbols"))
+                opt_do_debugsymbols = true;
             /* frankf 6/18/96 */
             else if (argv[i].equals("-nopositions"))
                 lr_values = false;
             else if (argv[i].equals("-locations"))
                 locations = true;
+            else if (argv[i].equals("-xmlactions"))
+                xmlactions = true;
+            else if (argv[i].equals("-genericlabels"))
+                genericlabels = true;
             /* CSA 12/21/97 */
             else if (argv[i].equals("-interface"))
                 sym_interface = true;
@@ -420,7 +467,12 @@ public class Main {
                 /* record the typearg */
                 emit.class_type_argument = argv[i];
             }
-
+            /* CupEx extension */
+            else if (argv[i].equals("-noexamples"))
+                report_counterexamples = false;
+            else if (argv[i].equals("-extendedsearch"))
+                UnifiedExample.extendedSearch = true;
+            /* End CupEx extension */
             /* CSA 24-Jul-1999; suggestion by Jean Vaucher */
             else if (!argv[i].startsWith("-") && i == len - 1) {
                 /* use input from file. */
@@ -514,13 +566,14 @@ public class Main {
         /* create a parser and parse with it */
         ComplexSymbolFactory csf = new ComplexSymbolFactory();
         parser_obj = new parser(new Lexer(csf), csf);
+        parser_obj.setDebugSymbols(opt_do_debugsymbols);
         try {
             if (opt_do_debug)
                 parser_obj.debug_parse();
             else parser_obj.parse();
         }
         catch (Exception e) {
-            /* something threw an exception.  catch it and emit a message so we 
+            /* something threw an exception.  catch it and emit a message so we
                have a line number to work with, then re-throw it */
             ErrorManager.getManager()
                         .emit_error("Internal error: Unexpected exception");
@@ -660,7 +713,7 @@ public class Main {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Helper routine to optionally return a plural or non-plural ending. 
+    /** Helper routine to optionally return a plural or non-plural ending.
      * @param val the numerical value determining plurality.
      */
     protected static String plural(int val) {
@@ -671,9 +724,9 @@ public class Main {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Emit a long summary message to standard error (System.err) which 
+    /** Emit a long summary message to standard error (System.err) which
      *  summarizes what was found in the specification, how many states were
-     *  produced, how many conflicts were found, etc.  A detailed timing 
+     *  produced, how many conflicts were found, etc.  A detailed timing
      *  summary is also produced if it was requested by the user.
      * @param output_produced did the system get far enough to generate code.
      */
@@ -727,7 +780,7 @@ public class Main {
         if (opt_show_timing) show_times();
 
         System.err.println("---------------------------------------------------- ("
-                + version.version_str + ")");
+                + version.title_str + ")");
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -795,7 +848,7 @@ public class Main {
 
     /** Helper routine to format a decimal based display of seconds and
      *  percentage of total time given counts of milliseconds.   Note: this
-     *  is broken for use with some instances of negative time (since we don't 
+     *  is broken for use with some instances of negative time (since we don't
      *  use any negative time here, we let if be for now).
      * @param time_val   the value being formatted (in ms).
      * @param total_time total time percentages are calculated against (in ms).
@@ -872,8 +925,8 @@ public class Main {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Produce a (semi-) human readable dump of the complete viable prefix 
-     *  recognition state machine. 
+    /** Produce a (semi-) human readable dump of the complete viable prefix
+     *  recognition state machine.
      */
     public static void dump_machine() {
         lalr_state ordered[] = new lalr_state[lalr_state.number()];

@@ -2,7 +2,7 @@ package java_cup;
 
 import java.util.BitSet;
 
-/** A set of terminals implemented as a bitset. 
+/** A set of terminals implemented as a bitset.
  * @version last updated: 11/25/95
  * @author  Scott Hudson
  */
@@ -20,7 +20,7 @@ public class terminal_set {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Constructor for cloning from another set. 
+    /** Constructor for cloning from another set.
      * @param other the set we are cloning from.
      */
     public terminal_set(terminal_set other) throws internal_error {
@@ -47,7 +47,7 @@ public class terminal_set {
     /*-----------------------------------------------------------*/
 
     /** Helper function to test for a null object and throw an exception if
-     *  one is found. 
+     *  one is found.
      * @param obj the object we are testing.
      */
     protected void not_null(Object obj) throws internal_error {
@@ -64,7 +64,7 @@ public class terminal_set {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Determine if the set contains a particular terminal. 
+    /** Determine if the set contains a particular terminal.
      * @param sym the terminal symbol we are looking for.
      */
     public boolean contains(terminal sym) throws internal_error {
@@ -74,7 +74,7 @@ public class terminal_set {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Given its index determine if the set contains a particular terminal. 
+    /** Given its index determine if the set contains a particular terminal.
      * @param indx the index of the terminal in question.
      */
     public boolean contains(int indx) {
@@ -111,7 +111,7 @@ public class terminal_set {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Add a single terminal to the set.  
+    /** Add a single terminal to the set.
      * @param sym the terminal being added.
      * @return true if this changes the set.
      */
@@ -141,7 +141,7 @@ public class terminal_set {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Add (union) in a complete set.  
+    /** Add (union) in a complete set.
      * @param other the set being added.
      * @return true if this changes the set.
      */
@@ -166,14 +166,8 @@ public class terminal_set {
     public boolean intersects(terminal_set other) throws internal_error {
         not_null(other);
 
-        /* make a copy of the other set */
-        BitSet copy = (BitSet) other._elements.clone();
-
-        /* xor out our values */
-        copy.xor(this._elements);
-
-        /* see if its different */
-        return !copy.equals(other._elements);
+        /* test underlying structure */
+        return _elements.intersects(other._elements);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/

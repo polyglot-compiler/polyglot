@@ -810,5 +810,4 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
         }
 
     }
-
 }

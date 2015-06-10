@@ -1,0 +1,4 @@
+class Generics57 {
+	<X> Generics57(X x) {}
+	<Y> Generics57(Y y) {}
+}

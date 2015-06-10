@@ -1,0 +1,77 @@
+package example;
+
+terminal LPAREN, RPAREN, PLUS, TIMES, EQUALS, IF, THEN, ELSE, ID, COMMA, WHILE, SEMI;
+terminal LBRACK, RBRACK, COLON, INT, BOOL, LBRACE, RBRACE, RETURN;
+terminal Number NUMBER;
+
+non terminal Expr goal, expr, fncall, stmt, exprs, someexprs, decls, type, sometypes;
+non terminal decl, optsemi, stmts, somestmts, optreturn, fndecl, fndecls;
+
+/*precedence nonassoc THEN;
+precedence nonassoc ELSE;
+precedence right EQUALS;
+precedence left PLUS;
+precedence left TIMES; */
+
+start with goal;
+
+goal ::= fndecls
+	    {: RESULT = e; :}
+     ;
+
+fndecls ::= fndecl | fndecls fndecl ;
+
+fndecl ::= ID LPAREN decls RPAREN COLON sometypes LBRACE stmts RBRACE
+        |  ID LPAREN decls RPAREN LBRACE stmts RBRACE
+        ;
+
+expr ::= NUMBER:n
+	    {: RESULT = n; :}
+      |  LPAREN expr:e RPAREN
+	    {: RESULT = e; :}
+      |  expr:e1 PLUS expr:e2
+	    {: RESULT = new Plus(e1, e2); :}
+      |  expr:e1 TIMES expr:e2
+	    {: RESULT = new Times(e1, e2); :}
+      |  fncall
+      |  ID
+      |  expr LBRACK expr RBRACK
+      ;
+
+fncall ::= ID LPAREN exprs RPAREN ;
+
+decls ::= decl | decls COMMA decl ;
+decl ::= ID COLON type ;
+type ::= INT | BOOL | type LBRACK RBRACK ;
+
+exprs ::=
+       |  someexprs
+       ;
+
+someexprs ::= expr
+      | someexprs COMMA expr
+      ;
+
+stmt ::= ID EQUALS expr:e2
+	    {: RESULT = new Equals(e1, e2); :}
+      | IF LPAREN expr:e1 RPAREN expr:e2
+		{: RESULT = new If(e1, e2, new Number(0)); :}
+	    %prec THEN
+      |  IF LPAREN expr:e1 RPAREN expr:e2 ELSE expr:e3
+		{: RESULT = new If(e1, e2, e3); :}
+            %prec ELSE
+      | WHILE LPAREN expr RPAREN stmt
+      | decls EQUALS expr
+      /* LPAREN decls RPAREN */ EQUALS expr
+      | LBRACE stmts optreturn RBRACE
+      ;
+
+optreturn ::=  | RETURN | RETURN someexprs ;
+
+optsemi ::= | SEMI ;
+stmts ::=  | somestmts optsemi ;
+somestmts ::= stmt
+     | somestmts optsemi stmt
+     ;
+
+sometypes ::= type | sometypes COMMA type ;

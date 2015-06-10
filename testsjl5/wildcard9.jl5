@@ -1,0 +1,14 @@
+import java.util.*;
+
+class A {
+
+    List<?> f() { return null; }
+
+    <T> void g(List<T> l1, List<T> l2) {}
+
+    void h() {
+        List<?> l1 = f();
+        List<?> l2 = f();
+        g(l1, l2); // error
+    }
+}

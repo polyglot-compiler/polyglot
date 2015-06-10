@@ -1,17 +1,17 @@
 package java_cup;
 
-/** This class contains version and authorship information. 
- *  It contains only static data elements and basically just a central 
+/** This class contains version and authorship information.
+ *  It contains only static data elements and basically just a central
  *  place to put this kind of information so it can be updated easily
- *  for each release.  
+ *  for each release.
  *
- *  Version numbers used here are broken into 3 parts: major, minor, and 
- *  update, and are written as v<major>.<minor>.<update> (e.g. v0.10a).  
- *  Major numbers will change at the time of major reworking of some 
- *  part of the system.  Minor numbers for each public release or 
+ *  Version numbers used here are broken into 3 parts: major, minor, and
+ *  update, and are written as v<major>.<minor>.<update> (e.g. v0.10a).
+ *  Major numbers will change at the time of major reworking of some
+ *  part of the system.  Minor numbers for each public release or
  *  change big enough to cause incompatibilities.  Finally update
  *  letter will be incremented for small bug fixes and changes that
- *  probably wouldn't be noticed by a user.  
+ *  probably wouldn't be noticed by a user.
  *
  * @version last updated: 12/22/97 [CSA]
  * @author  Frank Flannery
@@ -29,7 +29,7 @@ public class version {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** The update letter. */
-    public static final String update = "b beta 20140226";
+    public static final String update = "b 20150326";
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 

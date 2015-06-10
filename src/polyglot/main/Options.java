@@ -255,71 +255,39 @@ public class Options {
             }
         });
 
-        flags.add(new PathFlag<File>(new String[] { "-classpath", "-cp" },
-                                     "<path>",
-                                     "where to find user class files",
-                                     "JVM property: java.class.path") {
+        flags.add(new StdPathFlag(new String[] { "-classpath", "-cp" },
+                                  "<path>",
+                                  "where to find user class files",
+                                  "JVM property: java.class.path") {
             @Override
             public Arg<List<File>> defaultArg() {
                 return handle(new String[] { System.getProperty("java.class.path") },
                               0);
             }
-
-            @Override
-            public File handlePathEntry(String entry) {
-                File f = new File(entry);
-                if (f.exists())
-                    return f;
-                else return null;
-            }
         });
 
-        flags.add(new PathFlag<File>("-bootclasspath",
-                                     "<path>",
-                                     "where to find runtime class files",
-                                     "JVM property: sun.boot.class.path (or all jars in java.home/lib)") {
+        flags.add(new StdPathFlag("-bootclasspath",
+                                  "<path>",
+                                  "where to find runtime class files",
+                                  "JVM property: sun.boot.class.path (or all jars in java.home/lib)") {
             @Override
             public Arg<List<File>> defaultArg() {
                 return handle(new String[] { jvmbootclasspath() }, 0);
             }
-
-            @Override
-            public File handlePathEntry(String entry) {
-                File f = new File(entry);
-                if (f.exists())
-                    return f;
-                else return null;
-            }
         });
 
-        flags.add(new PathFlag<File>("-addbootcp",
-                                     "<path>",
-                                     "prepend <path> to the bootclasspath") {
-            @Override
-            public File handlePathEntry(String entry) {
-                File f = new File(entry);
-                if (f.exists())
-                    return f;
-                else return null;
-            }
-        });
+        flags.add(new StdPathFlag("-addbootcp",
+                                  "<path>",
+                                  "prepend <path> to the bootclasspath"));
 
-        flags.add(new PathFlag<File>("-sourcepath",
-                                     "<path>",
-                                     "where to find source files",
-                                     "current directory") {
+        flags.add(new StdPathFlag("-sourcepath",
+                                  "<path>",
+                                  "where to find source files",
+                                  "current directory") {
             @Override
             public Arg<List<File>> defaultArg() {
                 return handle(new String[] { System.getProperty("user.dir") },
                               0);
-            }
-
-            @Override
-            public File handlePathEntry(String entry) {
-                File f = new File(entry);
-                if (f.exists())
-                    return f;
-                else return null;
             }
         });
 
@@ -473,6 +441,34 @@ public class Options {
 
         flags.add(new Switch("-no-output-to-fs",
                              "keep .java files in memory if possible"));;
+    }
+
+    /**
+     * A PathFlag<File> that accepts a list of directory names and filters out
+     * the invalid ones.
+     * 
+     */
+    public static class StdPathFlag extends PathFlag<File> {
+        public StdPathFlag(String id, String params, String usage,
+                String defaultValue) {
+            super(id, params, usage, defaultValue);
+        }
+        public StdPathFlag(String id, String params, String usage) {
+            super(id, params, usage);
+        }
+        public StdPathFlag(String[] ids, String params, String usage) {
+            super(ids, params, usage);
+        }
+        public StdPathFlag(String[] ids, String params, String usage, String defaultValue) {
+            super(ids, params, usage, defaultValue);
+        }
+        @Override
+        public File handlePathEntry(String entry) {
+            File f = new File(entry);
+            if (f.exists())
+                return f;
+            else return null;
+        }
     }
 
     /**

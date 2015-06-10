@@ -11,7 +11,7 @@ package java_cup.runtime;
 /* *************************************************
   class DefaultSymbolFactory
 
-  interface for creating new symbols  
+  interface for creating new symbols
  ***************************************************/
 public class DefaultSymbolFactory implements SymbolFactory {
     // Factory methods
@@ -33,6 +33,11 @@ public class DefaultSymbolFactory implements SymbolFactory {
     public Symbol newSymbol(String name, int id, Symbol left, Symbol right,
             Object value) {
         return new Symbol(id, left, right, value);
+    }
+
+    @Override
+    public Symbol newSymbol(String name, int id, Symbol left, Object value) {
+        return new Symbol(id, left, value);
     }
 
     @Override

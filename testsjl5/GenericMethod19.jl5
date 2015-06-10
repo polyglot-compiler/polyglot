@@ -1,0 +1,3 @@
+public interface Generics55 {
+    <T> boolean equals(Object obj);
+}

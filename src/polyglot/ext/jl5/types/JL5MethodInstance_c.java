@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -52,7 +52,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<TypeVariable> typeParams;
-	protected Annotations annotations;
+    protected Annotations annotations;
 
     public JL5MethodInstance_c(JL5TypeSystem ts, Position pos,
             ReferenceType container, Flags flags, Type returnType, String name,
@@ -62,7 +62,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
         this.typeParams = ListUtil.copy(typeParams, true);
         // Set the declaring procedure of the type vars
         for (TypeVariable tv : typeParams) {
-            tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
+            tv.setDeclaringProcedure((JL5ProcedureInstance) declaration());
         }
 
     }
@@ -76,9 +76,9 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     public List<MethodInstance> overridesImpl() {
         List<MethodInstance> l = new LinkedList<>();
         ReferenceType rt = container();
-        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
         while (rt != null) {
-            // add any method with the same name and formalTypes from 
+            // add any method with the same name and formalTypes from
             // rt
             for (MethodInstance mj : rt.methodsNamed(name)) {
                 if (ts.areOverrideEquivalent(this, (JL5MethodInstance) mj)) {
@@ -98,57 +98,60 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     }
 
     @Override
-    public List<MethodInstance> implementedImpl(ReferenceType rt) {
+    protected List<MethodInstance> implementedImplAux(ReferenceType rt) {
         if (rt == null) {
             return Collections.<MethodInstance> emptyList();
         }
-        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
 
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
         List<MethodInstance> l = new LinkedList<>();
-        // add any method with the same name and formalTypes from 
-        // rt
         for (MethodInstance mj : rt.methodsNamed(name)) {
             if (ts.areOverrideEquivalent(this, (JL5MethodInstance) mj)) {
                 l.add(mj);
             }
         }
 
-        List<? extends ReferenceType> ints = rt.interfaces();
-        for (ReferenceType rt2 : ints) {
-            l.addAll(implementedImpl(rt2));
-        }
-
-        Set<? extends Type> supers;
-        if (rt.isClass()) {
-            supers = ((JL5ClassType) rt).superclasses();
-        }
-        else {
-            supers = Collections.singleton(rt.superType());
-        }
+        Set<? extends Type> supers =
+                rt.isClass()
+                        ? ((JL5ClassType) rt).superclasses()
+                        : Collections.singleton(rt.superType());
         for (Type superType : supers) {
             if (superType != null && superType.isReference()) {
                 l.addAll(implementedImpl(superType.toReference()));
             }
         }
 
+        List<? extends ReferenceType> ints = rt.interfaces();
+        for (ReferenceType rt2 : ints) {
+            l.addAll(implementedImplAux(rt2));
+        }
+
         return l;
+    }
+
+    @Override
+    public boolean isSameMethodImpl(MethodInstance mi) {
+        if (!(mi instanceof JL5MethodInstance)) return false;
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+        return ts.areOverrideEquivalent(this, (JL5MethodInstance) mi);
     }
 
     @Override
     public boolean canOverrideImpl(MethodInstance mj_, boolean quiet)
             throws SemanticException {
         JL5MethodInstance mi = this;
+        String overridOrHid = mi.flags().isStatic() ? "hid" : "overrid";
         if (!(mj_ instanceof JL5MethodInstance)) {
             return false;
         }
         JL5MethodInstance mj = (JL5MethodInstance) mj_;
 
-        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
-        if (!(ts.areOverrideEquivalent(mi, mj))) {
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+        if (!ts.isSubSignature(mi, mj)) {
             if (quiet) return false;
             throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot override " + mj.signature()
-                    + " in " + mj.container()
+                    + mi.container() + " cannot " + overridOrHid + "e "
+                    + mj.signature() + " in " + mj.container()
                     + "; incompatible parameter types", mi.position());
         }
 
@@ -157,15 +160,10 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             if (Report.should_report(Report.types, 3))
                 Report.report(3, mj.flags() + " final");
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot override "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; overridden method is final",
-                                        mi.position());
+            throw new SemanticException(mi.signature() + " in "
+                    + mi.container() + " cannot " + overridOrHid + "e "
+                    + mj.signature() + " in " + mj.container() + "; "
+                    + overridOrHid + "den method is final", mi.position());
         }
 
         // replace the type variables of mj with the type variables of mi
@@ -188,7 +186,9 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             throw new SemanticException(mi.signature()
                                                 + " in "
                                                 + mi.container()
-                                                + " cannot override "
+                                                + " cannot "
+                                                + overridOrHid
+                                                + "e "
                                                 + mj.signature()
                                                 + " in "
                                                 + mj.container()
@@ -205,17 +205,16 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
                               mi.throwTypes() + " not subset of "
                                       + mj.throwTypes());
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot override "
-                                                + mj.signature()
-                                                + " in "
+            throw new SemanticException(mi.signature() + " in "
+                                                + mi.container() + " cannot "
+                                                + overridOrHid + "e "
+                                                + mj.signature() + " in "
                                                 + mj.container()
                                                 + "; the throw set "
                                                 + mi.throwTypes()
                                                 + " is not a subset of the "
-                                                + "overridden method's throw set "
+                                                + overridOrHid
+                                                + "den method's throw set "
                                                 + mj.throwTypes() + ".",
                                         mi.position());
         }
@@ -229,7 +228,9 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             throw new SemanticException(mi.signature()
                                                 + " in "
                                                 + mi.container()
-                                                + " cannot override "
+                                                + " cannot "
+                                                + overridOrHid
+                                                + "e "
                                                 + mj.signature()
                                                 + " in "
                                                 + mj.container()
@@ -248,13 +249,17 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             throw new SemanticException(mi.signature()
                                                 + " in "
                                                 + mi.container()
-                                                + " cannot override "
+                                                + " cannot "
+                                                + overridOrHid
+                                                + "e "
                                                 + mj.signature()
                                                 + " in "
                                                 + mj.container()
-                                                + "; overridden method is "
+                                                + "; "
+                                                + overridOrHid
+                                                + "den method is "
                                                 + (mj.flags().isStatic()
-                                                        ? "" : "not")
+                                                        ? "" : "not ")
                                                 + "static", mi.position());
         }
 
@@ -263,17 +268,16 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
 
     @Override
     public boolean callValidImpl(List<? extends Type> argTypes) {
-        List<Type> myFormalTypes = this.formalTypes;
+        List<Type> myFormalTypes = formalTypes;
 
         //         System.err.println("JL5MethodInstance_c callValid Impl " + this +" called with " +argTypes);
         // now compare myFormalTypes to argTypes
-        if (!this.isVariableArity() && argTypes.size() != myFormalTypes.size()) {
+        if (!isVariableArity() && argTypes.size() != myFormalTypes.size()) {
             //            System.err.println("     1");
             return false;
         }
-        if (this.isVariableArity()
-                && argTypes.size() < myFormalTypes.size() - 1) {
-            // the last (variable) argument can consume 0 or more of the actual arguments. 
+        if (isVariableArity() && argTypes.size() < myFormalTypes.size() - 1) {
+            // the last (variable) argument can consume 0 or more of the actual arguments.
             //            System.err.println("     2");
             return false;
         }
@@ -287,7 +291,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             if (formalTypes.hasNext()) {
                 formal = formalTypes.next();
             }
-            if (!formalTypes.hasNext() && this.isVariableArity()) {
+            if (!formalTypes.hasNext() && isVariableArity()) {
                 // varible arity method, and this is the last arg.
                 ArrayType arr =
                         (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
@@ -300,8 +304,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             }
             // the actual can't be cast to the formal.
             // HOWEVER: there is still hope.
-            if (this.isVariableArity()
-                    && myFormalTypes.size() == argTypes.size()
+            if (isVariableArity() && myFormalTypes.size() == argTypes.size()
                     && !formalTypes.hasNext()) {
                 // This is a variable arity method (e.g., m(int x,
                 // String[])) and there
@@ -347,18 +350,18 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
         this.typeParams = typeParams;
         // Set the declaring procedure of the type vars
         for (TypeVariable tv : typeParams) {
-            tv.setDeclaringProcedure((JL5ProcedureInstance) this.declaration());
+            tv.setDeclaringProcedure((JL5ProcedureInstance) declaration());
         }
     }
 
     @Override
     public List<TypeVariable> typeParams() {
-        return Collections.unmodifiableList(this.typeParams);
+        return Collections.unmodifiableList(typeParams);
     }
 
     @Override
     public JL5Subst erasureSubst() {
-        JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
+        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
         return ts.erasureSubst(this);
     }
 
@@ -368,9 +371,9 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
         sb.append(designator());
         sb.append(" ");
         sb.append(flags.translate());
-        if (!this.typeParams.isEmpty()) {
+        if (!typeParams.isEmpty()) {
             sb.append("<");
-            Iterator<TypeVariable> iter = this.typeParams().iterator();
+            Iterator<TypeVariable> iter = typeParams().iterator();
             while (iter.hasNext()) {
                 sb.append(iter.next());
                 if (iter.hasNext()) {
@@ -402,7 +405,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
 
     @Override
     public Annotations annotations() {
-        return this.annotations;
+        return annotations;
     }
 
     @Override

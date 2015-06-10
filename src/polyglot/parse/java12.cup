@@ -5,8 +5,8 @@
  * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
  *
  * This file is based on:
- * Java 1.2 parser for CUP.
- * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
+ * Java 1.4 parser for CUP.  
+ * Copyright (C) 2002-2003 C. Scott Ananian <cananian@alumni.princeton.edu>
  * This program is released under the terms of the GPL; see the file
  * COPYING for more details.  There is NO WARRANTY on this code.
  *
@@ -19,6 +19,16 @@
  *
  */
 
+/*
+JDK 1.4 Features added:
+  assertion statement.
+  statement_without_trailing_substatement ::= ...
+     |    assert_statement ;
+  assert_statement ::=
+    ASSERT expression SEMICOLON
+  | ASSERT expression COLON expression SEMICOLON
+  ;
+*/
 package polyglot.parse;
 
 import java.util.*;
@@ -147,14 +157,12 @@ terminal polyglot.lex.StringLiteral STRING_LITERAL;
 terminal polyglot.lex.NullLiteral NULL_LITERAL;
 terminal Token JAVADOC; // Javadoc comment
 
-// strictfp keyword, new in Java 1.2
-terminal Token STRICTFP;
-
-// assert keyword, new in Java 1.4
-terminal Token ASSERT;
-
 // Reserved but unused:
 terminal CONST, GOTO;
+// strictfp keyword, new in Java 1.2
+terminal Token STRICTFP;
+// assert keyword, new in Java 1.4
+terminal Token ASSERT; // assert_statement
 
 // 19.2) The Syntactic Grammar
 non terminal SourceFile goal;
@@ -257,6 +265,7 @@ non terminal Expr primary, primary_no_new_array;
 non terminal Expr class_instance_creation_expression;
 non terminal List<Expr> argument_list_opt, argument_list;
 non terminal NewArray array_creation_expression;
+//**non terminal array_creation_init, array_creation_uninit;
 non terminal List<Expr> dim_exprs;
 non terminal Expr dim_expr;
 non terminal Integer dims_opt, dims;
@@ -285,8 +294,7 @@ start with goal;
 goal ::=
                     // SourceFile
         compilation_unit:a
-            {: if (parser.eq.hasErrors()) RESULT = null;
-               else RESULT = a; :}
+            {: RESULT = parser.eq.hasErrors() ? null : a; :}
     ;
 
 // 19.3) Lexical Structure.
@@ -489,7 +497,7 @@ import_declaration ::=
     ;
 single_type_import_declaration ::=
                     // Import
-        IMPORT:a qualified_name:b SEMICOLON:c
+        IMPORT:a name:b SEMICOLON:c
             {: RESULT = parser.nf.Import(parser.pos(a, c), Import.SINGLE_TYPE, b.toString()); :}
     ;
 type_import_on_demand_declaration ::=
@@ -544,12 +552,13 @@ modifier ::=
             {: RESULT = Flags.TRANSIENT.position(a.getPosition()); :}
     |   VOLATILE:a
             {: RESULT = Flags.VOLATILE.position(a.getPosition()); :}
-    |   STRICTFP:a
+    |   STRICTFP:a   // note that semantic analysis must check that the
+                     // context of the modifier allows strictfp.
             {: RESULT = Flags.STRICTFP.position(a.getPosition()); :}
     ;
 // 19.8) Classes
 
-// 19.8.1) Class Declarations
+// 19.8.1) Class Declaration:
 class_declaration ::=
                     // ClassDecl
         modifiers_opt:a CLASS:n IDENTIFIER:b
@@ -623,13 +632,7 @@ class_body_declaration ::=
             {: List<ClassMember> l = new LinkedList<>();
                l.add(parser.nf.Initializer(parser.pos(a), Flags.NONE, a));
                RESULT = l; :}
-    |   SEMICOLON
-            {: List<ClassMember> l = new LinkedList<>();
-               RESULT = l; :}
-    |   error SEMICOLON
-            {: List<ClassMember> l = new LinkedList<>();
-               RESULT = l; :}
-    |   error LBRACE
+    |   error RBRACE
             {: List<ClassMember> l = new LinkedList<>();
                RESULT = l; :}
     ;
@@ -651,6 +654,12 @@ class_member_declaration ::=
     |   interface_declaration:a
             {: List<ClassMember> l = new LinkedList<>();
                l.add(a);
+               RESULT = l; :}
+    |   SEMICOLON
+            {: List<ClassMember> l = new LinkedList<>();
+               RESULT = l; :}
+    |   error SEMICOLON
+            {: List<ClassMember> l = new LinkedList<>();
                RESULT = l; :}
     ;
 
@@ -887,6 +896,9 @@ interface_member_declaration ::=
 constant_declaration ::=
                     // List of ClassMember
         field_declaration:a
+    // need to semantically check that modifiers of field declaration
+    // include only PUBLIC, STATIC, or FINAL.  Other modifiers are
+    // disallowed.
             {: RESULT = a; :}
     ;
 abstract_method_declaration ::=
@@ -922,16 +934,14 @@ block ::=
                     // Block
         LBRACE:n block_statements_opt:a RBRACE:d
             {: RESULT = parser.nf.Block(parser.pos(n, d), a); :}
-    |
-        error RBRACE:d
-            {: RESULT = parser.nf.Block(parser.pos(d),
-                                        Collections.<Stmt> emptyList()); :}
     ;
 block_statements_opt ::=
                     // List of Stmt
             {: RESULT = new LinkedList<>(); :}
     |   block_statements:a
             {: RESULT = a; :}
+    |   error
+            {: RESULT = Collections.<Stmt> emptyList(); :}
     ;
 block_statements ::=
                     // List of Stmt
@@ -1289,6 +1299,8 @@ primary ::=
             {: RESULT = a; :}
     |   array_creation_expression:a
             {: RESULT = a; :}
+    //**| array_creation_init
+    //**| array_creation_uninit
     ;
 primary_no_new_array ::=
                     // Expr
@@ -1321,9 +1333,9 @@ primary_no_new_array ::=
     ;
 class_instance_creation_expression ::=
                     // Expr
-        NEW:n class_type:a LPAREN argument_list_opt:b RPAREN:d
+        NEW:n class_or_interface_type:a LPAREN argument_list_opt:b RPAREN:d
             {: RESULT = parser.nf.New(parser.pos(n, d), a, b); :}
-    |   NEW:n class_type:a LPAREN argument_list_opt:b RPAREN class_body:c
+    |   NEW:n class_or_interface_type:a LPAREN argument_list_opt:b RPAREN class_body:c
             {: RESULT = parser.nf.New(parser.pos(n, c), a, b, c); :}
     |   primary:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN:d
             {: RESULT = parser.nf.New(parser.pos(a, d), a,
@@ -1435,6 +1447,7 @@ array_access ::=
             {: RESULT = parser.nf.ArrayAccess(parser.pos(a, d), a.toExpr(), b); :}
     |   primary_no_new_array:a LBRACK expression:b RBRACK:d
             {: RESULT = parser.nf.ArrayAccess(parser.pos(a, d), a, b); :}
+    //**| array_creation_init LBRACK expression RBRACK
     ;
 postfix_expression ::=
                     // Expr
@@ -1639,6 +1652,8 @@ assignment_expression ::=
     |   assignment:a
             {: RESULT = a; :}
     ;
+// allowing a parenthesized variable here on the lhs was introduced in
+// JLS 2; thanks to Eric Blake for pointing this out.
 assignment ::=
                     // Expr
         left_hand_side:a assignment_operator:b assignment_expression:c
@@ -1652,6 +1667,7 @@ left_hand_side ::=
             {: RESULT = a; :}
     |   array_access:a
             {: RESULT = a; :}
+    //**| LPAREN expression RPAREN
     ;
 assignment_operator ::=
                     // Assign.Operator

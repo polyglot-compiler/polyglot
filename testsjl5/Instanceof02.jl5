@@ -1,0 +1,8 @@
+import java.util.*;
+
+class G {
+    void g() {
+        Object o = null;
+        if (o instanceof List<?>) {}
+    }
+}

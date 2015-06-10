@@ -1,0 +1,14 @@
+//http://stackoverflow.com/questions/910445/issue-resolving-a-shift-reduce-conflict-in-my-grammar
+//(amb)
+
+terminal asd, AND, OR;
+
+non terminal ExpressionTerm, LogicalExpression;
+
+start with LogicalExpression;
+
+ExpressionTerm ::= asd;
+LogicalExpression ::=
+    ExpressionTerm |
+    LogicalExpression AND LogicalExpression |
+    LogicalExpression OR LogicalExpression;

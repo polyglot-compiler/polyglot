@@ -1,20 +1,22 @@
 package java_cup;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
+
+import parser.Counterexample;
+import parser.UnifiedExample;
 
 /** This class represents a state in the LALR viable prefix recognition machine.
- *  A state consists of an LALR item set and a set of transitions to other 
+ *  A state consists of an LALR item set and a set of transitions to other
  *  states under terminal and non-terminal symbols.  Each state represents
- *  a potential configuration of the parser.  If the item set of a state 
+ *  a potential configuration of the parser.  If the item set of a state
  *  includes an item such as: <pre>
  *    [A ::= B * C d E , {a,b,c}]
- *  </pre> 
- *  this indicates that when the parser is in this state it is currently 
+ *  </pre>
+ *  this indicates that when the parser is in this state it is currently
  *  looking for an A of the given form, has already seen the B, and would
  *  expect to see an a, b, or c after this sequence is complete.  Note that
  *  the parser is normally looking for several things at once (represented
@@ -22,9 +24,9 @@ import java.util.Stack;
  *  items such as: <pre>
  *    [C ::= * X e Z, {d}]
  *    [X ::= * f, {e}]
- *  </pre> 
+ *  </pre>
  *  to indicate that it was currently looking for a C followed by a d (which
- *  would be reduced into a C, matching the first symbol in our production 
+ *  would be reduced into a C, matching the first symbol in our production
  *  above), and the terminal f followed by e.<p>
  *
  *  At runtime, the parser uses a viable prefix recognition machine made up
@@ -32,15 +34,15 @@ import java.util.Stack;
  *  In a shift, it consumes one Symbol and makes a transition to a new state.
  *  This corresponds to "moving the dot past" a terminal in one or more items
  *  in the state (these new shifted items will then be found in the state at
- *  the end of the transition).  For a reduce operation, the parser is 
+ *  the end of the transition).  For a reduce operation, the parser is
  *  signifying that it is recognizing the RHS of some production.  To do this
- *  it first "backs up" by popping a stack of previously saved states.  It 
- *  pops off the same number of states as are found in the RHS of the 
+ *  it first "backs up" by popping a stack of previously saved states.  It
+ *  pops off the same number of states as are found in the RHS of the
  *  production.  This leaves the machine in the same state is was in when the
- *  parser first attempted to find the RHS.  From this state it makes a 
+ *  parser first attempted to find the RHS.  From this state it makes a
  *  transition based on the non-terminal on the LHS of the production.  This
- *  corresponds to placing the parse in a configuration equivalent to having 
- *  replaced all the symbols from the the input corresponding to the RHS with 
+ *  corresponds to placing the parse in a configuration equivalent to having
+ *  replaced all the symbols from the the input corresponding to the RHS with
  *  the symbol on the LHS.
  *
  * @see     java_cup.lalr_item
@@ -48,7 +50,7 @@ import java.util.Stack;
  * @see     java_cup.lalr_transition
  * @version last updated: 7/3/96
  * @author  Frank Flannery
- *  
+ *
  */
 
 public class lalr_state {
@@ -94,6 +96,7 @@ public class lalr_state {
         _all.clear();
         _all_kernels.clear();
         next_index = 0;
+        clearCexStats();
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -105,21 +108,21 @@ public class lalr_state {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Hash table to find states by their kernels (i.e, the original, 
-     *  unclosed, set of items -- which uniquely define the state).  This table 
-     *  stores state objects using (a copy of) their kernel item sets as keys. 
+    /** Hash table to find states by their kernels (i.e, the original,
+     *  unclosed, set of items -- which uniquely define the state).  This table
+     *  stores state objects using (a copy of) their kernel item sets as keys.
      */
     protected static HashMap<lalr_item_set, lalr_state> _all_kernels =
             new HashMap<>();
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Find and return state with a given a kernel item set (or null if not 
+    /** Find and return state with a given a kernel item set (or null if not
      *  found).  The kernel item set is the subset of items that were used to
      *  originally create the state.  These items are formed by "shifting the
      *  dot" within items of other states that have a transition to this one.
      *  The remaining elements of this state's item set are added during closure.
-     * @param itms the kernel set of the state we are looking for. 
+     * @param itms the kernel set of the state we are looking for.
      */
     public static lalr_state find_state(lalr_item_set itms) {
         if (itms == null)
@@ -169,8 +172,8 @@ public class lalr_state {
     /*-----------------------------------------------------------*/
 
     /** Helper routine for debugging -- produces a dump of the given state
-      * onto System.out.
-      */
+     * onto System.out.
+     */
     protected static void dump_state(lalr_state st) throws internal_error {
         lalr_item_set itms;
         production_part part;
@@ -187,14 +190,14 @@ public class lalr_state {
             System.out.print(itm.the_production().lhs().the_symbol().name());
             System.out.print(" ::= ");
             for (int i = 0; i < itm.the_production().rhs_length(); i++) {
-                if (i == itm.dot_pos()) System.out.print("(*) ");
+                if (i == itm.dot_pos()) System.out.print("• ");
                 part = itm.the_production().rhs(i);
                 if (part.is_action())
                     System.out.print("{action} ");
                 else System.out.print(((symbol_part) part).the_symbol().name()
                         + " ");
             }
-            if (itm.dot_at_end()) System.out.print("(*) ");
+            if (itm.dot_at_end()) System.out.print("• ");
             System.out.println("]");
         }
         System.out.println("}");
@@ -202,11 +205,11 @@ public class lalr_state {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Propagate lookahead sets through the constructed viable prefix 
+    /** Propagate lookahead sets through the constructed viable prefix
      *  recognizer.  When the machine is constructed, each item that results
         in the creation of another such that its lookahead is included in the
         other's will have a propagate link set up for it.  This allows additions
-        to the lookahead of one item to be included in other items that it 
+        to the lookahead of one item to be included in other items that it
         was used to directly or indirectly create.
      */
     protected static void propagate_all_lookaheads() throws internal_error {
@@ -236,7 +239,7 @@ public class lalr_state {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Build an LALR viable prefix recognition machine given a start 
+    /** Build an LALR viable prefix recognition machine given a start
      *  production.  This method operates by first building a start state
      *  from the start production (based on a single item with the dot at
      *  the beginning and EOF as expected lookahead).  Then for each state
@@ -248,25 +251,25 @@ public class lalr_state {
      *    [B ::= a b * X d, {a,b}]
      *  </pre>
      *  in some state, then we would be making a transition under X to a new
-     *  state.  This new state would be formed by a "kernel" of items 
+     *  state.  This new state would be formed by a "kernel" of items
      *  corresponding to moving the dot past the X.  In this case: <pre>
      *    [A ::= a b X * c, {d,e}]
      *    [B ::= a b X * Y, {a,b}]
      *  </pre>
-     *  The full state would then be formed by "closing" this kernel set of 
+     *  The full state would then be formed by "closing" this kernel set of
      *  items so that it included items that represented productions of things
-     *  the parser was now looking for.  In this case we would items 
+     *  the parser was now looking for.  In this case we would items
      *  corresponding to productions of Y, since various forms of Y are expected
-     *  next when in this state (see lalr_item_set.compute_closure() for details 
+     *  next when in this state (see lalr_item_set.compute_closure() for details
      *  on closure). <p>
      *
      *  The process of building the viable prefix recognizer terminates when no
      *  new states can be added.  However, in order to build a smaller number of
-     *  states (i.e., corresponding to LALR rather than canonical LR) the state 
-     *  building process does not maintain full loookaheads in all items.  
-     *  Consequently, after the machine is built, we go back and propagate 
-     *  lookaheads through the constructed machine using a call to 
-     *  propagate_all_lookaheads().  This makes use of propagation links 
+     *  states (i.e., corresponding to LALR rather than canonical LR) the state
+     *  building process does not maintain full loookaheads in all items.
+     *  Consequently, after the machine is built, we go back and propagate
+     *  lookaheads through the constructed machine using a call to
+     *  propagate_all_lookaheads().  This makes use of propagation links
      *  constructed during the closure and transition process.
      *
      * @param start_prod the start production of the grammar
@@ -277,9 +280,17 @@ public class lalr_state {
     private static lalr_state start_state;
     private static lalr_item start_itm;
 
+    public static lalr_state startState() {
+        return start_state;
+    }
+
+    public static lalr_item startItem() {
+        return start_itm;
+    }
+
     public static lalr_state build_machine(production start_prod)
             throws internal_error {
-        /* lalr_state    start_state; // ACM -- made static */
+        /* lalr_state    start_state; // CupEx extension -- made static */
         lalr_item_set start_items;
         lalr_item_set new_items;
         lalr_item_set linked_items;
@@ -407,9 +418,9 @@ public class lalr_state {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Propagate lookahead sets out of this state. This recursively 
-     *  propagates to all items that have propagation links from some item 
-     *  in this state. 
+    /** Propagate lookahead sets out of this state. This recursively
+     *  propagates to all items that have propagation links from some item
+     *  in this state.
      */
     protected void propagate_lookaheads() throws internal_error {
         /* recursively propagate out from each item in the state */
@@ -419,21 +430,21 @@ public class lalr_state {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Fill in the parse table entries for this state.  There are two 
-     *  parse tables that encode the viable prefix recognition machine, an 
-     *  action table and a reduce-goto table.  The rows in each table 
+    /** Fill in the parse table entries for this state.  There are two
+     *  parse tables that encode the viable prefix recognition machine, an
+     *  action table and a reduce-goto table.  The rows in each table
      *  correspond to states of the machine.  The columns of the action table
-     *  are indexed by terminal symbols and correspond to either transitions 
+     *  are indexed by terminal symbols and correspond to either transitions
      *  out of the state (shift entries) or reductions from the state to some
      *  previous state saved on the stack (reduce entries).  All entries in the
      *  action table that are not shifts or reduces, represent errors.    The
-     *  reduce-goto table is indexed by non terminals and represents transitions 
+     *  reduce-goto table is indexed by non terminals and represents transitions
      *  out of a state on that non-terminal.<p>
      *  Conflicts occur if more than one action needs to go in one entry of the
      *  action table (this cannot happen with the reduce-goto table).  Conflicts
      *  are resolved by always shifting for shift/reduce conflicts and choosing
      *  the lowest numbered production (hence the one that appeared first in
-     *  the specification) in reduce/reduce conflicts.  All conflicts are 
+     *  the specification) in reduce/reduce conflicts.  All conflicts are
      *  reported and if more conflicts are detected than were declared by the
      *  user, code generation is aborted.
      *
@@ -539,14 +550,14 @@ public class lalr_state {
 
     /** Procedure that attempts to fix a shift/reduce error by using
      * precedences.  --frankf 6/26/96
-     *  
+     *
      *  if a production (also called rule) or the lookahead terminal
      *  has a precedence, then the table can be fixed.  if the rule
      *  has greater precedence than the terminal, a reduce by that rule
-     *  in inserted in the table.  If the terminal has a higher precedence, 
+     *  in inserted in the table.  If the terminal has a higher precedence,
      *  it is shifted.  if they have equal precedence, then the associativity
      *  of the precedence is used to determine what to put in the table:
-     *  if the precedence is left associative, the action is to reduce. 
+     *  if the precedence is left associative, the action is to reduce.
      *  if the precedence is right associative, the action is to shift.
      *  if the precedence is non associative, then it is a syntax error.
      *
@@ -581,7 +592,7 @@ public class lalr_state {
             }
             else { /* they are == precedence */
 
-                /* equal precedences have equal sides, so only need to 
+                /* equal precedences have equal sides, so only need to
                    look at one: if it is right, put shift in table */
                 if (term.precedence_side() == assoc.right) {
                     table_row.under_term[term_index] =
@@ -608,7 +619,7 @@ public class lalr_state {
                 }
             }
         }
-        /* check if terminal has precedence, if so, shift, since 
+        /* check if terminal has precedence, if so, shift, since
         rule does not have precedence */
         else if (term.precedence_num() > assoc.no_prec) {
             table_row.under_term[term_index] =
@@ -623,12 +634,12 @@ public class lalr_state {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /*  given two actions, and an action type, return the 
+    /*  given two actions, and an action type, return the
         action of that action type.  give an error if they are of
         the same action, because that should never have tried
-        to be fixed 
-       
-    */
+        to be fixed
+
+     */
     protected parse_action insert_action(parse_action a1, parse_action a2,
             int act_type) throws internal_error {
         if (a1.kind() == act_type && a2.kind() == act_type) {
@@ -664,6 +675,7 @@ public class lalr_state {
             throws internal_error {
 
         boolean after_itm;
+        Set<Integer> shift_reduce_conflict_set = new TreeSet<>();
 
         /* consider each element */
         for (lalr_item itm : items()) {
@@ -674,46 +686,51 @@ public class lalr_state {
             if (itm.dot_at_end()) {
                 /* not yet after itm */
                 after_itm = false;
+                shift_reduce_conflict_set.clear();
+                terminal_set lookahead = itm.lookahead();
 
                 /* compare this item against all others looking for conflicts */
                 for (lalr_item compare : items()) {
 
                     /* if this is the item, next one is after it */
-                    if (itm == compare) after_itm = true;
+                    if (itm == compare) {
+                        after_itm = true;
+                        continue;
+                    }
 
-                    /* only look at it if its not the same item */
-                    if (itm != compare) {
-                        /* is it a reduce */
-                        if (compare.dot_at_end()) {
-                            /* only look at reduces after itm */
-                            if (after_itm)
-                                /* does the comparison item conflict? */
-                                if (compare.lookahead()
-                                           .intersects(itm.lookahead()))
-                                /* report a reduce/reduce conflict */
-                                report_reduce_reduce(itm, compare);
+                    /* only look at reduces after itm */
+                    /* is it a reduce */
+                    if (compare.dot_at_end()) {
+                        /* only look at reduces after itm */
+                        if (after_itm)
+                        /* does the comparison item conflict? */
+                        if (compare.lookahead().intersects(lookahead)) {
+                            /* report a reduce/reduce conflict */
+                            report_reduce_reduce(itm, compare);
+                        }
+                    }
+                    else {
+                        /* is it a shift on our conflicting terminal */
+                        symbol shift_sym = compare.symbol_after_dot();
+                        int t;
+                        if (!shift_sym.is_non_term()
+                                && conflict_set.contains(t = shift_sym.index())
+                                && lookahead.contains(t)) {
+                            /* note a shift/reduce conflict */
+                            shift_reduce_conflict_set.add(t);
                         }
                     }
                 }
                 /* report S/R conflicts under all the symbols we conflict under */
-                for (int t = 0; t < terminal.number(); t++)
-                    if (conflict_set.contains(t)) report_shift_reduce(itm, t);
+                for (int t : shift_reduce_conflict_set)
+                    report_shift_reduce(itm, t);
             }
-        }
-    }
-
-    private void errOutput(StringBuilder sb, ByteArrayOutputStream s) {
-        try {
-            sb.append(s.toString("UTF-8"));
-        }
-        catch (java.io.UnsupportedEncodingException e) {
-            sb.append("<UNENCODABLE>");
         }
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Produce a warning message for one reduce/reduce conflict. 
+    /** Produce a warning message for one reduce/reduce conflict.
      *
      * @param itm1 first item in conflict.
      * @param itm2 second item in conflict.
@@ -728,29 +745,19 @@ public class lalr_state {
         message.append("\n  between ");
         message.append(itm1.to_simple_string());
         message.append("\n");
-        /* ACM extension */
-        ByteArrayOutputStream ds = new ByteArrayOutputStream();
-        if (Main.report_counterexamples) {
-            message.append("    Example:    ");
-            report_shortest_path(itm1, message, new PrintStream(ds));
-            message.append(" (*)\n    Derivation: ");
-            errOutput(message, ds);
-            message.append(" ] (*)\n\n");
+        /* CupEx extension */
+        long start;
+        /** conflict_lookaheads is the list of symbols on which the two actions conflict. */
+        Set<terminal> conflict_lookaheads = new HashSet<>();
+        for (int t = 0; t < terminal.number(); t++) {
+            if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t))
+                conflict_lookaheads.add(terminal.find(t));
         }
-        /* End ACM extension */
+        terminal cs = conflict_lookaheads.iterator().next(); // pick one
+        /* End CupEx extension */
         message.append("  and     ");
         message.append(itm2.to_simple_string());
         message.append("\n");
-        /* ACM extension */
-        ds.reset();
-        if (Main.report_counterexamples) {
-            message.append("    Example:    ");
-            report_shortest_path(itm2, message, new PrintStream(ds));
-            message.append(" (*)\n    Derivation: ");
-            errOutput(message, ds);
-            message.append(" ] (*)\n");
-        }
-        /* End ACM extension */
         message.append("  under symbols: {");
         for (int t = 0; t < terminal.number(); t++) {
             if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
@@ -760,7 +767,47 @@ public class lalr_state {
                 message.append(terminal.find(t).name());
             }
         }
-        message.append("}\n  Resolved in favor of ");
+        message.append("}\n");
+        /* CupEx extension */
+        if (Main.report_counterexamples) {
+            start = System.nanoTime();
+            UnifiedExample ue = new UnifiedExample(this, itm1, itm2, cs);
+            boolean tle = cexTimeLimit();
+            Counterexample cex =
+                    tle ? ue.exampleFromShortestPath(true) : ue.find();
+            if (cex.unifying()) {
+                message.append("  Ambiguity detected for nonterminal ");
+                message.append(cex.cexNonterminal());
+                message.append("\n  Example: ");
+                message.append(cex.prettyExample1());
+                message.append("\n  First derivation : ");
+                message.append(cex.example1());
+                message.append("\n  Second derivation: ");
+                message.append(cex.example2());
+                message.append("\n");
+                numUnif++;
+            }
+            else {
+                message.append("  First example    : ");
+                message.append(cex.prettyExample1());
+                message.append("\n  First derivation : ");
+                message.append(cex.example1());
+                message.append("\n  Second example   : ");
+                message.append(cex.prettyExample2());
+                message.append("\n  Second derivation: ");
+                message.append(cex.example2());
+                message.append("\n");
+                if (!tle) {
+                    if (cex.timeout())
+                        numTimeOut++;
+                    else numNonUnif++;
+                }
+                else numTle++;
+            }
+            reportCexStats(cex, System.nanoTime() - start);
+        }
+        /* End CupEx extension */
+        message.append("  Resolved in favor of ");
         if (itm1.the_production().index() < itm2.the_production().index())
             message.append("the first production.\n");
         else message.append("the second production.\n");
@@ -785,233 +832,129 @@ public class lalr_state {
         StringBuilder message =
                 new StringBuilder("*** Shift/Reduce conflict found in state #");
         message.append(index());
-        message.append("\n  between reduction on ");
-        message.append(red_itm.to_simple_string());
-        message.append("\n");
-        /* ACM extension */
-        ByteArrayOutputStream ds = new ByteArrayOutputStream();
-        if (Main.report_counterexamples) {
-            message.append("    Example:    ");
-            report_shortest_path(red_itm, message, new PrintStream(ds));
-            message.append(" (*) ");
-            message.append(terminal.find(conflict_sym).name());
-            message.append("\n    Derivation: ");
-            errOutput(message, ds);
-            message.append(" ] (*) ");
-            message.append(terminal.find(conflict_sym).name());
-            message.append("\n\n");
-        }
-        /* end ACM extension */
+//        message.append("\n  between reduction on ");
+//        message.append(red_itm.to_simple_string());
+//        message.append("\n");
+        /* CupEx extension */
+        long start;
+        terminal cs = terminal.find(conflict_sym);
+        /* end CupEx extension */
 
+        int relevancecounter = 0;
         /* find and report on all items that shift under our conflict symbol */
         for (lalr_item itm : items()) {
 
             /* only look if its not the same item and not a reduce */
             if (itm != red_itm && !itm.dot_at_end()) {
+
                 /* is it a shift on our conflicting terminal */
                 shift_sym = itm.symbol_after_dot();
                 if (!shift_sym.is_non_term()
                         && shift_sym.index() == conflict_sym) {
+                    relevancecounter++;
                     /* yes, report on it */
-                    message.append("  and shift on ");
+                    message.append("\n  between reduction on ");
+                    message.append(red_itm.to_simple_string());
+                    message.append("\n");
+                    message.append("  and shift on         ");
                     message.append(itm.to_simple_string());
                     message.append("\n");
-                    /* ACM extension */
+                    message.append("  under symbol ");
+                    message.append(terminal.find(conflict_sym).name());
+                    message.append("\n");
+                    /* CupEx extension */
                     if (Main.report_counterexamples) {
-                        ds.reset();
-                        message.append("    Example:    ");
-                        report_shortest_path(itm, message, new PrintStream(ds));
-                        message.append(" (*) ");
-                        message.append(right_of_dot(itm));
-                        message.append("\n    Derivation: ");
-                        errOutput(message, ds);
-                        message.append(" (*) ");
-                        message.append(right_of_dot(itm));
-                        message.append("\n\n");
+                        start = System.nanoTime();
+                        UnifiedExample ue =
+                                new UnifiedExample(this, red_itm, itm, cs);
+                        boolean tle = cexTimeLimit();
+                        Counterexample cex =
+                                tle
+                                        ? ue.exampleFromShortestPath(true)
+                                        : ue.find();
+                        if (cex.unifying()) {
+                            message.append("  Ambiguity detected for nonterminal ");
+                            message.append(cex.cexNonterminal());
+                            message.append("\n  Example: ");
+                            message.append(cex.prettyExample1());
+                            message.append("\n  Derivation using reduction: ");
+                            message.append(cex.example1());
+                            message.append("\n  Derivation using shift    : ");
+                            message.append(cex.example2());
+                            message.append("\n");
+                            numUnif++;
+                        }
+                        else {
+                            message.append("  Example using reduction   : ");
+                            message.append(cex.prettyExample1());
+                            message.append("\n  Derivation using reduction: ");
+                            message.append(cex.example1());
+                            message.append("\n  Example using shift       : ");
+                            message.append(cex.prettyExample2());
+                            message.append("\n  Derivation using shift    : ");
+                            message.append(cex.example2());
+                            message.append("\n");
+                            if (!tle) {
+                                if (cex.timeout())
+                                    numTimeOut++;
+                                else numNonUnif++;
+                            }
+                            else numTle++;
+                        }
+                        reportCexStats(cex, System.nanoTime() - start);
                     }
-                    /* end ACM extension */
+                    /* end CupEx extension */
+                    /* count the conflict */
+                    emit.num_conflicts++;
                 }
             }
         }
-        message.append("  under symbol ");
-        message.append(terminal.find(conflict_sym).name());
         message.append("\n  Resolved in favor of shifting.\n");
+        if (relevancecounter == 0) return;
 
-        /* count the conflict */
-        emit.num_conflicts++;
         ErrorManager.getManager().emit_warning(message.toString());
     }
 
-    /* ACM extension */
-    /** A Path represents a path through the DFA, with edges between different
-     *  items in the same state represented explicitly.
-     */
-
-    private interface Step {
-        void appendToReport(StringBuilder example_s, PrintStream derivation_s,
-                boolean first);
-    }
-
-    private static class TransStep implements Step {
-        public TransStep(lalr_transition tr) {
-            trans = tr;
-        }
-
-        lalr_transition trans;
-
-        @Override
-        public void appendToReport(StringBuilder example_s,
-                PrintStream derivation_s, boolean first) {
-            String name = trans.on_symbol().name();
-            if (!first) {
-                derivation_s.print(" ");
-                example_s.append(" ");
+    protected static void reportCexStats(Counterexample cex, long duration) {
+        if (Main.report_cex_stats) {
+            if (Main.report_cex_stats_to_out) {
+                boolean tle = cexTimeLimit();
+                System.out.print("stage4");
+                if (cex.unifying())
+                    System.out.print(" unif");
+                else if (tle)
+                    System.out.print(" tle");
+                else if (cex.timeout())
+                    System.out.print(" t/o");
+                else System.out.print(" nonunif");
+                System.out.println(":\n" + duration);
             }
-            example_s.append(name);
-            derivation_s.print(name);
+            else System.err.println("stage4: " + duration);
         }
+        cumulativeCexTime += duration;
     }
 
-    private static class ProdStep implements Step {
-        private production prod;
-
-        public ProdStep(production pr) {
-            prod = pr;
-        }
-
-        @Override
-        public void appendToReport(StringBuilder example_s,
-                PrintStream derivation_s, boolean first) {
-            /* production: don't add anything to the example */
-            if (!first) derivation_s.print(" ");
-            derivation_s.print("[" + prod.lhs().the_symbol().name() + "::=");
-        }
+    protected static boolean cexTimeLimit() {
+        return cumulativeCexTime > 120000000000L;
     }
 
-    private static class Path {
-        Path(LinkedList<Step> t, StateItem si) {
-            steps = t;
-            last = si;
-        }
+    protected static long cumulativeCexTime;
+    protected static int numUnif, numNonUnif, numTimeOut, numTle;
 
-        /** steps is a linked list of lalr_transition _or_ production.
-         * The latter are found in the path when a "push" occurs to work
-         * on a new production. */
-        LinkedList<Step> steps;
-        /** last is the last state and item reached on the path. */
-        StateItem last;
+    protected static void clearCexStats() {
+        cumulativeCexTime = 0;
+        numUnif = 0;
+        numNonUnif = 0;
+        numTimeOut = 0;
+        numTle = 0;
     }
 
-    private static class StateItem {
-        lalr_state state;
-        lalr_item item;
-
-        StateItem(lalr_state s, lalr_item i) {
-            state = s;
-            item = i;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            StateItem si2 = (StateItem) o;
-            return state.equals(si2.state) && item.equals(si2.item);
-        }
-
-        @Override
-        public int hashCode() {
-            return state.hashCode() + item.hashCode();
-        }
+    public static void report() {
+        System.out.println("numUnif:\n" + numUnif);
+        System.out.println("numNonUnif:\n" + numNonUnif);
+        System.out.println("numTimeOut:\n" + numTimeOut);
+        System.out.println("numTle:\n" + numTle);
     }
-
-    /**
-     * Report on example_s a textual version of the shortest
-     * path from the start state and start item to the current state
-     * and item itm. Report on derivation_s a more detailed
-     * textual description including derivation information.
-     * This output is useful for diagnosing conflicts in the grammar.
-     */
-    protected void report_shortest_path(lalr_item itm, StringBuilder example_s,
-            PrintStream derivation_s) throws internal_error {
-        Path p = shortest_path(itm);
-        boolean first = true;
-        for (Step s : p.steps) {
-            s.appendToReport(example_s, derivation_s, first);
-            first = false;
-        }
-    }
-
-    /**
-     * Find the shortest way to get from the start state and start item
-     * to the current state and the item "itm". The steps that change
-     * the item being transitioned on (corresponding to items formed
-     * through closure computation) are represented explicitly in this
-     * path.
-     */
-    protected Path shortest_path(lalr_item itm) throws internal_error {
-        HashSet<StateItem> visited = new HashSet<>();
-        LinkedList<Path> active = new LinkedList<>(); // work queue
-        StateItem start = new StateItem(start_state, start_itm);
-
-        // This is a breadth-first search over the state graph, building
-        // up paths as we go.
-        Path p = new Path(new LinkedList<Step>(), start);
-        active.add(p);
-        while (!active.isEmpty()) {
-            Path p1 = active.removeFirst();
-            StateItem si = p1.last;
-            if (visited.contains(si)) continue; /* saw it already */
-            visited.add(si);
-            lalr_state s = si.state;
-            lalr_item i = si.item;
-            if (equals(s) && itm.equals(i)) {
-                p = p1;
-                return p;
-            }
-            /* try taking transitions */
-            for (lalr_transition tr = s.transitions(); tr != null; tr =
-                    tr.next()) {
-                if (tr.on_symbol().equals(i.symbol_after_dot())) {
-                    lalr_item i2 = i.shift();
-                    LinkedList<Step> newt = new LinkedList<Step>(p1.steps);
-                    newt.add(new TransStep(tr));
-                    Path p2 = new Path(newt, new StateItem(tr.to_state(), i2));
-                    active.add(p2);
-                }
-            }
-            /* try changing the production (one step of closure) */
-            non_terminal nt = i.dot_before_nt();
-            if (nt != null) {
-                for (production prod : nt.productions()) {
-                    terminal_set new_lookaheads =
-                            i.calc_lookahead(i.lookahead());
-                    lalr_item i2 =
-                            new lalr_item(prod,
-                                          new terminal_set(new_lookaheads));
-                    LinkedList<Step> newt = new LinkedList<>(p1.steps);
-                    newt.add(new ProdStep(prod));
-                    Path p2 = new Path(newt, new StateItem(s, i2));
-                    active.add(p2);
-                }
-            }
-        }
-        return null;
-    }
-
-    String right_of_dot(lalr_item itm) throws internal_error {
-        String result = "";
-        production prod = itm.the_production();
-        int pos = itm.dot_pos();
-        for (int i = pos; i < prod.rhs_length(); i++) {
-            if (i != pos) result += " ";
-            production_part pp = prod.rhs(i);
-            if (pp instanceof symbol_part) {
-                result = result + ((symbol_part) pp).the_symbol().name();
-            }
-        }
-        return result;
-    }
-
-    /* End ACM extension */
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 

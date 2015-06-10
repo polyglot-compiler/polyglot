@@ -1,5 +1,5 @@
 # Compile some java classes first
-javac "-d java-out -cp ." {
+javac ["../tests/"] "-d java-out -cp ." {
 	java-src/ClassFile01.java;
 	java-src/ClassFile02.java;
 }
@@ -46,8 +46,11 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         ClassDecl06.jl (Semantic, "Cannot declare a top-level class with flag");
         ClassDecl07.jl (Semantic, "clashes with package of the same name");
         ClassFile01.jl;
-        ClassFile02.jl (Semantic, "incompatible return type");
+        ClassFile02.jl;
         ClassLit.jl ;
+	CombRule1.jl; 
+	CombRule2.jl (Semantic, "Method.*cannot be called with arguments");
+	CombRule3.jl (Semantic, "Method.*cannot be called with arguments");
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
 	ConformanceCheck2.jl (Semantic, "cannot override.*throw set.*is not a subset");
@@ -58,6 +61,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         ConformanceCheck7.jl (Semantic, "should be declared abstract");        
         packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
         ConformanceCheck9.jl ;         
+        ConformanceCheck10.jl packA/ConformanceCheck10a.jl packA/ConformanceCheck10b.jl; 
         packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Method.*inaccessible");
         package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "Method.*inaccessible");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
@@ -82,7 +86,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Empty.jl ;
         Equality.jl ;
         Equality2.jl ;
-        Equality03.jl (Semantic, "must have operands of similar type");
+        Equality03.jl;
         ExcTest.jl ;
         Except.jl ; Except2.jl ; Except3.jl ; Except4.jl ;
         Except5.jl ;
@@ -160,7 +164,7 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         InnerSuperConstructor6.jl;
         InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
         InnerSuperConstructor8.jl;
-        Instanceof01.jl (Semantic, "incompatible with type operand");
+        Instanceof01.jl;
         InterfaceOverride.jl ;
         Label01.jl (Semantic, "Label .* already in use");
         LabeledBreak.jl ;
@@ -263,9 +267,6 @@ polyglot.ext.jl5.JL5ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         TypeAccess02a.jl TypeAccess02b.jl (Semantic, "Could not find type");
         TypeShadowing.jl ;
         xIterator.jl ;
-	CombRule1.jl; 
-	CombRule2.jl (Semantic, "Method.*cannot be called with arguments");
-	CombRule3.jl (Semantic, "Method.*cannot be called with arguments");
         FormalsDup.jl (Semantic, "multiply defined"), (Semantic, "multiply defined");
         AbstractSuperMethod.jl (Semantic, "Cannot call an abstract method of the super class");
         BadAbstract.jl (Semantic, "should be declared abstract");

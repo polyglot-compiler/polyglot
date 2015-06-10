@@ -3,18 +3,18 @@ package java_cup;
 import java.util.HashMap;
 
 /** This class represents a production in the grammar.  It contains
- *  a LHS non terminal, and an array of RHS symbols.  As various 
+ *  a LHS non terminal, and an array of RHS symbols.  As various
  *  transformations are done on the RHS of the production, it may shrink.
  *  As a result a separate length is always maintained to indicate how much
  *  of the RHS array is still valid.<p>
- * 
+ *
  *  I addition to construction and manipulation operations, productions provide
  *  methods for factoring out actions (see  remove_embedded_actions()), for
  *  computing the nullability of the production (i.e., can it derive the empty
  *  string, see check_nullable()), and operations for computing its first
  *  set (i.e., the set of terminals that could appear at the beginning of some
  *  string derived from the production, see check_first_set()).
- * 
+ *
  * @see     java_cup.production_part
  * @see     java_cup.symbol_part
  * @see     java_cup.action_part
@@ -29,14 +29,14 @@ public class production {
     /*-----------------------------------------------------------*/
 
     /** Full constructor.  This constructor accepts a LHS non terminal,
-     *  an array of RHS parts (including terminals, non terminals, and 
+     *  an array of RHS parts (including terminals, non terminals, and
      *  actions), and a string for a final reduce action.   It does several
      *  manipulations in the process of  creating a production object.
      *  After some validity checking it translates labels that appear in
      *  actions into code for accessing objects on the runtime parse stack.
      *  It them merges adjacent actions if they appear and moves any trailing
      *  action into the final reduce actions string.  Next it removes any
-     *  embedded actions by factoring them out with new action productions.  
+     *  embedded actions by factoring them out with new action productions.
      *  Finally it assigns a unique index to the production.<p>
      *
      *  Factoring out of actions is accomplished by creating new "hidden"
@@ -46,7 +46,7 @@ public class production {
      *  then it is factored into two productions:<pre>
      *    A ::= B X C D
      *    X ::= {action}
-     *  </pre> 
+     *  </pre>
      *  (where X is a unique new non terminal).  This has the effect of placing
      *  all actions at the end where they can be handled as part of a reduce by
      *  the parser.
@@ -71,11 +71,11 @@ public class production {
 
         /* I'm not translating labels anymore, I'm adding code to declare
         labels as valid variables.  This way, the users code string is
-        untouched 
+        untouched
         6/96 frankf */
 
         /* check if the last part of the right hand side is an action.  If
-           it is, it won't be on the stack, so we don't want to count it 
+           it is, it won't be on the stack, so we don't want to count it
         in the rightlen.  Then when we search down the stack for a
            Symbol, we don't try to search past action */
 
@@ -109,7 +109,7 @@ public class production {
         if (tail_action != null) _rhs_length--;
 
         /* Why does this run through the right hand side happen
-        over and over?  here a quick combination of two 
+        over and over?  here a quick combination of two
         prior runs plus one I wanted of my own
         frankf 6/25/96 */
         /* allocate and copy over the right-hand-side */
@@ -133,7 +133,7 @@ public class production {
         if (action_str == null) action_str = "";
         if (tail_action != null && tail_action.code_string() != null)
             action_str =
-                    action_str + "                " + tail_action.code_string();
+            action_str + "                " + tail_action.code_string();
 
         /* stash the action */
         _action = new action_part(action_str);
@@ -165,7 +165,7 @@ public class production {
        contextually define */
     public production(non_terminal lhs_sym, production_part rhs_parts[],
             int rhs_l, String action_str, int prec_num, int prec_side)
-            throws internal_error {
+                    throws internal_error {
         this(lhs_sym, rhs_parts, rhs_l, action_str);
 
         /* set the precedence */
@@ -191,7 +191,7 @@ public class production {
     /*--- (Access to) Static (Class) Variables ------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Table of all productions.  Elements are stored using their index as 
+    /** Table of all productions.  Elements are stored using their index as
      *  the key.
      */
     protected static HashMap<Integer, production> _all = new HashMap<>();
@@ -280,13 +280,13 @@ public class production {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** An action_part containing code for the action to be performed when we 
-     *  reduce with this production. 
+    /** An action_part containing code for the action to be performed when we
+     *  reduce with this production.
      */
     protected action_part _action;
 
-    /** An action_part containing code for the action to be performed when we 
-     *  reduce with this production. 
+    /** An action_part containing code for the action to be performed when we
+     *  reduce with this production.
      */
     public action_part action() {
         return _action;
@@ -339,12 +339,12 @@ public class production {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** First set of the production.  This is the set of terminals that 
+    /** First set of the production.  This is the set of terminals that
      *  could appear at the front of some string derived from this production.
      */
     protected terminal_set _first_set = new terminal_set();
 
-    /** First set of the production.  This is the set of terminals that 
+    /** First set of the production.  This is the set of terminals that
      *  could appear at the front of some string derived from this production.
      */
     public terminal_set first_set() {
@@ -355,8 +355,8 @@ public class production {
     /*--- Static Methods ----------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Determine if a given character can be a label id starter. 
-     * @param c the character in question. 
+    /** Determine if a given character can be a label id starter.
+     * @param c the character in question.
      */
     protected static boolean is_id_start(char c) {
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_';
@@ -366,7 +366,7 @@ public class production {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Determine if a character can be in a label id. 
+    /** Determine if a character can be in a label id.
      * @param c the character in question.
      */
     protected static boolean is_id_char(char c) {
@@ -390,15 +390,15 @@ public class production {
         if (emit.lr_values()) {
             if (!emit.locations())
                 ret =
-                        "                "
-                                + "int "
-                                + labelname
-                                + "left = "
-                                + emit.pre("stack")
-                                +
-                                // TUM 20050917
-                                (offset == 0 ? ".peek()" : ".elementAt("
-                                        + emit.pre("top") + "-" + offset + ")")
+                "                "
+                        + "int "
+                        + labelname
+                        + "left = "
+                        + emit.pre("stack")
+                        +
+                        // TUM 20050917
+                        (offset == 0 ? ".peek()" : ".elementAt("
+                                + emit.pre("top") + "-" + offset + ")")
                                 + ".left;\n"
                                 + "                "
                                 + "int "
@@ -409,7 +409,7 @@ public class production {
                                 // TUM 20050917
                                 (offset == 0 ? ".peek()" : ".elementAt("
                                         + emit.pre("top") + "-" + offset + ")")
-                                + ".right;\n";
+                                        + ".right;\n";
             else ret =
                     "                "
                             + "Location "
@@ -420,17 +420,17 @@ public class production {
                             // TUM 20050917
                             (offset == 0 ? ".peek()" : ".elementAt("
                                     + emit.pre("top") + "-" + offset + ")")
-                            + ").xleft;\n"
-                            + "                "
-                            + "Location "
-                            + labelname
-                            + "xright = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
-                            + emit.pre("stack")
-                            +
-                            // TUM 20050917
-                            (offset == 0 ? ".peek()" : ".elementAt("
-                                    + emit.pre("top") + "-" + offset + ")")
-                            + ").xright;\n";
+                                    + ").xleft;\n"
+                                    + "                "
+                                    + "Location "
+                                    + labelname
+                                    + "xright = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
+                                    + emit.pre("stack")
+                                    +
+                                    // TUM 20050917
+                                    (offset == 0 ? ".peek()" : ".elementAt("
+                                            + emit.pre("top") + "-" + offset + ")")
+                                            + ").xright;\n";
         }
         else ret = "";
 
@@ -446,7 +446,7 @@ public class production {
                 // TUM 20050917
                 (offset == 0 ? ".peek()" : ".elementAt(" + emit.pre("top")
                         + "-" + offset + ")") + ".<" + stack_type
-                + "> value();\n";
+                        + "> value();\n";
 
     }
 
@@ -455,7 +455,7 @@ public class production {
     /** Declare label names as valid variables within the action string
      * @param rhs          array of RHS parts.
      * @param rhs_len      how much of rhs to consider valid.
-     * @param final_action the final action string of the production. 
+     * @param final_action the final action string of the production.
      * @param lhs_type     the object type associated with the LHS symbol.
      */
     protected String declare_labels(production_part rhs[], int rhs_len,
@@ -470,11 +470,13 @@ public class production {
             if (!rhs[pos].is_action()) {
                 part = (symbol_part) rhs[pos];
 
+                String label;
                 /* if it has a label, make declaration! */
-                if (part.label() != null) {
+                if ((label = part.label()) != null || emit._xmlactions) {
+                    if (label == null) label = part.the_symbol().name() + pos;
                     declaration =
                             declaration
-                                    + make_declaration(part.label(),
+                                    + make_declaration(label,
                                                        part.the_symbol()
                                                            .stack_type(),
                                                        rhs_len - pos - 1);
@@ -486,7 +488,7 @@ public class production {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Helper routine to merge adjacent actions in a set of RHS parts 
+    /** Helper routine to merge adjacent actions in a set of RHS parts
      * @param rhs_parts array of RHS parts.
      * @param len       amount of that array that is valid.
      * @return          remaining valid length.
@@ -518,7 +520,7 @@ public class production {
                     /* merge */
                     rhs_parts[to_loc] =
                             new action_part(((action_part) rhs_parts[to_loc]).code_string()
-                                    + ((action_part) rhs_parts[from_loc]).code_string());
+                                            + ((action_part) rhs_parts[from_loc]).code_string());
                     merge_cnt++;
                 }
                 else {
@@ -558,10 +560,10 @@ public class production {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Remove all embedded actions from a production by factoring them 
+    /** Remove all embedded actions from a production by factoring them
      *  out into individual action production using new non terminals.
      *  if the original production was:  <pre>
-     *    A ::= B {action1} C {action2} D 
+     *    A ::= B {action1} C {action2} D
      *  </pre>
      *  then it will be factored into: <pre>
      *    A ::= B NT$1 C NT$2 D
@@ -577,7 +579,7 @@ public class production {
        frank 6/20/96 */
     protected void remove_embedded_actions(
 
-    ) throws internal_error {
+            ) throws internal_error {
         non_terminal new_nt;
         String declare_str;
         int lastLocation = -1;
@@ -589,7 +591,7 @@ public class production {
                 /* create a new non terminal for the action production */
                 new_nt =
                         non_terminal.create_new(null, lhs().the_symbol()
-                                                           .stack_type()); // TUM 20060608 embedded actions patch
+                                                .stack_type()); // TUM 20060608 embedded actions patch
                 new_nt.is_embedded_action = true; /* 24-Mar-1998, CSA */
 
                 /* create a new production with just the action */
@@ -598,7 +600,7 @@ public class production {
                                       null,
                                       0,
                                       declare_str
-                                              + ((action_part) rhs(act_loc)).code_string(),
+                                      + ((action_part) rhs(act_loc)).code_string(),
                                       lastLocation == -1 ? -1 : act_loc
                                               - lastLocation);
 
@@ -642,8 +644,8 @@ public class production {
                     return set_nullable(false);
                 /* its a non-term, is it marked nullable */
                 else if (!((non_terminal) sym).nullable())
-                /* this one not (yet) nullable, so we aren't */
-                return false;
+                    /* this one not (yet) nullable, so we aren't */
+                    return false;
             }
         }
 
@@ -660,9 +662,9 @@ public class production {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Update (and return) the first set based on current NT firsts. 
-     *  This assumes that nullability has already been computed for all non 
-     *  terminals and productions. 
+    /** Update (and return) the first set based on current NT firsts.
+     *  This assumes that nullability has already been computed for all non
+     *  terminals and productions.
      */
     public terminal_set check_first_set() throws internal_error {
         int part;
@@ -734,7 +736,7 @@ public class production {
         try {
             result = "production [" + index() + "]: ";
             result += lhs() != null ? lhs().toString() : "$$NULL-LHS$$";
-            result += " :: = ";
+            result += " ::= ";
             for (int i = 0; i < rhs_length(); i++)
                 result += rhs(i) + " ";
             result += ";";

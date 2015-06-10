@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -26,8 +26,11 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassDeclOps;
@@ -40,7 +43,9 @@ import polyglot.ext.jl5.types.Annotations;
 import polyglot.ext.jl5.types.JL5Context;
 import polyglot.ext.jl5.types.JL5Flags;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5SubstType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl5.types.TypeVariable;
 import polyglot.ext.jl5.visit.AnnotationChecker;
 import polyglot.ext.jl5.visit.JL5Translator;
@@ -87,7 +92,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     }
 
     public List<ParamTypeNode> paramTypes() {
-        return this.paramTypes;
+        return paramTypes;
     }
 
     public Node paramTypes(List<ParamTypeNode> types) {
@@ -110,7 +115,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             throws SemanticException {
         super.annotationCheck(annoCheck);
 
-        ClassDecl n = this.node();
+        ClassDecl n = node();
 
         // check annotation circularity
         if (JL5Flags.isAnnotation(n.flags())) {
@@ -135,7 +140,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void setAnnotations(Annotations annotations) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         JL5ParsedClassType pct = (JL5ParsedClassType) n.type();
         pct.setAnnotations(annotations);
         pct.setAnnotationsResolved(true);
@@ -143,7 +148,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     protected Declaration declaration() {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         return n.type();
     }
 
@@ -161,11 +166,13 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        ClassDecl n = (ClassDecl) superLang().buildTypes(this.node(), tb);
+        ClassDecl n = (ClassDecl) superLang().buildTypes(node(), tb);
+        JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
+        if (ct == null) {
+            return n;
+        }
 
         JL5TypeSystem ts = (JL5TypeSystem) tb.typeSystem();
-        JL5ParsedClassType ct = (JL5ParsedClassType) n.type();
-
         MuPClass<TypeVariable, ReferenceType> pc =
                 ts.mutablePClass(ct.position());
         ct.setPClass(pc);
@@ -187,12 +194,12 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see polyglot.ast.NodeOps#enterScope(polyglot.types.Context)
      */
     @Override
     public Context enterChildScope(Node child, Context c) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
 
         if (child == n.body()) {
             TypeSystem ts = c.typeSystem();
@@ -213,14 +220,15 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         ParsedClassType type = n.type();
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(n);
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
         Type superType = type.superType();
-        if (superType != null && JL5Flags.isEnum(superType.toClass().flags())) {
+        if (superType != null && superType.isClass()
+                && JL5Flags.isEnum(superType.toClass().flags())) {
             throw new SemanticException("Cannot extend enum type", n.position());
         }
 
@@ -257,6 +265,47 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
             }
         }
 
+        Map<Type, List<ReferenceType>> superInterfaces = new HashMap<>();
+        for (TypeNode tn : n.interfaces()) {
+            Type t = tn.type();
+
+            // JLS 3rd Ed. | 8.1.5
+            // A class may not at the same time be a subtype of two interface
+            // types which are different invocations of the same generic
+            // interface, or an invocation of a generic interface and a raw type
+            // naming that same generic interface.
+            if (t instanceof JL5SubstType) {
+                JL5SubstType st = (JL5SubstType) t;
+                Type base = st.base();
+                List<ReferenceType> actuals = st.actuals();
+                if (superInterfaces.containsKey(base)) {
+                    List<ReferenceType> inherited = superInterfaces.get(base);
+                    if (!inherited.equals(actuals))
+                        throw new SemanticException(t
+                                                            + " cannot be inherited with different arguments: "
+                                                            + inherited
+                                                            + " and " + actuals,
+                                                    tn.position());
+                }
+                superInterfaces.put(base, actuals);
+            }
+            else if (t instanceof RawClass) {
+                RawClass rc = (RawClass) t;
+                JL5ParsedClassType base = rc.base();
+                List<ReferenceType> actuals = Collections.emptyList();
+                if (superInterfaces.containsKey(base)) {
+                    List<ReferenceType> inherited = superInterfaces.get(base);
+                    if (!inherited.equals(actuals))
+                        throw new SemanticException(t
+                                                            + " cannot be inherited with different arguments: "
+                                                            + inherited
+                                                            + " and " + actuals,
+                                                    tn.position());
+                }
+                superInterfaces.put(base, actuals);
+            }
+        }
+
         for (TypeNode paramType : ext.paramTypes)
             ts.checkCycles(paramType.type().toReference());
 
@@ -264,7 +313,7 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     }
 
     public void prettyPrintModifiers(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         Flags f = n.flags();
         if (f.isInterface()) {
             f = f.clearInterface().clearAbstract();
@@ -294,14 +343,14 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
     }
 
     public void prettyPrintName(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = this.node();
+        ClassDecl n = node();
         w.write(n.id().id());
     }
 
     public void prettyPrintHeaderRest(CodeWriter w, PrettyPrinter tr) {
-        ClassDecl n = this.node();
-        if (n.superClass() != null
-                && ((!JL5Flags.isEnum(n.flags()) && !JL5Flags.isAnnotation(n.flags())))) {
+        ClassDecl n = node();
+        if (n.superClass() != null && !JL5Flags.isEnum(n.flags())
+                && !JL5Flags.isAnnotation(n.flags())) {
             w.write(" extends ");
             print(n.superClass(), w, tr);
         }
@@ -366,14 +415,14 @@ public class JL5ClassDeclExt extends JL5AnnotatedElementExt implements
 
     @Override
     public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
-        superLang().prettyPrintFooter(this.node(), w, tr);
+        superLang().prettyPrintFooter(node(), w, tr);
     }
 
     @Override
     public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
             ConstructorInstance defaultConstructorInstance)
             throws SemanticException {
-        return superLang().addDefaultConstructor(this.node(),
+        return superLang().addDefaultConstructor(node(),
                                                  ts,
                                                  nf,
                                                  defaultConstructorInstance);

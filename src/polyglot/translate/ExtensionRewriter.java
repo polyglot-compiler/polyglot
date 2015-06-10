@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -33,6 +33,7 @@ import polyglot.ast.SourceFile;
 import polyglot.ast.TypeNode;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
+import polyglot.main.Report;
 import polyglot.qq.QQ;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -45,16 +46,16 @@ import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 
 /**
- * The ExtensionRewriter translates AST nodes created by one extension's 
- * NodeFactory to nodes created by a target extension's NodeFactory.  
- * Extensions using this visitor should add the extension factory 
+ * The ExtensionRewriter translates AST nodes created by one extension's
+ * NodeFactory to nodes created by a target extension's NodeFactory.
+ * Extensions using this visitor should add the extension factory
  * ToExtFactory_c to their node factory.
- * 
- * After the AST of a source file is rewritten, a new job for the 
- * translated AST is enqueued in the scheduler of the target extension.  
- * Since this job has not been parsed from a source file, the usual 
+ *
+ * After the AST of a source file is rewritten, a new job for the
+ * translated AST is enqueued in the scheduler of the target extension.
+ * Since this job has not been parsed from a source file, the usual
  * pattern is to subclass the target extension's scheduler in order to
- * substitute an empty pass for the Parsed compiler goal. 
+ * substitute an empty pass for the Parsed compiler goal.
  * @see JLOutputExtensionInfo for an example.
  */
 public class ExtensionRewriter extends ContextVisitor {
@@ -84,6 +85,23 @@ public class ExtensionRewriter extends ContextVisitor {
     @Override
     public Lang lang() {
         return lang;
+    }
+
+    @Override
+    public Node override(Node parent, Node n) {
+        if (Report.should_report(Report.visit, 2))
+            Report.report(2, ">> " + this + "::override " + n);
+
+        Node m = lang().extRewriteOverride(n, this);
+
+        if (Report.should_report(Report.visit, 2))
+            Report.report(2, "<< " + this + "::override " + n + " -> " + m);
+        if (m == null) {
+            return super.override(parent, n);
+        }
+        else {
+            return m;
+        }
     }
 
     @Override

@@ -185,14 +185,28 @@ action code {:
       }
     }
   }
+  
+  private int cur_debug_id = 0;
+  public int get_new_debug_id() {
+    return cur_debug_id++;
+  }
+   
+  public String attach_debug_symbol(int id, String code) {
+  if (!parser.debugSymbols)
+    return code;
+  return "//@@CUPDBG" + id + "\n" + code;
+  }
 :};
 
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
 parser code {:
-
  /* override error routines */
   protected Lexer lexer;
+  public boolean debugSymbols;
+  public void setDebugSymbols(boolean debugSymbols){
+    this.debugSymbols = debugSymbols;
+  }
   public void report_fatal_error(
     String   message,
     Object   info)
@@ -230,7 +244,7 @@ terminal
   PACKAGE, IMPORT, CODE, ACTION, PARSER, TERMINAL, NON, INIT, SCAN, WITH, 
   START, SEMI, COMMA, STAR, DOT, COLON, COLON_COLON_EQUALS, BAR, PRECEDENCE,
   LEFT, RIGHT, NONASSOC, PERCENT_PREC, LBRACK, RBRACK, NONTERMINAL, GT, LT,
-  QUESTION, EXTENDS, IMPLEMENTS /* ACM extension */
+  QUESTION, EXTENDS, IMPLEMENTS /* CupEx extension */, CLASS
   ;
 
 terminal String  ID, CODE_STRING;
@@ -243,12 +257,12 @@ non terminal
   type_id, term_name_list, non_term_name_list, production, prod_part_list, 
   prod_part, new_term_id, new_non_term_id, rhs_list, rhs, empty,
   precedence_list, preced, terminal_list, precedence_l, declares_term, 
-  declares_non_term;
+  declares_non_term, class_name;
 
 non terminal String  nt_id, symbol_id, label_id, opt_label, terminal_id,
                      term_id, robust_id, typearglist, typearguement, wildcard;
 
-non terminal String qualified_identifier, extendsimpls; /* ACM extension */
+non terminal String qualified_identifier, extendsimpls; /* CupEx extension */
 
 /*----------------------------------------------------------------*/ 
 
@@ -266,6 +280,7 @@ spec ::=
 	:}
 	package_spec
 	import_list
+	class_name
 	code_parts
 	symbol_list
 	precedence_list
@@ -325,6 +340,15 @@ import_spec ::=
 	SEMI
 	;
 
+class_name ::=
+    empty |
+    CLASS ID:id SEMI
+    {:
+     emit.parser_class_name = id;
+     emit.symbol_const_class_name = id + "Sym";
+    :}
+    ;
+
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
 // allow any order; all parts are optional. [CSA, 23-Jul-1999]
@@ -342,7 +366,7 @@ action_code_part ::=
 	  if (emit.action_code!=null)
 	    ErrorManager.getManager().emit_warning("Redundant action code (skipping)");
 	  else /* save the user included code string */
-	    emit.action_code = user_code;
+      emit.action_code = attach_debug_symbol(get_new_debug_id(),user_code);
 	:}
 	;
 
@@ -354,9 +378,9 @@ parser_code_part ::=
 	  if (emit.parser_code!=null)
 	    ErrorManager.getManager().emit_warning("Redundant parser code (skipping)");
 	  else /* save the user included code string */
-	    emit.parser_code = user_code;
+      emit.parser_code = attach_debug_symbol(get_new_debug_id(),user_code);
 	:}
-/* ACM extension starts here */
+/* CupEx extension starts here */
     |   PARSER ID:classname extendsimpls:e CODE_STRING:user_code opt_semi
 	{:
 	  if (emit.parser_code!=null) {
@@ -388,7 +412,7 @@ qualified_identifier ::=
 	    RESULT = qid + "." + x;
 	:}
     ;
-/* end ACM extension */
+/* end CupEx extension */
 
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
@@ -398,7 +422,7 @@ init_code ::=
 	  if (emit.init_code!=null)
 	    ErrorManager.getManager().emit_warning("Redundant init code (skipping)");
 	  else /* save the user code */
-	    emit.init_code = user_code;
+      emit.init_code = attach_debug_symbol(get_new_debug_id(),user_code);
 	:}
 	;
 
@@ -410,7 +434,7 @@ scan_code ::=
 	  if (emit.scan_code!=null)
 	    ErrorManager.getManager().emit_warning("Redundant scan code (skipping)");
 	  else /* save the user code */
-	    emit.scan_code = user_code;
+      emit.scan_code = attach_debug_symbol(get_new_debug_id(),user_code);
 	:}
 	;
 
@@ -569,7 +593,7 @@ start_spec ::=
 	      new_rhs();
 	      add_rhs_part(add_lab(new symbol_part(start_nt), "start_val"));
 	      add_rhs_part(new symbol_part(terminal.EOF));
-	      add_rhs_part(new action_part("RESULT = start_val;"));
+	      if (!emit._xmlactions) add_rhs_part(new action_part("RESULT = start_val;"));
 	      emit.start_production = 
 		     new production(non_terminal.START_nt, rhs_parts, rhs_pos);
 	      new_rhs();
@@ -656,7 +680,7 @@ rhs ::=
 	          new_rhs();
 	          add_rhs_part(add_lab(new symbol_part(start_nt),"start_val"));
 	          add_rhs_part(new symbol_part(terminal.EOF));
-		  add_rhs_part(new action_part("RESULT = start_val;"));
+		  if (!emit._xmlactions) add_rhs_part(new action_part("RESULT = start_val;"));
 		  if ((sym!=null) && (sym instanceof terminal)) {
 		    emit.start_production = 
 		      new production(non_terminal.START_nt, rhs_parts, 
@@ -692,7 +716,7 @@ rhs ::=
 	          new_rhs();
 	          add_rhs_part(add_lab(new symbol_part(start_nt),"start_val"));
 	          add_rhs_part(new symbol_part(terminal.EOF));
-		  add_rhs_part(new action_part("RESULT = start_val;"));
+		  if (!emit._xmlactions) add_rhs_part(new action_part("RESULT = start_val;"));
 	          emit.start_production = 
 		     new production(non_terminal.START_nt, rhs_parts, rhs_pos);
 
@@ -734,7 +758,7 @@ prod_part ::=
 	CODE_STRING:code_str
 	{: 
 	  /* add a new production part */
-	  add_rhs_part(new action_part(code_str));
+    add_rhs_part(new action_part(attach_debug_symbol(get_new_debug_id(),code_str)));
 	:}
 	;
 

@@ -1,0 +1,85 @@
+terminal Term_y_alter;
+terminal BY;
+terminal Term_y_order;
+terminal Term_y_create;
+terminal Term_y_table;
+terminal Term_y_sql;
+terminal Term_y_select;
+terminal Term_y_insert;
+terminal Term_y_assignments;
+terminal UPDATE;
+terminal Term_y_drop;
+terminal WHERE;
+terminal RPAREN;
+terminal Term_y_term;
+terminal Term_y_value_list;
+terminal Term_y_delete;
+terminal SET;
+terminal Term_y_columndefs;
+terminal SELECT;
+terminal Term_y_values;
+terminal Term_y_value;
+terminal AND;
+terminal Term_y_product;
+terminal Term_y_columndef;
+terminal NOT;
+terminal Term_y_expression;
+terminal Term_y_column;
+terminal Term_y_sub_condition2;
+terminal Term_y_boolean;
+terminal ORDER;
+terminal Term_y_column_list;
+terminal DELETE;
+terminal FROM;
+terminal Term_y_atom;
+terminal LPAREN;
+terminal Term_y_assignment;
+terminal Term_y_columns;
+terminal OR;
+terminal Term_y_sub_condition;
+terminal Term_y_comparison;
+terminal Term_y_update;
+terminal Term_y_condition;
+
+non terminal y_sql, y_update, y_sub_condition2, y_sub_condition, y_condition,
+y_select, y_boolean, y_delete;
+
+start with y_sql;
+
+y_sql ::=  Term_y_sql
+|  y_update
+|  y_select
+|  y_delete
+;
+
+y_update ::=  Term_y_update
+|  UPDATE Term_y_table SET Term_y_assignments WHERE y_condition
+;
+
+y_sub_condition2 ::=  Term_y_sub_condition2
+|  y_sub_condition2 AND y_boolean
+|  y_boolean
+;
+
+y_sub_condition ::=  Term_y_sub_condition
+|  y_sub_condition2
+|  y_sub_condition OR y_sub_condition
+;
+
+y_condition ::=  Term_y_condition
+|  y_sub_condition
+;
+
+y_select ::=  Term_y_select
+|  SELECT Term_y_columns FROM Term_y_table WHERE y_condition ORDER BY Term_y_order
+|  SELECT Term_y_columns FROM Term_y_table WHERE y_condition
+;
+
+y_boolean ::=  Term_y_boolean
+|  NOT y_boolean
+|  LPAREN y_sub_condition RPAREN
+;
+
+y_delete ::=  Term_y_delete
+|  DELETE FROM Term_y_table WHERE y_condition
+;

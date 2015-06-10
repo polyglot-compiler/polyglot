@@ -3,7 +3,7 @@ package java_cup;
 import java.util.HashMap;
 import java.util.Iterator;
 
-/** This class represents a set of symbols and provides a series of 
+/** This class represents a set of symbols and provides a series of
  *  set operations to manipulate them.
  *
  * @see     java_cup.symbol
@@ -20,7 +20,7 @@ public class symbol_set implements Iterable<symbol> {
     public symbol_set() {
     }
 
-    /** Constructor for cloning from another set. 
+    /** Constructor for cloning from another set.
      * @param other the set we are cloning from.
      */
     @SuppressWarnings("unchecked")
@@ -33,7 +33,7 @@ public class symbol_set implements Iterable<symbol> {
     /*--- (Access to) Instance Variables ------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** A hash table to hold the set. Symbols are keyed using their name string. 
+    /** A hash table to hold the set. Symbols are keyed using their name string.
      */
     protected HashMap<String, symbol> _all = new HashMap<>(11);
 
@@ -63,7 +63,7 @@ public class symbol_set implements Iterable<symbol> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Determine if the set contains a particular symbol. 
+    /** Determine if the set contains a particular symbol.
      * @param sym the symbol we are looking for.
      */
     public boolean contains(symbol sym) {
@@ -72,7 +72,7 @@ public class symbol_set implements Iterable<symbol> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Determine if this set is an (improper) subset of another. 
+    /** Determine if this set is an (improper) subset of another.
      * @param other the set we are testing against.
      */
     public boolean is_subset_of(symbol_set other) throws internal_error {
@@ -88,7 +88,7 @@ public class symbol_set implements Iterable<symbol> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Determine if this set is an (improper) superset of another. 
+    /** Determine if this set is an (improper) superset of another.
      * @param other the set we are are testing against.
      */
     public boolean is_superset_of(symbol_set other) throws internal_error {
@@ -98,7 +98,7 @@ public class symbol_set implements Iterable<symbol> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Add a single symbol to the set.  
+    /** Add a single symbol to the set.
      * @param sym the symbol we are adding.
      * @return true if this changes the set.
      */
@@ -116,7 +116,7 @@ public class symbol_set implements Iterable<symbol> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Remove a single symbol if it is in the set. 
+    /** Remove a single symbol if it is in the set.
      * @param sym the symbol we are removing.
      */
     public void remove(symbol sym) throws internal_error {
@@ -126,9 +126,9 @@ public class symbol_set implements Iterable<symbol> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Add (union) in a complete set.  
+    /** Add (union) in a complete set.
      * @param other the set we are adding in.
-     * @return true if this changes the set. 
+     * @return true if this changes the set.
      */
     public boolean add(symbol_set other) throws internal_error {
         boolean result = false;
@@ -144,7 +144,7 @@ public class symbol_set implements Iterable<symbol> {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Remove (set subtract) a complete set. 
+    /** Remove (set subtract) a complete set.
      * @param other the set we are removing.
      */
     public void remove(symbol_set other) throws internal_error {
@@ -188,7 +188,6 @@ public class symbol_set implements Iterable<symbol> {
     @Override
     public int hashCode() {
         int result = 0;
-        int cnt;
 
         for (symbol s : this)
             result ^= s.hashCode();

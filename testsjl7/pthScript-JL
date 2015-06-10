@@ -1,11 +1,56 @@
+# Compile some java classes first
+javac ["../tests/"] "-d java-out -cp ." {
+	java-src/ClassFile01.java;
+	java-src/ClassFile02.java;
+}
+
 polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-out -assert -noserial -postopts \"-source 1.7 -Xlint\\:-options\" -morepermissiveinference" {
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
+        AnonymousClass03.jl;
+        AnonymousClass04.jl;
         ArrayInit.jl ;
-#        Array01.jl ;
+        Array01.jl ;
+        Assign01.jl
+          (Semantic, "Cannot assign"),
+          (Semantic, "type .* does not match"),
+          (Semantic, "type .* does not match"),
+          (Semantic, "type .* does not match"),
+          (Semantic, "type .* does not match");
+        Binary01.jl
+          (Semantic, "numeric or String operands"),
+          (Semantic, "numeric or String operands"),
+          (Semantic, "numeric or String operands");
         BoolTest.jl ;
         BoolTest2.jl (Semantic, "may not have been initialized");
+        Call01.jl;
+        Call02.jl (Semantic, "does not have an enclosing instance");
+        Call03.jl (Semantic, "Method .* inaccessible");
+        Call04.jl;
+        Call05.jl;
+        Call06.jl;
+        Call07.jl;
+        Call08a.jl Call08b.jl;
+        Call09a.jl Call09b.jl (Semantic, "ambiguous, multiple methods match");
+        Call10.jl (Semantic, "No valid method call found for clone()");
+        Call11.jl;
+        Cast01.jl;
+        ClassDecl01.jl
+          (Semantic, "abstract and final"),
+          (Semantic, "abstract and final"),
+          (Semantic, "abstract and final");
+        ClassDecl02.jl (Semantic, "Duplicate interface");
+        ClassDecl03.jl (Semantic, "Cannot declare a top-level interface with flag");
+        ClassDecl04.jl;
+        ClassDecl05.jl;
+        ClassDecl06.jl (Semantic, "Cannot declare a top-level class with flag");
+        ClassDecl07.jl (Semantic, "clashes with package of the same name");
+        ClassFile01.jl;
+        ClassFile02.jl;
         ClassLit.jl ;
+	CombRule1.jl; 
+	CombRule2.jl (Semantic, "Method.*cannot be called with arguments");
+	CombRule3.jl (Semantic, "Method.*cannot be called with arguments");
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
 	ConformanceCheck2.jl (Semantic, "cannot override.*throw set.*is not a subset");
@@ -16,9 +61,15 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         ConformanceCheck7.jl (Semantic, "should be declared abstract");        
         packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
         ConformanceCheck9.jl ;         
+        ConformanceCheck10.jl packA/ConformanceCheck10a.jl packA/ConformanceCheck10b.jl; 
         packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Method.*inaccessible");
         package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "Method.*inaccessible");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
+        package1/Point.jl package2/Point3d.jl
+          (Semantic, "Cannot access field");
+        package2/Point3d.jl package1/Point.jl
+          (Semantic, "Cannot access field"),
+          (Semantic, "Cannot access field");
         ConstantInit.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
@@ -26,6 +77,8 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Constants11.jl ;
         Constants13.jl ;
         Constants14A.jl ;
+        ConstructorCall01.jl;
+        ConstructorDecl01.jl (Semantic, "synchronized");
         Ctor.jl ;
         DefaultCtor.jl ;
         Dep1.jl ;
@@ -33,6 +86,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Empty.jl ;
         Equality.jl ;
         Equality2.jl ;
+        Equality03.jl;
         ExcTest.jl ;
         Except.jl ; Except2.jl ; Except3.jl ; Except4.jl ;
         Except5.jl ;
@@ -40,23 +94,82 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Except7.jl (Semantic, "must either be caught or declared");
         Field.jl ;
         FieldAccess.jl ;
-        FieldAccess2.jl (Semantic, "Field .* not visible");
+        FieldAccess2.jl (Semantic, "field .* not visible");
         FieldAccess3.jl ;
         FieldAccess4.jl (Semantic, "Field.*ambiguous");
         FieldAccess5.jl (Semantic, "Field.*ambiguous");
-        FieldAccess6.jl (Semantic, "Field .* not visible");
+        FieldAccess6.jl (Semantic, "field .* not visible");
+        FieldAccess07.jl (Semantic, "does not have an enclosing instance");
+        FieldAccess08.jl (Semantic, "field .* not visible");
+        FieldAccess09.jl (Semantic, "field .* not visible");
+        FieldAccess10a.jl FieldAccess10b.jl (Semantic, "Cannot access field");
+        FieldAccess11.jl (Semantic, "type .* inaccessible from class");
+        FieldAccess12a.jl FieldAccess12b.jl;
+        FieldAccess13a.jl FieldAccess13b.jl;
         FieldClassConflict.jl ;
+        FieldDecl01.jl (Semantic, "final and volatile");
+        FieldDecl02.jl (Semantic, "interface constant .* transient");
         FinalInit1.jl ; FinalInit2.jl ; FinalInit3.jl ; FinalInit4.jl ;
         FinalInit5.jl ; FinalInit6.jl ; FinalInit7.jl ; FinalInit8.jl ;
 	FinalInit9.jl ;
         ForInit.jl ;
         ForwardRef.jl ; ForwardRef2.jl ; ForwardRef3.jl ;
         Import.jl ;
+        Import02.jl (Semantic, "import .* conflicts with type .* defined in the same file");
+        Import03.jl (Semantic, "already defined in a single-type import");
+        Import04.jl;
+        Import05a.jl Import05b.jl;
         Increment.jl ;
         Infinite.jl ;
-        Inherit.jl (Semantic), (Semantic);
+        Inherit.jl (Semantic);
+        Inherit02.jl (Semantic, "unrelated return types");
+        Inherit03.jl (Semantic, "weaker access privileges");
+        Inherit04a.jl Inherit04b.jl;
+        Inherit05.jl;
         InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
+        Init6.jl ;
+        Init7.jl ; Init8.jl ; Init9.jl ;
+	Init10.jl; 
+	Init11.jl; 
+	Init12.jl; 
+	Init13.jl;
+	Init14.jl;
+	Init15.jl;
+        InitializerType1.jl ;
+        Initializer1.jl (Semantic, "Initializers must be able to complete normally");
+        Initializer2.jl (Semantic, "Initializers must be able to complete normally");
+        Initializer3.jl ;
+        Initializer4.jl ;
+        Initializer5.jl ;
+        Initializer6.jl (Semantic, "cannot throw a");
+        Initializer7.jl ;
+        Initializer8.jl ;
+        Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
+        Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
+        Inner10.jl ; Inner11.jl ; Inner12.jl ; Inner13.jl ;
+        Inner14.jl;
+        Inner15.jl;
+        Inner16.jl
+          (Semantic, "Constructor .* inaccessible"),
+          (Semantic, "Constructor .* inaccessible");
+        Inner17.jl (Semantic, "Member class .* not visible");
+        InnerBen.jl ;
+        InnerFormalSuper.jl;
+        InnerSuperConstructor1.jl;
+        InnerSuperConstructor2.jl (Semantic, ".*must have an enclosing instance that is a subtype.*");
+        InnerSuperConstructor3.jl;
+        InnerSuperConstructor4.jl;
+        InnerSuperConstructor5.jl (Semantic, ".*must have an enclosing instance that is a subtype.*");
+        InnerSuperConstructor6.jl;
+        InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
+        InnerSuperConstructor8.jl;
+        Instanceof01.jl;
+        InterfaceOverride.jl ;
+        Label01.jl (Semantic, "Label .* already in use");
+        LabeledBreak.jl ;
+        Lexical01.jl;
+        Lexical02.jl (Lexical, "Unclosed comment");
         LiteralsCf.jl   (Lexical, "Illegal float literal"),
                         (Lexical, "Illegal float literal"),
                         (Lexical, "Illegal float literal"),
@@ -80,49 +193,59 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
                         (Lexical, "Long literal.*out of range"),
                         (Lexical, "Long literal.*out of range"),
                         (Syntax);
-        Init6.jl ;
-        Init7.jl ; Init8.jl ; Init9.jl ;
-	Init10.jl; 
-	Init11.jl; 
-	Init12.jl; 
-        InitializerType1.jl ;
-        Initializer1.jl (Semantic, "Initializers must be able to complete normally");
-        Initializer2.jl (Semantic, "Initializers must be able to complete normally");
-        Initializer3.jl ;
-        Initializer4.jl ;
-        Initializer5.jl ;
-        Initializer6.jl (Semantic, "can not throw a");
-        Initializer7.jl ;
-        Initializer8.jl ;
-        Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
-        Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
-        Inner10.jl ; Inner11.jl ; Inner12.jl ; Inner13.jl ;
-        InnerBen.jl ;
-        InnerFormalSuper.jl;
-        InnerSuperConstructor1.jl;
-        InnerSuperConstructor2.jl (Semantic, ".*must have an enclosing instance that is a subtype.*");
-        InnerSuperConstructor3.jl;
-        InnerSuperConstructor4.jl;
-        InnerSuperConstructor5.jl (Semantic, ".*must have an enclosing instance that is a subtype.*");
-        InnerSuperConstructor6.jl;
-        InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
-        InnerSuperConstructor8.jl;
-        InterfaceOverride.jl ;
-        LabeledBreak.jl ;
         Local.jl ;
         LocalClass.jl ; 
 #        LocalClass2.jl ; 
         LocalClass3.jl ; LocalClass4.jl ;
+	LocalClass5.jl ;
+	LocalClass6.jl (Semantic, "Circular inheritance");
+        LocalClass07.jl (Semantic, "Unreachable statement");
+        LocalClass08.jl
+          (Semantic, "Inner classes cannot declare static fields"),
+          (Semantic, "Inner classes cannot declare static methods"),
+          (Semantic, "Inner classes cannot declare static initializers"),
+          (Semantic, "Inner classes cannot declare static member classes"),
+          (Semantic, "Inner classes cannot declare member interfaces");
+        LocalClass09.jl;
+        LocalClass10.jl;
         LocalInners2.jl ;
         LocalInit.jl ;
         LongString01.jl;
+        MemberClass01.jl (Semantic, "Member class .* not visible");
        MemberClassFlags.jl ;
+        MethodDecl01.jl (Semantic, "native and strictfp");
+        MethodDecl02.jl;
+        MethodDecl03.jl;
+        MethodDecl04.jl;
+        MethodDecl05.jl (Semantic, "incompatible return type");
+        MethodDecl06.jl (Semantic, "throw set .* not a subset of the overridden method");
+        MethodDecl07.jl (Semantic, "overridden method is final");
+        MethodDecl08a.jl MethodDecl08b.jl (Semantic, "hidden method is not static");
+        MethodDecl09.jl;
         Narrowing.jl ;
+        New01a.jl New01b.jl;
+        New02a.jl New02b.jl (Semantic, "Cannot instantiate an interface");
         # Output.jl ;
+        Package01a.jl Package01b.jl Package01c.jl (Semantic, "imported type .* not canonical");
+        Package02.jl (Semantic, "imported type .* not visible");
         Prim.jl ;
         Prec.jl ; 
 	Prec2.jl ;
 	Prec3.jl ;
+	Protection.jl (Semantic, "Cannot declare abstract method with flags static"),
+		      (Semantic, "Cannot declare abstract method with flags final"),
+		      (Semantic, "Cannot declare abstract method with flags native");
+	Protection2.jl (Semantic, "cannot override.*overridden method is final");
+	Protection3.jl package1/ProtClassPubMeth.jl package1/PubClassInheritMeth.jl ;
+	Protection4.jl;
+	Protection5.jl;
+	Protection6a.jl Protection6b.jl;
+	Protection7.jl (Semantic, "Method .* inaccessible");
+	Protection08A.jl package1/Protection08B.jl;
+	Protection09.jl;
+        Resolver01a.jl Resolver01b.jl;
+        Resolver02a.jl Resolver02b.jl Resolver02c.jl;
+        Resolver03a.jl Resolver03b.jl Resolver03c.jl;
         Return1.jl ; Return2.jl ; Return3.jl ;
         Return4.jl ;
         Return5.jl ;
@@ -137,7 +260,11 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Switch1.jl ; Switch2.jl ; Switch3.jl ; Switch4.jl ; Switch5.jl ;
         Switch6.jl ; 
 #        Switch7.jl ;
+        Switch08.jl (Semantic, "not assignable");
+        Synchronized01.jl (Semantic, "Cannot synchronize");
         TernaryPrimitiveOps.jl ;
+        TypeAccess01a.jl TypeAccess01b.jl (Semantic, "Cannot access class");
+        TypeAccess02a.jl TypeAccess02b.jl (Semantic, "Could not find type");
         TypeShadowing.jl ;
         xIterator.jl ;
         FormalsDup.jl (Semantic, "multiply defined"), (Semantic, "multiply defined");
@@ -151,12 +278,6 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         BadExtends.jl (Semantic, "Cannot extend final class");
 #	BadInterfaceMethod.jl (Semantic, "weaker access privileges");
         BadFinalInit1.jl (Semantic, "Local variable .* may not have been initialized");
-        BadFinalInit10.jl (Semantic, "Final field .* might already have been initialized");
-        BadFinalInit11.jl (Semantic, "Final field .* might already have been initialized");
-        BadFinalInit12.jl (Semantic, "Cannot assign a value to final field");
-        BadFinalInit14.jl (Semantic, "Cannot assign a value to final field");
-        BadFinalInit15.jl (Semantic, "Final variable .* might already have been initialized"); 
-        BadFinalInit16.jl (Semantic, "Local variable .* may not have been initialized"); 
         BadFinalInit2.jl (Semantic, "Final variable .* might already have been initialized");
         BadFinalInit3.jl (Semantic, "Final variable .* might already have been initialized");
         BadFinalInit4.jl (Post, "may not be assigned"); # we allow, javac rejects.
@@ -165,14 +286,23 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         BadFinalInit7.jl (Semantic, "Cannot assign a value to final field .*");
         BadFinalInit8.jl (Semantic, "Final field .* might already have been initialized");
         BadFinalInit9.jl (Semantic, "Final variable .* might already have been initialized");
+        BadFinalInit10.jl (Semantic, "Final field .* might already have been initialized");
+        BadFinalInit11.jl (Semantic, "Final field .* might already have been initialized");
+        BadFinalInit12.jl (Semantic, "Cannot assign a value to final field");
+        BadFinalInit14.jl (Semantic, "Cannot assign a value to final field");
+        BadFinalInit15.jl (Semantic, "Final variable .* might already have been initialized"); 
+        BadFinalInit16.jl (Semantic, "Local variable .* may not have been initialized"); 
+        BadFinalInit17.jl (Semantic, "Final field .* might not have been initialized");
         BadIncrement1.jl (Semantic, "Operand of .* operator must be a variable");
         BadIncrement2.jl (Semantic, "Operand of .* operator must be a variable");
         BadIncrement3.jl (Semantic, "Operand of .* operator must be a variable");
         BadIncrement4.jl (Semantic, "Operand of .* operator must be a variable");
 
         BadInit.jl (Semantic, "Method .* not found");
-        BadInner.jl (Semantic, "Could not find non-static member class");
-        BadInner2.jl (Semantic, "Cannot provide a containing instance for non-inner class");
+        BadInner.jl (Semantic, "Inner class .* cannot be instantiated in a static context.");
+        BadInner2.jl
+          (Semantic, "Cannot provide a containing instance for non-inner class"),
+          (Semantic, "Cannot provide a containing instance for non-inner class");
         BadInner3.jl (Semantic, "The nested class .* does not have an enclosing instance of type .*");
         BadInner4.jl (Semantic, "The type of the qualifier .* does not match the immediately enclosing class  of the super class .*");
 	BadInner5.jl (Semantic, "Class .* not found");
@@ -193,7 +323,6 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
 	BadStaticContext.jl (Semantic); 
         BadSwitch1.jl (Semantic, "Case label must be an integral constant");
 	BadSwitch2.jl (Semantic, "Duplicate case label");
-	Call01.jl;
 	Constants12.jl (Semantic, "Duplicate case label"),
                        (Semantic, "Duplicate case label"),
                        (Semantic, "Duplicate case label"),
@@ -245,17 +374,6 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
 	BadExpCC.jl (Syntax), (); // misplaced constructor call
 	BadOverride2.jl;
 	DoubleFlags.jl (Syntax), ();
-	LocalClass5.jl ;
-	LocalClass6.jl (Semantic, "Circular inheritance");
-	Protection.jl (Semantic, "Cannot declare abstract method with flags static"),
-		      (Semantic, "Cannot declare abstract method with flags final"),
-		      (Semantic, "Cannot declare abstract method with flags native");
-	Protection2.jl (Semantic, "cannot override.*overridden method is final");
-	Protection3.jl package1/ProtClassPubMeth.jl package1/PubClassInheritMeth.jl ;
-	Protection4.jl;
-	Protection5.jl;
-	Protection6a.jl Protection6b.jl;
-	Protection7.jl (Semantic, "Method .* inaccessible");
 
         // on the following file, javac produces an error, but we intentionally do not.
         //  BadFinalInit13.jl (Post); 
