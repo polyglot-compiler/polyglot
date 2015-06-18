@@ -568,6 +568,13 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     public void dump(CodeWriter w) {
         super.dump(w);
 
+        if (javadoc != null) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(javadoc ...)");
+            w.end();
+        }
+
         if (fi != null) {
             w.allowBreak(4, " ");
             w.begin(0);

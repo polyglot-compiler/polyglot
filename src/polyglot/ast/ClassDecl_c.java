@@ -827,6 +827,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         w.write("(name " + name + ")");
         w.end();
 
+        if (javadoc != null) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(javadoc ...)");
+            w.end();
+        }
+
         if (type != null) {
             w.allowBreak(4, " ");
             w.begin(0);

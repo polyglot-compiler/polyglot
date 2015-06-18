@@ -278,6 +278,13 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
     public void dump(CodeWriter w) {
         super.dump(w);
 
+        if (javadoc != null) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(javadoc ...)");
+            w.end();
+        }
+
         ProcedureInstance pi = procedureInstance();
         if (pi != null) {
             w.allowBreak(4, " ");
