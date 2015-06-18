@@ -93,7 +93,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     @Deprecated
     public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init, Ext ext) {
-        this(pos, flags, type, name, init, null, null);
+        this(pos, flags, type, name, init, null, ext);
     }
 
     public FieldDecl_c(Position pos, Flags flags, TypeNode type, Id name,

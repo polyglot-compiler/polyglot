@@ -101,7 +101,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
              throwTypes,
              body,
              null,
-             null);
+             ext);
     }
 
     public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,

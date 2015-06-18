@@ -82,7 +82,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
     @Deprecated
     public ProcedureDecl_c(Position pos, Flags flags, Id name,
             List<Formal> formals, List<TypeNode> throwTypes, Block body, Ext ext) {
-        this(pos, flags, name, formals, throwTypes, body, null, null);
+        this(pos, flags, name, formals, throwTypes, body, null, ext);
     }
 
     public ProcedureDecl_c(Position pos, Flags flags, Id name,
