@@ -18,14 +18,15 @@ public class JL5FieldDeclToExt_c extends FieldDeclToExt_c {
 
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
-        FieldDecl n = (FieldDecl) this.node();
+        FieldDecl n = (FieldDecl) node();
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
         return to_nf.FieldDecl(n.position(),
                                n.flags(),
                                ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
                                n.type(),
                                n.id(),
-                               n.init());
+                               n.init(),
+                               n.javadoc());
     }
 
 }

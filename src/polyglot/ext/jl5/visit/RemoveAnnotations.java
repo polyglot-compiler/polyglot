@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -57,8 +57,7 @@ public class RemoveAnnotations extends ContextVisitor {
         if (n instanceof ClassDecl) {
             ClassDecl cd = (ClassDecl) n;
             cd = cd.flags(JL5Flags.clearAnnotation(cd.flags()));
-            cd =
-                    (ClassDecl) ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems(Collections.<AnnotationElem> emptyList());
+            cd = (ClassDecl) ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems(Collections.<AnnotationElem> emptyList());
             return cd;
         }
         if (n instanceof AnnotationElemDecl) {
@@ -81,7 +80,8 @@ public class RemoveAnnotations extends ContextVisitor {
                                          n.id(),
                                          n.formals(),
                                          n.throwTypes(),
-                                         n.body());
+                                         n.body(),
+                                         n.javadoc());
         md = md.methodInstance(n.methodInstance());
         return md;
     }
