@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -125,7 +125,11 @@ public class QQ {
     /**
      * Parse a string into a {@code SourceFile} AST node,
      * applying substitutions.
+     *
+     * @param subst a list containing the values to be substituted
+     * @deprecated Use {@link #parseFile(String, Object...)} instead.
      */
+    @Deprecated
     public SourceFile parseFile(String fmt, List<?> subst) {
         return (SourceFile) parse(FILE, fmt, subst.toArray());
     }
@@ -136,8 +140,14 @@ public class QQ {
         return (ClassDecl) parse(DECL, fmt, os);
     }
 
-    /** Parse a string into a {@code ClassDecl} AST node,
-     * applying substitutions. */
+    /**
+     * Parse a string into a {@code ClassDecl} AST node,
+     * applying substitutions.
+     *
+     * @param subst a list containing the values to be substituted
+     * @deprecated Use {@link #parseDecl(String, Object...)} instead.
+     */
+    @Deprecated
     public ClassDecl parseDecl(String fmt, List<?> subst) {
         return (ClassDecl) parse(DECL, fmt, subst.toArray());
     }
@@ -148,8 +158,14 @@ public class QQ {
         return (ClassMember) parse(MEMB, fmt, os);
     }
 
-    /** Parse a string into a {@code ClassMember} AST node,
-     * applying substitutions. */
+    /**
+     * Parse a string into a {@code ClassMember} AST node,
+     * applying substitutions.
+     *
+     * @param subst a list containing the values to be substituted
+     * @deprecated Use {@link #parseMember(String, Object...)} instead.
+     */
+    @Deprecated
     public ClassMember parseMember(String fmt, List<?> subst) {
         return (ClassMember) parse(MEMB, fmt, subst.toArray());
     }
@@ -160,8 +176,14 @@ public class QQ {
         return (Expr) parse(EXPR, fmt, os);
     }
 
-    /** Parse a string into a {@code Expr} AST node,
-     * applying substitutions. */
+    /**
+     * Parse a string into a {@code Expr} AST node,
+     * applying substitutions.
+     *
+     * @param subst a list containing the values to be substituted
+     * @deprecated Use {@link #parseExpr(String, Object...)} instead.
+     */
+    @Deprecated
     public Expr parseExpr(String fmt, List<?> subst) {
         return (Expr) parse(EXPR, fmt, subst.toArray());
     }
@@ -172,8 +194,14 @@ public class QQ {
         return (Stmt) parse(STMT, fmt, os);
     }
 
-    /** Parse a string into a {@code Stmt} AST node,
-     * applying substitutions. */
+    /**
+     * Parse a string into a {@code Stmt} AST node,
+     * applying substitutions.
+     *
+     * @param subst a list containing the values to be substituted
+     * @deprecated Use {@link #parseStmt(String, Object...)} instead.
+     */
+    @Deprecated
     public Stmt parseStmt(String fmt, List<?> subst) {
         return (Stmt) parse(STMT, fmt, subst.toArray());
     }
@@ -184,8 +212,14 @@ public class QQ {
         return (TypeNode) parse(TYPE, fmt, os);
     }
 
-    /** Parse a string into a {@code TypeNode} AST node,
-     * applying substitutions. */
+    /**
+     * Parse a string into a {@code TypeNode} AST node,
+     * applying substitutions.
+     *
+     * @param subst a list containing the values to be substituted
+     * @deprecated Use {@link #parseType(String, Object...)} instead.
+     */
+    @Deprecated
     public TypeNode parseType(String fmt, List<?> subst) {
         return (TypeNode) parse(TYPE, fmt, subst.toArray());
     }
