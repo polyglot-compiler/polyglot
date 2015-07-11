@@ -1,0 +1,8 @@
+class List<T> {
+	class Itr {
+		void f() {
+			List<T> lst = List.this;
+			List<T>.Itr itr = Itr.this; // OK
+		}	
+	}
+}
