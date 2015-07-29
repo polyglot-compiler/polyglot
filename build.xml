@@ -4,9 +4,15 @@
 >
 	<description>
     Polyglot build file
-  </description>
+    </description>
 
 	<!-- set global properties for this build -->
+
+	<!-- prefix for reading environment properties -->
+	<property environment="env" />
+
+	<!-- read local definitions that override this file, if any -->
+	<property file="config.properties" />
 
 	<!-- source directory -->
 	<property name="src" location="${basedir}/src" />
@@ -56,7 +62,6 @@
 	<property name="tmp" location="${basedir}/tmp" />
 
 	<!-- classpath to use when compiling polyglot -->
-	<property environment="env" />
 	<path id="standard.classpath">
 		<pathelement location="${classes}" />
 		<pathelement location="${lib}/java_cup.jar" />

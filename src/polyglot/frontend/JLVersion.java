@@ -17,11 +17,11 @@ public class JLVersion extends polyglot.main.Version {
     public int major() { return 2; }
 
     @Override
-    public int minor() { return 6; }
+    public int minor() { return 7; }
 
     @Override
-    public int patch_level() { return 1; }
+    public int patch_level() { return 0; }
 
     @Override
-    public String toString() { return "2.6.1 (2014-06-10 14:10:35)"; }
+    public String toString() { return "2.7.0 (2015-07-29 15:07:11)"; }
 }
