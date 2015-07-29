@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -65,7 +65,8 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
      * @param name The name to search for.
      */
     @Override
-    public Named find(String name, ClassType accessor) throws SemanticException {
+    public Named find(String name, ClassType accessor)
+            throws SemanticException {
         if (Report.should_report(TOPICS, 2))
             Report.report(2, "Looking for " + name + " in " + this);
 
@@ -83,50 +84,50 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
             // Check if the member was explicitly declared.
             Named m = type.memberClassNamed(name);
 
-            // XXX why is this needed?
-//            String fullName = type.fullName() + "." + name;
-//            String rawName = ts.getTransformedClassName(type) + "$" + name;
-//
-//            // Check the system resolver.
-//            if (m == null) m = ts.systemResolver().check(fullName);
-//
-//            // Try the raw class file name.
-//            if (m == null) m = ts.systemResolver().check(rawName);
-//
-//            if (m == null) {
-//                // Go to disk, but only if there is no job for the type.
-//                // If there is a job, all members should be in the resolver
-//                // already.
-//                boolean useLoadedResolver = true;
-//
-//                if (type instanceof ParsedTypeObject) {
-//                    ParsedTypeObject pto = (ParsedTypeObject) type;
-//                    if (pto.job() != null) useLoadedResolver = false;
-//                }
-//
-//                if (useLoadedResolver) {
-//                    try {
-//                        m = ts.systemResolver().find(rawName);
-//                    }
-//                    catch (SemanticException e) {
-//                        // Not found; will fall through to error handling code
-//                    }
-//                }
-//            }
+            // The desired type could be a member class of a deserialized type.
+            // In that case, type will be lazily populated with member classes.
+            // So, we need to use the system resolver to populate type as
+            // necessary.
+            String fullName = type.fullName() + "." + name;
+            String rawName = ts.getTransformedClassName(type) + "$" + name;
+
+            // Check the system resolver.
+            if (m == null) m = ts.systemResolver().check(fullName);
+
+            // Try the raw class file name.
+            if (m == null) m = ts.systemResolver().check(rawName);
+
+            if (m == null) {
+                // Go to disk, but only if there is no job for the type.
+                // If there is a job, all members should be in the resolver
+                // already.
+                boolean useLoadedResolver = true;
+
+                if (type instanceof ParsedTypeObject) {
+                    ParsedTypeObject pto = (ParsedTypeObject) type;
+                    if (pto.job() != null) useLoadedResolver = false;
+                }
+
+                if (useLoadedResolver) {
+                    try {
+                        m = ts.systemResolver().find(rawName);
+                    }
+                    catch (SemanticException e) {
+                        // Not found; will fall through to error handling code
+                    }
+                }
+            }
 
             if (m instanceof MemberInstance) {
                 if (!ts.isMember((MemberInstance) m, this.type)) {
                     if (error == null)
-                        error =
-                                new SemanticException("Member class " + m
-                                        + " is not visible in class "
-                                        + this.type);
+                        error = new SemanticException("Member class " + m
+                                + " is not visible in class " + this.type);
                 }
                 else if (!canAccess(m, accessor)) {
                     if (error == null)
-                        error =
-                                new SemanticException("Cannot access member type \""
-                                        + m + "\" from class " + accessor + ".");
+                        error = new SemanticException("Cannot access member type \""
+                                + m + "\" from class " + accessor + ".");
                 }
                 else acceptable.add(m);
                 continue;
@@ -164,14 +165,14 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                 Iterator<ReferenceType> i = containers.iterator();
                 Type t1 = i.next();
                 Type t2 = i.next();
-                throw new SemanticException("Member \"" + name + "\" of "
-                        + type + " is ambiguous; it is defined in both " + t1
-                        + " and " + t2 + ".");
+                throw new SemanticException("Member \"" + name + "\" of " + type
+                        + " is ambiguous; it is defined in both " + t1 + " and "
+                        + t2 + ".");
             }
             else {
-                throw new SemanticException("Member \"" + name + "\" of "
-                        + type + " is ambiguous; it is defined in "
-                        + containers + ".");
+                throw new SemanticException("Member \"" + name + "\" of " + type
+                        + " is ambiguous; it is defined in " + containers
+                        + ".");
             }
         }
         Named m = acceptable.iterator().next();
@@ -184,10 +185,9 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
 
     protected boolean canAccess(Named n, ClassType accessor) {
         if (n instanceof MemberInstance) {
-            return accessor == null
-                    || ts.isAccessible((MemberInstance) n,
-                                       ((MemberInstance) n).container(),
-                                       accessor);
+            return accessor == null || ts.isAccessible((MemberInstance) n,
+                                                       ((MemberInstance) n).container(),
+                                                       accessor);
         }
         return true;
     }

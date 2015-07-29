@@ -49,20 +49,16 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         Switch s = node();
-        Expr expr = s.visitChild(s.expr(), tc);
-        if (!expr.isTypeChecked()) {
-            return s;
-        }
+        Expr expr = s.expr();
         Type type = expr.type();
 
         if (!((J5Lang) tc.lang()).isAcceptableSwitchType(s, expr.type())) {
             throw new SemanticException("Switch index must be of type char, byte,"
                     + " short, int, Character, Byte, Short, Integer, or an enum type.",
-                    s.position());
+                                        s.position());
         }
 
         ArrayList<SwitchElement> newels = new ArrayList<>(s.elements().size());
@@ -72,26 +68,22 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
                 Case c = (Case) el;
                 c = ((J5Lang) tc.lang()).resolveCaseLabel(c, tc, switchType);
                 Expr cExpr = c.expr();
-                if (cExpr != null
-                        && !ts.isImplicitCastValid(cExpr.type(), type)
+                if (cExpr != null && !ts.isImplicitCastValid(cExpr.type(), type)
                         && !ts.typeEquals(cExpr.type(), type)
                         && !ts.numericConversionValid(type,
                                                       tc.lang()
-                                                      .constantValue(cExpr,
-                                                                     tc.lang()))) {
-                    throw new SemanticException("Case constant \""
-                            + cExpr
-                            + "\" is not assignable to "
-                            + type + ".",
-                            c.position());
+                                                        .constantValue(cExpr,
+                                                                       tc.lang()))) {
+                    throw new SemanticException("Case constant \"" + cExpr
+                            + "\" is not assignable to " + type + ".",
+                                                c.position());
                 }
                 el = c;
             }
-            else el = s.visitChild(el, tc);
 
             newels.add(el);
         }
-        return s.expr(expr).elements(newels);
+        return s.elements(newels);
     }
 
     @Override

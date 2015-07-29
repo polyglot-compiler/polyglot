@@ -279,6 +279,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"
         Return6.jl ;
         Semicolon.jl ;
         SemicolonClass.jl ;
+        Serialize01a.jl, Serialize01.jl;
         Shadowing.jl ;
         Statements.jl ;
         StaticContext.jl ;

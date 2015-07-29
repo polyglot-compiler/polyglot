@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -59,7 +59,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
 
-        Case c = this.node();
+        Case c = node();
         Expr expr = c.expr();
 
         if (expr == null) {
@@ -75,27 +75,26 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
             else if (expr instanceof EnumConstant) {
                 Field ec = (Field) expr;
                 EnumConstant ext = (EnumConstant) ec;
-                EnumInstance ei =
-                        ts.findEnumConstant(switchType.toReference(), ec.name());
+                EnumInstance ei = ts.findEnumConstant(switchType.toReference(),
+                                                      ec.name());
                 ec = (Field) ext.enumInstance(ei);
                 ec = (Field) ec.type(ei.type());
                 return c.expr(ec).value(ei.ordinal());
             }
             else if (expr instanceof AmbExpr) {
                 AmbExpr amb = (AmbExpr) expr;
-                EnumInstance ei =
-                        ts.findEnumConstant(switchType.toReference(),
-                                            amb.name());
-                Receiver r =
-                        nf.CanonicalTypeNode(Position.compilerGenerated(),
-                                             switchType);
+                EnumInstance ei = ts.findEnumConstant(switchType.toReference(),
+                                                      amb.name());
+                Receiver r = nf.CanonicalTypeNode(Position.compilerGenerated(),
+                                                  switchType);
                 Field e = nf.EnumConstant(expr.position(), r, amb.id());
                 e = (Field) ((EnumConstant) e).enumInstance(ei);
                 e = (Field) e.type(ei.type());
                 return c.expr(e).value(ei.ordinal());
             }
             else {
-                throw new InternalCompilerError("Unexpected case label " + expr);
+                throw new InternalCompilerError("Unexpected case label "
+                        + expr);
             }
         }
 
@@ -108,14 +107,11 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
         else if (expr instanceof AmbExpr) {
             AmbExpr amb = (AmbExpr) expr;
             //Disambiguate and typecheck
-            Expr e =
-                    (Expr) tc.nodeFactory()
-                             .disamb()
-                             .disambiguate(amb,
-                                           tc,
-                                           expr.position(),
-                                           null,
-                                           amb.id());
+            Expr e = (Expr) tc.nodeFactory().disamb().disambiguate(amb,
+                                                                   tc,
+                                                                   expr.position(),
+                                                                   null,
+                                                                   amb.id());
             e = (Expr) e.visit(tc);
             n = n.expr(e);
         }
@@ -139,7 +135,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
             }
         }
         throw new SemanticException("Case label must be an integral constant or an unqualified enum value.",
-                                    this.node().position());
+                                    node().position());
     }
 
     public boolean isNumericSwitchType(Type switchType, JL5TypeSystem ts) {
@@ -165,7 +161,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
     @Override
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
             throws SemanticException {
-        Case c = this.node();
+        Case c = node();
         Expr expr = c.expr();
         // We can't disambiguate unqualified names until the switch expression
         // is typed.
@@ -180,7 +176,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc)
             throws SemanticException {
-        Case c = this.node();
+        Case c = node();
         Expr expr = c.expr();
         if (expr == null || expr instanceof Lit) {
             return null;
@@ -191,7 +187,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        Case c = this.node();
+        Case c = node();
         Expr expr = c.expr();
         if (expr == null) return c; // default case
 
@@ -199,24 +195,23 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
 
         if (expr instanceof EnumConstant) return c;
 
-        return superLang().checkConstants(this.node(), cc);
+        return superLang().checkConstants(node(), cc);
     }
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        Case c = this.node();
+        Case c = node();
         Expr expr = c.expr();
         if (expr == null) {
             w.write("default:");
         }
         else {
             w.write("case ");
-            JL5TypeSystem ts =
-                    expr.type() == null
-                            ? null : (JL5TypeSystem) expr.type().typeSystem();
+            JL5TypeSystem ts = expr.type() == null
+                    ? null : (JL5TypeSystem) expr.type().typeSystem();
             if (ts != null && expr.type().isReference()
                     && expr.type().isSubtype(ts.toRawType(ts.Enum()))) {
-                // this is an enum                  
+                // this is an enum
                 Field f = (Field) expr;
                 w.write(f.name());
             }
