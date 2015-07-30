@@ -5,6 +5,21 @@ This file documents changes between releases of Polyglot. More information
 about some releases may be found in the appropriate directory
 doc/release-notes-<version>.
 
+August 1, 2015: Polyglot 2.7.0
+==============================
+
+- The PPG parser generator now has much better debugging support, in the form
+  of counterexamples to parsing conflicts. The algorithm is described in the
+  PLDI 2015 paper by Isradisaikul and Myers.
+
+- Many bug fixes, especially related to generics.
+
+- Comments are now preserved in translated code, supporting use of
+  Javadoc.
+
+- Improvements to the pth testing harness.
+
+
 June 10, 2014 : Polyglot 2.6.1
 ==============================
 
