@@ -90,7 +90,7 @@ README is in).  We'll call this directory $POLYGLOT from now on.
 
 This need only be performed once.
 
-3. Optionally: add $POLYGLOT/bin to your PATH environment variable. 
+3. Optionally: add $POLYGLOT/bin to your PATH environment variable.
 
 4. You are now ready to try out Polyglot.
 To compile a language extension source file, do:
@@ -169,7 +169,7 @@ directory.
 Optionally, create some extensions in the examples directory:
 
     $ ant coffer pao
-  
+
 Class files will be placed in the $POLYGLOT/classes directory.
 You may optionally, do:
 
@@ -202,16 +202,18 @@ to it.
 Many people have contributed substantially to the development of Polyglot,
 including:
 
-        Owen Arden              Michael Brukman
-        Stephen Chong           Michael Clarkson
-        Matt Harren             Chin Isradisaikul
-        Rob Jellinek            Aleksey Kliger
-        Samarth Lad             Jed Liu
-        Scott Moore             Andrew Myers
-        Nate Nystrom            Xin Qi
-        Naveen Sastry           Dan Spoonhower
-        Steve Zdancewic         Lantian Zheng
-        Xin Zheng
+        Owen Arden              Scott Moore
+        Karthik Bellur          Andrew Myers
+        Michael Brukman         Nate Nystrom
+        Stephen Chong           Xin Qi
+        Michael Clarkson        Naveen Sastry
+        Matt Harren             Jeffrey Sheldon
+        Chin Isradisaikul       Dan Spoonhower
+        Rob Jellinek            Steve Zdancewic
+        Aleksey Kliger          Yizhou Zhang
+        Samarth Lad             Lantian Zheng
+        Jed Liu                 Xin Zheng
+        Nick Mathewson
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
 is derived from code written for the BLOAT bytecode optimizer written
@@ -229,15 +231,20 @@ from Vincent Cavé.
 
 The following people have provided patches:
 
-        Alvin Cheung <akcheung@csail.mit.edu>
-        Keunwoo Lee <klee@cs.washington.edu>
-        Patrick Lam <plam@mit.edu>
-        Ondrej Lhotak <olhotak@sable.mcgill.ca>
-        Oege de Moor <Oege.de.Moor@comlab.ox.ac.uk>
         Pavel Avgustinov <pavel.avgustinov@magdalen.oxford.ac.uk>
-        Alessandro Warth <alexwarth@gmail.com>
+        Hubert Chao <hchao@google.com>
+        Alvin Cheung <akcheung@csail.mit.edu>
+        Robert Fuhrer <rfuhrer@us.ibm.com>
+        Michael George <mdgeorge@cs.cornell.edu>
+        Patrick Lam <plam@mit.edu>
+        Keunwoo Lee <klee@cs.washington.edu>
+        Ondrej Lhotak <olhotak@sable.mcgill.ca>
+        Matthew Loring <mcl83@cornell.edu>
+        Oege de Moor <Oege.de.Moor@comlab.ox.ac.uk>
         Igor Peshansky <igorp@us.ibm.com>
-        Robert Fuhrer <rfuhrer@us.ibm.com>        
+        Krishnaprasad Vikram <kvikram@cs.cornell.edu>
+        Grant Wang <gjw@theory.csail.mit.edu>
+        Alessandro Warth <alexwarth@gmail.com>
 
 The development of the Polyglot project has been supported by a
 number of funding sources, including DARPA Contract F30602-99-1-0533,
