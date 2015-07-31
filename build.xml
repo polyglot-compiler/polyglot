@@ -840,6 +840,14 @@
 		<copy todir="${tmp}/doc/release-notes-2.5">
                     <fileset dir="doc/release-notes-2.5" />
                 </copy>
+		<mkdir dir="${tmp}/doc/release-notes-2.6" />
+		<copy todir="${tmp}/doc/release-notes-2.6">
+                    <fileset dir="doc/release-notes-2.6" />
+                </copy>
+		<mkdir dir="${tmp}/doc/release-notes-2.7" />
+		<copy todir="${tmp}/doc/release-notes-2.7">
+                    <fileset dir="doc/release-notes-2.7" />
+                </copy>
 		<copy file="doc/Overview.txt" todir="${tmp}/doc" />
 		<copy file="doc/Overview.html" todir="${tmp}/doc" />
 		<copy file="doc/overview.css" todir="${tmp}/doc" />
