@@ -1,14 +1,18 @@
-             Polyglot Extensible Compiler Framework (Version 2.6.1)
+             Polyglot Extensible Compiler Framework (Version 2.7.0)
              ------------------------------------------------------
 
 Overview
 --------
 
-This is release 2.6 of the Polyglot extensible compiler framework.
+This is release 2.7 of the Polyglot extensible compiler framework.
 It contains many improvements over previous releases of Polyglot,
-including support for Java 7 and significantly improved performance.
-More details on these changes can be found in the file
-doc/release-2.6-notes/PolyglotChanges.html.
+including better debugging support in the PPG parser generator,
+preservation of Javadoc comments in translated code, improvements to
+the pth testing harness, and many bug fixes, especially related to
+generics.
+
+More details on the Javadoc-related changes can be found in the file
+doc/release-2.7-notes/PolyglotJavadocPreservation.html.
 
 Contents
 --------
@@ -38,7 +42,7 @@ Disclaimer
 Polyglot is research software.  Over time, some of the interfaces in the
 framework may change.  This may require some extensions to be changed to
 conform to the new interfaces.  Also, Polyglot is not well-documented; in
-particular, some of the javadoc is missing or out-of-date.  We are working on
+particular, some of the Javadoc is missing or out-of-date.  We are working on
 writing better documentation.  For future updates, watch this web page:
 
     http://www.cs.cornell.edu/Projects/polyglot
@@ -50,8 +54,8 @@ Requirements
 ------------
 
 Polyglot builds on Unix, Mac OS X, and on Windows using the Cygwin
-environment.  We recommend that you use JDK 1.5 or later.  You will
-experience problems with versions of the JDK older than 1.5.  You must ensure
+environment.  We recommend that you use JDK 7 or later.  You will
+experience problems with versions of the JDK older than 7.  You must ensure
 that java and javac are in your path, and that the JAVA_HOME environment
 variable is set to the installation directory of the JDK.  Polyglot is compiled
 with the Ant build tool (http://jakarta.apache.org/ant).

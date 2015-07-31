@@ -1,0 +1,62 @@
+diff --git a/src/jif/parse/jif.flex b/src/jif/parse/jif.flex
+index 5c19b7d..3638b7e 100644
+--- a/src/jif/parse/jif.flex
++++ b/src/jif/parse/jif.flex
+@@ -32,7 +32,7 @@ import java.util.Set;
+ %column
+ %char
+ 
+-%state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT
++%state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT, JAVADOC_COMMENT
+ 
+ %{
+     StringBuffer sb = new StringBuffer();
+@@ -40,6 +40,7 @@ import java.util.Set;
+     String path;
+     ErrorQueue eq;
+     HashMap keywords;
++    Position commentBegin;
+ 
+     public Lexer_c(java.io.InputStream in, Source file, ErrorQueue eq) {
+         this(new java.io.BufferedReader(new java.io.InputStreamReader(in)),
+@@ -264,6 +265,10 @@ import java.util.Set;
+         return new StringLiteral(pos(sb.length()), sb.toString(),
+                                  sym.STRING_LITERAL);
+     }
++	
++	private Token javadoc_token() {
++		return new JavadocToken(pos(sb.length()), sb.toString(), sym.JAVADOC);
++    }
+ 
+     private String chop(int i, int j) {
+         return yytext().substring(i,yylength()-j);
+@@ -329,6 +334,10 @@ OctalEscape = \\ [0-7]
+     /* 3.7 Comments */
+     "/*"    { yybegin(TRADITIONAL_COMMENT); }
+     "//"    { yybegin(END_OF_LINE_COMMENT); }
++    "/**"   { yybegin(JAVADOC_COMMENT);
++              sb.setLength(0);
++              sb.append(yytext());
++              commentBegin = pos(); }
+ 
+     /* 3.10.4 Character Literals */
+     \'      { yybegin(CHARACTER); sb.setLength(0); }
+@@ -438,6 +447,18 @@ OctalEscape = \\ [0-7]
+     .                            { /* ignore */ }
+ }
+ 
++<JAVADOC_COMMENT> {
++    "*/"                         { yybegin(YYINITIAL);
++    							   sb.append(yytext()); 
++    							   return javadoc_token(); }
++
++    <<EOF>>                      { yybegin(YYINITIAL);
++                                   eq.enqueue(ErrorInfo.LEXICAL_ERROR,
++                                                  "Unclosed Javadoc comment",
++                                                  commentBegin); }
++    [^]                          { sb.append(yytext()); }
++}
++
+ <CHARACTER> {
+     /* End of the character literal */
+     \'                           { yybegin(YYINITIAL);

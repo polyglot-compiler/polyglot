@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Polyglot Javadoc Preservation</title>
+<link rel="stylesheet" href="../overview.css" type="text/css"/>
+
+<body>
+  <div class="content">
+    <header>
+      <h2>Javadoc preservation for Polyglot extensions</h2>
+    </header>
+
+    <main>
+      <p class="cont">
+        We have implemented Javadoc preservation in JL, JL5 and JL7. This means
+        that Javadoc comments (for classes, methods, fields, etc) in the source
+        file will be preserved in the compiler-generated <code>.java</code>
+        file. Since this implementation will not work out-of-the-box for
+        Polyglot extensions, we are outlining the steps required to be
+        performed to support Javadoc preservation in Polyglot extensions.
+      </p>
+
+      <ol>
+        <li>
+          <p class="cont">
+            Your extension's lexer will need to capture Javadoc comments and
+            return them to the parser as tokens. This document ships with the
+            <a href="jif.flex.patch">patch</a> that was applied to the
+            <a href="http://www.cs.cornell.edu/jif/">Jif</a>
+            lexer to achieve this, which should be representative of the
+            changes required. The patch makes the following changes:
+          </p>
+
+          <ol type="a">
+            <li>
+              Add a new lexical state called <code>JAVADOC_COMMENT</code> to
+              the existing set of states:
+              <pre>
+  @@ -32,7 +32,7 @@ import java.util.Set;
+   %column
+   %char
+   
+  -%state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT
+  +%state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT, JAVADOC_COMMENT
+   
+   %{
+       StringBuffer sb = new StringBuffer();
+              </pre>
+            </li>
+            <li>
+              Add a <code>commentBegin</code> field to the lexer class:
+              <pre>
+  @@ -40,6 +40,7 @@ import java.util.Set;
+       String path;
+       ErrorQueue eq;
+       HashMap keywords;
+  +    Position commentBegin;
+   
+       public Lexer_c(java.io.InputStream in, Source file, ErrorQueue eq) {
+           this(new java.io.BufferedReader(new java.io.InputStreamReader(in)),
+              </pre>
+            </li>
+            <li>
+              Add a convenience method for creating <code>JavadocToken</code>s:
+              <pre>
+  @@ -264,6 +265,10 @@ import java.util.Set;
+           return new StringLiteral(pos(sb.length()), sb.toString(),
+                                    sym.STRING_LITERAL);
+       }
+  +	
+  +	private Token javadoc_token() {
+  +		return new JavadocToken(pos(sb.length()), sb.toString(), sym.JAVADOC);
+  +    }
+   
+       private String chop(int i, int j) {
+           return yytext().substring(i,yylength()-j);
+              </pre>
+            </li>
+            <li>
+              Add a new transition from <code>&lt;YYINITIAL&gt;</code> to
+              start capturing Javadoc comments:
+              <pre>
+  @@ -329,6 +334,10 @@ OctalEscape = \\ [0-7]
+       /* 3.7 Comments */
+       "/*"    { yybegin(TRADITIONAL_COMMENT); }
+       "//"    { yybegin(END_OF_LINE_COMMENT); }
+  +    "/**"   { yybegin(JAVADOC_COMMENT);
+  +              sb.setLength(0);
+  +              sb.append(yytext());
+  +              commentBegin = pos(); }
+   
+       /* 3.10.4 Character Literals */
+       \'      { yybegin(CHARACTER); sb.setLength(0); }
+              </pre>
+            </li>
+            <li>
+              When done capturing a Javadoc comment, return it to the parser as
+              a <code>JavadocToken</code>:
+              <pre>
+  @@ -438,6 +447,18 @@ OctalEscape = \\ [0-7]
+       .                            { /* ignore */ }
+   }
+   
+  +&lt;JAVADOC_COMMENT&gt; {
+  +    "*/"                         { yybegin(YYINITIAL);
+  +    							   sb.append(yytext()); 
+  +    							   return javadoc_token(); }
+  +
+  +    &lt;&lt;EOF&gt;&gt;                      { yybegin(YYINITIAL);
+  +                                   eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+  +                                                  "Unclosed Javadoc comment",
+  +                                                  commentBegin); }
+  +    [^]                          { sb.append(yytext()); }
+  +}
+  +
+   &lt;CHARACTER&gt; {
+       /* End of the character literal */
+       \'                           { yybegin(YYINITIAL);
+              </pre>
+            </li>
+          </ol>
+        </li>
+        <li>
+          <p class="cont">
+            The new interface <code>Documentable</code> was created to mark
+            those AST Nodes which can have a Javadoc comment associated with
+            them. The parser attaches <code>Javadoc</code> comments to the
+            <code>Documentable</code> nodes with which they are associated. 
+          </p>
+          <p>
+            The following top-level interfaces (and their subclasses) now
+            implement <code>Documentable</code>: <code>TopLevelDecl</code>,
+            <code>ProcedureDecl</code>, <code>FieldDecl</code>, and
+            <code>EnumConstantDecl</code>.
+            This change may mean that some of the AST classes in your extension
+            now implement <code>Documentable</code>.
+            For each such class <code>C</code> in your extension, you will need
+            to modify <code>C</code>'s constructors, pretty printer, and
+            factory methods, and adjust the parser to compensate.
+          </p>
+          <ol type="a">
+            <li>
+              Modify <code>C's</code> constructor to take in an additional
+              <code>Javadoc</code> argument, and hand this object to the
+              superclass constructor in the <code>super()</code> call.
+            </li>
+            <li>
+              If <code>C</code> overrides <code>prettyPrint()</code>, then
+              add a call to <code>javadoc.prettyPrint()</code>
+              before printing rest of the declaration:
+              <pre>
+  if (javadoc != null) javadoc.prettyPrint(...);</pre>
+            </li>
+            <li>
+              In your extension's <code>NodeFactory</code>, have the factory
+              method for <code>C</code> take an additional <code>Javadoc</code>
+              argument, and hand it to the constructor we modified in Step a.
+            </li>
+            <li>
+              Update your parser generator (CUP file) to use the factory method
+              we just modified in Step c. Use the
+              <code>BaseParser.javadoc(Position)</code> method to construct
+              <code>Javadoc</code> objects by specifying the start position of
+              the <code>Documentable</code> node under consideration.
+            </li>
+          </ol>
+
+          <p>
+            Once <code>Javadoc</code> objects are attached to their
+            corresponding <code>Documentable</code> nodes, and the
+            <code>Documentable</code> classes' <code>prettyPrint()</code>
+            methods are updated, the Javadoc comment associated with every
+            <code>Documentable</code> node will be added to the
+            compiler-generated .java file during compilation.
+          </p>
+        </li>
+      </ol>
+    </main>
+  </div>
+</body>
+</html>
