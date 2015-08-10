@@ -89,7 +89,20 @@ public class OptimalCodeWriter extends CodeWriter {
         if (OptimalCodeWriter.showInput) {
             trace("write '" + s + "' (" + length + ")");
         }
-        current.add(new TextItem(s, length));
+        int b = 0, e;
+        while (b < s.length()) {
+            e = s.indexOf(b, '\n');
+            if (e == -1) {
+                current.add(new TextItem(s.substring(b, s.length()), length-b));
+                break;
+            } else {
+                // auto-split string on newlines.
+                System.out.println("AUTOSPLITTING");
+                current.add(new TextItem(s.substring(b, e), e-b));
+                current.add(new Newline(1));
+                b = e+1;
+            }
+        }
     }
 
     /**
@@ -287,9 +300,7 @@ public class OptimalCodeWriter extends CodeWriter {
 
 /**
  * An {@code Overrun} represents a formatting that failed because the
- * right margin was exceeded by at least {@code amount} chars. If
- * sameLine, the overrun occurred on the first line of the requested
- * formatting; otherwise, it occurred on a subsequent line.
+ * right margin was exceeded by at least {@code amount} chars.
  */
 class Overrun extends Exception {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -896,7 +907,7 @@ class AllowBreak extends Item {
     String selfToString() {
         if (indent == 0)
             return " ";
-        else return "^" + indent;
+        else return "^[" + indent + "]";
     }
 }
 
@@ -1089,9 +1100,9 @@ class BlockItem extends Item {
 
     @Override
     String selfToString() {
-        if (indent == 0)
-            return "[" + first + "]";
-        else return "[" + indent + first + "]";
+        return first == null ? "[]" :
+         (indent == 0)  ? "[" + first + "]"
+                        : "[" + indent + first + "]";
     }
 }
 
