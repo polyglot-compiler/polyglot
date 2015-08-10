@@ -6,6 +6,8 @@ Bundle-SymbolicName: polyglot
 Bundle-Version: @version@
 Bundle-Localization: plugin
 Export-Package: polyglot.ast,
+ polyglot.ext.jl5,
+ polyglot.ext.jl7,
  polyglot.frontend,
  polyglot.frontend.goals,
  polyglot.frontend.passes,
@@ -17,3 +19,6 @@ Export-Package: polyglot.ast,
  polyglot.util,
  polyglot.visit
 Bundle-Vendor: nate@nanocow.com
+Bundle-ClassPath: lib/java_cup.jar,
+ lib/jflex.jar,
+ .
