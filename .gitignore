@@ -11,3 +11,4 @@ SyncToy*
 /bin_
 polyglot-?.?.?-src*
 .*.sw?
+/tmp/
