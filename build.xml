@@ -58,6 +58,16 @@
     <!-- temporary directory -->
     <property name="tmp" location="${basedir}/tmp"/>
 
+    <!-- Set of source files to include in the distribution. -->
+    <fileset id="dist-src-files"
+            dir="${src}"
+            includes="polyglot/**/*.java,polyglot/qq/qq.ppg,polyglot/qq/qq.flex,polyglot/qq/qq_ppg.cup,polyglot/parse/java12.cup,polyglot/parse/java.flex,polyglot/**/package.html,polyglot/ext/jl5/parse/jl5_ppg.cup,polyglot/ext/jl5/parse/jl5.flex,polyglot/ext/jl5/parse/jl5.ppg,polyglot/ext/jl7/parse/jl?_ppg.cup,polyglot/ext/jl7/parse/jl7.flex,polyglot/ext/jl7/parse/jl?.ppg"/>
+
+    <!-- Set of class files to include in the distribution. -->
+    <fileset id="dist-class-files"
+            dir="${classes}"
+            includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**,polyglot/ext/jl5/**,polyglot/ext/jl7/**,polyglot/translate/**,polyglot/filemanager/**"/>
+
     <!-- classpath to use when compiling polyglot -->
     <path id="standard.classpath">
         <pathelement location="${classes}"/>
@@ -82,7 +92,9 @@
     <target name="configure-buildstring" depends="configure-version"
             unless="jl.version.build">
         <tstamp>
-            <format property="now" pattern="yyyy-MM-dd HH:mm:ss"/>
+            <format property="now"
+                    pattern="yyyy-MM-dd HH:mm:ss"
+                    timezone="UTC"/>
         </tstamp>
         <property name="jl.version.build" value="${jl.version} (${now})"/>
     </target>
@@ -800,15 +812,15 @@
             <attribute name="Main-Class" value="polyglot.main.Main"/>
 
             <attribute name="Implementation-Version" value="${jl.version}"/>
-            <attribute name="Built-Date" value="${jl.version.build}"/>
+            <attribute name="Built-Date" value="${now}"/>
             <attribute name="Class-Path"
                     value="java_cup.jar polyglot.jar ppg.jar"/>
         </manifest>
 
         <jar destfile="${lib}/polyglot.jar"
-                basedir="${classes}"
-                manifest="${classes}/MANIFEST.MF"
-                includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**,polyglot/ext/jl5/**,polyglot/ext/jl7/**,polyglot/translate/**,polyglot/filemanager/**"/>
+                manifest="${classes}/MANIFEST.MF">
+            <fileset refid="dist-class-files"/>
+        </jar>
 
         <delete file="${classes}/MANIFEST.MF" failonerror="false"/>
     </target>
@@ -950,8 +962,7 @@
     <target name="src-dist-tmp"
             depends="jar-base,jar-pth,jar-ppg,javadoc,mkdir-tmp">
         <copy todir="${tmp}/src" includeemptydirs="false">
-            <fileset dir="${src}"
-                    includes="polyglot/**/*.java,polyglot/qq/qq.ppg,polyglot/qq/qq.flex,polyglot/qq/qq_ppg.cup,polyglot/parse/java12.cup,polyglot/parse/java.flex,polyglot/**/package.html,polyglot/ext/jl5/parse/jl5_ppg.cup,polyglot/ext/jl5/parse/jl5.flex,polyglot/ext/jl5/parse/jl5.ppg,polyglot/ext/jl7/parse/jl?_ppg.cup,polyglot/ext/jl7/parse/jl7.flex,polyglot/ext/jl7/parse/jl?.ppg"/>
+            <fileset refid="dist-src-files"/>
         </copy>
 
         <copy todir="${tmp}/skel" includeEmptyDirs="false">
