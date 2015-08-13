@@ -938,8 +938,8 @@
 
     <!-- Distribution targets -->
 
-    <!-- do a cvs checkout into a tmp directory and run ant task there -->
-    <target name="sub-ant-cvs">
+    <!-- assume the tmp directory has a git clone and run ant task there -->
+    <target name="sub-ant-git">
         <ant inheritAll="false"
                 antfile="${tmp}/polyglot/build.xml"
                 dir="${tmp}/polyglot"
@@ -948,15 +948,15 @@
 
     <target name="source-tarball-stable"
             depends="configure-buildstring"
-            description="generate a source tarball from CVS">
+            description="generate a source tarball from Git">
         <antcall target="git-checkout"/>
-        <antcall target="sub-ant-cvs">
+        <antcall target="sub-ant-git">
             <param name="sub-ant.target" value="gen-version"/>
         </antcall>
-        <antcall target="sub-ant-cvs">
+        <antcall target="sub-ant-git">
             <param name="sub-ant.target" value="javadoc"/>
         </antcall>
-        <antcall target="sub-ant-cvs">
+        <antcall target="sub-ant-git">
             <param name="sub-ant.target" value="src.zip"/>
         </antcall>
         <move tofile="${basedir}/polyglot-${jl.version}-src.zip"
@@ -966,12 +966,12 @@
 
     <target name="binary-jar-epl-stable"
             depends="configure-buildstring"
-            description="generate an EPL jar file from CVS">
+            description="generate an EPL jar file from Git">
         <antcall target="git-checkout"/>
-        <antcall target="sub-ant-cvs">
+        <antcall target="sub-ant-git">
             <param name="sub-ant.target" value="gen-version"/>
         </antcall>
-        <antcall target="sub-ant-cvs">
+        <antcall target="sub-ant-git">
             <param name="sub-ant.target" value="bin-epl.jar"/>
         </antcall>
         <move tofile="${basedir}/polyglot_${jl.version}.jar"
@@ -981,12 +981,12 @@
 
     <target name="source-jar-epl-stable"
             depends="configure-buildstring"
-            description="generate an EPL source jar file from CVS" >
+            description="generate an EPL source jar file from Git" >
         <antcall target="git-checkout"/>
-        <antcall target="sub-ant-cvs">
+        <antcall target="sub-ant-git">
             <param name="sub-ant.target" value="gen-version"/>
         </antcall>
-        <antcall target="sub-ant-cvs">
+        <antcall target="sub-ant-git">
             <param name="sub-ant.target" value="src-epl.jar"/>
         </antcall>
         <move tofile="${basedir}/polyglot_src_${jl.version}.jar"
