@@ -26,6 +26,8 @@
 
 package polyglot.ast;
 
+import java.util.StringTokenizer;
+
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -46,7 +48,31 @@ public class Javadoc_c extends Node_c implements Javadoc {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-        w.write(text);
+        // Avoid messing up the pretty printer.
+        String whitespace = " \t";
+        String linebreak = "\n\r\f";
+        StringTokenizer tokenizer =
+                new StringTokenizer(text, whitespace + linebreak, true);
+        boolean ignoreSpace = false;
+        w.begin(0);
+        while (tokenizer.hasMoreTokens()) {
+            String token = tokenizer.nextToken();
+            if (linebreak.contains(token)) {
+                w.newline();
+                ignoreSpace = true;
+            }
+            else if (whitespace.contains(token)) {
+                if (!ignoreSpace) w.allowBreak(1, token);
+            }
+            else {
+                if (ignoreSpace) {
+                    w.write(" ");
+                    ignoreSpace = false;
+                }
+                w.write(token);
+            }
+        }
+        w.end();
         w.newline();
     }
 
