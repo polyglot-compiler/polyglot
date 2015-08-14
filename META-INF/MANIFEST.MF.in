@@ -4,6 +4,7 @@ Bundle-Name: Polyglot
 Main-Class: polyglot.main.Main
 Bundle-SymbolicName: polyglot
 Bundle-Version: @version@
+Bundle-Vendor: Polyglot project group
 Export-Package: polyglot.ast,
  polyglot.ext.jl5,
  polyglot.ext.jl7,

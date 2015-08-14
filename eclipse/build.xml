@@ -20,6 +20,9 @@
         <tstamp>
             <format property="timestamp" pattern="yyyyMMddHHmm" timezone="UTC"/>
         </tstamp>
+        <tstamp>
+            <format property="year" pattern="yyyy" timezone="UTC"/>
+        </tstamp>
         <property name="plugin.version"
                 value="${jl.version}.${timestamp}"/>
     </target>
@@ -37,6 +40,7 @@
 
         <!-- Copy feature.xml to the temp directory. -->
         <filter token="version" value="${plugin.version}"/>
+        <filter token="year" value="${year}"/>
         <copy tofile="${tmp}/feature.xml"
                 file="${basedir}/eclipse/feature.xml.in"
                 filtering="true"/>
