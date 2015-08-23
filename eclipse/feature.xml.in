@@ -2,25 +2,27 @@
 <feature
       id="polyglot"
       label="Polyglot"
-      version="@version@"
-      provider-name="nate@nanocow.com">
+      version="@version@">
 
-   <description url="http://www.cs.cornell.edu/Projects/polyglot/">
+   <description url="https://www.cs.cornell.edu/Projects/polyglot/">
       The Polyglot extensible compiler framework
    </description>
 
-   <copyright url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/copyright.html">
-     Copyright (C) 2000-2007 Polyglot project group, Cornell University
-     Copyright (C) 2006-2007 IBM Corporation
+   <copyright
+         url="https://www.cs.cornell.edu/Projects/polyglot/ide/copyright.html">
+      Copyright (C) 2000-@year@ Polyglot project group, Cornell University
+Copyright (C) 2006-2007 IBM Corporation
    </copyright>
 
-   <license url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/license.html">
-      This release of the Polyglot distribution is governed by the Eclipse
-      Public License.
+   <license url="https://www.cs.cornell.edu/Projects/polyglot/ide/license.html">
+      This release of the Polyglot distribution is governed by the GNU Lesser General Public License, version 2.1.
    </license>
 
    <url>
-      <update url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/"/>
+      <update label="Polyglot Updates"
+            url="https://www.cs.cornell.edu/projects/polyglot/ide/"/>
+      <discovery label="Polyglot project page"
+            url="https://www.cs.cornell.edu/projects/polyglot/"/>
    </url>
 
    <plugin
@@ -29,5 +31,7 @@
          install-size="0"
          version="@version@"
          unpack="false"/>
-
 </feature>
+<!--
+vim: ts=3 sw=3 ai et
+-->

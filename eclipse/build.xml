@@ -1,0 +1,100 @@
+<project name="polyglot-plugin" default="all" basedir=".."
+    xmlns:if="ant:if"
+    xmlns:unless="ant:unless"
+>
+    <description>
+        Polyglot plugin build file
+    </description>
+
+    <include file="../build.xml"/>
+    <property name="features" location="${basedir}/eclipse/features"/>
+    <property name="plugins" location="${basedir}/eclipse/plugins"/>
+
+    <target name="all"
+            depends="build-features,build-plugins"
+            description="Build features and plugins for the Eclipse update site"
+    />
+
+    <target name="configure-buildstring"
+            depends="polyglot.configure-buildstring">
+        <tstamp>
+            <format property="timestamp" pattern="yyyyMMddHHmm" timezone="UTC"/>
+        </tstamp>
+        <tstamp>
+            <format property="year" pattern="yyyy" timezone="UTC"/>
+        </tstamp>
+        <property name="plugin.version"
+                value="${jl.version}.${timestamp}"/>
+    </target>
+
+    <target name="mkdir-tmp">
+        <mkdir dir="${tmp}"/>
+    </target>
+
+    <target name="build-features" depends="configure-buildstring,mkdir-tmp">
+        <!-- Make the features directory pristine. -->
+        <antcall target="polyglot.rmdir">
+            <param name="dir" value="${features}"/>
+        </antcall>
+        <mkdir dir="${features}"/>
+
+        <!-- Copy feature.xml to the temp directory. -->
+        <filter token="version" value="${plugin.version}"/>
+        <filter token="year" value="${year}"/>
+        <copy tofile="${tmp}/feature.xml"
+                file="${basedir}/eclipse/feature.xml.in"
+                filtering="true"/>
+
+        <!-- Jar into the features directory. -->
+        <jar destfile="${features}/polyglot_${plugin.version}.jar"
+                basedir="${tmp}"
+                includes="feature.xml"/>
+    </target>
+
+    <target name="build-plugins" depends="configure-buildstring">
+        <!-- Make the plugins directory pristine. -->
+        <antcall target="polyglot.rmdir">
+            <param name="dir" value="${plugins}"/>
+        </antcall>
+        <mkdir dir="${plugins}"/>
+
+        <!-- Compile Polyglot. -->
+        <ant antfile="${basedir}/build.xml" target="jl"/>
+
+        <!-- Make ${tmp} pristine. We will build the plugin image there. -->
+        <ant antfile="${basedir}/build.xml" target="mkdir-tmp"/>
+
+        <!-- Copy and update manifest. -->
+        <filter token="version" value="${plugin.version}"/>
+        <copy tofile="${tmp}/META-INF/MANIFEST.MF"
+                file="${basedir}/META-INF/MANIFEST.MF.in"
+                filtering="true"/>
+        <manifest file="${tmp}/META-INF/MANIFEST.MF" mode="update">
+            <attribute name="Built-By" value="${user.name}"/>
+            <attribute name="Implementation-Version" value="${plugin.version}"/>
+            <attribute name="Built-Date" value="${now}"/>
+        </manifest>
+
+        <!-- Copy source files. -->
+        <copy todir="${tmp}/src" includeEmptyDirs="false">
+            <fileset refid="dist-src-files"/>
+        </copy>
+
+        <!-- Copy class files. -->
+        <copy todir="${tmp}" includeEmptyDirs="false">
+            <fileset refid="dist-class-files"/>
+        </copy>
+
+        <!-- Copy libraries. -->
+        <copy file="${lib}/java_cup.jar" todir="${tmp}/lib"/>
+        <copy file="${lib}/jflex.jar" todir="${tmp}/lib"/>
+
+        <jar destfile="${plugins}/polyglot_${plugin.version}.jar"
+                basedir="${tmp}"
+                manifest="${tmp}/META-INF/MANIFEST.MF"/>
+    </target>
+</project>
+<!--
+vim: ts=4 sw=4 ai et
+-->
+

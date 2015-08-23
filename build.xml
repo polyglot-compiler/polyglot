@@ -1,456 +1,600 @@
 <project name="polyglot" default="compile" basedir="."
-	xmlns:if="ant:if"
-	xmlns:unless="ant:unless"
+    xmlns:if="ant:if"
+    xmlns:unless="ant:unless"
 >
-	<description>
-    Polyglot build file
+    <description>
+        Polyglot build file
     </description>
 
-	<!-- set global properties for this build -->
+    <!-- set global properties for this build -->
 
-	<!-- prefix for reading environment properties -->
-	<property environment="env" />
+    <!-- prefix for reading environment properties -->
+    <property environment="env"/>
 
-	<!-- read local definitions that override this file, if any -->
-	<property file="config.properties" />
+    <!-- read local definitions that override this file, if any -->
+    <property file="config.properties"/>
 
-	<!-- source directory -->
-	<property name="src" location="${basedir}/src" />
+    <!-- source directory -->
+    <property name="src" location="${basedir}/src"/>
 
-	<!-- directory for class file targets -->
-	<property name="classes" location="${basedir}/classes" />
+    <!-- directory for class file targets -->
+    <property name="classes" location="${basedir}/classes"/>
 
-	<!-- directory for jar files -->
-	<property name="lib" location="${basedir}/lib" />
+    <!-- directory for jar files -->
+    <property name="lib" location="${basedir}/lib"/>
 
-	<!-- binaries directory -->
-	<property name="bin" location="${basedir}/bin" />
+    <!-- binaries directory -->
+    <property name="bin" location="${basedir}/bin"/>
 
-	<!-- tools directory -->
-	<property name="tools.dir" location="${basedir}/tools" />
+    <!-- tools directory -->
+    <property name="tools.dir" location="${basedir}/tools"/>
 
-	<!-- pth (Polyglot Test Harness) directory -->
-	<property name="pth.dir" location="${tools.dir}/pth" />
-	<property name="pth.classes" location="${pth.dir}/classes" />
-	<property name="pth.src" location="${pth.dir}/src" />
+    <!-- pth (Polyglot Test Harness) directory -->
+    <property name="pth.dir" location="${tools.dir}/pth"/>
+    <property name="pth.classes" location="${pth.dir}/classes"/>
+    <property name="pth.src" location="${pth.dir}/src"/>
 
-	<!-- ppg (Polyglot Parser Generator) directory -->
-	<property name="ppg.dir" location="${tools.dir}/ppg" />
-	<property name="ppg.classes" location="${ppg.dir}/classes" />
-	<property name="ppg.src" location="${ppg.dir}/src" />
+    <!-- ppg (Polyglot Parser Generator) directory -->
+    <property name="ppg.dir" location="${tools.dir}/ppg"/>
+    <property name="ppg.classes" location="${ppg.dir}/classes"/>
+    <property name="ppg.src" location="${ppg.dir}/src"/>
 
-	<!-- java_cup directory -->
-	<property name="cup.dir" location="${tools.dir}/java_cup" />
-	<property name="cup.classes" location="${cup.dir}/classes" />
-	<property name="cup.src" location="${cup.dir}/src" />
+    <!-- java_cup directory -->
+    <property name="cup.dir" location="${tools.dir}/java_cup"/>
+    <property name="cup.classes" location="${cup.dir}/classes"/>
+    <property name="cup.src" location="${cup.dir}/src"/>
 
-	<!-- examples directory -->
-	<property name="examples.dir" location="${basedir}/examples" />
-	<property name="pao.dir" location="${examples.dir}/pao" />
-	<property name="coffer.dir" location="${examples.dir}/coffer" />
-	<property name="carray.dir" location="${examples.dir}/carray" />
-	<property name="covarRet.dir" location="${examples.dir}/covarRet" />
-	<property name="carray_jl5.dir" location="${examples.dir}/carray_jl5" />
+    <!-- examples directory -->
+    <property name="examples.dir" location="${basedir}/examples"/>
+    <property name="pao.dir" location="${examples.dir}/pao"/>
+    <property name="coffer.dir" location="${examples.dir}/coffer"/>
+    <property name="carray.dir" location="${examples.dir}/carray"/>
+    <property name="covarRet.dir" location="${examples.dir}/covarRet"/>
+    <property name="carray_jl5.dir" location="${examples.dir}/carray_jl5"/>
 
-	<!--
-	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
-	<property name="cvs.root" value=":ext:gforge.cis.cornell.edu:/cvsroot/polyglot" />
-	-->
-	<property name="gitrepo" value="https://github.com/polyglot-compiler/polyglot.git" />
+    <property name="gitrepo"
+            value="https://github.com/polyglot-compiler/polyglot.git"/>
 
-	<!-- temporary directory -->
-	<property name="tmp" location="${basedir}/tmp" />
+    <!-- temporary directory -->
+    <property name="tmp" location="${basedir}/tmp"/>
 
-	<!-- classpath to use when compiling polyglot -->
-	<path id="standard.classpath">
-		<pathelement location="${classes}" />
-		<pathelement location="${lib}/java_cup.jar" />
-		<pathelement location="${lib}/jflex.jar" />
-		<pathelement location="${lib}/ppg.jar" />
-		<pathelement location="${env.JAVA_HOME}/lib/tools.jar" />
-	</path>
+    <!-- Set of source files to include in the distribution. -->
+    <fileset id="dist-src-files"
+            dir="${src}"
+            includes="polyglot/**/*.java,polyglot/qq/qq.ppg,polyglot/qq/qq.flex,polyglot/qq/qq_ppg.cup,polyglot/parse/java12.cup,polyglot/parse/java.flex,polyglot/**/package.html,polyglot/ext/jl5/parse/jl5_ppg.cup,polyglot/ext/jl5/parse/jl5.flex,polyglot/ext/jl5/parse/jl5.ppg,polyglot/ext/jl7/parse/jl?_ppg.cup,polyglot/ext/jl7/parse/jl7.flex,polyglot/ext/jl7/parse/jl?.ppg"/>
 
-        <fileset id="epl.excludes.src" dir="${src}" excludes="polyglot/parse/Grm.java,polyglot/parse/sym.java,polyglot/parse/Lexer_c.java,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.java,polyglot/parse/BaseParser.java,polyglot/lex/EscapedUnicodeReader.java" />
+    <!-- Set of class files to include in the distribution. -->
+    <fileset id="dist-class-files"
+            dir="${classes}"
+            includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**,polyglot/ext/jl5/**,polyglot/ext/jl7/**,polyglot/translate/**,polyglot/filemanager/**"/>
 
-        <fileset id="epl.excludes.classes" dir="${classes}" excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class,polyglot/lex/EscapedUnicodeReader.class" />
+    <!-- classpath to use when compiling polyglot -->
+    <path id="standard.classpath">
+        <pathelement location="${classes}"/>
+        <pathelement location="${lib}/java_cup.jar"/>
+        <pathelement location="${lib}/jflex.jar"/>
+        <pathelement location="${lib}/ppg.jar"/>
+        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+    </path>
 
-	<!-- classpath to use when bootstrapping java_cup.jar -->
-	<path id="cup.jar.classpath">
-		<pathelement location="${classes}" />
-		<pathelement location="${cup.dir}/lib/java_cup.jar" />
-	</path>
+    <!-- classpath to use when bootstrapping java_cup.jar -->
+    <path id="cup.jar.classpath">
+        <pathelement location="${classes}"/>
+        <pathelement location="${cup.dir}/lib/java_cup.jar"/>
+    </path>
 
-	<target name="configure-version" unless="jl.version">
-		<property file="${basedir}/build.properties" prefix="jl" />
-		<property name="jl.version" value="${jl.version.major}.${jl.version.minor}.${jl.version.patch}" />
-	</target>
+    <target name="configure-version" unless="jl.version">
+        <property file="${basedir}/build.properties" prefix="jl"/>
+        <property name="jl.version"
+                value="${jl.version.major}.${jl.version.minor}.${jl.version.patch}"/>
+    </target>
 
-	<target name="configure-buildstring" depends="configure-version" unless="jl.version.build">
-		<tstamp>
-			<format property="now" pattern="yyyy-MM-dd HH:mm:ss" />
-		</tstamp>
-		<property name="jl.version.build" value="${jl.version} (${now})" />
-	</target>
+    <target name="configure-buildstring" depends="configure-version"
+            unless="jl.version.build">
+        <tstamp>
+            <format property="now"
+                    pattern="yyyy-MM-dd HH:mm:ss"
+                    timezone="UTC"/>
+        </tstamp>
+        <property name="jl.version.build" value="${jl.version} (${now})"/>
+    </target>
 
-	<target name="configure" description="Check the build configuration" depends="check-jars,configure-buildstring,eclipse" unless="configure.up-to-date">
-		<echo message="java version is ${java.version}" />
-		<echo message="current directory is ${user.dir}" />
-		<echo message="Java home directory is ${java.home}" />
-		<echo message="Polyglot version is ${jl.version.build}" />
-		<property name="configure.up-to-date" value="true" />
-	</target>
+    <target name="configure"
+            description="Check the build configuration"
+            depends="check-jars,configure-buildstring,eclipse"
+            unless="configure.up-to-date">
+        <echo message="java version is ${java.version}"/>
+        <echo message="current directory is ${user.dir}"/>
+        <echo message="Java home directory is ${java.home}"/>
+        <echo message="Polyglot version is ${jl.version.build}"/>
+        <property name="configure.up-to-date" value="true"/>
+    </target>
 
-	<!-- Configures Eclipse's .classpath file. -->
-	<target name="eclipse" depends="eclipse-check"
-			unless="eclipse.up-to-date"
-			description="Configures Eclipse's .classpath file">
-                <property environment="env" />
-                <condition property="tools.jar-entry"
-                        value="&lt;classpathentry kind=&quot;lib&quot; path=&quot;${env.JAVA_HOME}/lib/tools.jar&quot;/&gt;"
-                        else="">
-                        <available file="${env.JAVA_HOME}/lib/tools.jar" />
-		</condition>
-		<copy file="eclipse/classpath.in" tofile=".classpath">
-			<filterset>
-				<filter token="TOOLS.JAR" value="${tools.jar-entry}" />
-			</filterset>
-		</copy>
-	</target>
+    <!-- Configures Eclipse's .classpath file. -->
+    <target name="eclipse" depends="eclipse-check"
+            unless="eclipse.up-to-date"
+            description="Configures Eclipse's .classpath file">
+        <property environment="env"/>
+        <condition property="tools.jar-entry"
+                value="&lt;classpathentry kind=&quot;lib&quot; path=&quot;${env.JAVA_HOME}/lib/tools.jar&quot;/&gt;"
+                else="">
+            <available file="${env.JAVA_HOME}/lib/tools.jar"/>
+        </condition>
+        <copy file="eclipse/classpath.in" tofile=".classpath">
+            <filterset>
+                <filter token="TOOLS.JAR" value="${tools.jar-entry}"/>
+            </filterset>
+        </copy>
+    </target>
 
-	<target name="eclipse-check">
-		<uptodate property="eclipse.up-to-date" targetfile=".classpath"
-				srcfile="eclipse/classpath.in" />
-	</target>
+    <target name="eclipse-check">
+        <uptodate property="eclipse.up-to-date"
+                targetfile=".classpath"
+                srcfile="eclipse/classpath.in"/>
+    </target>
 
-	<target name="check-jars">
-		<available file="${cup.dir}/lib/java_cup.jar" property="cup.jar.exists" />
-		<available file="${lib}/jflex.jar" property="jflex.jar.exists" />
-		<fail unless="cup.jar.exists" message="${cup.dir}/lib/java_cup.jar not found." />
-		<fail unless="jflex.jar.exists" message="${lib}/jflex.jar not found." />
-	</target>
+    <target name="check-jars">
+        <available file="${cup.dir}/lib/java_cup.jar"
+                property="cup.jar.exists"/>
+        <available file="${lib}/jflex.jar" property="jflex.jar.exists"/>
+        <fail unless="cup.jar.exists"
+                message="${cup.dir}/lib/java_cup.jar not found."/>
+        <fail unless="jflex.jar.exists"
+                message="${lib}/jflex.jar not found."/>
+    </target>
 
-	<!-- create appropriate executables in the bin directory -->
-	<target name="bin" depends="configure" unless="bin.up-to-date">
-		<chmod perm="+x" file="${bin}/jlc" />
-		<chmod perm="+x" file="${bin}/jl5c" />
-		<chmod perm="+x" file="${bin}/jl7c" />
-		<chmod perm="+x" file="${bin}/pth" />
-		<property name="bin.up-to-date" value="true" />
-	</target>
+    <!-- create appropriate executables in the bin directory -->
+    <target name="bin" depends="configure" unless="bin.up-to-date">
+        <chmod perm="+x" file="${bin}/jlc"/>
+        <chmod perm="+x" file="${bin}/jl5c"/>
+        <chmod perm="+x" file="${bin}/jl7c"/>
+        <chmod perm="+x" file="${bin}/pth"/>
+        <property name="bin.up-to-date" value="true"/>
+    </target>
 
-	<!-- initialize the build -->
-	<target name="init" depends="configure">
-		<!-- Create the time stamp -->
-		<tstamp />
-		<!-- Create the build directory structure used by compile -->
-		<antcall target="mkdirs" />
-	</target>
-	
-	<target name="mkdirs">
-		<mkdir dir="${classes}" />
-		<mkdir dir="${cup.classes}" />
-		<mkdir dir="${ppg.classes}" />
-		<mkdir dir="${pth.classes}" />
-	</target>
+    <!-- initialize the build -->
+    <target name="init" depends="configure">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <antcall target="mkdirs"/>
+    </target>
 
-	<!-- build everything -->
-	<target name="all" depends="jar-all" description="Build everything" />
+    <target name="mkdirs">
+        <mkdir dir="${classes}"/>
+        <mkdir dir="${cup.classes}"/>
+        <mkdir dir="${ppg.classes}"/>
+        <mkdir dir="${pth.classes}"/>
+    </target>
 
-        <!-- build the base compiler, qq, and pth -->
-        <target name="compile" depends="base,pth" description="Build the base compiler, qq, and pth" />
+    <!-- build everything -->
+    <target name="all" depends="jar-all" description="Build everything"/>
 
-	<!-- build the base compiler -->
-	<target name="base" depends="bin,base-parser,compile-base" description="Build the base compiler" />
-    <target name="jl" depends="base" description="Build the base compiler" />
+    <!-- build the base compiler, qq, and pth -->
+    <target name="compile"
+            depends="base,pth"
+            description="Build the base compiler, qq, and pth"/>
 
-	<!-- compile everything -->
-	<target name="compile-all" depends="base,compile-ppg,compile-pth,examples" description="Compile the base compiler, ppg, pth, and the examples" />
+    <!-- build the base compiler -->
+    <target name="base"
+            depends="bin,base-parser,compile-base"
+            description="Build the base compiler"/>
+    <target name="jl" depends="base" description="Build the base compiler"/>
 
-	<!-- build all the jars -->
-	<target name="jar-all" depends="jar,jar-pth,jar-ppg,jar-examples" description="Build polyglot.jar ppg.jar pth.jar and examples" />
+    <!-- compile everything -->
+    <target name="compile-all"
+            depends="base,compile-ppg,compile-pth,examples"
+            description="Compile the base compiler, ppg, pth, and the examples"
+    />
 
-	<!-- install the jars in the examples -->
-	<target name="install-jars-in-examples" depends="jar">
-		<copy file="${lib}/polyglot.jar" todir="${pao.dir}/lib" />
-		<copy file="${lib}/polyglot.jar" todir="${coffer.dir}/lib" />
-		<copy file="${lib}/polyglot.jar" todir="${covarRet.dir}/lib" />
-		<copy file="${lib}/polyglot.jar" todir="${carray.dir}/lib" />
-		<copy file="${lib}/polyglot.jar" todir="${carray_jl5.dir}/lib" />
-		<copy file="${lib}/java_cup.jar" todir="${pao.dir}/lib" />
-		<copy file="${lib}/java_cup.jar" todir="${coffer.dir}/lib" />
-		<copy file="${lib}/java_cup.jar" todir="${carray.dir}/lib" />
-		<copy file="${lib}/java_cup.jar" todir="${carray_jl5.dir}/lib" />
-		<copy file="${lib}/jflex.jar" todir="${pao.dir}/lib" />
-		<copy file="${lib}/jflex.jar" todir="${coffer.dir}/lib" />
-		<copy file="${lib}/jflex.jar" todir="${carray.dir}/lib" />
-		<copy file="${lib}/jflex.jar" todir="${carray_jl5.dir}/lib" />
-		<copy file="${lib}/ppg.jar" todir="${pao.dir}/lib" />
-		<copy file="${lib}/ppg.jar" todir="${coffer.dir}/lib" />
-		<copy file="${lib}/ppg.jar" todir="${carray.dir}/lib" />
-		<copy file="${lib}/ppg.jar" todir="${carray_jl5.dir}/lib" />
-	</target>
+    <!-- build all the jars -->
+    <target name="jar-all"
+            depends="jar,jar-pth,jar-ppg,jar-examples"
+            description="Build polyglot.jar ppg.jar pth.jar and examples"/>
 
-	<target name="serialuid" description="Build polyglot.util.SerialVersionUID">
-        <javac source="1.7" target="1.7" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/util/SerialVersionUID.java" includeAntRuntime="false">
-            <classpath refid="standard.classpath" />
-        </javac>
-	</target>
+    <!-- install the jars in the examples -->
+    <target name="install-jars-in-examples" depends="jar">
+        <copy file="${lib}/polyglot.jar" todir="${pao.dir}/lib"/>
+        <copy file="${lib}/polyglot.jar" todir="${coffer.dir}/lib"/>
+        <copy file="${lib}/polyglot.jar" todir="${covarRet.dir}/lib"/>
+        <copy file="${lib}/polyglot.jar" todir="${carray.dir}/lib"/>
+        <copy file="${lib}/polyglot.jar" todir="${carray_jl5.dir}/lib"/>
+        <copy file="${lib}/java_cup.jar" todir="${pao.dir}/lib"/>
+        <copy file="${lib}/java_cup.jar" todir="${coffer.dir}/lib"/>
+        <copy file="${lib}/java_cup.jar" todir="${carray.dir}/lib"/>
+        <copy file="${lib}/java_cup.jar" todir="${carray_jl5.dir}/lib"/>
+        <copy file="${lib}/jflex.jar" todir="${pao.dir}/lib"/>
+        <copy file="${lib}/jflex.jar" todir="${coffer.dir}/lib"/>
+        <copy file="${lib}/jflex.jar" todir="${carray.dir}/lib"/>
+        <copy file="${lib}/jflex.jar" todir="${carray_jl5.dir}/lib"/>
+        <copy file="${lib}/ppg.jar" todir="${pao.dir}/lib"/>
+        <copy file="${lib}/ppg.jar" todir="${coffer.dir}/lib"/>
+        <copy file="${lib}/ppg.jar" todir="${carray.dir}/lib"/>
+        <copy file="${lib}/ppg.jar" todir="${carray_jl5.dir}/lib"/>
+    </target>
 
-	<!-- build the examples -->
-	<target name="examples" depends="pao,coffer,carray,carray_jl5" description="Build the examples" />
-
-	<target name="pao" depends="install-jars-in-examples" description="Build the pao example">
-		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="compile-all" />
-		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="jar" />
-	</target>
-
-	<target name="coffer" depends="install-jars-in-examples" description="Build the coffer example">
-		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="compile-all" />
-		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
-	</target>
-
-	<target name="carray" depends="install-jars-in-examples" description="Build the carray example">
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="compile-all" />
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="jar" />
-	</target>
-
-	<target name="carray_jl5" depends="carray,install-jars-in-examples" description="Build the carray_jl5 example">
-		<copy file="${carray.dir}/lib/carray.jar" todir="${carray_jl5.dir}/lib" />
-		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="compile-all" />
-		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="jar" />
-	</target>
-
-	<!-- clean the examples -->
-	<target name="clean-examples" description="Clean the examples">
-		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="clean" />
-		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="clean" />
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="clean" />
-		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="clean" />
-	</target>
-
-	<!-- clobber the examples -->
-	<target name="clobber-examples" description="Clobber the examples">
-		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="clobber" />
-		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="clobber" />
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="clobber" />
-		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="clobber" />
-		<delete file="${pao.dir}/lib/polyglot.jar" />
-		<delete file="${coffer.dir}/lib/polyglot.jar" />
-		<delete file="${covarRet.dir}/lib/polyglot.jar" />
-		<delete file="${carray.dir}/lib/polyglot.jar" />
-		<delete file="${carray_jl5.dir}/lib/polyglot.jar" />
-		<delete file="${pao.dir}/lib/java_cup.jar" />
-		<delete file="${coffer.dir}/libjava_cup.jar" />
-		<delete file="${carray.dir}/libjava_cup.jar" />
-		<delete file="${carray_jl5.dir}/lib" />
-		<delete file="${pao.dir}/lib/jflex.jar" />
-		<delete file="${coffer.dir}/lib/jflex.jar" />
-		<delete file="${carray.dir}/lib/jflex.jar" />
-		<delete file="${carray_jl5.dir}/lib/jflex.jar" />
-		<delete file="${pao.dir}/lib/ppg.jar" />
-		<delete file="${coffer.dir}/lib/ppg.jar" />
-		<delete file="${carray.dir}/lib/ppg.jar" />
-		<delete file="${carray_jl5.dir}/lib/ppg.jar" />
-	</target>
-
-	<!-- jar the examples -->
-	<target name="jar-examples" depends="examples" description="Build pao.jar and coffer.jar">
-		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="jar" />
-		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
-		<ant inheritAll="false" antfile="${carray.dir}/build.xml" dir="${carray.dir}" target="jar" />
-		<ant inheritAll="false" antfile="${carray_jl5.dir}/build.xml" dir="${carray_jl5.dir}" target="jar" />
-	</target>
-
-	<target name="clean-all" depends="clean,clean-examples" description="Clean the base compiler and the examples" />
-	<target name="clobber-all" depends="clobber,clobber-examples" description="Clobber the base compiler and the examples" />
-
-	<target name="dust" depends="clobber-all">
-		<delete file="${lib}/polyglot.jar" />
-		<delete file="${lib}/polyglot-epl.jar" />
-		<delete file="${lib}/java_cup.jar" />
-		<delete file="${lib}/ppg.jar" />
-		<delete file="${lib}/pth.jar" />
-	</target>
-
-	<target name="clean" description="Cleans up the directory tree: deletes the distribution directory and the classes directories">
-		<!-- Delete the ${classes} and ${dist} directory trees -->
-		<delete dir="${lib}/polyglot.jar" />
-		<delete dir="${classes}" includeemptydirs="true" failonerror="false" />
-		<delete dir="${pth.classes}" includeemptydirs="true" failonerror="false" />
-		<delete dir="${ppg.classes}" includeemptydirs="true" failonerror="false" />
-		<delete dir="${cup.classes}" includeemptydirs="true" failonerror="false" />
-		<delete dir="${tmp}" includeemptydirs="true" failonerror="false" />
-		<antcall target="mkdirs" />
-	</target>
-
-	<target name="clean-jars" description="Clean up the jars">
-		<delete dir="${lib}/polyglot.jar" />
-	</target>
-
-	<target name="clobber" depends="clean,clobber-examples" description="Cleans up the directory tree and deletes generated files">
-		<delete>
-			<fileset dir="${src}">
-				<include name="polyglot/parse/Grm.java" />
-				<include name="polyglot/parse/sym.java" />
-				<include name="polyglot/parse/Lexer_c.java" />
-				<include name="polyglot/qq/Grm.java" />
-				<include name="polyglot/qq/sym.java" />
-				<include name="polyglot/qq/Lexer_c.java" />
-				<include name="polyglot/qq/qq_ppg.cup" />
-                                <include name="polyglot/ext/jl5/parse/Grm.java" />
-                                <include name="polyglot/ext/jl5/parse/jl5_ppg.cup" />
-                                <include name="polyglot/ext/jl5/parse/sym.java" />
-                                <include name="polyglot/ext/jl5/parse/Lexer_c.java" />
-				<include name="polyglot/ext/jl5/qq/Grm.java" />
-				<include name="polyglot/ext/jl5/qq/sym.java" />
-				<include name="polyglot/ext/jl5/qq/Lexer_c.java" />
-				<include name="polyglot/ext/jl5/qq/qq_ppg.cup" />
-                                <include name="polyglot/ext/jl7/parse/Grm.java" />
-                                <include name="polyglot/ext/jl7/parse/jl7_ppg.cup" />
-                                <include name="polyglot/ext/jl7/parse/sym.java" />
-                                <include name="polyglot/ext/jl7/parse/Lexer_c.java" />
-			</fileset>
-		</delete>
-		<delete>
-			<fileset dir="${pth.src}">
-				<include name="polyglot/pth/Grm.java" />
-				<include name="polyglot/pth/sym.java" />
-				<include name="polyglot/pth/Lexer_c.java" />
-			</fileset>
-		</delete>
-		<delete>
-			<fileset dir="${ppg.src}">
-				<include name="ppg/parse/Parser.java" />
-				<include name="ppg/parse/sym.java" />
-				<include name="ppg/lex/Lexer.java" />
-			</fileset>
-		</delete>
-		<delete>
-			<fileset dir="${cup.src}">
-				<include name="java_cup/Lexer.java" />
-				<include name="java_cup/parser.java" />
-				<include name="java_cup/sym.java" />
-			</fileset>
-		</delete>
-	</target>
-
-	<!-- compile the base compiler except for the quasiquoter and generated parser -->
-	<target name="compile-base" depends="init,base-parser">
-        <javac source="1.7" target="1.7" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/jl5/**,polyglot/ext/jl7/**,polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java"
-               includeantruntime="false">
-            <classpath refid="standard.classpath" />
-        </javac>
-		<!-- Compile the JL5 code -->
-        <javac source="1.7" target="1.7" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java"
-               includeantruntime="false">
-            <classpath refid="standard.classpath" />
-        </javac>
-		<!-- Compile the JL7 code -->
-        <javac source="1.7" target="1.7" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl7/**" excludes="polyglot/ext/jl7/parse/Lexer_c.java,polyglot/ext/jl7/parse/sym.java,polyglot/ext/jl7/parse/Grm.java"
-               includeantruntime="false">
-            <classpath refid="standard.classpath" />
+    <target name="serialuid" description="Build polyglot.util.SerialVersionUID">
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${src}"
+                destdir="${classes}"
+                debug="on"
+                includes="polyglot/util/SerialVersionUID.java"
+                includeAntRuntime="false">
+            <classpath refid="standard.classpath"/>
         </javac>
     </target>
 
-    	<target name="compile-epl-base" depends="init">
-          <javac source="1.7" target="1.7" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/**,polyglot/qq/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java"
-               includeantruntime="false">
-			<classpath refid="standard.classpath" />
-		</javac>
-	</target>
+    <!-- build the examples -->
+    <target name="examples"
+            depends="pao,coffer,carray,carray_jl5"
+            description="Build the examples"/>
 
-	<target name="cup" depends="init" description="Builds the extended CUP parser generator">
-		<antcall target="jflex-lexer">
-			<param name="lexer.dir" value="${cup.src}/java_cup" />
-			<param name="lexer.class" value="Lexer" />
-			<param name="jflex.file" value="Lexer.jflex" />
-		</antcall>
-		<antcall target="cup-parser-using-jar">
-			<param name="parser.dir" value="${cup.src}/java_cup" />
-			<param name="cup.file" value="parser.cup" />
-			<param name="parser.class" value="parser" />
-			<param name="symbol.class" value="sym" />
-		</antcall>
-		<javac source="1.7" target="1.7" srcdir="${cup.src}" destdir="${cup.classes}" debug="on" includes="java_cup/**"
-               includeantruntime="false">
-			<classpath refid="cup.jar.classpath" />
-		</javac>
+    <target name="pao"
+            depends="install-jars-in-examples"
+            description="Build the pao example">
+        <ant inheritAll="false"
+                antfile="${pao.dir}/build.xml"
+                dir="${pao.dir}"
+                target="compile-all"/>
+        <ant inheritAll="false"
+                antfile="${pao.dir}/build.xml"
+                dir="${pao.dir}"
+                target="jar"/>
+    </target>
 
-		<!-- install a jar file in the polyglot lib directory -->
-		<jar jarfile="${lib}/java_cup.jar" basedir="${cup.classes}" />
-	</target>
+    <target name="coffer"
+            depends="install-jars-in-examples"
+            description="Build the coffer example">
+        <ant inheritAll="false"
+                antfile="${coffer.dir}/build.xml"
+                dir="${coffer.dir}"
+                target="compile-all"/>
+        <ant inheritAll="false"
+                antfile="${coffer.dir}/build.xml"
+                dir="${coffer.dir}"
+                target="jar"/>
+    </target>
 
-	<!-- Build a CUP parser based on parameters supplied to the target.
+    <target name="carray"
+            depends="install-jars-in-examples"
+            description="Build the carray example">
+        <ant inheritAll="false"
+                antfile="${carray.dir}/build.xml"
+                dir="${carray.dir}"
+                target="compile-all"/>
+        <ant inheritAll="false"
+                antfile="${carray.dir}/build.xml"
+                dir="${carray.dir}"
+                target="jar"/>
+    </target>
+
+    <target name="carray_jl5"
+            depends="carray,install-jars-in-examples"
+            description="Build the carray_jl5 example">
+        <copy file="${carray.dir}/lib/carray.jar"
+                todir="${carray_jl5.dir}/lib"/>
+        <ant inheritAll="false"
+                antfile="${carray_jl5.dir}/build.xml"
+                dir="${carray_jl5.dir}"
+                target="compile-all"/>
+        <ant inheritAll="false"
+                antfile="${carray_jl5.dir}/build.xml"
+                dir="${carray_jl5.dir}"
+                target="jar"/>
+    </target>
+
+    <!-- clean the examples -->
+    <target name="clean-examples" description="Clean the examples">
+        <ant inheritAll="false"
+                antfile="${pao.dir}/build.xml"
+                dir="${pao.dir}"
+                target="clean"/>
+        <ant inheritAll="false"
+                antfile="${coffer.dir}/build.xml"
+                dir="${coffer.dir}"
+                target="clean"/>
+        <ant inheritAll="false"
+                antfile="${carray.dir}/build.xml"
+                dir="${carray.dir}"
+                target="clean"/>
+        <ant inheritAll="false"
+                antfile="${carray_jl5.dir}/build.xml"
+                dir="${carray_jl5.dir}"
+                target="clean"/>
+    </target>
+
+    <!-- clobber the examples -->
+    <target name="clobber-examples" description="Clobber the examples">
+        <ant inheritAll="false"
+                antfile="${pao.dir}/build.xml"
+                dir="${pao.dir}"
+                target="clobber"/>
+        <ant inheritAll="false"
+                antfile="${coffer.dir}/build.xml"
+                dir="${coffer.dir}"
+                target="clobber"/>
+        <ant inheritAll="false"
+                antfile="${carray.dir}/build.xml"
+                dir="${carray.dir}"
+                target="clobber"/>
+        <ant inheritAll="false"
+                antfile="${carray_jl5.dir}/build.xml"
+                dir="${carray_jl5.dir}"
+                target="clobber"/>
+        <delete file="${pao.dir}/lib/polyglot.jar"/>
+        <delete file="${coffer.dir}/lib/polyglot.jar"/>
+        <delete file="${covarRet.dir}/lib/polyglot.jar"/>
+        <delete file="${carray.dir}/lib/polyglot.jar"/>
+        <delete file="${carray_jl5.dir}/lib/polyglot.jar"/>
+        <delete file="${pao.dir}/lib/java_cup.jar"/>
+        <delete file="${coffer.dir}/libjava_cup.jar"/>
+        <delete file="${carray.dir}/libjava_cup.jar"/>
+        <delete file="${carray_jl5.dir}/lib"/>
+        <delete file="${pao.dir}/lib/jflex.jar"/>
+        <delete file="${coffer.dir}/lib/jflex.jar"/>
+        <delete file="${carray.dir}/lib/jflex.jar"/>
+        <delete file="${carray_jl5.dir}/lib/jflex.jar"/>
+        <delete file="${pao.dir}/lib/ppg.jar"/>
+        <delete file="${coffer.dir}/lib/ppg.jar"/>
+        <delete file="${carray.dir}/lib/ppg.jar"/>
+        <delete file="${carray_jl5.dir}/lib/ppg.jar"/>
+    </target>
+
+    <!-- jar the examples -->
+    <target name="jar-examples"
+            depends="examples"
+            description="Build pao.jar and coffer.jar">
+        <ant inheritAll="false"
+                antfile="${pao.dir}/build.xml"
+                dir="${pao.dir}"
+                target="jar"/>
+        <ant inheritAll="false"
+                antfile="${coffer.dir}/build.xml"
+                dir="${coffer.dir}"
+                target="jar"/>
+        <ant inheritAll="false"
+                antfile="${carray.dir}/build.xml"
+                dir="${carray.dir}"
+                target="jar"/>
+        <ant inheritAll="false"
+                antfile="${carray_jl5.dir}/build.xml"
+                dir="${carray_jl5.dir}"
+                target="jar"/>
+    </target>
+
+    <target name="clean-all"
+            depends="clean,clean-examples"
+            description="Clean the base compiler and the examples"/>
+    <target name="clobber-all"
+            depends="clobber,clobber-examples"
+            description="Clobber the base compiler and the examples"/>
+
+    <target name="dust" depends="clobber-all">
+        <delete file="${lib}/polyglot.jar"/>
+        <delete file="${lib}/java_cup.jar"/>
+        <delete file="${lib}/ppg.jar"/>
+        <delete file="${lib}/pth.jar"/>
+    </target>
+
+    <target name="clean"
+            description="Cleans up the directory tree: deletes the distribution directory and the classes directories">
+        <!-- Delete the ${classes} and ${dist} directory trees -->
+        <delete dir="${lib}/polyglot.jar"/>
+        <delete dir="${classes}" includeemptydirs="true" failonerror="false"/>
+        <delete dir="${pth.classes}"
+                includeemptydirs="true"
+                failonerror="false"/>
+        <delete dir="${ppg.classes}"
+                includeemptydirs="true"
+                failonerror="false"/>
+        <delete dir="${cup.classes}"
+                includeemptydirs="true"
+                failonerror="false"/>
+        <delete dir="${tmp}"
+                includeemptydirs="true"
+                failonerror="false"/>
+        <antcall target="mkdirs"/>
+    </target>
+
+    <target name="clean-jars" description="Clean up the jars">
+        <delete dir="${lib}/polyglot.jar"/>
+    </target>
+
+    <target name="clobber"
+            depends="clean,clobber-examples"
+            description="Cleans up the directory tree and deletes generated files">
+        <delete>
+            <fileset dir="${src}">
+                <include name="polyglot/parse/Grm.java"/>
+                <include name="polyglot/parse/sym.java"/>
+                <include name="polyglot/parse/Lexer_c.java"/>
+                <include name="polyglot/qq/Grm.java"/>
+                <include name="polyglot/qq/sym.java"/>
+                <include name="polyglot/qq/Lexer_c.java"/>
+                <include name="polyglot/qq/qq_ppg.cup"/>
+                <include name="polyglot/ext/jl5/parse/Grm.java"/>
+                <include name="polyglot/ext/jl5/parse/jl5_ppg.cup"/>
+                <include name="polyglot/ext/jl5/parse/sym.java"/>
+                <include name="polyglot/ext/jl5/parse/Lexer_c.java"/>
+                <include name="polyglot/ext/jl5/qq/Grm.java"/>
+                <include name="polyglot/ext/jl5/qq/sym.java"/>
+                <include name="polyglot/ext/jl5/qq/Lexer_c.java"/>
+                <include name="polyglot/ext/jl5/qq/qq_ppg.cup"/>
+                <include name="polyglot/ext/jl7/parse/Grm.java"/>
+                <include name="polyglot/ext/jl7/parse/jl7_ppg.cup"/>
+                <include name="polyglot/ext/jl7/parse/sym.java"/>
+                <include name="polyglot/ext/jl7/parse/Lexer_c.java"/>
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${pth.src}">
+                <include name="polyglot/pth/Grm.java"/>
+                <include name="polyglot/pth/sym.java"/>
+                <include name="polyglot/pth/Lexer_c.java"/>
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${ppg.src}">
+                <include name="ppg/parse/Parser.java"/>
+                <include name="ppg/parse/sym.java"/>
+                <include name="ppg/lex/Lexer.java"/>
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${cup.src}">
+                <include name="java_cup/Lexer.java"/>
+                <include name="java_cup/parser.java"/>
+                <include name="java_cup/sym.java"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <!-- compile the base compiler except for the quasiquoter and generated parser -->
+    <target name="compile-base" depends="init,base-parser">
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${src}"
+                destdir="${classes}"
+                debug="on"
+                includes="polyglot/**"
+                excludes="polyglot/ext/jl5/**,polyglot/ext/jl7/**,polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
+        <!-- Compile the JL5 code -->
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${src}"
+                destdir="${classes}"
+                debug="on"
+                includes="polyglot/ext/jl5/**"
+                excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
+        <!-- Compile the JL7 code -->
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${src}"
+                destdir="${classes}"
+                debug="on"
+                includes="polyglot/ext/jl7/**"
+                excludes="polyglot/ext/jl7/parse/Lexer_c.java,polyglot/ext/jl7/parse/sym.java,polyglot/ext/jl7/parse/Grm.java"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
+    </target>
+
+    <target name="cup"
+            depends="init"
+            description="Builds the extended CUP parser generator">
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${cup.src}/java_cup"/>
+            <param name="lexer.class" value="Lexer"/>
+            <param name="jflex.file" value="Lexer.jflex"/>
+        </antcall>
+        <antcall target="cup-parser-using-jar">
+            <param name="parser.dir" value="${cup.src}/java_cup"/>
+            <param name="cup.file" value="parser.cup"/>
+            <param name="parser.class" value="parser"/>
+            <param name="symbol.class" value="sym"/>
+        </antcall>
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${cup.src}"
+                destdir="${cup.classes}"
+                debug="on"
+                includes="java_cup/**"
+                includeantruntime="false">
+            <classpath refid="cup.jar.classpath"/>
+        </javac>
+
+        <!-- install a jar file in the polyglot lib directory -->
+        <jar jarfile="${lib}/java_cup.jar" basedir="${cup.classes}"/>
+    </target>
+
+    <!-- Build a CUP parser based on parameters supplied to the target.
        @param parser.dir    The directory, relative to $basedir, in which
                             the CUP file is located.
        @param parser.class  The name to be passed to CUP with -parser.
        @param symbol.class  The name to be passed to CUP with -symbols.
        @param cup.file      The name of the CUP file.
    -->
-	<target name="cup-parser" depends="cup,cup-parser-deps,serialuid" unless="cup-parser.up-to-date">
-		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
-			<classpath refid="standard.classpath" />
-			<arg value="-nopositions" />
-			<arg value="-parser" />
-			<arg value="${parser.class}" />
-			<arg value="-symbols" />
-			<arg value="${symbol.class}" />
-			<arg value="${cup.file}" />
-		</java>
-	</target>
+    <target name="cup-parser"
+            depends="cup,cup-parser-deps,serialuid"
+            unless="cup-parser.up-to-date">
+        <java classname="java_cup.Main"
+                fork="true"
+                dir="${parser.dir}"
+                failonerror="true">
+            <classpath refid="standard.classpath"/>
+            <arg value="-nopositions"/>
+            <arg value="-parser"/>
+            <arg value="${parser.class}"/>
+            <arg value="-symbols"/>
+            <arg value="${symbol.class}"/>
+            <arg value="${cup.file}"/>
+        </java>
+    </target>
 
-	<!-- The following target builds a cup parser using the version of
+    <!-- The following target builds a cup parser using the version of
        cup already sitting in the java_cup.jar file. This is needed to
        bootstrap the build of cup. -->
-	<target name="cup-parser-using-jar" depends="cup-parser-deps,serialuid" unless="cup-parser-using-jar.up-to-date">
-		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
-			<classpath refid="cup.jar.classpath" />
-			<arg value="-nopositions" />
-			<arg value="-parser" />
-			<arg value="${parser.class}" />
-			<arg value="-symbols" />
-			<arg value="${symbol.class}" />
-			<arg value="${cup.file}" />
-		</java>
-		<!-- Hack to suppress warnings in parser. -->
-		<replaceregexp
-		  file="${parser.dir}/${parser.class}.java"
-		  match="^(public )?class"
-		  replace="@SuppressWarnings(&quot;all&quot;)${line.separator}\1class"
-		  flags="g"
-		  byline="true"
-		/>
-	</target>
+    <target name="cup-parser-using-jar"
+            depends="cup-parser-deps,serialuid"
+            unless="cup-parser-using-jar.up-to-date">
+        <java classname="java_cup.Main"
+                fork="true"
+                dir="${parser.dir}"
+                failonerror="true">
+            <classpath refid="cup.jar.classpath"/>
+            <arg value="-nopositions"/>
+            <arg value="-parser"/>
+            <arg value="${parser.class}"/>
+            <arg value="-symbols"/>
+            <arg value="${symbol.class}"/>
+            <arg value="${cup.file}"/>
+        </java>
+        <!-- Hack to suppress warnings in parser. -->
+        <replaceregexp
+                file="${parser.dir}/${parser.class}.java"
+                match="^(public )?class"
+                replace="@SuppressWarnings(&quot;all&quot;)${line.separator}\1class"
+                flags="g"
+                byline="true"
+        />
+    </target>
 
-	<!-- Set the property cup-parser.up-to-date if the parser is in fact
+    <!-- Set the property cup-parser.up-to-date if the parser is in fact
        up to date.  Called by the cup-parser-using-jar target.
    -->
-	<target name="cup-parser-deps">
-		<dependset>
-			<srcfileset dir="${parser.dir}" includes="${cup.file}" />
-			<targetfileset dir="${parser.dir}">
-				<include name="${parser.class}.java" />
-				<include name="${symbol.class}.java" />
-			</targetfileset>
-		</dependset>
-		<uptodate property="cup-parser.up-to-date">
-			<srcfiles dir="${cup.src}/java_cup" />
-			<srcfiles dir="${parser.dir}" includes="${cup.file}" />
-			<compositemapper>
-				<mergemapper to="${parser.dir}/${parser.class}.java" />
-				<mergemapper to="${parser.dir}/${symbol.class}.java" />
-			</compositemapper>
-		</uptodate>
-		<uptodate property="cup-parser-using-jar.up-to-date">
-			<srcfiles dir="${parser.dir}" includes="${cup.file}" />
-			<compositemapper>
-				<mergemapper to="${parser.dir}/${parser.class}.java" />
-				<mergemapper to="${parser.dir}/${symbol.class}.java" />
-			</compositemapper>
-		</uptodate>
-	</target>
+    <target name="cup-parser-deps">
+        <dependset>
+            <srcfileset dir="${parser.dir}" includes="${cup.file}"/>
+            <targetfileset dir="${parser.dir}">
+                <include name="${parser.class}.java"/>
+                <include name="${symbol.class}.java"/>
+            </targetfileset>
+        </dependset>
+        <uptodate property="cup-parser.up-to-date">
+            <srcfiles dir="${cup.src}/java_cup"/>
+            <srcfiles dir="${parser.dir}" includes="${cup.file}"/>
+            <compositemapper>
+                <mergemapper to="${parser.dir}/${parser.class}.java"/>
+                <mergemapper to="${parser.dir}/${symbol.class}.java"/>
+            </compositemapper>
+        </uptodate>
+        <uptodate property="cup-parser-using-jar.up-to-date">
+            <srcfiles dir="${parser.dir}" includes="${cup.file}"/>
+            <compositemapper>
+                <mergemapper to="${parser.dir}/${parser.class}.java"/>
+                <mergemapper to="${parser.dir}/${symbol.class}.java"/>
+            </compositemapper>
+        </uptodate>
+    </target>
 
-	<!-- Build a PPG parser based on parameters supplied to the target.
+    <!-- Build a PPG parser based on parameters supplied to the target.
            @param parser.dir    The directory, relative to $basedir, in which
                                 the PPG file is located.
            @param ppg.file      The name of the PPG file.
@@ -458,598 +602,555 @@
            @param parser.class  The name to be passed to CUP with -parser.
            @param symbol.class  The name to be passed to CUP with -symbols.
        -->
-	<target name="ppg-parser" depends="ppg-parser.deps,serialuid">
-		<java classname="ppg.PPG" fork="true" failonerror="true" unless:set="ppg-parser.up-to-date">
-			<classpath refid="standard.classpath" />
-			<arg value="${parser.dir}/${ppg.file}" />
-			<arg value="-o" />
-			<arg value="${parser.dir}/${cup.file}" />
-		</java>
-		<antcall target="cup-parser" />
-	</target>
+    <target name="ppg-parser" depends="ppg-parser.deps,serialuid">
+        <java classname="ppg.PPG"
+                fork="true"
+                failonerror="true"
+                unless:set="ppg-parser.up-to-date">
+            <classpath refid="standard.classpath"/>
+            <arg value="${parser.dir}/${ppg.file}"/>
+            <arg value="-o"/>
+            <arg value="${parser.dir}/${cup.file}"/>
+        </java>
+        <antcall target="cup-parser"/>
+    </target>
 
-	<!-- Set the property ppg-parser.up-to-date if the parser is in fact
+    <!-- Set the property ppg-parser.up-to-date if the parser is in fact
            up to date.  Called by the ppg-parser target.
        -->
-	<target name="ppg-parser.deps">
-		<dependset>
-			<srcfileset dir="${parser.dir}">
-				<include name="${ppg.file}" />
-			</srcfileset>
-      <srcfileset file="${base-parser}" />
-			<targetfileset dir="${parser.dir}">
-				<include name="${cup.file}" />
-				<include name="${parser.class}.java" />
-				<include name="${symbol.class}.java" />
-			</targetfileset>
-		</dependset>
-		<uptodate property="ppg-parser.up-to-date">
-			<srcfiles dir="${ppg.src}" />
-			<srcfiles file="${base-parser}" />
-			<srcfiles dir="${parser.dir}" includes="${ppg.file}" />
-			<compositemapper>
-				<mergemapper to="${parser.dir}/${cup.file}" />
-				<mergemapper to="${parser.dir}/${parser.class}.java" />
-				<mergemapper to="${parser.dir}/${symbol.class}.java" />
-			</compositemapper>
-		</uptodate>
-	</target>
+    <target name="ppg-parser.deps">
+        <dependset>
+            <srcfileset dir="${parser.dir}">
+                <include name="${ppg.file}"/>
+            </srcfileset>
+      <srcfileset file="${base-parser}"/>
+            <targetfileset dir="${parser.dir}">
+                <include name="${cup.file}"/>
+                <include name="${parser.class}.java"/>
+                <include name="${symbol.class}.java"/>
+            </targetfileset>
+        </dependset>
+        <uptodate property="ppg-parser.up-to-date">
+            <srcfiles dir="${ppg.src}"/>
+            <srcfiles file="${base-parser}"/>
+            <srcfiles dir="${parser.dir}" includes="${ppg.file}"/>
+            <compositemapper>
+                <mergemapper to="${parser.dir}/${cup.file}"/>
+                <mergemapper to="${parser.dir}/${parser.class}.java"/>
+                <mergemapper to="${parser.dir}/${symbol.class}.java"/>
+            </compositemapper>
+        </uptodate>
+    </target>
 
-	<!-- Build a JFlex lexer based on parameters supplied to the target.
+    <!-- Build a JFlex lexer based on parameters supplied to the target.
        @param lexer.dir     The directory, relative to $basedir, in which
                             the JFlex file is located.
        @param lexer.class   The name of the lexer as declared with %class
                             in the JFlex file.
        @param jflex.file    The name of the JFlex file.
       -->
-	<target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex-lexer.up-to-date">
-		<java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
-			<classpath refid="standard.classpath" />
-			<arg value="--noinputstreamctor" />
-			<arg value="${jflex.file}" />
-		</java>
-	</target>
-
-	<!-- Set the property jflex-lexer.up-to-date if the lexer is in fact
-       up to date.  Called by the jflex.lexer target.
-   -->
-	<target name="jflex-lexer-deps">
-		<dependset>
-			<srcfileset dir="${lexer.dir}" includes="${jflex.file}" />
-			<targetfileset dir="${lexer.dir}" includes="${lexer.class}.java" />
-		</dependset>
-		<available property="jflex-lexer.up-to-date" file="${lexer.dir}/${lexer.class}.java" />
-	</target>
-
-	<target name="base-parser" depends="bin,cup,ppg,init" description="Build the base compiler parser">
-		<!-- generate parser source -->
-		<antcall target="jflex-lexer">
-			<param name="lexer.dir" value="${src}/polyglot/parse" />
-			<param name="lexer.class" value="Lexer_c" />
-			<param name="jflex.file" value="java.flex" />
-		</antcall>
-		<antcall target="cup-parser">
-			<param name="parser.dir" value="${src}/polyglot/parse" />
-			<param name="cup.file" value="java12.cup" />
-			<param name="parser.class" value="Grm" />
-			<param name="symbol.class" value="sym" />
-		</antcall>
-		<copy file="${src}/polyglot/parse/java12.cup" todir="${classes}/polyglot/parse" />
-		<!-- generate QQ parser source -->
-		<antcall target="jflex-lexer">
-			<param name="lexer.dir" value="${src}/polyglot/qq" />
-			<param name="lexer.class" value="Lexer_c" />
-			<param name="jflex.file" value="qq.flex" />
-		</antcall>
-		<antcall target="ppg-parser">
-			<param name="parser.dir" value="${src}/polyglot/qq" />
-			<param name="ppg.file" value="qq.ppg" />
-			<param name="base-parser" value="${src}/polyglot/parse/java12.cup" />
-			<param name="cup.file" value="qq_ppg.cup" />
-			<param name="parser.class" value="Grm" />
-			<param name="symbol.class" value="sym" />
-		</antcall>
-		<javac source="1.7" target="1.7" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/parse/**,polyglot/qq/**"
-               includeantruntime="false">
-			<classpath refid="standard.classpath" />
-		</javac>
-
-		<!-- JL5 compiler parser -->
-        <antcall target="jflex-lexer">
-            <param name="lexer.dir" value="${src}/polyglot/ext/jl5/parse" />
-            <param name="lexer.class" value="Lexer_c" />
-            <param name="jflex.file" value="jl5.flex" />
-        </antcall>
-        <antcall target="ppg-parser">
-            <param name="parser.dir" value="${src}/polyglot/ext/jl5/parse" />
-            <param name="ppg.file" value="jl5.ppg" />
-            <param name="base-parser" value="${src}/polyglot/parse/java12.cup" />
-            <param name="cup.file" value="jl5_ppg.cup" />
-            <param name="parser.class" value="Grm" />
-            <param name="symbol.class" value="sym" />
-        </antcall>
-        <copy file="${src}/polyglot/parse/java12.cup" todir="${classes}/polyglot/ext/jl5/parse" />
-        <copy file="${src}/polyglot/ext/jl5/parse/jl5.ppg" todir="${classes}/polyglot/ext/jl5/parse" />
-        <copy file="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup" todir="${classes}/polyglot/ext/jl5/parse" />		
-        <javac source="1.7" target="1.7" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/parse/**"
-               includeantruntime="false">
-            <classpath refid="standard.classpath" />
-        </javac>
-		<!-- JL5 QQ parser -->
-        <antcall target="ppg-parser">
-            <param name="parser.dir" value="${src}/polyglot/ext/jl5/qq" />
-            <param name="ppg.file" value="qq.ppg" />
-            <param name="base-parser" value="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup" />
-            <param name="cup.file" value="qq_ppg.cup" />
-            <param name="parser.class" value="Grm" />
-            <param name="symbol.class" value="sym" />
-        </antcall>
-        <javac source="1.7" target="1.7" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/qq/**"
-               includeantruntime="false">
-            <classpath refid="standard.classpath" />
-        </javac>
-
-		<!-- JL7 compiler parser -->
-        <antcall target="jflex-lexer">
-            <param name="lexer.dir" value="${src}/polyglot/ext/jl7/parse" />
-            <param name="lexer.class" value="Lexer_c" />
-            <param name="jflex.file" value="jl7.flex" />
-        </antcall>
-        <antcall target="ppg-parser">
-            <param name="parser.dir" value="${src}/polyglot/ext/jl7/parse" />
-            <param name="ppg.file" value="jl7.ppg" />
-            <param name="cup.file" value="jl7_ppg.cup" />
-            <param name="base-parser" value="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup" />
-            <param name="parser.class" value="Grm" />
-            <param name="symbol.class" value="sym" />
-        </antcall>
-        <copy file="${src}/polyglot/parse/java12.cup" todir="${classes}/polyglot/ext/jl7/parse" />
-        <copy file="${src}/polyglot/ext/jl5/parse/jl5.ppg"     todir="${classes}/polyglot/ext/jl7/parse" />
-        <copy file="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup" todir="${classes}/polyglot/ext/jl7/parse" />		
-        <copy file="${src}/polyglot/ext/jl7/parse/jl7.ppg"     todir="${classes}/polyglot/ext/jl7/parse" />
-        <copy file="${src}/polyglot/ext/jl7/parse/jl7_ppg.cup" todir="${classes}/polyglot/ext/jl7/parse" />		
-        <javac source="1.7" target="1.7" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl7/parse/**"
-               includeantruntime="false">
-            <classpath refid="standard.classpath" />
-        </javac>
-
+    <target name="jflex-lexer"
+            depends="jflex-lexer-deps"
+            unless="jflex-lexer.up-to-date">
+        <java classname="jflex.Main"
+                fork="true"
+                dir="${lexer.dir}"
+                failonerror="true">
+            <classpath refid="standard.classpath"/>
+            <arg value="--noinputstreamctor"/>
+            <arg value="${jflex.file}"/>
+        </java>
     </target>
 
-	<target name="jar" description="Build polyglot.jar" depends="jar-base" />
+    <!-- Set the property jflex-lexer.up-to-date if the lexer is in fact
+       up to date.  Called by the jflex.lexer target.
+   -->
+    <target name="jflex-lexer-deps">
+        <dependset>
+            <srcfileset dir="${lexer.dir}" includes="${jflex.file}"/>
+            <targetfileset dir="${lexer.dir}" includes="${lexer.class}.java"/>
+        </dependset>
+        <available property="jflex-lexer.up-to-date"
+                file="${lexer.dir}/${lexer.class}.java"/>
+    </target>
 
-	<target name="jar-base" depends="jl,ppg,configure-buildstring">
-		<delete file="${lib}/polyglot.jar" failonerror="false" />
-		<delete file="${classes}/MANIFEST.MF" failonerror="false" />
+    <target name="base-parser"
+            depends="bin,cup,ppg,init"
+            description="Build the base compiler parser">
+        <!-- generate parser source -->
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${src}/polyglot/parse"/>
+            <param name="lexer.class" value="Lexer_c"/>
+            <param name="jflex.file" value="java.flex"/>
+        </antcall>
+        <antcall target="cup-parser">
+            <param name="parser.dir" value="${src}/polyglot/parse"/>
+            <param name="cup.file" value="java12.cup"/>
+            <param name="parser.class" value="Grm"/>
+            <param name="symbol.class" value="sym"/>
+        </antcall>
+        <copy file="${src}/polyglot/parse/java12.cup"
+                todir="${classes}/polyglot/parse"/>
+        <!-- generate QQ parser source -->
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${src}/polyglot/qq"/>
+            <param name="lexer.class" value="Lexer_c"/>
+            <param name="jflex.file" value="qq.flex"/>
+        </antcall>
+        <antcall target="ppg-parser">
+            <param name="parser.dir" value="${src}/polyglot/qq"/>
+            <param name="ppg.file" value="qq.ppg"/>
+            <param name="base-parser"
+                    value="${src}/polyglot/parse/java12.cup"/>
+            <param name="cup.file" value="qq_ppg.cup"/>
+            <param name="parser.class" value="Grm"/>
+            <param name="symbol.class" value="sym"/>
+        </antcall>
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${src}"
+                destdir="${classes}"
+                debug="on"
+                includes="polyglot/parse/**,polyglot/qq/**"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
 
-		<manifest file="${classes}/MANIFEST.MF">
-			<attribute name="Built-By" value="${user.name}" />
-			<attribute name="Main-Class" value="polyglot.main.Main" />
+        <!-- JL5 compiler parser -->
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${src}/polyglot/ext/jl5/parse"/>
+            <param name="lexer.class" value="Lexer_c"/>
+            <param name="jflex.file" value="jl5.flex"/>
+        </antcall>
+        <antcall target="ppg-parser">
+            <param name="parser.dir" value="${src}/polyglot/ext/jl5/parse"/>
+            <param name="ppg.file" value="jl5.ppg"/>
+            <param name="base-parser" value="${src}/polyglot/parse/java12.cup"/>
+            <param name="cup.file" value="jl5_ppg.cup"/>
+            <param name="parser.class" value="Grm"/>
+            <param name="symbol.class" value="sym"/>
+        </antcall>
+        <copy file="${src}/polyglot/parse/java12.cup"
+                todir="${classes}/polyglot/ext/jl5/parse"/>
+        <copy file="${src}/polyglot/ext/jl5/parse/jl5.ppg"
+                todir="${classes}/polyglot/ext/jl5/parse"/>
+        <copy file="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup"
+                todir="${classes}/polyglot/ext/jl5/parse"/>     
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${src}"
+                destdir="${classes}"
+                debug="on"
+                includes="polyglot/ext/jl5/parse/**"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
+        <!-- JL5 QQ parser -->
+        <antcall target="ppg-parser">
+            <param name="parser.dir" value="${src}/polyglot/ext/jl5/qq"/>
+            <param name="ppg.file" value="qq.ppg"/>
+            <param name="base-parser"
+                    value="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup"/>
+            <param name="cup.file" value="qq_ppg.cup"/>
+            <param name="parser.class" value="Grm"/>
+            <param name="symbol.class" value="sym"/>
+        </antcall>
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${src}"
+                destdir="${classes}"
+                debug="on"
+                includes="polyglot/ext/jl5/qq/**"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
 
-			<attribute name="Implementation-Version" value="${jl.version}" />
-			<attribute name="Built-Date" value="${jl.version.build}" />
-			<attribute name="Class-Path" value="java_cup.jar polyglot.jar ppg.jar" />
-		</manifest>
+        <!-- JL7 compiler parser -->
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${src}/polyglot/ext/jl7/parse"/>
+            <param name="lexer.class" value="Lexer_c"/>
+            <param name="jflex.file" value="jl7.flex"/>
+        </antcall>
+        <antcall target="ppg-parser">
+            <param name="parser.dir" value="${src}/polyglot/ext/jl7/parse"/>
+            <param name="ppg.file" value="jl7.ppg"/>
+            <param name="cup.file" value="jl7_ppg.cup"/>
+            <param name="base-parser"
+                    value="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup"/>
+            <param name="parser.class" value="Grm"/>
+            <param name="symbol.class" value="sym"/>
+        </antcall>
+        <copy file="${src}/polyglot/parse/java12.cup"
+                todir="${classes}/polyglot/ext/jl7/parse"/>
+        <copy file="${src}/polyglot/ext/jl5/parse/jl5.ppg"
+                todir="${classes}/polyglot/ext/jl7/parse"/>
+        <copy file="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup"
+                todir="${classes}/polyglot/ext/jl7/parse"/>     
+        <copy file="${src}/polyglot/ext/jl7/parse/jl7.ppg"
+                todir="${classes}/polyglot/ext/jl7/parse"/>
+        <copy file="${src}/polyglot/ext/jl7/parse/jl7_ppg.cup"
+                todir="${classes}/polyglot/ext/jl7/parse"/>     
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${src}"
+                destdir="${classes}"
+                debug="on"
+                includes="polyglot/ext/jl7/parse/**"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
+    </target>
 
-		<jar destfile="${lib}/polyglot.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**,polyglot/ext/jl5/**,polyglot/ext/jl7/**,polyglot/translate/**,polyglot/filemanager/**" />
+    <target name="jar" description="Build polyglot.jar" depends="jar-base"/>
 
-		<delete file="${classes}/MANIFEST.MF" failonerror="false" />
-	</target>
+    <target name="jar-base" depends="jl,ppg,configure-buildstring">
+        <delete file="${lib}/polyglot.jar" failonerror="false"/>
+        <delete file="${classes}/MANIFEST.MF" failonerror="false"/>
 
-	<target name="eclipse-plugin-jar" depends="bin-epl.jar" description="Build the Eclipse plugin jar"/>
-	
-	<target name="jar-epl-base" depends="bin-epl.jar" description="Build a jar file containing the EPL-licensed base compiler"/>
+        <manifest file="${classes}/MANIFEST.MF">
+            <attribute name="Built-By" value="${user.name}"/>
+            <attribute name="Main-Class" value="polyglot.main.Main"/>
 
-	<target name="javadoc" description="Runs javadoc over the Polyglot source code" depends="jl">
-	 <echo>javadoc starting... ${src}</echo>
-		<javadoc destdir="doc/api" encoding="utf-8">
-			<packageset dir="${src}" defaultexcludes="yes">
-				<include name="polyglot/**" />
-			</packageset>
-			<packageset dir="${ppg.src}" defaultexcludes="yes">
-				<include name="ppg/**" />
-				<exclude name="ppg/*/**" />
-			</packageset>
-			<packageset dir="${pth.src}" defaultexcludes="yes">
-				<include name="polyglot/pth/**" />
-			</packageset>
-			<classpath refid="standard.classpath" />
-		</javadoc>
-	</target>
+            <attribute name="Implementation-Version" value="${jl.version}"/>
+            <attribute name="Built-Date" value="${now}"/>
+            <attribute name="Class-Path"
+                    value="java_cup.jar polyglot.jar ppg.jar"/>
+        </manifest>
 
-	<!-- compile pth (Polyglot Test Harness) -->
-	<target name="compile-pth" depends="compile-base">
-		<antcall target="jflex-lexer">
-			<param name="lexer.dir" value="${pth.src}/polyglot/pth" />
-			<param name="lexer.class" value="Lexer_c" />
-			<param name="jflex.file" value="script.flex" />
-		</antcall>
-		<antcall target="cup-parser">
-			<param name="parser.dir" value="${pth.src}/polyglot/pth" />
-			<param name="parser.class" value="Grm" />
-			<param name="symbol.class" value="sym" />
-			<param name="cup.file" value="script.cup" />
-		</antcall>
-		<javac source="1.7" target="1.7" srcdir="${pth.src}" destdir="${pth.classes}" debug="on" includes="polyglot/**"
-               includeantruntime="false">
-			<classpath refid="standard.classpath" />
-		</javac>
-	</target>
+        <jar destfile="${lib}/polyglot.jar"
+                manifest="${classes}/MANIFEST.MF">
+            <fileset refid="dist-class-files"/>
+        </jar>
 
-	<!-- create jar pth (Polyglot Test Harness) -->
-	<target name="jar-pth" depends="compile-pth" description="Builds pth.jar">
-		<jar jarfile="${lib}/pth.jar" basedir="${pth.classes}" includes="polyglot/pth/**" />
-	</target>
+        <delete file="${classes}/MANIFEST.MF" failonerror="false"/>
+    </target>
 
-	<!-- create pth (Polyglot Test Harness) -->
-	<target name="pth" depends="jar-pth" description="Builds the pth (Polyglot Test Harness) tool" />
+    <target name="javadoc"
+            description="Runs javadoc over the Polyglot source code"
+            depends="jl">
+     <echo>javadoc starting... ${src}</echo>
+        <javadoc destdir="doc/api" encoding="utf-8">
+            <packageset dir="${src}" defaultexcludes="yes">
+                <include name="polyglot/**"/>
+            </packageset>
+            <packageset dir="${ppg.src}" defaultexcludes="yes">
+                <include name="ppg/**"/>
+                <exclude name="ppg/*/**"/>
+            </packageset>
+            <packageset dir="${pth.src}" defaultexcludes="yes">
+                <include name="polyglot/pth/**"/>
+            </packageset>
+            <classpath refid="standard.classpath"/>
+        </javadoc>
+    </target>
 
-	<!-- compile ppg (Polyglot Parser Generator) -->
-	<target name="compile-ppg" description="Build the Polyglot parser generator">
-		<antcall target="jflex-lexer">
-			<param name="lexer.dir" value="${ppg.src}/ppg/lex" />
-			<param name="lexer.class" value="Lexer" />
-			<param name="jflex.file" value="ppg.flex" />
-		</antcall>
-		<antcall target="cup-parser">
-			<param name="parser.dir" value="${ppg.src}/ppg/parse" />
-			<param name="parser.class" value="Parser" />
-			<param name="symbol.class" value="Constant" />
-			<param name="cup.file" value="ppg.cup" />
-		</antcall>
-		<javac source="1.7" target="1.7" srcdir="${ppg.src}" destdir="${ppg.classes}" debug="on" includes="ppg/**"
-               includeantruntime="false">
-			<classpath refid="standard.classpath" />
-		</javac>
-	</target>
+    <!-- compile pth (Polyglot Test Harness) -->
+    <target name="compile-pth" depends="compile-base">
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${pth.src}/polyglot/pth"/>
+            <param name="lexer.class" value="Lexer_c"/>
+            <param name="jflex.file" value="script.flex"/>
+        </antcall>
+        <antcall target="cup-parser">
+            <param name="parser.dir" value="${pth.src}/polyglot/pth"/>
+            <param name="parser.class" value="Grm"/>
+            <param name="symbol.class" value="sym"/>
+            <param name="cup.file" value="script.cup"/>
+        </antcall>
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${pth.src}"
+                destdir="${pth.classes}"
+                debug="on"
+                includes="polyglot/**"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
+    </target>
 
-	<!-- create jar ppg (Polyglot Parser Generator) -->
-	<target name="jar-ppg" depends="compile-ppg" description="Builds ppg.jar">
-		<jar jarfile="${lib}/ppg.jar" basedir="${ppg.classes}" includes="ppg/**" />
-	</target>
+    <!-- create jar pth (Polyglot Test Harness) -->
+    <target name="jar-pth" depends="compile-pth" description="Builds pth.jar">
+        <jar jarfile="${lib}/pth.jar"
+                basedir="${pth.classes}"
+                includes="polyglot/pth/**"/>
+    </target>
 
-	<!-- create ppg (Polyglot Parser Generator) -->
-	<target name="ppg" depends="jar-ppg" description="Builds the ppg (Polyglot Parser Generator) tool" />
+    <!-- create pth (Polyglot Test Harness) -->
+    <target name="pth"
+            depends="jar-pth"
+            description="Builds the pth (Polyglot Test Harness) tool"/>
+
+    <!-- compile ppg (Polyglot Parser Generator) -->
+    <target name="compile-ppg"
+            description="Build the Polyglot parser generator">
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${ppg.src}/ppg/lex"/>
+            <param name="lexer.class" value="Lexer"/>
+            <param name="jflex.file" value="ppg.flex"/>
+        </antcall>
+        <antcall target="cup-parser">
+            <param name="parser.dir" value="${ppg.src}/ppg/parse"/>
+            <param name="parser.class" value="Parser"/>
+            <param name="symbol.class" value="Constant"/>
+            <param name="cup.file" value="ppg.cup"/>
+        </antcall>
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${ppg.src}"
+                destdir="${ppg.classes}"
+                debug="on"
+                includes="ppg/**"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
+    </target>
+
+    <!-- create jar ppg (Polyglot Parser Generator) -->
+    <target name="jar-ppg" depends="compile-ppg" description="Builds ppg.jar">
+        <jar jarfile="${lib}/ppg.jar"
+                basedir="${ppg.classes}"
+                includes="ppg/**"/>
+    </target>
+
+    <!-- create ppg (Polyglot Parser Generator) -->
+    <target name="ppg"
+            depends="jar-ppg"
+            description="Builds the ppg (Polyglot Parser Generator) tool"/>
 
 
-	<!-- Distribution targets -->
+    <!-- Distribution targets -->
 
-	<!-- do a cvs checkout into a tmp directory and run ant task there -->
-	<target name="sub-ant-cvs">
-		<ant inheritAll="false" antfile="${tmp}/polyglot/build.xml" dir="${tmp}/polyglot" target="${sub-ant.target}" />
-	</target>
+    <!-- assume the tmp directory has a git clone and run ant task there -->
+    <target name="sub-ant-git">
+        <ant inheritAll="false"
+                antfile="${tmp}/polyglot/build.xml"
+                dir="${tmp}/polyglot"
+                target="${sub-ant.target}"/>
+    </target>
 
-	<target name="source-tarball-stable" depends="configure-buildstring" description="generate a source tarball from CVS">
-		<antcall target="git-checkout" />
-		<antcall target="sub-ant-cvs">
-			<param name="sub-ant.target" value="gen-version" />
-		</antcall>
-		<antcall target="sub-ant-cvs">
-			<param name="sub-ant.target" value="javadoc" />
-		</antcall>
-		<antcall target="sub-ant-cvs">
-			<param name="sub-ant.target" value="src.zip" />
-		</antcall>
-                <move tofile="${basedir}/polyglot-${jl.version}-src.zip" file="${tmp}/polyglot/polyglot-${jl.version}-src.zip" />
-		<antcall target="rmdir-tmp" />
-	</target>
+    <target name="source-tarball-stable"
+            depends="configure-buildstring"
+            description="generate a source tarball from Git">
+        <antcall target="git-checkout"/>
+        <antcall target="sub-ant-git">
+            <param name="sub-ant.target" value="gen-version"/>
+        </antcall>
+        <antcall target="sub-ant-git">
+            <param name="sub-ant.target" value="javadoc"/>
+        </antcall>
+        <antcall target="sub-ant-git">
+            <param name="sub-ant.target" value="src.zip"/>
+        </antcall>
+        <move tofile="${basedir}/polyglot-${jl.version}-src.zip"
+                file="${tmp}/polyglot/polyglot-${jl.version}-src.zip"/>
+        <antcall target="rmdir-tmp"/>
+    </target>
 
-	<target name="binary-jar-epl-stable" depends="configure-buildstring" description="generate an EPL jar file from CVS">
-		<antcall target="git-checkout" />
-		<antcall target="sub-ant-cvs">
-			<param name="sub-ant.target" value="gen-version" />
-		</antcall>
-		<antcall target="sub-ant-cvs">
-			<param name="sub-ant.target" value="bin-epl.jar" />
-		</antcall>
-                <move tofile="${basedir}/polyglot_${jl.version}.jar" file="${tmp}/polyglot/lib/polyglot-epl.jar" />
-		<antcall target="rmdir-tmp" />
-	</target>
+    <!-- make the LGPL source distribution and install into dist -->
+    <target name="src.zip" depends="configure-buildstring,src-dist-tmp">
+        <antcall target="rmdir">
+            <param name="dir" value="${basedir}/polyglot-${jl.version}-src"/>
+        </antcall>
+        <!-- <ant inheritall="false" antfile="${tmp}/build.xml" target="javadoc"/> -->
+        <move tofile="${basedir}/polyglot-${jl.version}-src" file="${tmp}"/>
+        <zip destfile="${basedir}/polyglot-${jl.version}-src.zip"
+                basedir="${basedir}"
+                includes="polyglot-${jl.version}-src/**"/>
+    </target>
 
-	<target name="source-jar-epl-stable" depends="configure-buildstring" description="generate an EPL source jar file from CVS" >
-		<antcall target="git-checkout" />
-		<antcall target="sub-ant-cvs">
-			<param name="sub-ant.target" value="gen-version" />
-		</antcall>
-		<antcall target="sub-ant-cvs">
-			<param name="sub-ant.target" value="src-epl.jar" />
-		</antcall>
-		<move tofile="${basedir}/polyglot_src_${jl.version}.jar" file="${tmp}/polyglot/polygot_src_latest.jar" />
-		<antcall target="rmdir-tmp" />
-	</target>
+    <!-- make the LGPL source distribution in a tmp directory -->
+    <target name="src-dist-tmp"
+            depends="jar-base,jar-pth,jar-ppg,javadoc,mkdir-tmp">
+        <copy todir="${tmp}/src" includeemptydirs="false">
+            <fileset refid="dist-src-files"/>
+        </copy>
 
-	<!-- make the LGPL source distribution and install into dist -->
-	<target name="src-epl.jar" depends="compile-epl-base">
-          <jar destfile="${lib}/polyglot-epl-src.jar" basedir="${basedir}" includes="src/**/*.java" excludes="src/polyglot/qq/**,src/polyglot/ext/**,src/polyglot/parse/BaseParser.java,src/polyglot/parse/sym.java,src/polyglot/parse/Grm.java,src/polyglot/parse/Lexer_c.java,src/polyglot/frontend/JLExtensionInfo.java,src/polyglot/lex/EscapedUnicodeReader.java" />
-	</target>
+        <copy todir="${tmp}/skel" includeEmptyDirs="false">
+            <fileset dir="${basedir}/skel"/>
+        </copy>
 
-	<!-- make the LGPL source distribution and install into dist -->
-	<target name="src-epl.zip" depends="compile-epl-base">
-          <zip destfile="${basedir}/src.zip" basedir="${basedir}" includes="src/**/*.java" excludes="src/polyglot/qq/**,src/polyglot/ext/**,src/polyglot/parse/BaseParser.java,src/polyglot/parse/sym.java,src/polyglot/parse/Grm.java,src/polyglot/parse/Lexer_c.java,src/polyglot/frontend/JLExtensionInfo.java,src/polyglot/lex/EscapedUnicodeReader.java" />
-	</target>
+        <copy todir="${tmp}/tools" includeEmptyDirs="false">
+            <fileset dir="${basedir}/tools"
+                    includes="pth/**,ppg/**,java_cup/**"
+                    excludes="**/classes,**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results"/>
+        </copy>
+        <copy todir="${tmp}/eclipse" includeEmptyDirs="false">
+            <fileset dir="${basedir}/eclipse" includes="*.in"/>
+        </copy>
 
-	<!-- make the LGPL source distribution and install into dist -->
-	<target name="src.zip" depends="configure-buildstring,src-dist-tmp">
-		<antcall target="rmdir">
-			<param name="dir" value="${basedir}/polyglot-${jl.version}-src" />
-		</antcall>
-		<!-- <ant inheritall="false" antfile="${tmp}/build.xml" target="javadoc"/> -->
-		<move tofile="${basedir}/polyglot-${jl.version}-src" file="${tmp}" />
-                <zip destfile="${basedir}/polyglot-${jl.version}-src.zip" basedir="${basedir}" includes="polyglot-${jl.version}-src/**" />
-	</target>
+        <copy todir="${tmp}/doc/api" includeEmptyDirs="false">
+            <fileset dir="${basedir}/doc/api"/>
+        </copy>
 
-	<target name="src-epl.tar" depends="configure-buildstring,src-dist-epl-tmp">
-		<antcall target="rmdir">
-			<param name="dir" value="${basedir}/polyglot-${jl.version}-epl-src" />
-		</antcall>
-		<move tofile="${basedir}/polyglot-${jl.version}-epl-src" file="${tmp}" />
-                <tar destfile="${basedir}/polyglot-${jl.version}-epl-src.tar.gz" basedir="${basedir}" includes="polyglot-${jl.version}-epl-src/**" compression="gzip" />
-	</target>
+        <copy todir="${tmp}/tests" includeEmptyDirs="false">
+            <fileset dir="tests"
+                    includes="java-src/*.java,**/*.*,pthScript"
+                    excludes="**/pthOutput*/**,*.java,**/*.results,out/**,**/*.class"/>
+        </copy>
 
-	<!-- make the LGPL source distribution in a tmp directory -->
-	<target name="src-dist-tmp" depends="jar-base,jar-pth,jar-ppg,javadoc,mkdir-tmp">
-		<copy todir="${tmp}/src" includeemptydirs="false">
-			<fileset dir="${src}" includes="polyglot/**/*.java,polyglot/qq/qq.ppg,polyglot/qq/qq.flex,polyglot/qq/qq_ppg.cup,polyglot/parse/java12.cup,polyglot/parse/java.flex,polyglot/**/package.html,polyglot/ext/jl5/parse/jl5_ppg.cup,polyglot/ext/jl5/parse/jl5.flex,polyglot/ext/jl5/parse/jl5.ppg,polyglot/ext/jl7/parse/jl?_ppg.cup,polyglot/ext/jl7/parse/jl7.flex,polyglot/ext/jl7/parse/jl?.ppg" />
-		</copy>
+        <copy todir="${tmp}/testsjl5" includeEmptyDirs="false">
+            <fileset dir="testsjl5"
+                    includes="java-src/*.java,**/*.*,pthScript"
+                    excludes="**/pthOutput*/**,*.java,**/*.results,out/**,**/*.class"/>
+        </copy>
+        <copy todir="${tmp}/testsjl7" includeEmptyDirs="false">
+            <fileset dir="testsjl7"
+                    includes="java-src/*.java,**/*.*,pthScript"
+                    excludes="**/pthOutput*/**,*.java,**/*.results,out/**,**/*.class"/>
+        </copy>
+        <mkdir dir="${tmp}/testsjl7/java-out"/>
 
-		<copy todir="${tmp}/skel" includeEmptyDirs="false">
-			<fileset dir="${basedir}/skel" />
-		</copy>
+        <copy todir="${tmp}/examples" includeEmptyDirs="true">
+            <fileset dir="${examples.dir}"
+                    includes="pao/**,coffer/**,covarRet/**,carray/**,carray_jl5/**"/>
+        </copy>
 
-		<copy todir="${tmp}/tools" includeEmptyDirs="false">
-			<fileset dir="${basedir}/tools" includes="pth/**,ppg/**,java_cup/**" excludes="**/classes,**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results" />
-		</copy>
-		<copy todir="${tmp}/eclipse" includeEmptyDirs="false">
-			<fileset dir="${basedir}/eclipse" includes="*.in" />
-		</copy>
+        <copy file="META-INF/MANIFEST.MF" todir="${tmp}/META-INF"/>
+        <copy file="${bin}/newext.sh" todir="${tmp}/bin"/>
+        <copy file="${bin}/jlc" todir="${tmp}/bin"/>
+        <copy file="${bin}/jl5c" todir="${tmp}/bin"/>
+        <copy file="${bin}/jl7c" todir="${tmp}/bin"/>
+        <copy file="${bin}/pth" todir="${tmp}/bin"/>
+        <mkdir dir="${tmp}/doc/release-notes-2.0"/>
+        <copy todir="${tmp}/doc/release-notes-2.0">
+            <fileset dir="doc/release-notes-2.0"/>
+        </copy>
+        <mkdir dir="${tmp}/doc/release-notes-2.5"/>
+        <copy todir="${tmp}/doc/release-notes-2.5">
+            <fileset dir="doc/release-notes-2.5"/>
+        </copy>
+        <mkdir dir="${tmp}/doc/release-notes-2.6"/>
+        <copy todir="${tmp}/doc/release-notes-2.6">
+            <fileset dir="doc/release-notes-2.6"/>
+        </copy>
+        <mkdir dir="${tmp}/doc/release-notes-2.7"/>
+        <copy todir="${tmp}/doc/release-notes-2.7">
+            <fileset dir="doc/release-notes-2.7"/>
+        </copy>
+        <copy file="doc/Overview.txt" todir="${tmp}/doc"/>
+        <copy file="doc/Overview.html" todir="${tmp}/doc"/>
+        <copy file="doc/overview.css" todir="${tmp}/doc"/>
+        <copy file="doc/ppg.html" todir="${tmp}/doc"/>
+        <copy file="${lib}/polyglot.jar" todir="${tmp}/lib"/>
+        <copy file="${lib}/pth.jar" todir="${tmp}/lib"/>
+        <copy file="${lib}/ppg.jar" todir="${tmp}/lib"/>
+        <copy file="${lib}/java_cup.jar" todir="${tmp}/lib"/>
+        <copy file="${lib}/jflex.jar" todir="${tmp}/lib"/>
+        <copy file="build.xml" todir="${tmp}"/>
+        <copy file="build.properties" todir="${tmp}"/>
+        <copy file="README" todir="${tmp}"/>
+        <copy file="CHANGES" todir="${tmp}"/>
+        <copy file="LICENSE" todir="${tmp}"/>
+        <copy file="LICENSE.LGPL" todir="${tmp}"/>
+        <copy file="LICENSE.Eclipse" todir="${tmp}"/>
 
-		<copy todir="${tmp}/doc/api" includeEmptyDirs="false">
-                    <fileset dir="${basedir}/doc/api" />
-		</copy>
+        <!-- these don't seem to work on Windows -->
+        <chmod perm="ug=rw,o="
+                dir="${tmp}"
+                excludes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c,${bin}/pth"
+                verbose="true"
+                maxparallel="100"/>
+        <chmod perm="ug=rwx,o="
+                dir="${tmp}"
+                includes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c,${bin}/pth"/>
+    </target>
 
-		<copy todir="${tmp}/tests" includeEmptyDirs="false">
-                    <fileset dir="tests" includes="java-src/*.java,**/*.*,pthScript" excludes="**/pthOutput*/**,*.java,**/*.results,out/**,**/*.class" />
-		</copy>
+    <target name="mkdir-tmp">
+        <antcall target="rmdir-tmp"/>
+        <mkdir dir="${tmp}"/>
+    </target>
 
-		<copy todir="${tmp}/testsjl5" includeEmptyDirs="false">
-                    <fileset dir="testsjl5" includes="java-src/*.java,**/*.*,pthScript" excludes="**/pthOutput*/**,*.java,**/*.results,out/**,**/*.class" />
-		</copy>
-		<copy todir="${tmp}/testsjl7" includeEmptyDirs="false">
-                    <fileset dir="testsjl7" includes="java-src/*.java,**/*.*,pthScript" excludes="**/pthOutput*/**,*.java,**/*.results,out/**,**/*.class" />
-		</copy>
-		<mkdir dir="${tmp}/testsjl7/java-out" />
+    <target name="rmdir">
+        <delete failonerror="false" includeemptydirs="true" dir="${dir}"/>
+    </target>
 
-		<copy todir="${tmp}/examples" includeEmptyDirs="true">
-                    <fileset dir="${examples.dir}" includes="pao/**,coffer/**,covarRet/**,carray/**,carray_jl5/**" />
-		</copy>
+    <target name="rmdir-tmp">
+        <antcall target="rmdir">
+            <param name="dir" value="${tmp}"/>
+        </antcall>
+    </target>
 
-                <copy file="META-INF/MANIFEST.MF" todir="${tmp}/META-INF" />
-                <copy file="${bin}/newext.sh" todir="${tmp}/bin" />
-                <copy file="${bin}/jlc" todir="${tmp}/bin" />
-                <copy file="${bin}/jl5c" todir="${tmp}/bin" />
-                <copy file="${bin}/jl7c" todir="${tmp}/bin" />
-		<copy file="${bin}/pth" todir="${tmp}/bin" />
-                <!--
-		<copy file="doc/Upgrade.txt" todir="${tmp}/doc" />
-		<copy file="doc/DATAFLOW_2_0.txt" todir="${tmp}/doc" />
-                -->
-		<mkdir dir="${tmp}/doc/release-notes-2.0" />
-		<copy todir="${tmp}/doc/release-notes-2.0">
-                    <fileset dir="doc/release-notes-2.0" />
-                </copy>
-		<mkdir dir="${tmp}/doc/release-notes-2.5" />
-		<copy todir="${tmp}/doc/release-notes-2.5">
-                    <fileset dir="doc/release-notes-2.5" />
-                </copy>
-		<mkdir dir="${tmp}/doc/release-notes-2.6" />
-		<copy todir="${tmp}/doc/release-notes-2.6">
-                    <fileset dir="doc/release-notes-2.6" />
-                </copy>
-		<mkdir dir="${tmp}/doc/release-notes-2.7" />
-		<copy todir="${tmp}/doc/release-notes-2.7">
-                    <fileset dir="doc/release-notes-2.7" />
-                </copy>
-		<copy file="doc/Overview.txt" todir="${tmp}/doc" />
-		<copy file="doc/Overview.html" todir="${tmp}/doc" />
-		<copy file="doc/overview.css" todir="${tmp}/doc" />
-		<copy file="doc/ppg.html" todir="${tmp}/doc" />
-		<copy file="${lib}/polyglot.jar" todir="${tmp}/lib" />
-		<copy file="${lib}/pth.jar" todir="${tmp}/lib" />
-		<copy file="${lib}/ppg.jar" todir="${tmp}/lib" />
-		<copy file="${lib}/java_cup.jar" todir="${tmp}/lib" />
-		<copy file="${lib}/jflex.jar" todir="${tmp}/lib" />
-		<copy file="build.xml" todir="${tmp}" />
-		<copy file="build.properties" todir="${tmp}" />
-		<copy file="README" todir="${tmp}" />
-		<copy file="CHANGES" todir="${tmp}" />
-		<copy file="LICENSE" todir="${tmp}" />
-		<copy file="LICENSE.LGPL" todir="${tmp}" />
-		<copy file="LICENSE.Eclipse" todir="${tmp}" />
+    <target name="git-checkout" depends="mkdir-tmp">
+        <echo message="checking out repository"/>
+        <exec executable="git" dir="${tmp}">
+            <arg value="clone"/>
+            <arg value="${gitrepo}"/>
+        </exec>
+    </target>
 
-		<!-- these don't seem to work on Windows -->
-		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c,${bin}/pth" verbose="true" maxparallel="100" />
-		<chmod perm="ug=rwx,o=" dir="${tmp}" includes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c,${bin}/pth" />
-	</target>
+    <target name="dist-checklist">
+        <echo>Checklist:</echo>
+        <echo>Builds and runs</echo>
+        <echo>Examples build and run</echo>
+        <echo>Regression tests successful</echo>
+        <echo>CHANGES file up-to-date</echo>
+        <echo>Version bump (also check README)</echo>
+    </target>
 
-	<!-- make the EPL source distribution in a tmp directory -->
-	<target name="src-dist-epl-tmp" depends="jar-epl-base,mkdir-tmp">
-		<copy todir="${tmp}/src" includeemptydirs="false">
-                  <fileset dir="${src}" includes="polyglot/**/*.java,polyglot/**/package.html" excludes="polyglot/qq/**,polyglot/ext/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java" />
-		</copy>
+    <target name="dist" depends="source-tarball-stable,dist-checklist"/>
 
-		<copy file="${bin}/jlc" todir="${tmp}/bin" />
-		<copy file="${bin}/jl5c" todir="${tmp}/bin" />
-		<copy file="${bin}/jl7c" todir="${tmp}/bin" />
-		<copy file="doc/Overview.txt" todir="${tmp}/doc" />
-                <!--
-		<copy file="doc/Upgrade.txt" todir="${tmp}/doc" />
-		<copy file="doc/DATAFLOW_2_0.txt" todir="${tmp}/doc" />
-                -->
-		<copy file="${lib}/polyglot-epl.jar" todir="${tmp}/lib" />
-		<copy file="build.xml" todir="${tmp}" />
-		<copy file="build.properties" todir="${tmp}" />
-		<copy file="README" todir="${tmp}" />
-		<copy file="CHANGES" todir="${tmp}" />
-		<copy file="LICENSE.Eclipse" todir="${tmp}" />
+    <target name="gen-version">
+        <antcall target="configure-buildstring"/>
+        <antcall target="gen-version-java"/>
+        <antcall target="gen-version-manifest"/>
+    </target>
 
-		<!-- these don't seem to work on Windows -->
-		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c" verbose="true" maxparallel="100" />
-		<chmod perm="ug=rwx,o=" dir="${tmp}" includes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c" />
-	</target>
+    <target name="bump-version">
+        <antcall target="bump-patch"/>
+    </target>
 
-	<!-- build a combined source and binary jar file -->
-	<target name="bin-epl.jar" depends="compile-epl-base,configure-buildstring,mkdir-tmp">
-		<copy todir="${tmp}">
-            <fileset dir="${basedir}/classes" includes="**/*.class" excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class,polyglot/lex/EscapedUnicodeReader.class" />
-		</copy>
+    <target name="bump-major">
+        <propertyfile file="${basedir}/build.properties">
+            <entry key="version.major"
+                    type="int"
+                    operation="+"
+                    value="1"
+                    pattern="0"/>
+            <entry key="version.minor" type="int" value="0"/>
+            <entry key="version.patch" type="int" value="0"/>
+        </propertyfile>
+        <!-- reread -->
+        <antcall target="configure-buildstring"/>
+        <antcall target="gen-version"/>
+    </target>
 
-		<mkdir dir="${tmp}/META-INF" />
-		<filter token="version" value="${jl.version}" />
-		<copy tofile="${tmp}/META-INF/MANIFEST.MF" filtering="true">
-			<fileset file="${basedir}/META-INF/MANIFEST.MF.in" />
-		</copy>
+    <target name="bump-minor">
+        <propertyfile file="${basedir}/build.properties">
+            <entry key="version.minor"
+                    type="int"
+                    operation="+"
+                    value="1"
+                    pattern="0"/>
+            <entry key="version.patch" type="int" value="0"/>
+        </propertyfile>
+        <!-- reread -->
+        <antcall target="configure-buildstring"/>
+        <antcall target="gen-version"/>
+    </target>
 
-		<manifest file="${tmp}/MANIFEST.MF" mode="update">
-			<attribute name="Built-By" value="${user.name}" />
-			<attribute name="Implementation-Version" value="${jl.version}" />
-			<attribute name="Built-Date" value="${jl.version.build}" />
-		</manifest>
+    <target name="bump-patch">
+        <propertyfile file="${basedir}/build.properties">
+            <entry key="version.patch"
+                    type="int"
+                    operation="+"
+                    value="1"
+                    pattern="0"/>
+        </propertyfile>
+        <!-- reread -->
+        <antcall target="configure-buildstring"/>
+        <antcall target="gen-version"/>
+    </target>
 
-		<copy todir="${tmp}/src">
-			<fileset dir="${basedir}/src" includes="**/*.java" excludes="polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java" />
-		</copy>
+    <target name="gen-version-manifest" depends="configure-buildstring">
+        <filter token="version" value="${jl.version}"/>
+        <delete file="META-INF/MANIFEST.MF"/>
+        <copy tofile="META-INF/MANIFEST.MF" filtering="true">
+            <fileset file="${basedir}/META-INF/MANIFEST.MF.in"/>
+        </copy>
+    </target>
 
-		<jar destfile="${lib}/polyglot-epl.jar" basedir="${tmp}" manifest="${tmp}/META-INF/MANIFEST.MF" includes="src/**,polyglot/**" />
-
-		<antcall target="rmdir-tmp" />
-	</target>
-
-	<!-- make the Eclipse update distribution and install into dist -->
-	<target name="eclipse-update-dist" depends="mkdir-tmp" description="Build the files to put on the eclipse update site">
-                <delete dir="${basedir}/eclipseUpdates" failonerror="false" includeemptydirs="true"/>
-		<mkdir dir="${basedir}/eclipseUpdates" />
-		<antcall target="build-features" />
-		<antcall target="build-site" />
-		<antcall target="build-plugin" />
-	</target>
-
-	<target name="build-site" depends="configure-buildstring">
-		<filter token="version" value="${jl.version}" />
-                <delete file="${basedir}/eclipseUpdates/site.xml" failonerror="false"/>
-		<copy tofile="${basedir}/eclipseUpdates/site.xml" file="${basedir}/eclipse/site.xml.in" filtering="true" />
-	</target>
-
-	<target name="build-plugin" depends="configure-buildstring">
-		<mkdir dir="${basedir}/eclipseUpdates/plugins" />
-		<antcall target="bin-epl.jar" />
-		<copy tofile="${basedir}/eclipseUpdates/plugins/polyglot_${jl.version}.jar" file="${lib}/polyglot-epl.jar" />
-	</target>
-
-	<target name="build-features" depends="configure-buildstring">
-		<filter token="version" value="${jl.version}" />
-                <echo>version = ${jl.version}</echo>
-		<copy tofile="${basedir}/eclipseUpdates/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true" />
-                <antcall target="mkdir-tmp"/>
-                <copy tofile="${basedir}/eclipseUpdates/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true" />
-                <copy tofile="${tmp}/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true" />
-		<mkdir dir="${basedir}/eclipseUpdates/features" />
-		<jar destfile="${basedir}/eclipseUpdates/features/polyglot_${jl.version}.jar" basedir="${tmp}" includes="feature.xml" />
-                <antcall target="rmdir-tmp"/>
-	</target>
-
-	<target name="mkdir-tmp">
-		<antcall target="rmdir-tmp" />
-		<mkdir dir="${tmp}" />
-	</target>
-
-	<target name="rmdir">
-		<delete failonerror="false" includeemptydirs="true" dir="${dir}" />
-	</target>
-
-	<target name="rmdir-tmp">
-		<antcall target="rmdir">
-		    <param name="dir" value="${tmp}" />
-		</antcall>
-	</target>
-
-	<target name="git-checkout" depends="mkdir-tmp">
-	    <echo message="checking out repository" />
-	    <exec executable="git" dir="${tmp}">
-		<arg value="clone" />
-		<arg value="${gitrepo}" />
-	    </exec>
-	</target>
-<!--
-	<target name="cvs-checkout" depends="mkdir-tmp">
-		<cvs command="checkout polyglot" quiet="true" cvsRsh="ssh" cvsRoot="${cvs.root}" dest="${tmp}" failonerror="true" />
-	</target>
-
-	<target name="cvs-tag" depends="configure-buildstring">
-		<cvs command="checkout rtag -F -rRELEASE_${jl.version.major}_${jl.version.minor}_${jl.version.patch} polyglot" cvsRoot="${cvs.root}" failonerror="true" />
-	</target>
-
--->
-
-	<target name="dist-checklist">
-		<echo>Checklist:</echo>
-		<echo>Builds and runs</echo>
-		<echo>Examples build and run</echo>
-		<echo>Regression tests successful</echo>
-		<echo>CHANGES file up-to-date</echo>
-		<echo>Version bump (also check README)</echo>
-	</target>
-
-	<target name="dist" depends="source-tarball-stable,dist-checklist" />
-
-        <target name="gen-version">
-		<antcall target="configure-buildstring" />
-		<antcall target="gen-version-java" />
-		<antcall target="gen-version-manifest" />
-	</target>
-
-        <target name="bump-version">
-                <antcall target="bump-patch"/>
-        </target>
-
-	<target name="bump-major">
-		<propertyfile file="${basedir}/build.properties">
-			<entry key="version.major" type="int" operation="+" value="1" pattern="0" />
-                        <entry key="version.minor" type="int" value="0"/>
-                        <entry key="version.patch" type="int" value="0"/>
-		</propertyfile>
-		<!-- reread -->
-		<antcall target="configure-buildstring" />
-		<antcall target="gen-version" />
-	</target>
-
-	<target name="bump-minor">
-		<propertyfile file="${basedir}/build.properties">
-			<entry key="version.minor" type="int" operation="+" value="1" pattern="0" />
-                        <entry key="version.patch" type="int" value="0"/>
-		</propertyfile>
-		<!-- reread -->
-		<antcall target="configure-buildstring" />
-		<antcall target="gen-version" />
-	</target>
-
-	<target name="bump-patch">
-		<propertyfile file="${basedir}/build.properties">
-			<entry key="version.patch" type="int" operation="+" value="1" pattern="0" />
-		</propertyfile>
-		<!-- reread -->
-		<antcall target="configure-buildstring" />
-		<antcall target="gen-version" />
-	</target>
-
-	<target name="gen-version-manifest" depends="configure-buildstring">
-		<filter token="version" value="${jl.version}" />
-                <delete file="META-INF/MANIFEST.MF" />
-		<copy tofile="META-INF/MANIFEST.MF" filtering="true">
-			<fileset file="${basedir}/META-INF/MANIFEST.MF.in" />
-		</copy>
-	</target>
-		
-	<target name="gen-version-java" depends="configure-buildstring">
-		<echo file="${basedir}/src/polyglot/frontend/JLVersion.java">/*
+    <target name="gen-version-java" depends="configure-buildstring">
+        <echo file="${basedir}/src/polyglot/frontend/JLVersion.java">/*
  * This file is part of the Polyglot extensible compiler framework.
  *
  * Copyright (c) 2000-2012 Polyglot project group, Cornell University
@@ -1077,5 +1178,8 @@ public class JLVersion extends polyglot.main.Version {
     public String toString() { return "${jl.version.build}"; }
 }
 </echo>
-	</target>
+    </target>
 </project>
+<!--
+vim: ts=4 sw=4 ai et
+-->

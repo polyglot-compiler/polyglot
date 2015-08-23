@@ -4,8 +4,10 @@ Bundle-Name: Polyglot
 Main-Class: polyglot.main.Main
 Bundle-SymbolicName: polyglot
 Bundle-Version: 2.7.0
-Bundle-Localization: plugin
+Bundle-Vendor: Polyglot project group
 Export-Package: polyglot.ast,
+ polyglot.ext.jl5,
+ polyglot.ext.jl7,
  polyglot.frontend,
  polyglot.frontend.goals,
  polyglot.frontend.passes,
@@ -16,4 +18,6 @@ Export-Package: polyglot.ast,
  polyglot.types.reflect,
  polyglot.util,
  polyglot.visit
-Bundle-Vendor: nate@nanocow.com
+Bundle-ClassPath: lib/java_cup.jar,
+ lib/jflex.jar,
+ .
