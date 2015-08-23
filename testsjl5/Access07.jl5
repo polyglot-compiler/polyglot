@@ -1,0 +1,4 @@
+import java.util.Map.Entry; // OK
+
+public class Main {
+}
