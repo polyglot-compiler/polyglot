@@ -59,7 +59,6 @@ import polyglot.types.reflect.Constant;
 import polyglot.types.reflect.Exceptions;
 import polyglot.types.reflect.Field;
 import polyglot.types.reflect.Method;
-import polyglot.util.Position;
 
 /**
  * XXX TODO
@@ -255,24 +254,24 @@ public class JL5ClassFileLazyClassInitializer extends
         return mi;
     }
 
-    @Override
-    protected ClassType quietTypeForName(String name) {
-        JL5ParsedClassType pct;
-        ClassType ct = super.quietTypeForName(name);
-        // If ct is a parameterized type, since we got here from a raw
-        // name we need to create a raw type
-        if (ct instanceof JL5ParsedClassType)
-            pct = (JL5ParsedClassType) ct;
-        else
-        // Only worried about ParsedClassTypes
-        return ct;
-
-        if (!pct.typeVariables().isEmpty()) {
-            return ((JL5TypeSystem) ts).rawClass(pct,
-                                                 Position.compilerGenerated());
-        }
-        return ct;
-    }
+//    @Override
+//    protected ClassType quietTypeForName(String name) {
+//        JL5ParsedClassType pct;
+//        ClassType ct = super.quietTypeForName(name);
+//        // If ct is a parameterized type, since we got here from a raw
+//        // name we need to create a raw type
+//        if (ct instanceof JL5ParsedClassType)
+//            pct = (JL5ParsedClassType) ct;
+//        else
+//        // Only worried about ParsedClassTypes
+//        return ct;
+//
+//        if (!pct.typeVariables().isEmpty()) {
+//            return ((JL5TypeSystem) ts).rawClass(pct,
+//                                                 Position.compilerGenerated());
+//        }
+//        return ct;
+//    }
 
     @Override
     protected ConstructorInstance constructorInstance(Method method_,
