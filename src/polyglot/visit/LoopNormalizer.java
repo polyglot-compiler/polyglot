@@ -27,6 +27,7 @@
 package polyglot.visit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import polyglot.ast.Assign;
@@ -62,12 +63,18 @@ public class LoopNormalizer extends NodeVisitor {
     protected final Job job;
     protected final TypeSystem ts;
     protected final NodeFactory nf;
+    protected final boolean dumbDo;
 
-    public LoopNormalizer(Job job, TypeSystem ts, NodeFactory nf) {
+    public LoopNormalizer(Job job, TypeSystem ts, NodeFactory nf, boolean dumbDo) {
         super(nf.lang());
         this.job = job;
         this.ts = ts;
         this.nf = nf;
+        this.dumbDo = dumbDo;
+    }
+    
+    public LoopNormalizer(Job job, TypeSystem ts, NodeFactory nf) {
+        this(job, ts, nf, true);
     }
 
     @Override
@@ -244,6 +251,11 @@ public class LoopNormalizer extends NodeVisitor {
      * 
      * becomes
      * 
+     * {...}
+     * while (e) {...} // which gets further translated
+     * 
+     * or
+     * 
      * boolean loop = false;
      * while (true) {
      *   if (loop)
@@ -255,24 +267,34 @@ public class LoopNormalizer extends NodeVisitor {
      *   else
      *     break;
      * }
+     * // java compiler is not smart enough to tell that the block 
+     * // is executed at least once, so the loop after translation
+     * // may cause compiler to emit "may not have been initialized"
+     * // error
      */
     protected Stmt translateDo(Do s) {
-        Expr cond = s.cond();
-
-        // new loop
-        While w = createLoop(s);
-        LocalDecl var = createLoopVar(s);
-        If init = createInitIf(var, cond);
-        If branch = createLoopIf(var, s.body());
-        List<Stmt> stmts = new ArrayList<>(2);
-        stmts.add(init);
-        stmts.add(branch);
-        w = w.body(((Block) w.body()).statements(stmts));
-        stmts = new ArrayList<>(2);
-        stmts.add(var);
-        stmts.add(w);
-
-        return createBlock(stmts);
+        if (dumbDo) {
+            While w = nf.While(s.position(), s.cond(), s.body());
+            return createBlock(Arrays.<Stmt> asList(s.body(),
+                                                    translateWhile(w)));
+        } else { 
+            Expr cond = s.cond();
+    
+            // new loop
+            While w = createLoop(s);
+            LocalDecl var = createLoopVar(s);
+            If init = createInitIf(var, cond);
+            If branch = createLoopIf(var, s.body());
+            List<Stmt> stmts = new ArrayList<>(2);
+            stmts.add(init);
+            stmts.add(branch);
+            w = w.body(((Block) w.body()).statements(stmts));
+            stmts = new ArrayList<>(2);
+            stmts.add(var);
+            stmts.add(w);
+    
+            return createBlock(stmts);
+        }
     }
 
     /* for (int i = 0; i < 10; i++) {...}
