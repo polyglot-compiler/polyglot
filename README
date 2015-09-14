@@ -58,13 +58,13 @@ environment.  We recommend that you use JDK 7 or later.  You will
 experience problems with versions of the JDK older than 7.  You must ensure
 that java and javac are in your path, and that the JAVA_HOME environment
 variable is set to the installation directory of the JDK.  Polyglot is compiled
-with the Ant build tool (http://jakarta.apache.org/ant).
+with the Ant build tool (https://ant.apache.org).
 
 Polyglot uses the JFlex scanner generator.  The JFlex jar file is
 included in the Polyglot distribution.  Polyglot is distributed under
 LGPL, but JFlex is distributed under GPL.  See the JFlex web site
 
-        http://www.jflex.de
+        http://jflex.de
 
 for updates and the source code of JFlex.  The output of JFlex
 inherits the copyright of the specification--licensed under
