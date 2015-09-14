@@ -5,9 +5,12 @@ Main-Class: polyglot.main.Main
 Bundle-SymbolicName: polyglot
 Bundle-Version: @version@
 Bundle-Vendor: Polyglot project group
-Export-Package: polyglot.ast,
+Export-Package: java_cup.runtime,
+ polyglot.ast,
  polyglot.ext.jl5,
  polyglot.ext.jl7,
+ polyglot.ext.param.types,
+ polyglot.filemanager,
  polyglot.frontend,
  polyglot.frontend.goals,
  polyglot.frontend.passes,
