@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -78,8 +78,8 @@ public class Context_c implements Context {
     public Context_c(Lang lang, TypeSystem ts) {
         this.lang = lang;
         this.ts = ts;
-        this.outer = null;
-        this.kind = OUTER;
+        outer = null;
+        kind = OUTER;
     }
 
     public boolean isBlock() {
@@ -123,7 +123,7 @@ public class Context_c implements Context {
     }
 
     protected Context_c push() {
-        Context_c v = (Context_c) this.copy();
+        Context_c v = (Context_c) copy();
         v.outer = this;
         v.types = null;
         v.vars = null;
@@ -170,8 +170,8 @@ public class Context_c implements Context {
     /** Return the code def that defines the local variable or type with the given name. */
     @Override
     public CodeInstance definingCodeDef(String name) {
-        if ((isBlock() || isCode())
-                && (findVariableInThisScope(name) != null || findInThisScope(name) != null)) {
+        if ((isBlock() || isCode()) && (findVariableInThisScope(name) != null
+                || findInThisScope(name) != null)) {
             return currentCode();
         }
 
@@ -193,8 +193,8 @@ public class Context_c implements Context {
             return false;
         }
 
-        if ((isBlock() || isCode())
-                && (findVariableInThisScope(name) != null || findInThisScope(name) != null)) {
+        if ((isBlock() || isCode()) && (findVariableInThisScope(name) != null
+                || findInThisScope(name) != null)) {
             return true;
         }
 
@@ -222,21 +222,21 @@ public class Context_c implements Context {
         // Check for any method with the appropriate name.
         // If found, stop the search since it shadows any enclosing
         // classes method of the same name.
-        if (this.currentClass() != null
-                && ts.hasAccessibleMethodNamed(this.currentClass(),
+        if (currentClass() != null
+                && ts.hasAccessibleMethodNamed(currentClass(),
                                                name,
-                                               this.currentClass())) {
+                                               currentClass())) {
             if (Report.should_report(TOPICS, 3))
-                Report.report(3, "find-method " + name + argTypes + " -> "
-                        + this.currentClass());
+                Report.report(3,
+                              "find-method " + name + argTypes + " -> "
+                                      + currentClass());
 
             // Found a class which has a method of the right name.
             // Now need to check if the method is of the correct type.
-            return ts.findMethod(this.currentClass(),
+            return ts.findMethod(currentClass(),
                                  name,
                                  argTypes,
-                                 this.currentClass(),
-                                 false);
+                                 currentClass());
         }
 
         if (outer != null) {
@@ -248,11 +248,11 @@ public class Context_c implements Context {
 
     /**
      * Gets a local of a particular name.
-     * 
+     *
      * @return
      * 		     the local instance
      * @throws SemanticException
-     *           if there is no such local 
+     *           if there is no such local
      */
     @Override
     public LocalInstance findLocal(String name) throws SemanticException {
@@ -266,7 +266,7 @@ public class Context_c implements Context {
 
     /**
      * Gets a local of a particular name.
-     * 
+     *
      * @return the local instance, or null if none exists
      */
     @Override
@@ -310,15 +310,15 @@ public class Context_c implements Context {
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "find-method-scope " + name + " in " + this);
 
-        if (this.currentClass() != null
-                && ts.hasAccessibleMethodNamed(this.currentClass(),
+        if (currentClass() != null
+                && ts.hasAccessibleMethodNamed(currentClass(),
                                                name,
-                                               this.currentClass())) {
+                                               currentClass())) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3,
                               "find-method-scope " + name + " -> "
-                                      + this.currentClass());
-            return this.currentClass();
+                                      + currentClass());
+            return currentClass();
         }
 
         if (outer != null) {
@@ -348,8 +348,8 @@ public class Context_c implements Context {
             return fi;
         }
 
-        throw new NoMemberException(NoMemberException.FIELD, "Field " + name
-                + " not found.");
+        throw new NoMemberException(NoMemberException.FIELD,
+                                    "Field " + name + " not found.");
     }
 
     /**
@@ -559,13 +559,13 @@ public class Context_c implements Context {
         return inCode;
     }
 
-    /** 
+    /**
      * Returns whether the current context is a static context.
      * A statement of expression occurs in a static context if and only if the
      * inner-most method, constructor, instance initializer, static initializer,
-     * field initializer, or explicit constructor statement enclosing the 
-     * statement or expressions is a static method, static initializer, the 
-     * variable initializer of a static variable, or an explicity constructor 
+     * field initializer, or explicit constructor statement enclosing the
+     * statement or expressions is a static method, static initializer, the
+     * variable initializer of a static variable, or an explicity constructor
      * invocation statment. (Java Language Spec, 2nd Edition, 8.1.2)
      */
     @Override
@@ -643,8 +643,8 @@ public class Context_c implements Context {
     }
 
     public ClassType findMethodContainerInThisScope(String name) {
-        if (isClass() && ts.hasMethodNamed(this.currentClass(), name)) {
-            return this.type;
+        if (isClass() && ts.hasMethodNamed(currentClass(), name)) {
+            return type;
         }
         return null;
     }
@@ -656,7 +656,7 @@ public class Context_c implements Context {
         }
         if (vi == null && isClass()) {
             try {
-                return ts.findField(this.type, name, this.type, true);
+                return ts.findField(type, name, type, true);
             }
             catch (SemanticException e) {
                 return null;

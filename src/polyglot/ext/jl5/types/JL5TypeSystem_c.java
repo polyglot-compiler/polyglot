@@ -595,35 +595,31 @@ public class JL5TypeSystem_c extends
     @Override
     protected List<? extends MethodInstance> findAcceptableMethods(
             ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass,
-            boolean fromClient) throws SemanticException {
+            List<? extends Type> argTypes, ClassType currClass) throws SemanticException {
         return findAcceptableMethods(container,
                                      name,
                                      argTypes,
                                      Collections.<ReferenceType> emptyList(),
-                                     currClass,
-                                     fromClient);
+                                     currClass);
     }
 
     protected List<? extends MethodInstance> findAcceptableMethods(
             ReferenceType container, String name,
             List<? extends Type> argTypes,
-            List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-            boolean fromClient) throws SemanticException {
+            List<? extends ReferenceType> actualTypeArgs, ClassType currClass) throws SemanticException {
         return findAcceptableMethods(container,
                                      name,
                                      argTypes,
                                      actualTypeArgs,
                                      currClass,
-                                     null,
-                                     fromClient);
+                                     null);
     }
 
     protected List<? extends MethodInstance> findAcceptableMethods(
             ReferenceType container, String name,
             List<? extends Type> argTypes,
             List<? extends ReferenceType> actualTypeArgs, ClassType currClass,
-            Type expectedReturnType, boolean fromClient)
+            Type expectedReturnType)
             throws SemanticException {
         assert_(container);
         assert_(argTypes);
@@ -705,8 +701,7 @@ public class JL5TypeSystem_c extends
                     if (isMember(mi, container.toReference())
                             && isAccessible(mi,
                                             container,
-                                            currClass,
-                                            fromClient)) {
+                                            currClass)) {
                         if (Report.should_report(Report.types, 3)) {
                             Report.report(3, "->acceptable: " + mi + " in "
                                     + mi.container());
@@ -1801,22 +1796,20 @@ public class JL5TypeSystem_c extends
 
     @Override
     public MethodInstance findMethod(ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass,
-            boolean fromClient) throws SemanticException {
+            List<? extends Type> argTypes, ClassType currClass) throws SemanticException {
         return findMethod(container,
                           name,
                           argTypes,
                           null,
                           currClass,
-                          null,
-                          fromClient);
+                          null);
     }
 
     @Override
     public MethodInstance findMethod(ReferenceType container,
             java.lang.String name, List<? extends Type> argTypes,
             List<? extends ReferenceType> typeArgs, ClassType currClass,
-            Type expectedReturnType, boolean fromClient)
+            Type expectedReturnType)
             throws SemanticException {
 
         assert_(container);
@@ -1828,8 +1821,7 @@ public class JL5TypeSystem_c extends
                                       argTypes,
                                       typeArgs,
                                       currClass,
-                                      expectedReturnType,
-                                      fromClient);
+                                      expectedReturnType);
 
         if (acceptable.size() == 0) {
             throw new NoMemberException(NoMemberException.METHOD,
@@ -2077,7 +2069,7 @@ public class JL5TypeSystem_c extends
                 if (mi instanceof ClassType || flags.isStatic()) return true;
                 // In addition, for expressions of the form E.Id or E.Id(...),
                 // access is permitted iff the type of E is S or a subclass of S.
-                return !fromClient || isSubtype(container, rt);
+                return isSubtype(container, rt);
             }
         }
 

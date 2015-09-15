@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -72,18 +72,19 @@ public class Call_c extends Expr_c implements Call, CallOps {
     protected boolean targetImplicit;
 
 //    @Deprecated
-    public Call_c(Position pos, Receiver target, Id name, List<Expr> arguments) {
+    public Call_c(Position pos, Receiver target, Id name,
+            List<Expr> arguments) {
         this(pos, target, name, arguments, null);
     }
 
     public Call_c(Position pos, Receiver target, Id name, List<Expr> arguments,
             Ext ext) {
         super(pos, ext);
-        assert (name != null && arguments != null); // target may be null
+        assert name != null && arguments != null; // target may be null
         this.target = target;
         this.name = name;
         this.arguments = ListUtil.copy(arguments, true);
-        this.targetImplicit = (target == null);
+        targetImplicit = target == null;
     }
 
     @Override
@@ -93,7 +94,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Receiver target() {
-        return this.target;
+        return target;
     }
 
     @Override
@@ -110,7 +111,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Id id() {
-        return this.name;
+        return name;
     }
 
     @Override
@@ -127,7 +128,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public String name() {
-        return this.name.id();
+        return name.id();
     }
 
     @Override
@@ -142,7 +143,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public MethodInstance methodInstance() {
-        return this.mi;
+        return mi;
     }
 
     @Override
@@ -159,7 +160,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public boolean isTargetImplicit() {
-        return this.targetImplicit;
+        return targetImplicit;
     }
 
     @Override
@@ -176,7 +177,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public List<Expr> arguments() {
-        return this.arguments;
+        return arguments;
     }
 
     @Override
@@ -241,14 +242,13 @@ public class Call_c extends Expr_c implements Call, CallOps {
         // let's find the target, using the context, and
         // set the target appropriately, and then type check
         // the result
-        MethodInstance mi = c.findMethod(this.name.id(), argTypes);
+        MethodInstance mi = c.findMethod(name.id(), argTypes);
 
         Receiver r;
         if (mi.flags().isStatic()) {
             Type container = tc.lang().findContainer(this, ts, mi);
-            r =
-                    nf.CanonicalTypeNode(position().startOf(), container)
-                      .type(container);
+            r = nf.CanonicalTypeNode(position().startOf(), container)
+                  .type(container);
         }
         else {
             // The method is non-static, so we must prepend with "this", but we
@@ -259,10 +259,9 @@ public class Call_c extends Expr_c implements Call, CallOps {
             ClassType scope = c.findMethodScope(name.id());
 
             if (!ts.equals(scope, c.currentClass())) {
-                r =
-                        nf.This(position().startOf(),
-                                nf.CanonicalTypeNode(position().startOf(),
-                                                     scope)).type(scope);
+                r = nf.This(position().startOf(),
+                            nf.CanonicalTypeNode(position().startOf(), scope))
+                      .type(scope);
             }
             else {
                 r = nf.This(position().startOf()).type(scope);
@@ -286,7 +285,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
 
-        List<Type> argTypes = new ArrayList<>(this.arguments.size());
+        List<Type> argTypes = new ArrayList<>(arguments.size());
 
         for (Expr e : arguments) {
             if (!e.type().isCanonical()) {
@@ -295,36 +294,35 @@ public class Call_c extends Expr_c implements Call, CallOps {
             argTypes.add(e.type());
         }
 
-        if (this.target == null) {
+        if (target == null) {
             return tc.lang().typeCheckNullTarget(this, tc, argTypes);
         }
 
-        if (!this.target.type().isCanonical()) {
+        if (!target.type().isCanonical()) {
             return this;
         }
 
         ReferenceType targetType = tc.lang().findTargetType(this);
         MethodInstance mi =
                 ts.findMethod(targetType,
-                              this.name.id(),
+                              name.id(),
                               argTypes,
-                              c.currentClass(),
-                              !(target instanceof Special));
+                              c.currentClass());
 
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.
          */
-        boolean staticContext = (this.target instanceof TypeNode);
+        boolean staticContext = target instanceof TypeNode;
 
         if (staticContext && !mi.flags().isStatic()) {
             throw new SemanticException("Cannot call non-static method "
-                    + this.name.id() + " of " + target.type() + " in static "
+                    + name.id() + " of " + target.type() + " in static "
                     + "context.", this.position());
         }
 
         // If the target is super, but the method is abstract, then complain.
-        if (this.target instanceof Special
-                && ((Special) this.target).kind() == Special.SUPER
+        if (target instanceof Special
+                && ((Special) target).kind() == Special.SUPER
                 && mi.flags().isAbstract()) {
             throw new SemanticException("Cannot call an abstract method "
                     + "of the super class", this.position());
@@ -352,9 +350,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
             }
             else if (target instanceof TypeNode) {
                 throw new SemanticException("Cannot invoke static method \""
-                                                    + name
-                                                    + "\" on non-reference type "
-                                                    + t + ".",
+                        + name + "\" on non-reference type " + t + ".",
                                             target.position());
             }
             throw new SemanticException("Cannot invoke method \"" + name
@@ -368,7 +364,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
             return mi.container();
         }
 
-        Iterator<Expr> i = this.arguments.iterator();
+        Iterator<Expr> i = arguments.iterator();
         Iterator<? extends Type> j = mi.formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
@@ -552,7 +548,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Call(this.position, this.target, this.name, this.arguments);
+        return nf.Call(position, target, name, arguments);
     }
 
 }

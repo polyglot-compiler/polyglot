@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -107,11 +107,10 @@ public class JL5Context_c extends Context_c implements JL5Context {
                         if (nt instanceof Type) {
                             Type t = (Type) nt;
                             try {
-                                vi =
-                                        ts.findField(t.toClass(),
-                                                     name,
-                                                     t.toClass(),
-                                                     true);
+                                vi = ts.findField(t.toClass(),
+                                                  name,
+                                                  t.toClass(),
+                                                  true);
                             }
                             catch (SemanticException e) {
                             }
@@ -127,11 +126,10 @@ public class JL5Context_c extends Context_c implements JL5Context {
                         if (nt instanceof Type) {
                             Type t = (Type) nt;
                             try {
-                                vi =
-                                        ts.findField(t.toClass(),
-                                                     name,
-                                                     t.toClass(),
-                                                     true);
+                                vi = ts.findField(t.toClass(),
+                                                  name,
+                                                  t.toClass(),
+                                                  true);
                             }
                             catch (SemanticException e) {
                             }
@@ -240,23 +238,22 @@ public class JL5Context_c extends Context_c implements JL5Context {
         catch (SemanticException e) {
             // couldn't find the method.
             // try static imports.
-            JL5ImportTable it = (JL5ImportTable) this.importTable();
-            if (it != null && this.currentClass() != null) {
+            JL5ImportTable it = (JL5ImportTable) importTable();
+            if (it != null && currentClass() != null) {
                 for (ReferenceType rt : it.findTypesContainingMethodOrField(name)) {
                     try {
                         return ts.findMethod(rt,
                                              name,
                                              argTypes,
-                                             this.currentClass(),
-                                             false);
+                                             currentClass());
                     }
                     catch (SemanticException f) {
-                        // ignore this exception and 
+                        // ignore this exception and
                         // try the next containing type.
                     }
                 }
             }
-            // couldn't find anything in the static imports.            
+            // couldn't find anything in the static imports.
             // throw the original exception.
             throw e;
         }
@@ -264,12 +261,12 @@ public class JL5Context_c extends Context_c implements JL5Context {
 
     @Override
     public boolean inExtendsClause() {
-        return this.kind == EXTENDS;
+        return kind == EXTENDS;
     }
 
     @Override
     public ClassType extendsClauseDeclaringClass() {
-        return this.declaringClass;
+        return declaringClass;
     }
 
 }

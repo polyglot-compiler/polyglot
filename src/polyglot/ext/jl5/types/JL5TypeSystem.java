@@ -51,10 +51,11 @@ import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
 
-public interface JL5TypeSystem extends
-        ParamTypeSystem<TypeVariable, ReferenceType> {
+public interface JL5TypeSystem
+        extends ParamTypeSystem<TypeVariable, ReferenceType> {
     @Override
-    ParsedClassType createClassType(LazyClassInitializer init, Source fromSource);
+    ParsedClassType createClassType(LazyClassInitializer init,
+            Source fromSource);
 
     @Override
     ParsedClassType createClassType(Source fromSource);
@@ -276,8 +277,7 @@ public interface JL5TypeSystem extends
     MethodInstance findMethod(ReferenceType container, String name,
             List<? extends Type> argTypes,
             List<? extends ReferenceType> typeArgs, ClassType currClass,
-            Type expectedReturnType, boolean fromClient)
-            throws SemanticException;
+            Type expectedReturnType) throws SemanticException;
 
     ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes,
