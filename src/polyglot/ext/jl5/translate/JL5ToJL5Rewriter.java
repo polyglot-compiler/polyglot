@@ -16,7 +16,6 @@ import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ReferenceType;
-import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -29,7 +28,7 @@ public class JL5ToJL5Rewriter extends ExtensionRewriter {
     }
 
     @Override
-    public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
+    public TypeNode typeToJava(Type t, Position pos) {
         JL5NodeFactory to_nf = (JL5NodeFactory) to_nf();
         // JL5ToJL5Rewriter.typeToJava
         if (t instanceof IntersectionType) {

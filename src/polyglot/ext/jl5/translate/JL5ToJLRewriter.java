@@ -31,7 +31,6 @@ import polyglot.ext.jl5.types.inference.LubType;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Job;
 import polyglot.translate.ExtensionRewriter;
-import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.Position;
 
@@ -44,7 +43,7 @@ public class JL5ToJLRewriter extends ExtensionRewriter {
     }
 
     @Override
-    public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
+    public TypeNode typeToJava(Type t, Position pos) {
         // TODO: disentangle erasureType from translated type
         t = jl5ts.erasureType(t);
         if (t instanceof LubType) {

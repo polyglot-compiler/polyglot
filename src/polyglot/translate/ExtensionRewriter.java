@@ -195,7 +195,7 @@ public class ExtensionRewriter extends ContextVisitor {
         return job.compiler().errorQueue();
     }
 
-    public TypeNode typeToJava(Type t, Position pos) throws SemanticException {
+    public TypeNode typeToJava(Type t, Position pos) {
         NodeFactory nf = to_nf();
         TypeSystem ts = to_ts();
 
