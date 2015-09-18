@@ -272,7 +272,12 @@ public class ImportTable implements Resolver {
             // It wasn't a ClassImport.  Maybe it was a PackageImport?
             Named resolved = null;
             for (String pkgOrTypeName : imports) {
-                Named n = findInPkgOrType(name, pkgOrTypeName);
+                Named n;
+                try {
+                    n = findInPkgOrType(name, pkgOrTypeName);
+                } catch (SemanticException e) {
+                    continue;
+                }
                 if (n != null) {
                     if (resolved == null) {
                         // This is the first occurrence of name we've found
