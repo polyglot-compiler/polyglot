@@ -285,6 +285,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"
         StaticContext.jl ;
         StaticMethod.jl ;
         StaticOps.jl ;
+        SuperCall01.jl;
         Switch1.jl ; Switch2.jl ; Switch3.jl ; Switch4.jl ; Switch5.jl ;
         Switch6.jl ; 
 #        Switch7.jl ;

@@ -89,8 +89,7 @@ public interface TypeSystem {
     /**
      * Constructs a new ClassFileLazyClassInitializer for the given class file.
      */
-    ClassFileLazyClassInitializer classFileLazyClassInitializer(
-            ClassFile clazz);
+    ClassFileLazyClassInitializer classFileLazyClassInitializer(ClassFile clazz);
 
     /**
      * Create an import table for the source file.
@@ -447,6 +446,15 @@ public interface TypeSystem {
             List<? extends Type> argTypes, Context c) throws SemanticException;
 
     /**
+     * Deprecated version of the findMethod method.
+     * @deprecated
+     */
+    @Deprecated
+    MethodInstance findMethod(ReferenceType container, String name,
+            List<? extends Type> argTypes, ClassType currClass)
+            throws SemanticException;
+
+    /**
      * Requires: all type arguments are canonical.
      *
      * Returns the MethodInstance named {@code name} defined in type
@@ -459,8 +467,8 @@ public interface TypeSystem {
      * inaccessible.
      */
     MethodInstance findMethod(ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass)
-                    throws SemanticException;
+            List<? extends Type> argTypes, ClassType currClass,
+            boolean fromClient) throws SemanticException;
 
     /**
      * Deprecated version of the findConstructor method.
@@ -477,7 +485,7 @@ public interface TypeSystem {
     @Deprecated
     ConstructorInstance findConstructor(ClassType container,
             List<? extends Type> argTypes, ClassType currClass)
-                    throws SemanticException;
+            throws SemanticException;
 
     /**
      * Find a constructor.  We need to pass the class from which the constructor
@@ -790,8 +798,7 @@ public interface TypeSystem {
     /**
      * Create a new empty class.
      */
-    ParsedClassType createClassType(LazyClassInitializer init,
-            Source fromSource);
+    ParsedClassType createClassType(LazyClassInitializer init, Source fromSource);
 
     /**
      * Create a new empty class.
@@ -1013,8 +1020,7 @@ public interface TypeSystem {
      * @return a suitable implementation of the method mi in the class
      *         {@code ct} or a supertype thereof, null if none exists.
      */
-    public MethodInstance findImplementingMethod(ClassType ct,
-            MethodInstance mi);
+    public MethodInstance findImplementingMethod(ClassType ct, MethodInstance mi);
 
     /**
      * Returns {@code t}, modified as necessary to make it a legal

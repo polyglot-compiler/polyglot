@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- *
+ * 
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -68,7 +68,7 @@ public class RemoveExtendedFors extends ContextVisitor {
     }
 
     /** track how many iterator variables we have created in this CodeDecl
-     *
+     * 
      */
     private LinkedList<Integer> varCount = new LinkedList<>();
 
@@ -84,8 +84,9 @@ public class RemoveExtendedFors extends ContextVisitor {
     protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v)
             throws SemanticException {
         if (isExtendedFor(n) && !(parent instanceof Labeled)) {
-            n = translateExtendedFor((ExtendedFor) n,
-                                     Collections.<String> emptyList());
+            n =
+                    translateExtendedFor((ExtendedFor) n,
+                                         Collections.<String> emptyList());
         }
         if (n instanceof CodeDecl) {
             varCount.removeLast();
@@ -123,7 +124,7 @@ public class RemoveExtendedFors extends ContextVisitor {
         Position pos = Position.compilerGenerated();
         Type iterType = ts.typeForName("java.util.Iterator");
         Type iteratedType = decl.type().type();
-        // translate "L1,...,Ln: for (C x: e) b" to
+        // translate "L1,...,Ln: for (C x: e) b" to 
         // "{ Iterator iter = e.iterator(); L1,...,Ln: while (iter.hasNext();)  { C x = (C)iter.next(); b }"
 
         // Create the iter declaration "Iterator iter = e.iterator()"
@@ -140,14 +141,16 @@ public class RemoveExtendedFors extends ContextVisitor {
                                                           "iterator",
                                                           Collections.<Type> emptyList(),
                                                           this.context()
-                                                              .currentClass()));
+                                                              .currentClass(),
+                                                          true));
 
-            iterDecl = nodeFactory().LocalDecl(pos,
-                                               Flags.NONE,
-                                               nodeFactory().CanonicalTypeNode(pos,
-                                                                               iterType),
-                                               nodeFactory().Id(pos, iterName),
-                                               iterator);
+            iterDecl =
+                    nodeFactory().LocalDecl(pos,
+                                            Flags.NONE,
+                                            nodeFactory().CanonicalTypeNode(pos,
+                                                                            iterType),
+                                            nodeFactory().Id(pos, iterName),
+                                            iterator);
             iterDecl = iterDecl.localInstance(iterLI);
         }
 
@@ -155,23 +158,27 @@ public class RemoveExtendedFors extends ContextVisitor {
         List<Stmt> loopBody = new ArrayList<>();
         {
             Id id = nodeFactory().Id(pos, "next");
-            Call call = nodeFactory().Call(pos,
-                                           ((Local) nodeFactory().Local(pos,
-                                                                        nodeFactory().Id(pos,
-                                                                                         iterName))
-                                                                 .type(iterType)).localInstance(iterDecl.localInstance()),
-                                           id);
+            Call call =
+                    nodeFactory().Call(pos,
+                                       ((Local) nodeFactory().Local(pos,
+                                                                    nodeFactory().Id(pos,
+                                                                                     iterName))
+                                                             .type(iterType)).localInstance(iterDecl.localInstance()),
+                                       id);
             call = (Call) call.type(ts.Object());
-            call = call.methodInstance(ts.findMethod(iterType.toClass(),
-                                                     "next",
-                                                     Collections.<Type> emptyList(),
-                                                     this.context()
-                                                         .currentClass()));
+            call =
+                    call.methodInstance(ts.findMethod(iterType.toClass(),
+                                                      "next",
+                                                      Collections.<Type> emptyList(),
+                                                      this.context()
+                                                          .currentClass(),
+                                                      true));
 
-            Cast cast = nodeFactory().Cast(pos,
-                                           nodeFactory().CanonicalTypeNode(pos,
-                                                                           iteratedType),
-                                           call);
+            Cast cast =
+                    nodeFactory().Cast(pos,
+                                       nodeFactory().CanonicalTypeNode(pos,
+                                                                       iteratedType),
+                                       call);
             cast = (Cast) cast.type(iteratedType);
 
             loopBody.add(decl.init(cast));
@@ -182,22 +189,26 @@ public class RemoveExtendedFors extends ContextVisitor {
         While loop;
         {
             Id id = nodeFactory().Id(pos, "hasNext");
-            Call cond = nodeFactory().Call(pos,
-                                           ((Local) nodeFactory().Local(pos,
-                                                                        nodeFactory().Id(pos,
-                                                                                         iterName))
-                                                                 .type(iterType)).localInstance(iterDecl.localInstance()),
-                                           id);
+            Call cond =
+                    nodeFactory().Call(pos,
+                                       ((Local) nodeFactory().Local(pos,
+                                                                    nodeFactory().Id(pos,
+                                                                                     iterName))
+                                                             .type(iterType)).localInstance(iterDecl.localInstance()),
+                                       id);
             cond = (Call) cond.type(ts.Boolean());
-            cond = cond.methodInstance(ts.findMethod(iterType.toClass(),
-                                                     "hasNext",
-                                                     Collections.<Type> emptyList(),
-                                                     this.context()
-                                                         .currentClass()));
+            cond =
+                    cond.methodInstance(ts.findMethod(iterType.toClass(),
+                                                      "hasNext",
+                                                      Collections.<Type> emptyList(),
+                                                      this.context()
+                                                          .currentClass(),
+                                                      true));
 
-            loop = nodeFactory().While(pos,
-                                       cond,
-                                       nodeFactory().Block(pos, loopBody));
+            loop =
+                    nodeFactory().While(pos,
+                                        cond,
+                                        nodeFactory().Block(pos, loopBody));
         }
 
         return nodeFactory().Block(pos, iterDecl, labelStmt(loop, labels));
@@ -220,7 +231,7 @@ public class RemoveExtendedFors extends ContextVisitor {
 
         Position pos = Position.compilerGenerated();
         Type iteratedType = decl.type().type();
-        // translate "L1,...,Ln: for (C x: e) b" to
+        // translate "L1,...,Ln: for (C x: e) b" to 
         // "{ C[] arr = e; int iter = 0;  L1,...,Ln: while (iter < arr.length)  { C x = arr[iter]; iter = iter + 1; b; }"
         List<Stmt> stmts = new ArrayList<>();
 
@@ -252,8 +263,9 @@ public class RemoveExtendedFors extends ContextVisitor {
                                                                             iterLI.type()),
                                             nodeFactory().Id(pos, iterID));
             ld = ld.localInstance(iterLI);
-            ld = ld.init(nodeFactory().IntLit(pos, IntLit.INT, 0)
-                                      .type(ts.Int()));
+            ld =
+                    ld.init(nodeFactory().IntLit(pos, IntLit.INT, 0)
+                                         .type(ts.Int()));
             stmts.add(ld);
         }
 
@@ -264,46 +276,45 @@ public class RemoveExtendedFors extends ContextVisitor {
             Field field =
                     (Field) nodeFactory().Field(pos, makeLocal(pos, arrLI), id)
                                          .type(ts.Int());
-            field = field.fieldInstance(ts.findField(arrLI.type().toReference(),
+            field =
+                    field.fieldInstance(ts.findField(arrLI.type().toReference(),
                                                      "length",
                                                      context().currentClass(),
                                                      true));
 
-            cond = nodeFactory().Binary(pos,
-                                        makeLocal(pos, iterLI),
-                                        Binary.LT,
-                                        field)
-                                .type(ts.Boolean());
+            cond =
+                    nodeFactory().Binary(pos,
+                                         makeLocal(pos, iterLI),
+                                         Binary.LT,
+                                         field).type(ts.Boolean());
         }
 
         // build the initlizer for the local decl: arr[iter]
         Expr init;
         {
-            init = nodeFactory().ArrayAccess(pos,
-                                             makeLocal(pos, arrLI),
-                                             makeLocal(pos, iterLI));
+            init =
+                    nodeFactory().ArrayAccess(pos,
+                                              makeLocal(pos, arrLI),
+                                              makeLocal(pos, iterLI));
             init = init.type(iteratedType);
         }
 
         // build the increment for iter (iter = iter + 1;)
         Stmt inc;
         {
-            Expr incExpr = nodeFactory()
-                                        .Binary(pos,
-                                                makeLocal(pos, iterLI),
-                                                Binary.ADD,
-                                                nodeFactory().IntLit(pos,
-                                                                     IntLit.INT,
-                                                                     1)
-                                                             .type(ts.Int()))
-                                        .type(ts.Int());
-            Assign incStore = (Assign) nodeFactory()
-                                                    .Assign(pos,
-                                                            makeLocal(pos,
-                                                                      iterLI),
-                                                            Assign.ASSIGN,
-                                                            incExpr)
-                                                    .type(ts.Int());
+            Expr incExpr =
+                    nodeFactory().Binary(pos,
+                                         makeLocal(pos, iterLI),
+                                         Binary.ADD,
+                                         nodeFactory().IntLit(pos,
+                                                              IntLit.INT,
+                                                              1).type(ts.Int()))
+                                 .type(ts.Int());
+            Assign incStore =
+                    (Assign) nodeFactory().Assign(pos,
+                                                  makeLocal(pos, iterLI),
+                                                  Assign.ASSIGN,
+                                                  incExpr).type(ts.Int());
             inc = nodeFactory().Eval(pos, incStore);
         }
 
@@ -319,11 +330,11 @@ public class RemoveExtendedFors extends ContextVisitor {
     }
 
     protected Expr makeLocal(Position pos, LocalInstance li) {
-        Local l = (Local) nodeFactory()
-                                       .Local(pos,
-                                              nodeFactory().Id(pos, li.name()))
-                                       .localInstance(li)
-                                       .type(li.type());
+        Local l =
+                (Local) nodeFactory().Local(pos,
+                                            nodeFactory().Id(pos, li.name()))
+                                     .localInstance(li)
+                                     .type(li.type());
 
         return l;
     }
@@ -337,7 +348,8 @@ public class RemoveExtendedFors extends ContextVisitor {
      */
     private Stmt labelStmt(Stmt s, List<String> labels) {
         for (int i = labels.size() - 1; i >= 0; i--) {
-            Id id = nodeFactory().Id(Position.compilerGenerated(),
+            Id id =
+                    nodeFactory().Id(Position.compilerGenerated(),
                                      labels.get(i));
             s = nodeFactory().Labeled(Position.compilerGenerated(), id, s);
         }

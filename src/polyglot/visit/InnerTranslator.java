@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- *
+ * 
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -79,10 +79,10 @@ import polyglot.util.Position;
 /**
  * @author xinqi
  *
- * This class translates inner classes to static nested classes with a field referring to the enclosing
+ * This class translates inner classes to static nested classes with a field referring to the enclosing 
  * instance. It will also add "new" methods to the enclosing class corresponding to constructors of inner
  * classes.
- *
+ * 
  */
 
 public class InnerTranslator extends NodeVisitor {
@@ -94,10 +94,10 @@ public class InnerTranslator extends NodeVisitor {
         Map<String, Integer> localNameCount; // Count how many local/anonymous classes with a particular name have appeared.
         List<ClassDecl> newMemberClasses; // New member class declarations converted from local/anonymous classes.
         List<MethodDecl> newMemberMethods; // New member methods added.
-        List<Formal> newConsFormals; // The list of added formals to constructors.
-        // The first one should be the reference to the outer class instance,
+        List<Formal> newConsFormals; // The list of added formals to constructors. 
+        // The first one should be the reference to the outer class instance, 
         // and the remaining ones are the final locals.
-        List<ClassInfo> innerClassInfo; // List of inner class info.
+        List<ClassInfo> innerClassInfo; // List of inner class info. 
         boolean hasOuterField;
         CodeInfo insideCode; // For local/anonymous classes, this is the code where the declaration is.
 
@@ -210,7 +210,7 @@ public class InnerTranslator extends NodeVisitor {
     // Information about methods, constructors, and initializers.
     protected class CodeInfo {
         CodeInstance ci;
-        List<LocalInstance> finalArgs; // the list of final arguments if any.
+        List<LocalInstance> finalArgs; // the list of final arguments if any. 
         List<ClassInfo> localClassInfo; // List of local/anonymous class info.
         Stack<LinkedList<LocalInstance>> blockFinals; // stack of lists of final variables defined in a block.
 
@@ -298,8 +298,8 @@ public class InnerTranslator extends NodeVisitor {
     protected Stack<CodeInfo> codeContext; // The context stack of all the enclosing code.
     // It is a stack of CodeInfo.
     protected HashMap<String, ClassInfo> innerClassInfoMap; // The map from full names to class infos of inner classes.
-    protected Stack<Boolean> insideCode; // Boolean stack that indicates whether it is inside a piece of code now.
-    protected Stack<Boolean> staticFieldDecl; // Boolean stack that indicates whether it is inside
+    protected Stack<Boolean> insideCode; // Boolean stack that indicates whether it is inside a piece of code now. 
+    protected Stack<Boolean> staticFieldDecl; // Boolean stack that indicates whether it is inside 
 
     // the initialization of a static field.
 
@@ -381,7 +381,7 @@ public class InnerTranslator extends NodeVisitor {
             CodeInfo codeInfo = codeContext.peek();
             ClassInfo classInfo = classContext.peek();
             if (!codeInfo.isStatic()) {
-                // If this local/anonymous class is inside a static method,
+                // If this local/anonymous class is inside a static method, 
                 // then it shouldn't have an outer field.
                 cinfo.addConsFormal(produceOuterFormal(cd.type(),
                                                        classInfo.classType()));
@@ -399,15 +399,17 @@ public class InnerTranslator extends NodeVisitor {
 
             for (LocalInstance li : codeInfo.finalList()) {
                 Id name = nf.Id(Position.compilerGenerated(), li.name());
-                Formal f = nf.Formal(Position.compilerGenerated(),
-                                     Flags.NONE,
-                                     nf.CanonicalTypeNode(Position.compilerGenerated(),
-                                                          li.type()),
-                                     name);
-                f = f.localInstance(ts.localInstance(Position.compilerGenerated(),
-                                                     f.flags(),
-                                                     f.type().type(),
-                                                     f.name()));
+                Formal f =
+                        nf.Formal(Position.compilerGenerated(),
+                                  Flags.NONE,
+                                  nf.CanonicalTypeNode(Position.compilerGenerated(),
+                                                       li.type()),
+                                  name);
+                f =
+                        f.localInstance(ts.localInstance(Position.compilerGenerated(),
+                                                         f.flags(),
+                                                         f.type().type(),
+                                                         f.name()));
                 cinfo.addConsFormal(f);
             }
             innerClassInfoMap.put(ct.fullName(), cinfo);
@@ -431,9 +433,9 @@ public class InnerTranslator extends NodeVisitor {
             }
             ClassInfo classInfo = classContext.peek();
 
-            if (inCode && !codeInfo.isStatic()
-                    || !inCode && !staticFieldDecl.peek().booleanValue()) {
-                // If this local/anonymous class is inside a static method,
+            if (inCode && !codeInfo.isStatic() || !inCode
+                    && !staticFieldDecl.peek().booleanValue()) {
+                // If this local/anonymous class is inside a static method, 
                 // then it shouldn't have an outer field.
                 cinfo.addConsFormal(produceOuterFormal(ct,
                                                        classInfo.classType()));
@@ -459,15 +461,17 @@ public class InnerTranslator extends NodeVisitor {
             if (inCode) {
                 for (LocalInstance li : codeInfo.finalList()) {
                     Id name = nf.Id(Position.compilerGenerated(), li.name());
-                    Formal f = nf.Formal(Position.compilerGenerated(),
-                                         Flags.NONE,
-                                         nf.CanonicalTypeNode(Position.compilerGenerated(),
-                                                              li.type()),
-                                         name);
-                    f = f.localInstance(ts.localInstance(Position.compilerGenerated(),
-                                                         f.flags(),
-                                                         f.type().type(),
-                                                         f.name()));
+                    Formal f =
+                            nf.Formal(Position.compilerGenerated(),
+                                      Flags.NONE,
+                                      nf.CanonicalTypeNode(Position.compilerGenerated(),
+                                                           li.type()),
+                                      name);
+                    f =
+                            f.localInstance(ts.localInstance(Position.compilerGenerated(),
+                                                             f.flags(),
+                                                             f.type().type(),
+                                                             f.name()));
                     cinfo.addConsFormal(f);
                 }
             }
@@ -481,7 +485,7 @@ public class InnerTranslator extends NodeVisitor {
     protected void enterCodeDecl(CodeDecl cd) {
         CodeInfo cinfo = new CodeInfo(cd.codeInstance());
 
-        // If it is a constructor or method, find all the final arguments and add them to the finalVar map.
+        // If it is a constructor or method, find all the final arguments and add them to the finalVar map. 
         if (cd instanceof ProcedureDecl) {
             ProcedureDecl pd = (ProcedureDecl) cd;
             for (Formal f : pd.formals()) {
@@ -524,7 +528,7 @@ public class InnerTranslator extends NodeVisitor {
             return leaveField(old, field, v);
         }
         else if (n instanceof Call) {
-            // Like Field accesses, we might also have method calls that have no explicit "A.this."
+            // Like Field accesses, we might also have method calls that have no explicit "A.this." 
             // qualifiers, while it means to.
             Call c = (Call) n;
             return leaveCall(old, c, v);
@@ -560,7 +564,7 @@ public class InnerTranslator extends NodeVisitor {
 
         ClassInfo selfInfo = classContext.pop();
 
-        // Do nothing if it is already a static class, or it is a toplevel class,
+        // Do nothing if it is already a static class, or it is a toplevel class,  
         // but need to add those classes converted from local/anonymous classes.
         if (ct.flags().isStatic() || ct.isTopLevel()) {
             if (selfInfo.newMemberClasses().size() > 0
@@ -590,13 +594,14 @@ public class InnerTranslator extends NodeVisitor {
             // Need to create a class declaration, and add it to the enclosing class.
             ParsedClassType ct = newExpr.anonType();
             Id name = nf.Id(Position.compilerGenerated(), ct.name());
-            ClassDecl cd = nf.ClassDecl(Position.compilerGenerated(),
-                                        ct.flags(),
-                                        name,
-                                        nf.CanonicalTypeNode(Position.compilerGenerated(),
-                                                             ct.superType()),
-                                        Collections.<TypeNode> emptyList(),
-                                        newExpr.body());
+            ClassDecl cd =
+                    nf.ClassDecl(Position.compilerGenerated(),
+                                 ct.flags(),
+                                 name,
+                                 nf.CanonicalTypeNode(Position.compilerGenerated(),
+                                                      ct.superType()),
+                                 Collections.<TypeNode> emptyList(),
+                                 newExpr.body());
             cd = cd.type(ct);
 
             ClassInfo selfInfo = classContext.pop();
@@ -674,7 +679,7 @@ public class InnerTranslator extends NodeVisitor {
     }
 
     /**
-     * Translate final local variables that should become field accesses of local/anonymous classes.
+     * Translate final local variables that should become field accesses of local/anonymous classes. 
      * @param old
      * @param local
      * @param v
@@ -694,11 +699,12 @@ public class InnerTranslator extends NodeVisitor {
                 }
                 Id id = nf.Id(Position.compilerGenerated(), newName);
                 Field f = nf.Field(Position.compilerGenerated(), t, id);
-                f = f.fieldInstance(ts.fieldInstance(Position.compilerGenerated(),
-                                                     (ReferenceType) t.type(),
-                                                     Flags.PROTECTED,
-                                                     local.type(),
-                                                     f.name()));
+                f =
+                        f.fieldInstance(ts.fieldInstance(Position.compilerGenerated(),
+                                                         (ReferenceType) t.type(),
+                                                         Flags.PROTECTED,
+                                                         local.type(),
+                                                         f.name()));
                 return f;
             }
         }
@@ -728,11 +734,12 @@ public class InnerTranslator extends NodeVisitor {
         int i = 0;
         for (Expr arg : newExpr.arguments()) {
             Id id = nf.Id(Position.compilerGenerated(), "arg" + i);
-            Formal f = nf.Formal(Position.compilerGenerated(),
-                                 Flags.NONE,
-                                 nf.CanonicalTypeNode(Position.compilerGenerated(),
-                                                      arg.type()),
-                                 id);
+            Formal f =
+                    nf.Formal(Position.compilerGenerated(),
+                              Flags.NONE,
+                              nf.CanonicalTypeNode(Position.compilerGenerated(),
+                                                   arg.type()),
+                              id);
             LocalInstance li =
                     ts.localInstance(Position.compilerGenerated(),
                                      Flags.NONE,
@@ -799,7 +806,7 @@ public class InnerTranslator extends NodeVisitor {
             ClassInfo cinfo = classContext.get(i);
             ParsedClassType ct = cinfo.classType();
             try {
-                ts.findMethod(ct, mi.name(), mi.formalTypes(), current);
+                ts.findMethod(ct, mi.name(), mi.formalTypes(), current, true);
             }
             catch (SemanticException se) {
                 continue;
@@ -814,7 +821,7 @@ public class InnerTranslator extends NodeVisitor {
         ConstructorInstance ci = cc.constructorInstance();
         ClassType ct = (ClassType) ci.container();
         if (cc.kind().equals(ConstructorCall.THIS)) {
-            // If calling a constructor of the same class, just need to pass all the new formals.
+            // If calling a constructor of the same class, just need to pass all the new formals. 
             ClassInfo cinfo = classContext.peek();
             ci = updateConstructorInst(ct, ci, cinfo);
             List<Formal> formals = cinfo.newConsFormals();
@@ -841,7 +848,8 @@ public class InnerTranslator extends NodeVisitor {
                     List<Expr> args =
                             new ArrayList<>(cc.arguments().size() + 1);
                     Formal f = selfInfo.newConsFormals().get(0);
-                    Id id = nf.Id(Position.compilerGenerated(),
+                    Id id =
+                            nf.Id(Position.compilerGenerated(),
                                   outerThisName(ct));
                     Local l = nf.Local(Position.compilerGenerated(), id);
                     l = l.localInstance(f.localInstance());
@@ -855,8 +863,9 @@ public class InnerTranslator extends NodeVisitor {
                     // The super class is a local class, and they are within the same code.
                     ci = updateConstructorInst(ct, ci, cinfo);
                     List<Formal> formals = cinfo.newConsFormals();
-                    List<Expr> args = new ArrayList<>(cc.arguments().size()
-                            + formals.size());
+                    List<Expr> args =
+                            new ArrayList<>(cc.arguments().size()
+                                    + formals.size());
                     args.addAll(cc.arguments());
                     for (Formal f : formals) {
                         Id id = nf.Id(Position.compilerGenerated(), f.name());
@@ -869,7 +878,8 @@ public class InnerTranslator extends NodeVisitor {
                     // The super class is a local class, and they are not within the same code.
                     // Need to first find an enclosing class that is inside the same code as the super class,
                     // and use its fields as arguments.
-                    Id id = nf.Id(Position.compilerGenerated(),
+                    Id id =
+                            nf.Id(Position.compilerGenerated(),
                                   outerThisName(ct));
                     Local outerLocal =
                             nf.Local(Position.compilerGenerated(), id);
@@ -891,12 +901,14 @@ public class InnerTranslator extends NodeVisitor {
                     }
                     ci = updateConstructorInst(ct, ci, cinfo);
                     List<Formal> formals = cinfo.newConsFormals();
-                    List<Expr> args = new ArrayList<>(cc.arguments().size()
-                            + formals.size());
+                    List<Expr> args =
+                            new ArrayList<>(cc.arguments().size()
+                                    + formals.size());
                     args.addAll(cc.arguments());
                     for (Formal f : formals) {
-                        Id fid = nf.Id(Position.compilerGenerated(),
-                                       newFieldName(f.name()));
+                        Id fid =
+                                nf.Id(Position.compilerGenerated(),
+                                      newFieldName(f.name()));
                         args.add(nf.Field(Position.compilerGenerated(),
                                           outer,
                                           fid));
@@ -913,9 +925,10 @@ public class InnerTranslator extends NodeVisitor {
      * Add new member classes/methods.
      */
     protected ClassDecl addNewMembers(ClassDecl cd, ClassInfo cinfo) {
-        List<ClassMember> members = new ArrayList<>(cd.body().members().size()
-                + cinfo.newMemberClasses().size()
-                + cinfo.newMemberMethods().size());
+        List<ClassMember> members =
+                new ArrayList<>(cd.body().members().size()
+                        + cinfo.newMemberClasses().size()
+                        + cinfo.newMemberMethods().size());
         members.addAll(cd.body().members());
         members.addAll(cinfo.newMemberClasses());
         members.addAll(cinfo.newMemberMethods());
@@ -926,7 +939,7 @@ public class InnerTranslator extends NodeVisitor {
     }
 
     /**
-     * Find ClassInfo for ClassType ct, from innerClassInfoMap.
+     * Find ClassInfo for ClassType ct, from innerClassInfoMap. 
      * @param ct
      */
     protected ClassInfo findClassInfo(ClassType ct) {
@@ -944,7 +957,7 @@ public class InnerTranslator extends NodeVisitor {
 
     /**
          * Update new expressions to include necessary arguments (for example,
-         * enclosing instances) and eliminate qualifers.
+         * enclosing instances) and eliminate qualifers. 
      * @param newExpr
      */
     protected Expr updateNewExpr(New newExpr) {
@@ -962,10 +975,10 @@ public class InnerTranslator extends NodeVisitor {
         if (cinfo != null) {
             ConstructorInstance ci = newExpr.constructorInstance();
             List<Formal> formals = cinfo.newConsFormals();
-            List<Expr> args = new ArrayList<>(newExpr.arguments().size()
-                    + formals.size());
-            List<Type> ftypes = new ArrayList<>(newExpr.arguments().size()
-                    + formals.size());
+            List<Expr> args =
+                    new ArrayList<>(newExpr.arguments().size() + formals.size());
+            List<Type> ftypes =
+                    new ArrayList<>(newExpr.arguments().size() + formals.size());
             args.addAll(newExpr.arguments());
             ftypes.addAll(ci.formalTypes());
             Iterator<Formal> it = formals.iterator();
@@ -991,7 +1004,8 @@ public class InnerTranslator extends NodeVisitor {
             ci.setFormalTypes(ftypes);
             if (newExpr.anonType() != null) {
                 ci.setContainer(newExpr.anonType());
-                nExpr = nExpr.objectType(nf.CanonicalTypeNode(Position.compilerGenerated(),
+                nExpr =
+                        nExpr.objectType(nf.CanonicalTypeNode(Position.compilerGenerated(),
                                                               newExpr.anonType()));
             }
 
@@ -1029,13 +1043,14 @@ public class InnerTranslator extends NodeVisitor {
 
     protected ConstructorDecl produceDefaultConstructor(ParsedClassType ct,
             ClassInfo cinfo) {
-        ConstructorCall cc = nf.ConstructorCall(Position.compilerGenerated(),
-                                                ConstructorCall.SUPER,
-                                                Collections.<Expr> emptyList());
+        ConstructorCall cc =
+                nf.ConstructorCall(Position.compilerGenerated(),
+                                   ConstructorCall.SUPER,
+                                   Collections.<Expr> emptyList());
         ConstructorInstance cci =
                 ts.constructorInstance(Position.compilerGenerated(),
                                        (ClassType) ct.superType(),
-                                       Flags.PUBLIC, // XXX: how to find the real flags?
+                                       Flags.PUBLIC, // XXX: how to find the real flags? 
                                        Collections.<Type> emptyList(),
                                        Collections.<Type> emptyList());
         cc = cc.constructorInstance(cci);
@@ -1089,13 +1104,13 @@ public class InnerTranslator extends NodeVisitor {
 
         if (ct.constructors().size() == 0) {
             // Add a default constructor for inner classes, if there is none,
-            // in case that it is inherited from another inner class, and
+            // in case that it is inherited from another inner class, and 
             // the default constructor is not having "default" behavior.
-            ConstructorDecl cons = updateConstructor(cd,
-                                                     ct,
-                                                     produceDefaultConstructor(ct,
-                                                                               cinfo),
-                                                     cinfo);
+            ConstructorDecl cons =
+                    updateConstructor(cd,
+                                      ct,
+                                      produceDefaultConstructor(ct, cinfo),
+                                      cinfo);
             members.add(cons);
             ct.addConstructor(cons.constructorInstance());
         }
@@ -1122,24 +1137,27 @@ public class InnerTranslator extends NodeVisitor {
         List<Formal> newFormals = cinfo.newConsFormals();
         List<FieldDecl> fields = new ArrayList<>(newFormals.size());
         for (Formal formal : newFormals) {
-            Id id = nf.Id(Position.compilerGenerated(),
+            Id id =
+                    nf.Id(Position.compilerGenerated(),
                           newFieldName(formal.name()));
-            FieldDecl fd = nf.FieldDecl(Position.compilerGenerated(),
-                                        Flags.PROTECTED,
-                                        formal.type(),
-                                        id);
-            FieldInstance fi = ts.fieldInstance(Position.compilerGenerated(),
-                                                ct,
-                                                Flags.PROTECTED,
-                                                formal.type().type(),
-                                                newFieldName(formal.name()));
+            FieldDecl fd =
+                    nf.FieldDecl(Position.compilerGenerated(),
+                                 Flags.PROTECTED,
+                                 formal.type(),
+                                 id);
+            FieldInstance fi =
+                    ts.fieldInstance(Position.compilerGenerated(),
+                                     ct,
+                                     Flags.PROTECTED,
+                                     formal.type().type(),
+                                     newFieldName(formal.name()));
             fd = fd.fieldInstance(fi);
             fields.add(fd);
         }
         return fields;
     }
 
-    // Return the name of the "outer this" field and formal in ct.
+    // Return the name of the "outer this" field and formal in ct. 
     protected String outerThisName(ClassType ct) {
         return "outer$this";
     }
@@ -1148,30 +1166,33 @@ public class InnerTranslator extends NodeVisitor {
      * ct  - ParsedClassType of the inner class that we are dealing with.
      * oct - ParsedClassType of the outer class.
      */
-    protected Formal produceOuterFormal(ParsedClassType ct,
-            ParsedClassType oct) {
+    protected Formal produceOuterFormal(ParsedClassType ct, ParsedClassType oct) {
         Id fn = nf.Id(Position.compilerGenerated(), outerThisName(ct));
-        Formal formal = nf.Formal(Position.compilerGenerated(),
-                                  Flags.NONE,
-                                  nf.CanonicalTypeNode(Position.compilerGenerated(),
-                                                       oct),
-                                  fn);
-        formal = formal.localInstance(ts.localInstance(Position.compilerGenerated(),
-                                                       formal.flags(),
-                                                       formal.type().type(),
-                                                       formal.name()));
+        Formal formal =
+                nf.Formal(Position.compilerGenerated(),
+                          Flags.NONE,
+                          nf.CanonicalTypeNode(Position.compilerGenerated(),
+                                               oct),
+                          fn);
+        formal =
+                formal.localInstance(ts.localInstance(Position.compilerGenerated(),
+                                                      formal.flags(),
+                                                      formal.type().type(),
+                                                      formal.name()));
         return formal;
     }
 
     protected Field produceOuterField(ClassType ct, Expr rec) {
-        Id id = nf.Id(Position.compilerGenerated(),
+        Id id =
+                nf.Id(Position.compilerGenerated(),
                       newFieldName(outerThisName(ct)));
         Field f = nf.Field(Position.compilerGenerated(), rec, id);
-        f = f.fieldInstance(ts.fieldInstance(Position.compilerGenerated(),
-                                             ct,
-                                             Flags.PROTECTED,
-                                             ct.container(), // FIXME: use the type of outer formal stored in cinfo?
-                                             f.name()));
+        f =
+                f.fieldInstance(ts.fieldInstance(Position.compilerGenerated(),
+                                                 ct,
+                                                 Flags.PROTECTED,
+                                                 ct.container(), // FIXME: use the type of outer formal stored in cinfo?
+                                                 f.name()));
         return f;
     }
 
@@ -1229,7 +1250,7 @@ public class InnerTranslator extends NodeVisitor {
                 }
             }
             else {
-                // If there is no explicit constructor call, we need to add the default
+                // If there is no explicit constructor call, we need to add the default 
                 // constructor call, and update it, in case it is from another inner class,
                 // and therefore needs adding new formals.
                 stmts.add(produceDefaultSuperConstructorCall(ct));
@@ -1254,9 +1275,10 @@ public class InnerTranslator extends NodeVisitor {
                                    formals,
                                    cons.throwTypes(),
                                    b);
-        newCons = newCons.constructorInstance(updateConstructorInst(ct,
-                                                                    cons.constructorInstance(),
-                                                                    cinfo));
+        newCons =
+                newCons.constructorInstance(updateConstructorInst(ct,
+                                                                  cons.constructorInstance(),
+                                                                  cinfo));
         return newCons;
     }
 
@@ -1270,19 +1292,22 @@ public class InnerTranslator extends NodeVisitor {
             local = local.localInstance(formal.localInstance());
             Special thisExpr = nf.This(Position.compilerGenerated());
             thisExpr = (Special) thisExpr.type(cinfo.classType());
-            Id fieldId = nf.Id(Position.compilerGenerated(),
-                               newFieldName(formal.name()));
+            Id fieldId =
+                    nf.Id(Position.compilerGenerated(),
+                          newFieldName(formal.name()));
             Field field =
                     nf.Field(Position.compilerGenerated(), thisExpr, fieldId);
-            field = field.fieldInstance(ts.fieldInstance(Position.compilerGenerated(),
+            field =
+                    field.fieldInstance(ts.fieldInstance(Position.compilerGenerated(),
                                                          cinfo.classType(),
                                                          Flags.PROTECTED,
                                                          formal.type().type(),
                                                          field.name()));
-            FieldAssign fAssign = nf.FieldAssign(Position.compilerGenerated(),
-                                                 field,
-                                                 Assign.ASSIGN,
-                                                 local);
+            FieldAssign fAssign =
+                    nf.FieldAssign(Position.compilerGenerated(),
+                                   field,
+                                   Assign.ASSIGN,
+                                   local);
             Stmt stmt = nf.Eval(Position.compilerGenerated(), fAssign);
             fInits.add(stmt);
         }
