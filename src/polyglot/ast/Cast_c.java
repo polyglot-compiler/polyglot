@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -59,7 +59,7 @@ public class Cast_c extends Expr_c implements Cast {
 
     public Cast_c(Position pos, TypeNode castType, Expr expr, Ext ext) {
         super(pos, ext);
-        assert (castType != null && expr != null);
+        assert castType != null && expr != null;
         this.castType = castType;
         this.expr = expr;
     }
@@ -71,7 +71,7 @@ public class Cast_c extends Expr_c implements Cast {
 
     @Override
     public TypeNode castType() {
-        return this.castType;
+        return castType;
     }
 
     @Override
@@ -88,7 +88,7 @@ public class Cast_c extends Expr_c implements Cast {
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -104,7 +104,8 @@ public class Cast_c extends Expr_c implements Cast {
     }
 
     /** Reconstruct the expression. */
-    protected <N extends Cast_c> N reconstruct(N n, TypeNode castType, Expr expr) {
+    protected <N extends Cast_c> N reconstruct(N n, TypeNode castType,
+            Expr expr) {
         n = castType(n, castType);
         n = expr(n, expr);
         return n;
@@ -123,8 +124,7 @@ public class Cast_c extends Expr_c implements Cast {
 
         if (!ts.isCastValid(expr.type(), castType.type())) {
             throw new SemanticException("Cannot cast the expression of type \""
-                                                + expr.type() + "\" to type \""
-                                                + castType.type() + "\".",
+                    + expr.type() + "\" to type \"" + castType.type() + "\".",
                                         position());
         }
 
@@ -189,7 +189,9 @@ public class Cast_c extends Expr_c implements Cast {
 
     @Override
     public boolean isConstant(Lang lang) {
-        return lang.isConstant(expr, lang) && castType.type().isPrimitive();
+        return lang.isConstant(expr, lang) && (castType.type().isPrimitive()
+                || castType.type()
+                           .typeEquals(castType.type().typeSystem().String()));
     }
 
     @Override
@@ -263,7 +265,7 @@ public class Cast_c extends Expr_c implements Cast {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Cast(this.position, this.castType, this.expr);
+        return nf.Cast(position, castType, expr);
     }
 
 }

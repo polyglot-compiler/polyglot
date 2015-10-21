@@ -31,13 +31,19 @@ javac "-d java-out -cp ." {
 	java-src/ClassFile02.java;
 }
 
-polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"" {
+polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-source 1.4\"" {
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
         AnonymousClass03.jl;
         AnonymousClass04.jl;
         ArrayInit.jl ;
         Array01.jl ;
+        Assert01.jl (Semantic, "Local variable .* may not have been initialized");
+        Assert02.jl;
+        Assert03.jl (Semantic, "Local variable .* may not have been initialized");
+        Assert04.jl (Semantic, "Final variable .* might already have been initialized");
+        Assert05.jl;
+        Assert06.jl;
         Assign01.jl
           (Semantic, "Cannot assign"),
           (Semantic, "type .* does not match"),
@@ -72,6 +78,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"
         ClassDecl05.jl;
         ClassDecl06.jl (Semantic, "Cannot declare a top-level class with flag");
         ClassDecl07.jl (Semantic, "clashes with package of the same name");
+        ClassDecl08.jl (Semantic, "Duplicate interface");
         ClassFile01.jl;
         ClassFile02.jl (Semantic, "incompatible return type");
         ClassLit.jl ;
@@ -104,6 +111,8 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"
         Constants11.jl ;
         Constants13.jl ;
         Constants14A.jl ;
+        Constants15.jl (Semantic, "Case label must be an integral constant");
+        Constants16.jl;
         ConstructorCall01.jl;
         ConstructorDecl01.jl (Semantic, "synchronized");
         Ctor.jl ;
@@ -153,6 +162,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"
         Inherit03.jl (Semantic, "weaker access privileges");
         Inherit04a.jl Inherit04b.jl;
         Inherit05.jl;
+        Inherit06.jl;
         InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
         Init6.jl ;
@@ -239,6 +249,9 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"
         LocalInit.jl ;
         LongString01.jl;
         MemberClass01.jl (Semantic, "Member class .* not visible");
+        MemberClass02.jl (Semantic, "The type of the variable initializer .* does not match that of the declaration");
+        MemberClass03.jl;
+        MemberClass04.jl;
        MemberClassFlags.jl ;
         MethodDecl01.jl (Semantic, "native and strictfp");
         MethodDecl02.jl;
@@ -270,9 +283,12 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"
 	Protection7.jl (Semantic, "Method .* inaccessible");
 	Protection08A.jl package1/Protection08B.jl;
 	Protection09.jl;
+	Protection10.jl (Semantic, "Cannot access type .* from package");
+	Protection11.jl (Semantic, "Cannot access type");
         Resolver01a.jl Resolver01b.jl;
         Resolver02a.jl Resolver02b.jl Resolver02c.jl;
         Resolver03a.jl Resolver03b.jl Resolver03c.jl;
+        Resolver04.jl;
         Return1.jl ; Return2.jl ; Return3.jl ;
         Return4.jl ;
         Return5.jl ;
@@ -292,7 +308,11 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"
         Switch08.jl (Semantic, "not assignable");
         Synchronized01.jl (Semantic, "Cannot synchronize");
         TernaryPrimitiveOps.jl ;
-        TypeAccess01a.jl TypeAccess01b.jl (Semantic, "Cannot access class");
+        Throw01.jl;
+        Throw02.jl;
+        TryFinallyAbrupt01.jl;
+        TryFinallyAbrupt02.jl (Semantic, "Final variable .* might already have been initialized");
+        TypeAccess01a.jl TypeAccess01b.jl (Semantic, "Cannot access");
         TypeAccess02a.jl TypeAccess02b.jl (Semantic, "Could not find type");
         TypeShadowing.jl ;
         xIterator.jl ;
@@ -411,6 +431,7 @@ polyglot.frontend.JLExtensionInfo "-d out -cp java-out -postopts \"-source 1.4\"
 	BadForwardRef.jl (Semantic, "Illegal forward ref"); 
 	BadForwardRef2.jl (Semantic, "Illegal forward ref"); 
 	BadForwardRef3.jl (Semantic, "Illegal forward ref"); 
+	BadForwardRef04.jl (Semantic, "Illegal forward ref"); 
         Continue1.jl (Semantic, "Target.*not found"), (), (), ();
         Continue2.jl (Semantic, "must be a loop"), (), (), ();
 	ForwardRef4.jl (Semantic, "Illegal forward ref"); 

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -59,13 +59,13 @@ public class Throw_c extends Stmt_c implements Throw {
 
     public Throw_c(Position pos, Expr expr, Ext ext) {
         super(pos, ext);
-        assert (expr != null);
+        assert expr != null;
         this.expr = expr;
     }
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class Throw_c extends Stmt_c implements Throw {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        if (!expr.type().isThrowable()) {
+        if (!expr.type().isSubtype(tc.typeSystem().Throwable())) {
             throw new SemanticException("Can only throw subclasses of \""
                     + tc.typeSystem().Throwable() + "\".", expr.position());
         }
@@ -142,12 +142,14 @@ public class Throw_c extends Stmt_c implements Throw {
     public List<Type> throwTypes(TypeSystem ts) {
         // if the exception that a throw statement is given to throw is null,
         // then a NullPointerException will be thrown.
+        if (expr.type().typeEquals(ts.Null()))
+            return Collections.<Type> singletonList(ts.NullPointerException());
         return CollectionUtil.list(expr.type(), ts.NullPointerException());
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Throw(this.position, this.expr);
+        return nf.Throw(position, expr);
     }
 
 }

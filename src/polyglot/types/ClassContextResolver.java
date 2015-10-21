@@ -77,7 +77,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
 
         LinkedList<ClassType> typeQueue = new LinkedList<>();
         typeQueue.addLast(type);
-        Set<Named> acceptable = new HashSet<>();
+        Set<MemberInstance> acceptable = new HashSet<>();
         SemanticException error = null;
         while (!typeQueue.isEmpty()) {
             ClassType type = typeQueue.removeFirst();
@@ -119,17 +119,18 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
             }
 
             if (m instanceof MemberInstance) {
-                if (!ts.isMember((MemberInstance) m, this.type)) {
+                MemberInstance mi = (MemberInstance) m;
+                if (!ts.isMember(mi, this.type)) {
                     if (error == null)
                         error = new SemanticException("Member class " + m
                                 + " is not visible in class " + this.type);
                 }
-                else if (!canAccess(m, accessor)) {
+                else if (!canAccess(mi, accessor)) {
                     if (error == null)
                         error = new SemanticException("Cannot access member type \""
                                 + m + "\" from class " + accessor + ".");
                 }
-                else acceptable.add(m);
+                else acceptable.add(mi);
                 continue;
             }
 
@@ -154,11 +155,8 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
         }
         else if (acceptable.size() > 1) {
             Set<ReferenceType> containers = new HashSet<>(acceptable.size());
-            for (Named n : acceptable) {
-                if (n instanceof MemberInstance) {
-                    MemberInstance mi = (MemberInstance) n;
-                    containers.add(mi.container());
-                }
+            for (MemberInstance mi : acceptable) {
+                containers.add(mi.container());
             }
 
             if (containers.size() == 2) {
@@ -175,21 +173,16 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                         + ".");
             }
         }
-        Named m = acceptable.iterator().next();
+        MemberInstance mi = acceptable.iterator().next();
 
         if (Report.should_report(TOPICS, 2))
-            Report.report(2, "Found member class " + m);
+            Report.report(2, "Found member class " + mi);
 
-        return m;
+        return (Named) mi;
     }
 
-    protected boolean canAccess(Named n, ClassType accessor) {
-        if (n instanceof MemberInstance) {
-            return accessor == null || ts.isAccessible((MemberInstance) n,
-                                                       ((MemberInstance) n).container(),
-                                                       accessor);
-        }
-        return true;
+    protected boolean canAccess(MemberInstance n, ClassType accessor) {
+        return accessor == null || ts.isAccessible(n, type, accessor);
     }
 
     /**
