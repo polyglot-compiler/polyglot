@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -56,7 +56,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      * {@code n} does not occur in a finally block, then the path map
      * should have only a single entry, from an empty list to the unique
      * {@code Peer} for {@code n}.
-     * 
+     *
      * <p>
      * <b>WARNING</b>: the AST must be a tree, not a DAG. Otherwise the same
      * peer may be used for a node that appears at multiple points in the AST.
@@ -85,7 +85,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         this(root, forward, true);
     }
 
-    public FlowGraph(Term root, boolean forward, boolean alwaysHaveSuccEdgeKey) {
+    public FlowGraph(Term root, boolean forward,
+            boolean alwaysHaveSuccEdgeKey) {
         this.root = root;
         this.forward = forward;
         this.peerMap = new HashMap<>();
@@ -141,7 +142,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      * Retrieve the entry or exit {@code Peer} for the
      * {@code Term n}, where {@code n} does not appear in a
      * finally block. If no such Peer exists, then one will be created.
-     * 
+     *
      * {@code entry} can be Term.ENTRY or Term.EXIT.
      */
     public Peer<FlowItem> peer(Term n, int entry) {
@@ -149,14 +150,15 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     public Peer<FlowItem> peer(Term n, boolean isEntry) {
-        return peer(n, Collections.<Term> emptyList(), isEntry
-                ? Term.ENTRY : Term.EXIT);
+        return peer(n,
+                    Collections.<Term> emptyList(),
+                    isEntry ? Term.ENTRY : Term.EXIT);
     }
 
     /**
      * Return a collection of all of the entry or exit {@code Peer}s for
      * the given {@code Term n}.
-     * 
+     *
      * {@code entry} can be Term.ENTRY or Term.EXIT.
      */
     public Collection<Peer<FlowItem>> peers(Term n, int entry) {
@@ -184,7 +186,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      * associated with the given path to the finally block. (A term that occurs
      * in a finally block has one Peer for each possible path to that finally
      * block.) If no such Peer exists, then one will be created.
-     * 
+     *
      * {@code entry} can be Term.ENTRY or Term.EXIT.
      */
     public Peer<FlowItem> peer(Term n, List<Term> path_to_finally, int entry) {
@@ -208,11 +210,10 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         Peer<FlowItem> p = pathMap.get(peerKey);
 
         if (p == null) {
-            p =
-                    new Peer<>(n,
-                               peerKey.list,
-                               peerKey.entry,
-                               this.alwaysHaveSuccEdgeKey);
+            p = new Peer<>(n,
+                           peerKey.list,
+                           peerKey.entry,
+                           this.alwaysHaveSuccEdgeKey);
             pathMap.put(peerKey, p);
         }
 
@@ -225,10 +226,10 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      * leaving it (in a forward flow graph): one will have the EdgeKey
      * FlowGraph.EDGE_KEY_TRUE, and is the flow that is taken when the condition
      * evaluates to true, and one will have the EdgeKey FlowGraph.EDGE_KEY_FALSE,
-     * and is the flow that is taken when the condition evaluates to false. 
-     * 
+     * and is the flow that is taken when the condition evaluates to false.
+     *
      * The differentiation of the flow graph edges allows for a finer grain
-     * data flow analysis, as the dataflow equations can incorporate the 
+     * data flow analysis, as the dataflow equations can incorporate the
      * knowledge that a condition is true or false on certain flow paths.
      */
     public static class EdgeKey {
@@ -245,8 +246,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
 
         @Override
         public boolean equals(Object other) {
-            return (other instanceof EdgeKey)
-                    && (((EdgeKey) other).o.equals(this.o));
+            return other instanceof EdgeKey
+                    && ((EdgeKey) other).o.equals(this.o);
         }
 
         @Override
@@ -259,9 +260,9 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      * This class extends EdgeKey and is the key for edges that are
      * taken when an exception of type t is thrown. Thus, the flow from
      * line 2 in the example below to the catch block (line 4) would have an
-     * ExceptionEdgeKey constructed with the Type representing 
+     * ExceptionEdgeKey constructed with the Type representing
      * NullPointerExceptions.
-     * 
+     *
      * <pre>
      * ...
      * try {                                      // line 1
@@ -284,8 +285,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
 
         @Override
         public String toString() {
-            return (type().isClass()
-                    ? type().toClass().name() : type().toString());
+            return type().isClass()
+                    ? type().toClass().name() : type().toString();
         }
     }
 
@@ -302,8 +303,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     public static final EdgeKey EDGE_KEY_FALSE = new EdgeKey("false");
 
     /**
-     * This EdgeKey is the EdgeKey for edges where the flow is not suitable 
-     * for EDGE_KEY_TRUE, EDGE_KEY_FALSE or an 
+     * This EdgeKey is the EdgeKey for edges where the flow is not suitable
+     * for EDGE_KEY_TRUE, EDGE_KEY_FALSE or an
      * ExceptionEdgeKey, such as the edges from a switch
      * statement to its cases and
      * the flow from a sink node in the control flow graph.
@@ -312,12 +313,12 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
 
     /**
      * This class represents an edge in the flow graph. The target of the edge
-     * is either the head or the tail of the edge, depending on how the Edge is 
+     * is either the head or the tail of the edge, depending on how the Edge is
      * used. Thus, the target field in Edges in the collection Peer.preds is the
-     * source Peer, while the target field in Edges in the collection Peer.succs 
+     * source Peer, while the target field in Edges in the collection Peer.succs
      * is the destination Peer of edges.
-     * 
-     * Each Edge has an EdgeKey, which identifies when flow uses that edge in 
+     *
+     * Each Edge has an EdgeKey, which identifies when flow uses that edge in
      * the flow graph. See EdgeKey for more information.
      */
     public static class Edge<FlowItem extends DataFlow.Item> {
@@ -345,19 +346,19 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
     }
 
     /**
-     * A {@code Peer} is an occurrence of an AST node in a flow graph. 
-     * For most AST nodes, there will be only one Peer for each AST node. 
+     * A {@code Peer} is an occurrence of an AST node in a flow graph.
+     * For most AST nodes, there will be only one Peer for each AST node.
      * However, if the AST node occurs in a finally block, then there will be
      * multiple {@code Peer}s for that AST node, one for each possible
-     * path to the finally block. This is because flow graphs for finally blocks 
+     * path to the finally block. This is because flow graphs for finally blocks
      * are copied, one copy for each possible path to the finally block.
      */
     public static class Peer<FlowItem extends DataFlow.Item> {
         protected FlowItem inItem; // Input Item for dataflow analysis
         protected Map<EdgeKey, FlowItem> outItems; // Output Items for dataflow analysis, a map from EdgeKeys to DataFlowlItems
         protected Term node; // The AST node that this peer is an occurrence of.
-        protected List<Edge<FlowItem>> succs; // List of successor Edges 
-        protected List<Edge<FlowItem>> preds; // List of predecessor Edges 
+        protected List<Edge<FlowItem>> succs; // List of successor Edges
+        protected List<Edge<FlowItem>> preds; // List of predecessor Edges
         protected final boolean alwaysHaveSuccEdgeKey;
         /**
          * the path to the finally block that uniquely distinguishes this Peer
@@ -369,8 +370,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         protected int entry; // Term.ENTRY or Term.EXIT
 
         /**
-         * Set of all the different EdgeKeys that occur in the Edges in the 
-         * succs. This Set is lazily constructed, as needed, by the 
+         * Set of all the different EdgeKeys that occur in the Edges in the
+         * succs. This Set is lazily constructed, as needed, by the
          * method succEdgeKeys()
          */
         private Set<EdgeKey> succEdgeKeys;
@@ -427,7 +428,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
 
         @Override
         public String toString() {
-            return (entry == Term.ENTRY ? "entry: " : "") + node
+            return (entry == Term.ENTRY ? "entry: " : "") + node + " "
                     + path_to_finally;
         }
 
@@ -498,10 +499,10 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
             Peer<FlowItem> p = queue.removeFirst();
             todo.remove(p);
 //        sb.append(StringUtil.getShortNameComponent(p.node.getClass().getName()) + " ["+p.node+"]" + "\n");
-            sb.append(p.node + " (" + p.node.position() + ")\n");
+            sb.append(p + " (" + p.node.position() + ")\n");
             for (Edge<FlowItem> e : p.succs) {
                 Peer<FlowItem> q = e.getTarget();
-                sb.append("    -> " + q.node + " (" + q.node.position() + ")\n");
+                sb.append("    -> " + q + " (" + q.node.position() + ")\n");
                 //sb.append("  " + StringUtil.getShortNameComponent(q.node.getClass().getName()) + " ["+q.node+"]" + "\n");
                 if (todo.contains(q) && !queue.contains(q)) {
                     queue.addLast(q);

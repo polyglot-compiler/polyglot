@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -105,20 +105,14 @@ public class Disamb_c implements Disamb {
     }
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     protected Node disambiguatePackagePrefix(PackageNode pn)
             throws SemanticException {
-        Resolver pc = ts.packageContextResolver(pn.package_());
+        Resolver pc =
+                ts.packageContextResolver(pn.package_(), c.currentClass());
 
-        Named n;
-
-        try {
-            n = pc.find(name.id());
-        }
-        catch (SemanticException e) {
-            return null;
-        }
+        Named n = pc.find(name.id());
 
         Qualifier q = null;
 
@@ -133,6 +127,11 @@ public class Disamb_c implements Disamb {
             return nf.PackageNode(pos, q.toPackage());
         }
         else if (q.isType() && typeOK()) {
+            if (!ts.classAccessibleFromPackage(q.toType().toClass(),
+                                               c.package_())) {
+                throw new SemanticException("Cannot access type " + q
+                        + " from package " + c.package_() + ".");
+            }
             return nf.CanonicalTypeNode(pos, q.toType());
         }
 
@@ -167,17 +166,22 @@ public class Disamb_c implements Disamb {
 
         // Try member classes.
         if (t.isClass() && typeOK()) {
-            Resolver tc = t.toClass().resolver();
             Named n;
             try {
-                n = tc.find(name.id());
+                n = ts.findMemberClass(t.toClass(),
+                                       name.id(),
+                                       c.currentClass());
             }
             catch (NoClassException e) {
                 return null;
             }
-            if (n instanceof Type) {
-                Type type = (Type) n;
-                return nf.CanonicalTypeNode(pos, type);
+            if (n instanceof ClassType) {
+                ClassType ct = (ClassType) n;
+                if (!ts.classAccessible(ct, c)) {
+                    throw new SemanticException("Cannot access type " + ct
+                            + ".");
+                }
+                return nf.CanonicalTypeNode(pos, ct);
             }
         }
 
@@ -185,7 +189,7 @@ public class Disamb_c implements Disamb {
     }
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     protected Node disambiguateExprPrefix(Expr e) throws SemanticException {
         // Must be a non-static field.
@@ -214,8 +218,7 @@ public class Disamb_c implements Disamb {
                     Type type = (Type) n;
                     if (!type.isCanonical()) {
                         throw new InternalCompilerError("Found an ambiguous type in the context: "
-                                                                + type,
-                                                        pos);
+                                + type, pos);
                     }
                     return nf.CanonicalTypeNode(pos, type);
                 }
@@ -227,7 +230,7 @@ public class Disamb_c implements Disamb {
                     throw e;
                 }
 
-                // couldn't find a type named name. 
+                // couldn't find a type named name.
                 // It must be a package--ignore the exception.
             }
         }
@@ -300,9 +303,9 @@ public class Disamb_c implements Disamb {
     }
 
     protected boolean exprOK() {
-        return !(amb instanceof QualifierNode)
-                && !(amb instanceof TypeNode)
-                && (amb instanceof Expr || amb instanceof Receiver || amb instanceof Prefix);
+        return !(amb instanceof QualifierNode) && !(amb instanceof TypeNode)
+                && (amb instanceof Expr || amb instanceof Receiver
+                        || amb instanceof Prefix);
     }
 
     @Override

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -26,6 +26,7 @@
 
 package polyglot.ast;
 
+import java.util.Collections;
 import java.util.List;
 
 import polyglot.main.Options;
@@ -39,6 +40,7 @@ import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.FlowGraph;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
@@ -61,14 +63,14 @@ public class Assert_c extends Stmt_c implements Assert {
 
     public Assert_c(Position pos, Expr cond, Expr errorMessage, Ext ext) {
         super(pos, ext);
-        assert (cond != null); // errorMessage may be null
+        assert cond != null; // errorMessage may be null
         this.cond = cond;
         this.errorMessage = errorMessage;
     }
 
     @Override
     public Expr cond() {
-        return this.cond;
+        return cond;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class Assert_c extends Stmt_c implements Assert {
 
     @Override
     public Expr errorMessage() {
-        return this.errorMessage;
+        return errorMessage;
     }
 
     @Override
@@ -191,15 +193,48 @@ public class Assert_c extends Stmt_c implements Assert {
     }
 
     @Override
+    public List<Type> throwTypes(TypeSystem ts) {
+        return Collections.<Type> singletonList(ts.AssertionError());
+    }
+
+    @Override
     public Term firstChild() {
         return cond;
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
+        v.visitAssert(this);
         if (errorMessage != null) {
-            v.visitCFG(cond, errorMessage, ENTRY);
-            v.visitCFG(errorMessage, this, EXIT);
+            if (v.lang().isConstant(cond, v.lang())) {
+                boolean condConstantValue =
+                        ((Boolean) v.lang()
+                                    .constantValue(cond,
+                                                   v.lang())).booleanValue();
+                if (condConstantValue) {
+                    v.visitCFG(cond, this, EXIT);
+                }
+                else {
+                    v.visitCFG(cond,
+                               FlowGraph.EDGE_KEY_FALSE,
+                               errorMessage,
+                               ENTRY);
+                    v.visitCFG(errorMessage, this, EXIT);
+
+                    // AssertionError edge will be handled by visitor.
+                    return succs;//Collections.<T> emptyList();
+                }
+            }
+            else {
+                v.visitCFG(cond,
+                           FlowGraph.EDGE_KEY_TRUE,
+                           this,
+                           EXIT,
+                           FlowGraph.EDGE_KEY_FALSE,
+                           errorMessage,
+                           ENTRY);
+                v.visitCFG(errorMessage, this, EXIT);
+            }
         }
         else {
             v.visitCFG(cond, this, EXIT);
@@ -210,7 +245,7 @@ public class Assert_c extends Stmt_c implements Assert {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Assert(this.position, this.cond, this.errorMessage);
+        return nf.Assert(position, cond, errorMessage);
     }
 
 }
