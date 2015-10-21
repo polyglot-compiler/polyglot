@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -93,14 +93,16 @@ public class OptimalCodeWriter extends CodeWriter {
         while (b < s.length()) {
             e = s.indexOf(b, '\n');
             if (e == -1) {
-                current.add(new TextItem(s.substring(b, s.length()), length-b));
+                current.add(new TextItem(s.substring(b, s.length()),
+                                         length - b));
                 break;
-            } else {
+            }
+            else {
                 // auto-split string on newlines.
                 System.out.println("AUTOSPLITTING");
-                current.add(new TextItem(s.substring(b, e), e-b));
+                current.add(new TextItem(s.substring(b, e), e - b));
                 current.add(new Newline(1));
-                b = e+1;
+                b = e + 1;
             }
         }
     }
@@ -121,7 +123,7 @@ public class OptimalCodeWriter extends CodeWriter {
      * inserted breaks. The first line is printed at the current cursor
      * position {@code pos}, all the following lines are printed at the
      * position {@code pos+n}.
-     * 
+     *
      * @param n
      *            the number of characters increased on indentation (relative
      *            to the current position) for all lines in the block.
@@ -219,13 +221,14 @@ public class OptimalCodeWriter extends CodeWriter {
             try {
                 top = input;
                 OCItem.format(input,
-                            0,
-                            0,
-                            width,
-                            width,
-                            new MaxLevels(Integer.MAX_VALUE, Integer.MAX_VALUE),
-                            0,
-                            0);
+                              0,
+                              0,
+                              width,
+                              width,
+                              new MaxLevels(Integer.MAX_VALUE,
+                                            Integer.MAX_VALUE),
+                              0,
+                              0);
             }
             catch (Overrun o) {
                 success = false;
@@ -370,7 +373,7 @@ class Overrun extends Exception {
  * An {@code OCItem} is a piece of input handed to the optimal codewriter. It
  * contains a reference to a possibly empty list of items that follow it.
  */
-public abstract class OCItem {
+abstract class OCItem {
     /** next is null if this is the last item in the list. */
     OCItem next;
 
@@ -380,11 +383,11 @@ public abstract class OCItem {
 
     /**
      * Try to format this and subsequent items.
-     * 
+     *
      * @return the final cursor position (which may overrun rmargin, fin, or
      *         both), and set any contained breaks accordingly.
      *         </p>
-     * 
+     *
      * @param lmargin
      *            is the current left margin.
      * @param pos
@@ -404,7 +407,7 @@ public abstract class OCItem {
      *            is the minimum level at which breaks must be broken.
      * @param minLevelUnified
      *            is the minimum level at which unified breaks must be broken.
-     * 
+     *
      * <p>
      * Breaks may be broken up to level maxLevel, which is set whenever a break
      * is not broken. Not breaking an ordinary break means that equal or
@@ -415,7 +418,7 @@ public abstract class OCItem {
      * maxLevelInner controls the maxLevel in nested blocks; it is equal to
      * either maxLevel or maxLevel-1.
      * </p>
-     * 
+     *
      * <p>
      * <dl>
      * <dt>Example 1:
@@ -424,14 +427,14 @@ public abstract class OCItem {
      * maxLevel is set to 2 and maxLevelInner is set to 1. This permits further
      * breaks of level 1 or 2 in the same block, but only level-1 breaks in
      * inner blocks.
-     * 
+     *
      * <dt>Example 2:</dt>
      * <dd>Suppose we have a current maxLevel of 4, and a unified break of
      * level 2 is not broken. Then for that block, maxLevel and maxLevelInner
      * are set to 1. This permits no breaks in this block or in any nested
      * blocks.</dd>
      * </dl>
-     * 
+     *
      * <p>
      * When a break is broken in a nested block, it means that all equal or
      * higher-level breaks in containing blocks must be broken. However, these
@@ -442,14 +445,14 @@ public abstract class OCItem {
      * {@code minLevelUnified} is the minimum level at which unified breaks must
      * be broken.  minLevelUnified is equal to either minLevel or minLevel+1.
      * </p>
-     * 
+     *
      * <dl>
      * <dt>Example 3:
      * <dd>Suppose we have a current maxLevel of 4, and a break of level 2 is
      * broken. Then for its block, minLevel is at least 1, and minLevelUnified
      * is at least 2. For containing blocks, minLevel is at least 2.</dd>
      * </dl>
-     * 
+     *
      * <b>Note:</b> It is important that formatN not necessarily convert
      * overruns in its final position into exceptions. This allows the calling
      * routine to distinguish between 'internal' overruns and ones that it can
@@ -457,7 +460,7 @@ public abstract class OCItem {
      * list will make the overrun go up by. Also, it simplifies the coding of
      * formatN.
      * </p>
-     * 
+     *
      * Requires: rmargin &lt; lmargin, pos &lt;= rmargin, lmargin &lt; rmargin,
      * pos &le; rmargin, lmargin &ge; 0
      */
@@ -467,7 +470,7 @@ public abstract class OCItem {
     /**
      * Send the output associated with this item to {@code o}, using the
      * current break settings.
-     * 
+     *
      * @param success
      */
     abstract int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin,
@@ -486,12 +489,12 @@ public abstract class OCItem {
      * way that overruns are checked!). The item {@code it} may be also
      * null, signifying an empty list. Requires: lmargin &lt; rmargin, pos &le;
      * rmargin, lmargin &ge; 0.
-     * 
+     *
      * @see formatN
      */
     static FormatResult format(OCItem it, int lmargin, int pos, int rmargin,
             int fin, MaxLevels m, int minLevel, int minLevelUnified)
-            throws Overrun {
+                    throws Overrun {
         OptimalCodeWriter.format_calls++;
         if (OptimalCodeWriter.debug) {
             if (it != null && it != OptimalCodeWriter.top) {
@@ -499,7 +502,12 @@ public abstract class OCItem {
                 PrintWriter w =
                         new PrintWriter(new OutputStreamWriter(System.err));
                 try {
-                    OptimalCodeWriter.top.sendOutput(w, 0, 0, rmargin, true, it);
+                    OptimalCodeWriter.top.sendOutput(w,
+                                                     0,
+                                                     0,
+                                                     rmargin,
+                                                     true,
+                                                     it);
                 }
                 catch (IOException e) {
                 }
@@ -522,7 +530,8 @@ public abstract class OCItem {
         if (it == null) { // no items to format. Check against final position.
             if (pos > fin) {
                 if (OptimalCodeWriter.debug)
-                    System.err.println("Final position overrun: " + (pos - fin));
+                    System.err.println("Final position overrun: "
+                            + (pos - fin));
                 throw Overrun.overrun(it, m, pos - fin, Overrun.FIN);
             }
             else return new FormatResult(pos, minLevelUnified);
@@ -568,7 +577,7 @@ public abstract class OCItem {
      * with an item and its following items, if all breaks are broken. The purpose
      * is to more aggressively tighten bounds when an overrun occurs. Formatting is
      * measured relative to both "lmargin" and to "pos". T
-     * 
+     *
      * lmargin pos
      *       | |
      *       | xxxxx
@@ -584,7 +593,7 @@ public abstract class OCItem {
     public static final int NO_WIDTH = -9999;
     public static final int NEWLINE_VIOLATION = 9999; // a big number XXX (hack)
 
-    /** Minimum lmargin-rhs width on second and following lines. 
+    /** Minimum lmargin-rhs width on second and following lines.
      * A map from max levels to Integer(width). */
 
     Map<MaxLevels, Integer> min_widths = new HashMap<>();
@@ -600,7 +609,7 @@ public abstract class OCItem {
         if (it.min_widths.containsKey(m)) return it.min_widths.get(m);
         int p1 = it.selfMinWidth(m);
         int p2 = it.selfMinIndent(m);
-        int p3 = (p2 != NO_WIDTH) ? getMinPosWidth(it.next, m) + p2 : NO_WIDTH;
+        int p3 = p2 != NO_WIDTH ? getMinPosWidth(it.next, m) + p2 : NO_WIDTH;
         int p4 = getMinWidth(it.next, m);
 
         if (OptimalCodeWriter.debug)
@@ -620,16 +629,14 @@ public abstract class OCItem {
         int result;
         if (it.next == null || it.selfContainsBreaks(m)) {
             result = p1;
-            if (OptimalCodeWriter.debug)
-                System.err.println("minpos " + m + ": item = " + it
-                        + ":  p1 = " + p1);
+            if (OptimalCodeWriter.debug) System.err.println("minpos " + m
+                    + ": item = " + it + ":  p1 = " + p1);
         }
         else {
             result = p1 + getMinPosWidth(it.next, m);
-            if (OptimalCodeWriter.debug)
-                System.err.println("minpos " + m + ": item = " + it
-                        + ":  p1 = " + p1 + " + " + getMinPosWidth(it.next, m)
-                        + " = " + result);
+            if (OptimalCodeWriter.debug) System.err.println("minpos " + m
+                    + ": item = " + it + ":  p1 = " + p1 + " + "
+                    + getMinPosWidth(it.next, m) + " = " + result);
         }
         it.min_pos_width.put(m, result);
         return result;
@@ -653,15 +660,13 @@ public abstract class OCItem {
     static boolean containsBreaks(OCItem it, MaxLevels m) {
         if (it == null) return false;
         if (it.selfContainsBreaks(m)) {
-            if (OptimalCodeWriter.debug)
-                System.err.println("containsBreaks " + m + " of " + it
-                        + ": true");
+            if (OptimalCodeWriter.debug) System.err.println("containsBreaks "
+                    + m + " of " + it + ": true");
             return true;
         }
         if (it.next == null) {
-            if (OptimalCodeWriter.debug)
-                System.err.println("containsBreaks " + m + " of " + it
-                        + ": false");
+            if (OptimalCodeWriter.debug) System.err.println("containsBreaks "
+                    + m + " of " + it + ": false");
             return false;
         }
         return containsBreaks(it.next, m);
@@ -797,10 +802,9 @@ class AllowBreak extends OCItem {
                               rmargin,
                               fin,
                               new MaxLevels(Math.min(unified
-                                                             ? level - 1
-                                                             : level,
-                                                     m.maxLevel),
-                                            Math.min(level - 1, m.maxLevelInner)),
+                                      ? level - 1 : level, m.maxLevel),
+                                            Math.min(level - 1,
+                                                     m.maxLevelInner)),
                               minLevel,
                               minLevelUnified);
 
@@ -875,7 +879,7 @@ class AllowBreak extends OCItem {
     }
 
     boolean canLeaveUnbroken(int minLevel, int minLevelUnified) {
-        return (level > minLevelUnified || !unified && level > minLevel);
+        return level > minLevelUnified || !unified && level > minLevel;
     }
 
     @Override
@@ -994,7 +998,7 @@ class BlockItem extends OCItem {
         else {
             if (it instanceof TextItem && last instanceof TextItem) {
                 TextItem lasts = (TextItem) last;
-                lasts.appendTextItem(((TextItem) it));
+                lasts.appendTextItem((TextItem) it);
                 return;
             }
             else {
@@ -1070,20 +1074,20 @@ class BlockItem extends OCItem {
 
     @Override
     int selfMinWidth(MaxLevels m) {
-        return getMinWidth(first, new MaxLevels(m.maxLevelInner,
-                                                m.maxLevelInner));
+        return getMinWidth(first,
+                           new MaxLevels(m.maxLevelInner, m.maxLevelInner));
     }
 
     @Override
     int selfMinPosWidth(MaxLevels m) {
-        return getMinPosWidth(first, new MaxLevels(m.maxLevelInner,
-                                                   m.maxLevelInner));
+        return getMinPosWidth(first,
+                              new MaxLevels(m.maxLevelInner, m.maxLevelInner));
     }
 
     @Override
     int selfMinIndent(MaxLevels m) {
-        return getMinIndent(first, new MaxLevels(m.maxLevelInner,
-                                                 m.maxLevelInner));
+        return getMinIndent(first,
+                            new MaxLevels(m.maxLevelInner, m.maxLevelInner));
     }
 
     /**
@@ -1095,20 +1099,20 @@ class BlockItem extends OCItem {
     @Override
     boolean selfContainsBreaks(MaxLevels m) {
         if (containsBreaks.containsKey(m)) {
-            return (containsBreaks.get(m) != null);
+            return containsBreaks.get(m) != null;
         }
         boolean result =
-                containsBreaks(first, new MaxLevels(m.maxLevelInner,
-                                                    m.maxLevelInner));
+                containsBreaks(first,
+                               new MaxLevels(m.maxLevelInner, m.maxLevelInner));
         containsBreaks.put(m, result ? m : null);
         return result;
     }
 
     @Override
     String selfToString() {
-        return first == null ? "[]" :
-         (indent == 0)  ? "[" + first + "]"
-                        : "[" + indent + first + "]";
+        return first == null
+                ? "[]"
+                : indent == 0 ? "[" + first + "]" : "[" + indent + first + "]";
     }
 }
 
@@ -1140,7 +1144,7 @@ class MaxLevels {
     public boolean equals(Object o) {
         if (o instanceof MaxLevels) {
             MaxLevels m2 = (MaxLevels) o;
-            return (maxLevel == m2.maxLevel && maxLevelInner == m2.maxLevelInner);
+            return maxLevel == m2.maxLevel && maxLevelInner == m2.maxLevelInner;
         }
         else return false;
     }
