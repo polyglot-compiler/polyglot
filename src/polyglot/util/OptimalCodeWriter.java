@@ -36,12 +36,12 @@ import java.util.Map;
 
 /**
  * The pretty-printing algorithm is loosely based on the Modula-3
- * pretty-printer, and on notes by Greg Nelson. It was extended to support
- * breaks at multiple levels.
+ * pretty-printer, and on notes by Greg Nelson, but extended to support
+ * breaks at multiple levels so that "miser mode" formatting is possible.
  *
  * OptimalCodeWriter follows the "break from root" rule: if a break is broken,
  * breaks of equal or lower level in all containing blocks must also be
- * broken, and breaks in the same block must also be broken if they are
+ * broken. Further, breaks in the same block must also be broken if they are
  * of strictly lower level or if they are of the same level but marked as
  * "unified".
  */
@@ -218,7 +218,7 @@ public class OptimalCodeWriter extends CodeWriter {
         if (format) {
             try {
                 top = input;
-                Item.format(input,
+                OCItem.format(input,
                             0,
                             0,
                             width,
@@ -261,7 +261,7 @@ public class OptimalCodeWriter extends CodeWriter {
     protected BlockItem input;
     protected BlockItem current;
 
-    protected static Item top;
+    protected static OCItem top;
 
     protected PrintWriter output;
     protected int width;
@@ -316,7 +316,7 @@ class Overrun extends Exception {
     private Overrun() {
     }
 
-    static Overrun overrun(Item it, MaxLevels m, int amount, int type) {
+    static Overrun overrun(OCItem it, MaxLevels m, int amount, int type) {
         if (OptimalCodeWriter.debug)
             System.err.println("-- Overrun: " + amount);
         if (OptimalCodeWriter.visualize) {
@@ -347,13 +347,13 @@ class Overrun extends Exception {
 
             System.err.println("  next item is " + it);
             System.err.println("  minPosWidth" + m + " of next item = "
-                    + Item.getMinPosWidth(it, m));
+                    + OCItem.getMinPosWidth(it, m));
             System.err.println("  minWidth" + m + " of next item = "
-                    + Item.getMinWidth(it, m));
+                    + OCItem.getMinWidth(it, m));
             System.err.println("  minIndent" + m + " of next item = "
-                    + Item.getMinIndent(it, m));
+                    + OCItem.getMinIndent(it, m));
             System.err.println("  containsBreaks" + m + " of next item = "
-                    + Item.containsBreaks(it, m));
+                    + OCItem.containsBreaks(it, m));
             try {
                 System.in.read();
             }
@@ -367,14 +367,14 @@ class Overrun extends Exception {
 }
 
 /**
- * An {@code Item} is a piece of input handed to the formatter. It
+ * An {@code OCItem} is a piece of input handed to the optimal codewriter. It
  * contains a reference to a possibly empty list of items that follow it.
  */
-abstract class Item {
+public abstract class OCItem {
     /** next is null if this is the last item in the list. */
-    Item next;
+    OCItem next;
 
-    protected Item() {
+    protected OCItem() {
         next = null;
     }
 
@@ -414,6 +414,7 @@ abstract class Item {
      * level in the same block must not also be broken. The parameter
      * maxLevelInner controls the maxLevel in nested blocks; it is equal to
      * either maxLevel or maxLevel-1.
+     * </p>
      * 
      * <p>
      * <dl>
@@ -449,7 +450,7 @@ abstract class Item {
      * is at least 2. For containing blocks, minLevel is at least 2.</dd>
      * </dl>
      * 
-     * <b>Note: </b> It is important that formatN not necessarily convert
+     * <b>Note:</b> It is important that formatN not necessarily convert
      * overruns in its final position into exceptions. This allows the calling
      * routine to distinguish between 'internal' overruns and ones that it can
      * tack on a conservative estimate of how much formatting the rest of the
@@ -470,7 +471,7 @@ abstract class Item {
      * @param success
      */
     abstract int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin,
-            boolean success, Item last) throws IOException;
+            boolean success, OCItem last) throws IOException;
 
     // XXX
     // the getminwidth etc. code is starting to duplicate the logic of the main
@@ -481,14 +482,14 @@ abstract class Item {
 
     /**
      * Try to format a whole sequence of items in the manner of formatN. Unlike
-     * for formatN, The initial position may be an overrun (this is the only
+     * for formatN, the initial position may be an overrun (this is the only
      * way that overruns are checked!). The item {@code it} may be also
      * null, signifying an empty list. Requires: lmargin &lt; rmargin, pos &le;
      * rmargin, lmargin &ge; 0.
      * 
      * @see formatN
      */
-    static FormatResult format(Item it, int lmargin, int pos, int rmargin,
+    static FormatResult format(OCItem it, int lmargin, int pos, int rmargin,
             int fin, MaxLevels m, int minLevel, int minLevelUnified)
             throws Overrun {
         OptimalCodeWriter.format_calls++;
@@ -594,7 +595,7 @@ abstract class Item {
     /** Minimum pos-rhs width (i.e., min width up to first break) */
     Map<MaxLevels, Integer> min_pos_width = new HashMap<>();
 
-    static int getMinWidth(Item it, MaxLevels m) {
+    static int getMinWidth(OCItem it, MaxLevels m) {
         if (it == null) return NO_WIDTH;
         if (it.min_widths.containsKey(m)) return it.min_widths.get(m);
         int p1 = it.selfMinWidth(m);
@@ -610,7 +611,7 @@ abstract class Item {
         return result;
     }
 
-    static int getMinPosWidth(Item it, MaxLevels m) {
+    static int getMinPosWidth(OCItem it, MaxLevels m) {
         if (it == null) return 0;
         if (it.min_pos_width.containsKey(m)) {
             return it.min_pos_width.get(m);
@@ -634,7 +635,7 @@ abstract class Item {
         return result;
     }
 
-    static int getMinIndent(Item it, MaxLevels m) {
+    static int getMinIndent(OCItem it, MaxLevels m) {
         if (it == null) return NO_WIDTH;
         if (it.min_indents.containsKey(m)) {
             return it.min_indents.get(m);
@@ -649,7 +650,7 @@ abstract class Item {
         return result;
     }
 
-    static boolean containsBreaks(Item it, MaxLevels m) {
+    static boolean containsBreaks(OCItem it, MaxLevels m) {
         if (it == null) return false;
         if (it.selfContainsBreaks(m)) {
             if (OptimalCodeWriter.debug)
@@ -689,7 +690,7 @@ abstract class Item {
 }
 
 /** A simple string. */
-class TextItem extends Item {
+class TextItem extends OCItem {
     String s; //@ invariant s != null
     int length;
 
@@ -714,7 +715,7 @@ class TextItem extends Item {
 
     @Override
     int sendOutput(PrintWriter o, int lm, int pos, int rm, boolean success,
-            Item last) throws IOException {
+            OCItem last) throws IOException {
         o.write(s);
         return pos + length;
     }
@@ -760,7 +761,7 @@ class TextItem extends Item {
     }
 }
 
-class AllowBreak extends Item {
+class AllowBreak extends OCItem {
     final int indent;
     final int level;
     final boolean unified;
@@ -855,7 +856,7 @@ class AllowBreak extends Item {
 
     @Override
     int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin,
-            boolean success, Item last) throws IOException {
+            boolean success, OCItem last) throws IOException {
         if (broken || !success && pos >= rmargin) {
             o.println();
             for (int i = 0; i < lmargin + indent; i++)
@@ -938,7 +939,7 @@ class Newline extends AllowBreak {
     // XXX should not need to override sendOutput
     @Override
     int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin,
-            boolean success, Item last) throws IOException {
+            boolean success, OCItem last) throws IOException {
         broken = true; // XXX how can this be necessary?
         return super.sendOutput(o, lmargin, pos, rmargin, success, last);
     }
@@ -969,13 +970,14 @@ class Newline extends AllowBreak {
  * A BlockItem is a formatting unit containing a list of other items to be
  * formatted.
  */
-class BlockItem extends Item {
+class BlockItem extends OCItem {
     BlockItem parent;
-    Item first;
-    Item last;
+    OCItem first;
+    OCItem last;
     int indent; //@ invariant indent >= 0
 
     BlockItem(BlockItem parent_, int indent_) {
+        assert indent_ >= 0;
         parent = parent_;
         first = last = null;
         indent = indent_;
@@ -985,7 +987,7 @@ class BlockItem extends Item {
      * Add a new item to the end of the block. Successive StringItems are
      * concatenated together to limit recursion depth when formatting.
      */
-    void add(Item it) {
+    void add(OCItem it) {
         if (first == null) {
             first = it;
         }
@@ -1009,6 +1011,10 @@ class BlockItem extends Item {
         if (childfin + getMinPosWidth(next, m) > rmargin) {
             childfin = rmargin - getMinPosWidth(next, m);
         }
+        // Keep trying to format while giving the first item in the list
+        // less and less space (childfin) as dictated by the space needs
+        // of the subsequent items. Eventually either the whole list succeeds
+        // or the first child cannot be formatted in the available space.
         while (true) {
             FormatResult fr =
                     format(first,
@@ -1044,8 +1050,8 @@ class BlockItem extends Item {
 
     @Override
     int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin,
-            boolean success, Item last) throws IOException {
-        Item it = first;
+            boolean success, OCItem last) throws IOException {
+        OCItem it = first;
         lmargin = pos + indent;
         if (last != this) {
             while (it != null) {
