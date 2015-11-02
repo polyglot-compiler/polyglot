@@ -79,7 +79,8 @@ public class ClassBody_c extends Term_c implements ClassBody {
         return members(this, members);
     }
 
-    protected <N extends ClassBody_c> N members(N n, List<ClassMember> members) {
+    protected <N extends ClassBody_c> N members(N n,
+            List<ClassMember> members) {
         if (CollectionUtil.equals(n.members, members)) return n;
         n = copyIfNeeded(n);
         n.members = ListUtil.copy(members, true);
@@ -107,7 +108,8 @@ public class ClassBody_c extends Term_c implements ClassBody {
     }
 
     @Override
-    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb)
+            throws SemanticException {
         return tb.enterAnonClass();
     }
 
@@ -121,7 +123,8 @@ public class ClassBody_c extends Term_c implements ClassBody {
         return "{ ... }";
     }
 
-    protected void duplicateFieldCheck(TypeChecker tc) throws SemanticException {
+    protected void duplicateFieldCheck(TypeChecker tc)
+            throws SemanticException {
         ClassType type = tc.context().currentClass();
 
         List<FieldInstance> l = new ArrayList<>(type.fields());
@@ -134,7 +137,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
                 if (fi.name().equals(fj.name())) {
                     throw new SemanticException("Duplicate field \"" + fj
-                                                + "\".", fj.position());
+                            + "\".", fj.position());
                 }
             }
         }
@@ -155,7 +158,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
                 if (isSameConstructor(ts, ci, cj)) {
                     throw new SemanticException("Duplicate constructor \"" + cj
-                                                + "\".", cj.position());
+                            + "\".", cj.position());
                 }
             }
         }
@@ -176,7 +179,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
                 if (isSameMethod(ts, mi, mj)) {
                     throw new SemanticException("Duplicate method \"" + mj
-                                                + "\".", mj.position());
+                            + "\".", mj.position());
                 }
             }
         }
@@ -196,7 +199,7 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
                 if (mi.name().equals(mj.name())) {
                     throw new SemanticException("Duplicate member type \"" + mj
-                                                + "\".", mj.position());
+                            + "\".", mj.position());
                 }
             }
         }
@@ -237,8 +240,9 @@ public class ClassBody_c extends Term_c implements ClassBody {
 
             for (Iterator<ClassMember> i = members.iterator(); i.hasNext();) {
                 ClassMember member = i.next();
-                if (member instanceof polyglot.ast.CodeDecl
-                        || prev instanceof polyglot.ast.CodeDecl) {
+                if (prev != null && (member instanceof polyglot.ast.CodeDecl
+                        && !(prev instanceof polyglot.ast.ClassDecl)
+                        || prev instanceof polyglot.ast.CodeDecl)) {
                     w.newline(0);
                 }
                 prev = member;

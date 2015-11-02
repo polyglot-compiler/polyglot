@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -90,17 +90,17 @@ public class New_c extends Expr_c implements New, NewOps {
     public New_c(Position pos, Expr qualifier, TypeNode tn,
             List<Expr> arguments, ClassBody body, Ext ext) {
         super(pos, ext);
-        assert (tn != null && arguments != null); // qualifier and body may be null
+        assert tn != null && arguments != null; // qualifier and body may be null
         this.qualifier = qualifier;
-        this.qualifierImplicit = (qualifier == null);
-        this.objectType = tn;
+        qualifierImplicit = qualifier == null;
+        objectType = tn;
         this.arguments = ListUtil.copy(arguments, true);
         this.body = body;
     }
 
     @Override
     public Expr qualifier() {
-        return this.qualifier;
+        return qualifier;
     }
 
     @Override
@@ -117,7 +117,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public boolean isQualifierImplicit() {
-        return this.qualifierImplicit;
+        return qualifierImplicit;
     }
 
     @Override
@@ -134,7 +134,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public TypeNode objectType() {
-        return this.objectType;
+        return objectType;
     }
 
     @Override
@@ -151,7 +151,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public ParsedClassType anonType() {
-        return this.anonType;
+        return anonType;
     }
 
     @Override
@@ -173,7 +173,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public ConstructorInstance constructorInstance() {
-        return this.ci;
+        return ci;
     }
 
     @Override
@@ -191,7 +191,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public List<Expr> arguments() {
-        return this.arguments;
+        return arguments;
     }
 
     @Override
@@ -208,7 +208,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public ClassBody body() {
-        return this.body;
+        return body;
     }
 
     @Override
@@ -236,7 +236,7 @@ public class New_c extends Expr_c implements New, NewOps {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr qualifier = visitChild(this.qualifier, v);
-        TypeNode tn = visitChild(this.objectType, v);
+        TypeNode tn = visitChild(objectType, v);
         List<Expr> arguments = visitList(this.arguments, v);
         ClassBody body = visitChild(this.body, v);
         return reconstruct(this, qualifier, tn, arguments, body);
@@ -251,15 +251,16 @@ public class New_c extends Expr_c implements New, NewOps {
     }
 
     @Override
-    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb)
+            throws SemanticException {
         if (body != null) {
             /*
             // bypass the visiting of the body of the anonymous class. We'll
             // get around to visiting it in the buildTypes method.
             // We do this because we need to visit the body of the anonymous
-            // class after we've pushed an anon class onto the type builder, 
-            // but we need to check the arguments, and qualifier, etc. outside 
-            // of the scope of the anon class.            
+            // class after we've pushed an anon class onto the type builder,
+            // but we need to check the arguments, and qualifier, etc. outside
+            // of the scope of the anon class.
             return tb.bypass(body);
              */
             return tb.pushAnonClass(position());
@@ -291,10 +292,10 @@ public class New_c extends Expr_c implements New, NewOps {
             // let's get a type builder that is prepared to visit the
             // body; tb wants to bypass it, due to the buildTypesEnter method.
             TypeBuilder bodyTB = (TypeBuilder)tb.visitChildren();
-
+            
             // push an anonymous class on the stack.
             bodyTB = bodyTB.pushAnonClass(position());
-
+            
             n = (New_c) n.body((ClassBody)n.body().visit(bodyTB));
             ParsedClassType type = (ParsedClassType) bodyTB.currentClass();
              */
@@ -444,9 +445,8 @@ public class New_c extends Expr_c implements New, NewOps {
         if (c.inStaticContext()) {
             if (body != null)
                 return null;
-            else throw new SemanticException("Inner class "
-                                                     + ct
-                                                     + " cannot be instantiated in a static context.",
+            else throw new SemanticException("Inner class " + ct
+                    + " cannot be instantiated in a static context.",
                                              position());
         }
 
@@ -459,8 +459,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
         if (outer == null) {
             throw new SemanticException("Could not find non-static member class \""
-                                                + ct.name() + "\".B" + this,
-                                        position());
+                    + ct.name() + "\".B" + this, position());
         }
 
         // Create the qualifier.
@@ -470,9 +469,8 @@ public class New_c extends Expr_c implements New, NewOps {
             q = nf.This(position().startOf());
         }
         else {
-            q =
-                    nf.This(position().startOf(),
-                            nf.CanonicalTypeNode(position(), outer));
+            q = nf.This(position().startOf(),
+                        nf.CanonicalTypeNode(position(), outer));
         }
         q = q.type(outer);
         return q;
@@ -496,7 +494,7 @@ public class New_c extends Expr_c implements New, NewOps {
         tc.lang().typeCheckFlags(this, tc);
         tc.lang().typeCheckNested(this, tc);
 
-        if (this.body != null) {
+        if (body != null) {
             ts.checkClassConformance(anonType);
         }
 
@@ -507,11 +505,10 @@ public class New_c extends Expr_c implements New, NewOps {
             if (anonType != null) {
                 c = c.pushClass(anonType, anonType);
             }
-            ci =
-                    ts.findConstructor(ct,
-                                       argTypes,
-                                       c.currentClass(),
-                                       body == null);
+            ci = ts.findConstructor(ct,
+                                    argTypes,
+                                    c.currentClass(),
+                                    body == null);
         }
         else {
             ci = ts.defaultConstructor(this.position(), ct);
@@ -530,10 +527,8 @@ public class New_c extends Expr_c implements New, NewOps {
                 // See JLS 2nd Ed. | 6.6.2.2.
                 ClassType contextClass = tc.context().currentClass();
                 if (!ts.equals(contextClass.package_(), ct.package_())) {
-                    throw new SemanticException("Constructor "
-                                                        + ci.signature()
-                                                        + " is inaccessible from class "
-                                                        + contextClass,
+                    throw new SemanticException("Constructor " + ci.signature()
+                            + " is inaccessible from class " + contextClass,
                                                 position());
                 }
             }
@@ -568,8 +563,7 @@ public class New_c extends Expr_c implements New, NewOps {
             }
             if (qualifierClassType == null) {
                 throw new SemanticException("Could not find non-static member class \""
-                                                    + ct.name() + "\".A" + this,
-                                            position());
+                        + ct.name() + "\".A" + this, position());
             }
         }
         else {
@@ -577,15 +571,13 @@ public class New_c extends Expr_c implements New, NewOps {
             // mustn't have a qualifier
             if (qualifier != null) {
                 throw new SemanticException("Cannot provide a containing instance for non-inner class "
-                                                    + ct.fullName() + ".",
-                                            qualifier.position());
+                        + ct.fullName() + ".", qualifier.position());
             }
             // make sure that all enclosing classes are static.
             for (ClassType t = ct; t.isMember(); t = t.outer()) {
                 if (!t.flags().isStatic()) {
                     throw new SemanticException("Cannot allocate non-static member class \""
-                                                        + t + "\".",
-                                                position());
+                            + t + "\".", position());
                 }
             }
 
@@ -595,7 +587,7 @@ public class New_c extends Expr_c implements New, NewOps {
     @Override
     public ClassType findEnclosingClass(Context c, ClassType ct) {
         if (anonType != null) {
-            // we need to find ct, is an anonymous class, and so 
+            // we need to find ct, is an anonymous class, and so
             // the enclosing class is the current class.
             return c.currentClass();
         }
@@ -632,7 +624,7 @@ public class New_c extends Expr_c implements New, NewOps {
     protected void typeCheckFlags(TypeChecker tc, Flags classFlags)
             throws SemanticException {
 
-        if (this.body == null) {
+        if (body == null) {
             if (classFlags.isInterface()) {
                 throw new SemanticException("Cannot instantiate an interface.",
                                             position());
@@ -651,7 +643,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
             if (classFlags.isInterface() && !arguments.isEmpty()) {
                 throw new SemanticException("Cannot pass arguments to an anonymous class that "
-                                                    + "implements an interface.",
+                        + "implements an interface.",
                                             arguments.get(0).position());
             }
         }
@@ -670,7 +662,7 @@ public class New_c extends Expr_c implements New, NewOps {
             return child.type();
         }
 
-        Iterator<Expr> i = this.arguments.iterator();
+        Iterator<Expr> i = arguments.iterator();
         Iterator<? extends Type> j = ci.formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
@@ -728,14 +720,14 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public String toString() {
-        return (qualifier != null ? (qualifier.toString() + ".") : "") + "new "
+        return (qualifier != null ? qualifier.toString() + "." : "") + "new "
                 + objectType + "(...)" + (body != null ? " " + body : "");
     }
 
     @Override
     public void printQualifier(CodeWriter w, PrettyPrinter tr) {
-        if (this.qualifier != null && !this.qualifierImplicit) {
-            printSubExpr(this.qualifier, w, tr);
+        if (qualifier != null && !qualifierImplicit) {
+            printSubExpr(qualifier, w, tr);
             w.write(".");
         }
     }
@@ -777,6 +769,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        w.begin(0);
         ((JLang) tr.lang()).printQualifier(this, w, tr);
         w.write("new ");
 
@@ -794,6 +787,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
         ((JLang) tr.lang()).printArgs(this, w, tr);
         ((JLang) tr.lang()).printBody(this, w, tr);
+        w.end();
     }
 
     @Override
@@ -872,7 +866,9 @@ public class New_c extends Expr_c implements New, NewOps {
         nn = (New_c) tc.leave(parent, old, nn, childtc);
 
         ConstantChecker cc =
-                new ConstantChecker(tc.job(), tc.typeSystem(), tc.nodeFactory());
+                new ConstantChecker(tc.job(),
+                                    tc.typeSystem(),
+                                    tc.nodeFactory());
         cc = (ConstantChecker) cc.context(childtc.context());
         nn = (New_c) tc.lang().checkConstants(nn, cc);
 
@@ -881,11 +877,7 @@ public class New_c extends Expr_c implements New, NewOps {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.New(this.position,
-                      this.qualifier,
-                      this.objectType,
-                      this.arguments,
-                      this.body);
+        return nf.New(position, qualifier, objectType, arguments, body);
     }
 
 }

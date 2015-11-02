@@ -31,17 +31,20 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * The pretty-printing algorithm is loosely based on the Modula-3
- * pretty-printer, and on notes by Greg Nelson, but extended to support
- * breaks at multiple levels so that "miser mode" formatting is possible.
+ * pretty-printer, and on notes by Greg Nelson. It was extended to support
+ * breaks at multiple levels.
  *
  * OptimalCodeWriter follows the "break from root" rule: if a break is broken,
  * breaks of equal or lower level in all containing blocks must also be
- * broken. Further, breaks in the same block must also be broken if they are
+ * broken, and breaks in the same block must also be broken if they are
  * of strictly lower level or if they are of the same level but marked as
  * "unified".
  */
@@ -64,7 +67,7 @@ public class OptimalCodeWriter extends CodeWriter {
     public OptimalCodeWriter(PrintWriter o, int width_) {
         output = o;
         width = width_;
-        current = input = new BlockItem(null, 0);
+        current = input = new BlockItem(0);
         if (OptimalCodeWriter.showInput) {
             trace("new OptimalCodeWriter: width = " + width);
         }
@@ -89,23 +92,10 @@ public class OptimalCodeWriter extends CodeWriter {
         if (OptimalCodeWriter.showInput) {
             trace("write '" + s + "' (" + length + ")");
         }
-        int b = 0, e;
-        while (b < s.length()) {
-            e = s.indexOf(b, '\n');
-            if (e == -1) {
-                current.add(new TextItem(s.substring(b, s.length()),
-                                         length - b));
-                break;
-            }
-            else {
-                // auto-split string on newlines.
-                System.out.println("AUTOSPLITTING");
-                current.add(new TextItem(s.substring(b, e), e - b));
-                current.add(new Newline(1));
-                b = e + 1;
-            }
-        }
+        current.add(new TextItem(s, length));
     }
+
+    protected List<BlockItem> blockStack = new LinkedList<>();
 
     /**
      * Start a new block with a relative indentation of {@code n}
@@ -135,8 +125,9 @@ public class OptimalCodeWriter extends CodeWriter {
             trace("begin " + n);
             incIndent();
         }
-        BlockItem b = new BlockItem(current, n);
+        BlockItem b = new BlockItem(n);
         current.add(b);
+        blockStack.add(0, current);
         current = b;
     }
 
@@ -149,9 +140,9 @@ public class OptimalCodeWriter extends CodeWriter {
             decIndent();
             trace("end");
         }
-        current = current.parent;
-        //@ assert current != null
-        // if (current == null) throw new RuntimeException();
+        if (blockStack.isEmpty())
+            throw new InternalCompilerError("Mismatched blocks");
+        current = blockStack.remove(0);
     }
 
     @Override
@@ -169,16 +160,6 @@ public class OptimalCodeWriter extends CodeWriter {
             trace("unifiedBreak " + n + " level=" + level);
         }
         current.add(new AllowBreak(n, level, alt, altlen, true));
-    }
-
-    /**
-     * This method should be used sparingly; usually a call to
-     * {@code allowBreak} is preferable because forcing a newline also
-     * causes all breaks in containing blocks to be broken.
-     */
-    @Override
-    public void newline() {
-        newline(0, 1);
     }
 
     /**
@@ -215,34 +196,23 @@ public class OptimalCodeWriter extends CodeWriter {
         if (OptimalCodeWriter.showInput) {
             trace("flush");
         }
+        if (!blockStack.isEmpty())
+            throw new InternalCompilerError("Mismatched blocks");
         boolean success = true;
         format_calls = 0;
-        if (format) {
-            try {
-                top = input;
-                OCItem.format(input,
-                              0,
-                              0,
-                              width,
-                              width,
-                              new MaxLevels(Integer.MAX_VALUE,
-                                            Integer.MAX_VALUE),
-                              0,
-                              0);
-            }
-            catch (Overrun o) {
-                success = false;
-            }
-        }
-        else success = false;
 
-        input.sendOutput(output, 0, 0, width, success, null);
+        Map<AllowBreak, Boolean> brkAssignment;
+        if (format)
+            brkAssignment = OCItem.format(input, width);
+        else brkAssignment = Collections.emptyMap();
+        input.sendOutput(output, 0, 0, brkAssignment);
+
         output.flush();
         if (OptimalCodeWriter.debug) {
             System.err.println("Total calls to format = " + format_calls);
             System.err.flush();
         }
-        current = input = new BlockItem(null, 0);
+        current = input = new BlockItem(0);
         return success;
     }
 
@@ -301,76 +271,134 @@ public class OptimalCodeWriter extends CodeWriter {
 
 }
 
-/**
- * An {@code Overrun} represents a formatting that failed because the
- * right margin was exceeded by at least {@code amount} chars.
- */
-class Overrun extends Exception {
-    private static final long serialVersionUID = SerialVersionUID.generate();
-
-    int amount;
-    int type;
-    final static int POS = 0;
-    final static int WIDTH = 1;
-    final static int FIN = 2;
-
-    private static final Overrun overrun = new Overrun();
-
-    private Overrun() {
+class ConsList<T> {
+    static <T> ConsList<T> empty() {
+        return new ConsList<>();
     }
 
-    static Overrun overrun(OCItem it, MaxLevels m, int amount, int type) {
-        if (OptimalCodeWriter.debug)
-            System.err.println("-- Overrun: " + amount);
-        if (OptimalCodeWriter.visualize) {
-            System.err.print("\033[H\033[2J");
-            PrintWriter w = new PrintWriter(new OutputStreamWriter(System.err));
-            try {
-                OptimalCodeWriter.top.sendOutput(w, 0, 0, 200, true, it);
-            }
-            catch (IOException e) {
-            }
-            w.flush();
-            System.err.println();
-            String type_name;
-            switch (type) {
-            default:
-            case POS:
-                type_name = "pos";
-                break;
-            case WIDTH:
-                type_name = "width";
-                break;
-            case FIN:
-                type_name = "fin";
-                break;
-            }
-            System.err.println("  overrun: type " + type_name + " amount: "
-                    + amount);
+    static <T> ConsList<T> cons(T elem, ConsList<T> next) {
+        return new ConsList<>(elem, next);
+    }
 
-            System.err.println("  next item is " + it);
-            System.err.println("  minPosWidth" + m + " of next item = "
-                    + OCItem.getMinPosWidth(it, m));
-            System.err.println("  minWidth" + m + " of next item = "
-                    + OCItem.getMinWidth(it, m));
-            System.err.println("  minIndent" + m + " of next item = "
-                    + OCItem.getMinIndent(it, m));
-            System.err.println("  containsBreaks" + m + " of next item = "
-                    + OCItem.containsBreaks(it, m));
-            try {
-                System.in.read();
-            }
-            catch (IOException e) {
-            }
+    T elem;
+    ConsList<T> next;
+
+    private ConsList() {
+    }
+
+    private ConsList(T elem, ConsList<T> next) {
+        this.elem = elem;
+        this.next = next;
+    }
+
+    boolean isEmpty() {
+        return next == null;
+    }
+
+    private int length = -1;
+
+    int length() {
+        if (length == -1) length = next == null ? 0 : 1 + next.length();
+        return length;
+    }
+
+    String toStringAux() {
+        if (next == null) return "";
+        return elem + ", " + next.toStringAux();
+    }
+
+    @Override
+    public String toString() {
+        return "[" + toStringAux() + "]";
+    }
+}
+
+class SearchState implements Cloneable {
+
+    int lmargin, rmargin, pos;
+    int minbr, minbu, maxbr, maxbi;
+    boolean forward;
+    boolean findminovf;
+    int minovf;
+
+    Map<AllowBreak, Boolean> brkAssignment;
+    ConsList<Boolean> afterBrkAssignment;
+
+    ConsList<BlockItem> blks;
+    ConsList<Integer> lmargins, rmargins;
+    ConsList<Integer> minbrs, minbus, maxbrs, maxbis;
+
+    AllowBreak it;
+    SearchState prevBreak;
+
+    SearchState(int lmargin, int rmargin, int pos, int minbr, int minbu,
+            int maxbr, int maxbi) {
+        this.lmargin = lmargin;
+        this.rmargin = rmargin;
+        this.pos = pos;
+        this.minbr = minbr;
+        this.minbu = minbu;
+        this.maxbr = maxbr;
+        this.maxbi = maxbi;
+        forward = true;
+        findminovf = false;
+        brkAssignment = new HashMap<>();
+        afterBrkAssignment = ConsList.empty();
+
+        blks = ConsList.empty();
+        lmargins = ConsList.empty();
+        rmargins = ConsList.empty();
+        minbrs = ConsList.empty();
+        minbus = ConsList.empty();
+        maxbrs = ConsList.empty();
+        maxbis = ConsList.empty();
+    }
+
+    void pushBlock(BlockItem it) {
+        blks = ConsList.cons(it, blks);
+        lmargins = ConsList.cons(lmargin, lmargins);
+        rmargins = ConsList.cons(rmargin, rmargins);
+        minbrs = ConsList.cons(minbr, minbrs);
+        minbus = ConsList.cons(minbu, minbus);
+        maxbrs = ConsList.cons(maxbr, maxbrs);
+        maxbis = ConsList.cons(maxbi, maxbis);
+    }
+
+    BlockItem popBlock() {
+        // Restore search parameters.
+        BlockItem result = blks.elem;
+        blks = blks.next;
+        lmargin = lmargins.elem;
+        lmargins = lmargins.next;
+        rmargin = rmargins.elem;
+        rmargins = rmargins.next;
+        int outerminbr = minbrs.elem;
+        minbrs = minbrs.next;
+        int outerminbu = minbus.elem;
+        minbus = minbus.next;
+        // The min break levels are the max required levels so far.
+        if (minbr < outerminbr) minbr = outerminbr;
+        if (minbu < outerminbu) minbu = outerminbu;
+        maxbr = maxbrs.elem;
+        maxbrs = maxbrs.next;
+        maxbi = maxbis.elem;
+        maxbis = maxbis.next;
+        return result;
+    }
+
+    SearchState copy() {
+        try {
+            SearchState s = (SearchState) clone();
+            return s;
         }
-        overrun.amount = amount;
-        overrun.type = type;
-        return overrun;
+        catch (CloneNotSupportedException e) {
+            throw new InternalCompilerError("Java clone weirdness", e);
+        }
     }
 }
 
 /**
- * An {@code OCItem} is a piece of input handed to the optimal codewriter. It
+ * An {@code OCItem} is a piece of input handed to the formatter. It
  * contains a reference to a possibly empty list of items that follow it.
  */
 abstract class OCItem {
@@ -382,11 +410,81 @@ abstract class OCItem {
     }
 
     /**
-     * Try to format this and subsequent items.
+     * Try to format a whole sequence of items in the manner of formatN. Unlike
+     * for formatN, The initial position may be an overrun (this is the only
+     * way that overruns are checked!). The item {@code it} may be also
+     * null, signifying an empty list. Requires: lmargin &lt; rmargin, pos &le;
+     * rmargin, lmargin &ge; 0.
      *
-     * @return the final cursor position (which may overrun rmargin, fin, or
-     *         both), and set any contained breaks accordingly.
-     *         </p>
+     * @see formatN
+     */
+    static Map<AllowBreak, Boolean> format(OCItem it, int rmargin) {
+        SearchState s =
+                new SearchState(0,
+                                rmargin,
+                                0,
+                                0,
+                                0,
+                                Integer.MAX_VALUE,
+                                Integer.MAX_VALUE);
+        for (OCItem cur = it; cur != null;) {
+            OptimalCodeWriter.format_calls++;
+            if (OptimalCodeWriter.debug) {
+                if (cur != OptimalCodeWriter.top) {
+                    System.err.println("SNAPSHOT:");
+                    PrintWriter w =
+                            new PrintWriter(new OutputStreamWriter(System.err));
+                    cur.sendOutput(w,
+                                   0,
+                                   0,
+                                   Collections.<AllowBreak, Boolean> emptyMap());
+                    w.write("<END>\n");
+                    w.flush();
+                }
+                System.err.println("Format: " + cur + "\n  lmargin = "
+                        + s.lmargin + " pos = " + s.pos + " max break levels: "
+                        + s.maxbr + "/" + s.maxbi + " min break levels: "
+                        + s.minbr + "/" + s.minbu);
+
+                System.err.flush();
+            }
+            cur.selfFormat(s);
+            if (s.forward) {
+                if (cur instanceof BlockItem) {
+                    BlockItem bi = (BlockItem) cur;
+                    cur = bi.first;
+                }
+                else cur = cur.next;
+                while (cur == null && !s.blks.isEmpty()) {
+                    // Retrieve next item in the outer block.
+                    cur = s.popBlock().next;
+                }
+            }
+            else {
+                SearchState prev = s.prevBreak;
+                cur = prev.it;
+                // Restore search parameters.
+                s.lmargin = prev.lmargin;
+                s.rmargin = prev.rmargin;
+                s.pos = prev.pos;
+                s.minbr = prev.minbr;
+                s.minbu = prev.minbu;
+                s.maxbr = prev.maxbr;
+                s.maxbi = prev.maxbi;
+                s.blks = prev.blks;
+                s.lmargins = prev.lmargins;
+                s.rmargins = prev.rmargins;
+                s.minbrs = prev.minbrs;
+                s.minbus = prev.minbus;
+                s.maxbrs = prev.maxbrs;
+                s.maxbis = prev.maxbis;
+            }
+        }
+        return s.brkAssignment;
+    }
+
+    /**
+     * Try to format this item.
      *
      * @param lmargin
      *            is the current left margin.
@@ -417,7 +515,6 @@ abstract class OCItem {
      * level in the same block must not also be broken. The parameter
      * maxLevelInner controls the maxLevel in nested blocks; it is equal to
      * either maxLevel or maxLevel-1.
-     * </p>
      *
      * <p>
      * <dl>
@@ -453,7 +550,7 @@ abstract class OCItem {
      * is at least 2. For containing blocks, minLevel is at least 2.</dd>
      * </dl>
      *
-     * <b>Note:</b> It is important that formatN not necessarily convert
+     * <b>Note: </b> It is important that formatN not necessarily convert
      * overruns in its final position into exceptions. This allows the calling
      * routine to distinguish between 'internal' overruns and ones that it can
      * tack on a conservative estimate of how much formatting the rest of the
@@ -464,213 +561,16 @@ abstract class OCItem {
      * Requires: rmargin &lt; lmargin, pos &lt;= rmargin, lmargin &lt; rmargin,
      * pos &le; rmargin, lmargin &ge; 0
      */
-    abstract FormatResult formatN(int lmargin, int pos, int rmargin, int fin,
-            MaxLevels m, int minLevel, int minLevelUnified) throws Overrun;
+    abstract void selfFormat(SearchState s);
 
     /**
-     * Send the output associated with this item to {@code o}, using the
-     * current break settings.
+     * Send the output associated with this item to {@code out}, using the
+     * given break settings.
      *
      * @param success
      */
-    abstract int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin,
-            boolean success, OCItem last) throws IOException;
-
-    // XXX
-    // the getminwidth etc. code is starting to duplicate the logic of the main
-    // formatting code. This suggests they should be merged. format can take
-    // two width arguments: one the width left on the current line, and one the
-    // width of subsequent lines. Hmmm -- new blocks start relative to current
-    // position, so knowing the initial width isn't enough.
-
-    /**
-     * Try to format a whole sequence of items in the manner of formatN. Unlike
-     * for formatN, the initial position may be an overrun (this is the only
-     * way that overruns are checked!). The item {@code it} may be also
-     * null, signifying an empty list. Requires: lmargin &lt; rmargin, pos &le;
-     * rmargin, lmargin &ge; 0.
-     *
-     * @see formatN
-     */
-    static FormatResult format(OCItem it, int lmargin, int pos, int rmargin,
-            int fin, MaxLevels m, int minLevel, int minLevelUnified)
-                    throws Overrun {
-        OptimalCodeWriter.format_calls++;
-        if (OptimalCodeWriter.debug) {
-            if (it != null && it != OptimalCodeWriter.top) {
-                System.err.println("SNAPSHOT:");
-                PrintWriter w =
-                        new PrintWriter(new OutputStreamWriter(System.err));
-                try {
-                    OptimalCodeWriter.top.sendOutput(w,
-                                                     0,
-                                                     0,
-                                                     rmargin,
-                                                     true,
-                                                     it);
-                }
-                catch (IOException e) {
-                }
-                w.write("<END>\n");
-                w.flush();
-            }
-            System.err.println("Format: " + it + "\n  lmargin = " + lmargin
-                    + " pos = " + pos + " fin = " + fin + " max break levels: "
-                    + m + " min break levels: " + minLevel + "/"
-                    + minLevelUnified);
-
-            if (OptimalCodeWriter.debug) {
-                System.err.println("  MinWidth = " + getMinWidth(it, m));
-                System.err.println("  MinPosWidth = " + getMinPosWidth(it, m));
-                System.err.println("  MinIndent = " + getMinIndent(it, m));
-            }
-
-            System.err.flush();
-        }
-        if (it == null) { // no items to format. Check against final position.
-            if (pos > fin) {
-                if (OptimalCodeWriter.debug)
-                    System.err.println("Final position overrun: "
-                            + (pos - fin));
-                throw Overrun.overrun(it, m, pos - fin, Overrun.FIN);
-            }
-            else return new FormatResult(pos, minLevelUnified);
-        }
-
-        int amount2 = lmargin + getMinWidth(it, m) - rmargin;
-        // lmargin is too far right
-        if (amount2 > 0) {
-            if (OptimalCodeWriter.debug)
-                System.err.println("Width overrun: " + amount2);
-
-            throw Overrun.overrun(it, m, amount2, Overrun.WIDTH);
-        }
-
-        int amount = pos + getMinPosWidth(it, m) - rmargin; // overrun on first line
-        if (amount > 0) {
-            if (OptimalCodeWriter.debug)
-                System.err.println("Position (first line) overrun: " + amount);
-
-            throw Overrun.overrun(it, m, amount, Overrun.POS);
-        }
-
-        int amount3 = lmargin + getMinIndent(it, m) - fin; // overrun on last line
-        if (amount3 > 0) {
-            if (OptimalCodeWriter.debug)
-                System.err.println("Final position (predicted) overrun: "
-                        + amount3);
-
-            throw Overrun.overrun(it, m, amount3, Overrun.FIN);
-        }
-
-        return it.formatN(lmargin,
-                          pos,
-                          rmargin,
-                          fin,
-                          m,
-                          minLevel,
-                          minLevelUnified);
-    }
-
-    /*
-     * The following fields keep track of the tightest formatting that is possible
-     * with an item and its following items, if all breaks are broken. The purpose
-     * is to more aggressively tighten bounds when an overrun occurs. Formatting is
-     * measured relative to both "lmargin" and to "pos". T
-     *
-     * lmargin pos
-     *       | |
-     *       | xxxxx
-     *       xxxxxxxx
-     *       xxxxxx
-     *       <------> min_width (at least min_pos_width):
-     * 		    distance from lmargin to rightmost char
-     *         <--->  min_pos_width: distance from initial pos to end of first line
-     *       <---->   min_indent (at most min_width):
-     *                  distance from lmargin to final position on last line
-     */
-
-    public static final int NO_WIDTH = -9999;
-    public static final int NEWLINE_VIOLATION = 9999; // a big number XXX (hack)
-
-    /** Minimum lmargin-rhs width on second and following lines.
-     * A map from max levels to Integer(width). */
-
-    Map<MaxLevels, Integer> min_widths = new HashMap<>();
-
-    /** Minimum lmargin-final offset */
-    Map<MaxLevels, Integer> min_indents = new HashMap<>();
-
-    /** Minimum pos-rhs width (i.e., min width up to first break) */
-    Map<MaxLevels, Integer> min_pos_width = new HashMap<>();
-
-    static int getMinWidth(OCItem it, MaxLevels m) {
-        if (it == null) return NO_WIDTH;
-        if (it.min_widths.containsKey(m)) return it.min_widths.get(m);
-        int p1 = it.selfMinWidth(m);
-        int p2 = it.selfMinIndent(m);
-        int p3 = p2 != NO_WIDTH ? getMinPosWidth(it.next, m) + p2 : NO_WIDTH;
-        int p4 = getMinWidth(it.next, m);
-
-        if (OptimalCodeWriter.debug)
-            System.err.println("minwidth" + m + ": item = " + it + ":  p1 = "
-                    + p1 + ", p2 = " + p2 + ", p3 = " + p3 + ", p4 = " + p4);
-        int result = Math.max(Math.max(p1, p3), p4);
-        it.min_widths.put(m, result);
-        return result;
-    }
-
-    static int getMinPosWidth(OCItem it, MaxLevels m) {
-        if (it == null) return 0;
-        if (it.min_pos_width.containsKey(m)) {
-            return it.min_pos_width.get(m);
-        }
-        int p1 = it.selfMinPosWidth(m);
-        int result;
-        if (it.next == null || it.selfContainsBreaks(m)) {
-            result = p1;
-            if (OptimalCodeWriter.debug) System.err.println("minpos " + m
-                    + ": item = " + it + ":  p1 = " + p1);
-        }
-        else {
-            result = p1 + getMinPosWidth(it.next, m);
-            if (OptimalCodeWriter.debug) System.err.println("minpos " + m
-                    + ": item = " + it + ":  p1 = " + p1 + " + "
-                    + getMinPosWidth(it.next, m) + " = " + result);
-        }
-        it.min_pos_width.put(m, result);
-        return result;
-    }
-
-    static int getMinIndent(OCItem it, MaxLevels m) {
-        if (it == null) return NO_WIDTH;
-        if (it.min_indents.containsKey(m)) {
-            return it.min_indents.get(m);
-        }
-        int p1 = it.selfMinIndent(m);
-        if (it.next == null) return p1;
-        int result;
-        if (containsBreaks(it.next, m))
-            result = getMinIndent(it.next, m);
-        else result = getMinPosWidth(it.next, m);
-        it.min_indents.put(m, result);
-        return result;
-    }
-
-    static boolean containsBreaks(OCItem it, MaxLevels m) {
-        if (it == null) return false;
-        if (it.selfContainsBreaks(m)) {
-            if (OptimalCodeWriter.debug) System.err.println("containsBreaks "
-                    + m + " of " + it + ": true");
-            return true;
-        }
-        if (it.next == null) {
-            if (OptimalCodeWriter.debug) System.err.println("containsBreaks "
-                    + m + " of " + it + ": false");
-            return false;
-        }
-        return containsBreaks(it.next, m);
-    }
+    abstract int sendOutput(PrintWriter out, int lmargin, int pos,
+            Map<AllowBreak, Boolean> brkAssignment);
 
     public String summarize(String s) {
         if (s.length() <= 79) return s;
@@ -685,13 +585,16 @@ abstract class OCItem {
 
     abstract String selfToString();
 
-    abstract int selfMinIndent(MaxLevels m);
-
-    abstract int selfMinWidth(MaxLevels m);
-
-    abstract int selfMinPosWidth(MaxLevels m);
-
-    abstract boolean selfContainsBreaks(MaxLevels m);
+    /**
+     * Returns an integer array of length at least 3 such that
+     * - [0] is the minimum break level that any break in the containing block
+     *   of the containing block of this item must break
+     * - [1] is the minimum break level that any break in the containing block
+     *   of this item must break
+     * - [2] is the minimum break level that any unified break in the containing
+     *   block of this item must break
+     */
+    abstract int[] minBreakLevels();
 }
 
 /** A simple string. */
@@ -705,44 +608,32 @@ class TextItem extends OCItem {
     }
 
     @Override
-    FormatResult formatN(int lmargin, int pos, int rmargin, int fin,
-            MaxLevels m, int minLevel, int minLevelUnified) throws Overrun {
-        return format(next,
-                      lmargin,
-                      pos + length,
-                      rmargin,
-                      fin,
-                      m,
-                      minLevel,
-                      minLevelUnified);
-        // all overruns passed through
+    void selfFormat(SearchState s) {
+        if (s.findminovf && s.pos + length > s.rmargin) {
+            // If break assignments causing minimal overflow is being sought,
+            // and this item overflows, backtrack.
+            s.forward = false;
+            s.minovf = s.pos + length - s.rmargin;
+        }
+        else {
+            // Otherwise, all preceding break assignments have done their best jobs,
+            // so move forward.
+            s.pos += length;
+        }
     }
 
     @Override
-    int sendOutput(PrintWriter o, int lm, int pos, int rm, boolean success,
-            OCItem last) throws IOException {
+    int sendOutput(PrintWriter o, int lmargin, int pos,
+            Map<AllowBreak, Boolean> brkAssignment) {
         o.write(s);
         return pos + length;
     }
 
-    @Override
-    boolean selfContainsBreaks(MaxLevels m) {
-        return false;
-    }
+    int[] minBreakLevels = { 0, 0, 0 };
 
     @Override
-    int selfMinIndent(MaxLevels m) {
-        return NO_WIDTH;
-    }
-
-    @Override
-    int selfMinWidth(MaxLevels m) {
-        return NO_WIDTH;
-    } // length only counts on s lines
-
-    @Override
-    int selfMinPosWidth(MaxLevels m) {
-        return length;
+    int[] minBreakLevels() {
+        return minBreakLevels;
     }
 
     @Override
@@ -787,149 +678,243 @@ class AllowBreak extends OCItem {
         unified = u;
     }
 
-    @Override
-    FormatResult formatN(int lmargin, int pos, int rmargin, int fin,
-            MaxLevels m, int minLevel, int minLevelUnified) throws Overrun {
-        if (canLeaveUnbroken(minLevel, minLevelUnified)) {
-            // first, we can try not breaking it
-            try {
-                if (OptimalCodeWriter.debug)
-                    System.err.println("trying not breaking it.");
-                broken = false;
-                return format(next,
-                              lmargin,
-                              pos + altlen,
-                              rmargin,
-                              fin,
-                              new MaxLevels(Math.min(unified
-                                      ? level - 1 : level, m.maxLevel),
-                                            Math.min(level - 1,
-                                                     m.maxLevelInner)),
-                              minLevel,
-                              minLevelUnified);
+    /* maxbr -> pos -> minovf * afterBrkAssignment */
+    Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> cache =
+            new HashMap<>();
 
-            }
-            //  |yyy^xxxx
-            //  |xxxxx
-            //  |xxx
-            // pos overrun: might help by breaking
-            // width overrun: might help by breaking (e.g., if breaking permits nested breaks)
-            // fin overrun: similar
-            catch (Overrun o) {
-                if (OptimalCodeWriter.debug) {
-                    System.err.println("not breaking caused overrun of "
-                            + o.amount);
-                }
-                if (level > m.maxLevel) {
-                    if (OptimalCodeWriter.debug) {
-                        System.err.println("not breaking failed, "
-                                + "but can't break either.");
+    int minovf;
+    ConsList<Boolean> afterBrkAssignment;
+
+    @Override
+    void selfFormat(SearchState s) {
+        boolean backtrack = false;
+        boolean findminovf = false;
+        boolean assignment;
+        if (s.forward) {
+            if (s.findminovf) {
+                // First, check the cache if we have done tried the given
+                // search parameters.  If so, just return the memoized
+                // result and backtrack.
+                if (cache.containsKey(s.maxbr)) {
+                    Map<Integer, Pair<Integer, ConsList<Boolean>>> brCache =
+                            cache.get(s.maxbr);
+                    if (brCache.containsKey(s.pos)) {
+                        Pair<Integer, ConsList<Boolean>> result =
+                                brCache.get(s.pos);
+                        s.forward = false;
+                        s.minovf = result.part1();
+                        s.afterBrkAssignment = result.part2();
+                        return;
                     }
-                    throw o; // can't break it
+                }
+            }
+            // First, check if there is already an assignment for us.
+            if (s.afterBrkAssignment.length() > 0) {
+                // Just take the specified assignment.
+                assignment = s.afterBrkAssignment.elem;
+                s.afterBrkAssignment = s.afterBrkAssignment.next;
+            }
+            else if (canLeaveUnbroken(s.minbr, s.minbu)
+                    && s.pos + altlen <= s.rmargin) {
+                // This break can be left unbroken without causing immediate overflow.
+                assignment = false;
+                findminovf = true;
+            }
+            else if (canBreak(s.maxbr)) {
+                // This break must be broken.
+                // If not breaking causes immediate overflow, it is better to
+                // break now and possibly overflow later.
+                assignment = true;
+                findminovf = s.findminovf;
+            }
+            else if (canLeaveUnbroken(s.minbr, s.minbu)) {
+                // Overflow always happens, and we could not break.
+                assignment = false;
+                if (s.findminovf) {
+                    // If an earlier break is finding minimal overflow, punt to that break.
+                    backtrack = true;
+                    // Since we could not break, the amount of minimal overflow is by not breaking.
+                    s.minovf = s.pos + altlen - s.rmargin;
+                }
+            }
+            else throw new InternalCompilerError("Could not either break or not break."
+                    + this);
+        }
+        else {
+            // Later item failed to stay within width limit
+            // Plan to move forward for now.
+            // If this is impossible, later code will reset.
+            s.forward = true;
+            if (!s.brkAssignment.get(this) && canBreak(s.maxbr)) {
+                // We tried not breaking and did not work.
+                // Save later assignments that cause the overflow when not breaking.
+                minovf = s.minovf;
+                afterBrkAssignment = s.afterBrkAssignment;
+                s.afterBrkAssignment = ConsList.empty();
+                // Now we try breaking.
+                assignment = true;
+            }
+            else {
+                // We tried all options, and overflow always happens.
+                if (afterBrkAssignment != null) {
+                    // We tried both breaking and not breaking.
+                    if (afterBrkAssignment.length() > s.afterBrkAssignment.length()
+                            || afterBrkAssignment.length() == s.afterBrkAssignment.length()
+                                    && minovf <= s.minovf) {
+                        // Not breaking causes overflow later.
+                        //  or
+                        // Overflow at the same location,
+                        // but breaking does not cause less overflow.
+                        assignment = false;
+                        // Restore saved assignments.
+                        s.minovf = minovf;
+                        s.afterBrkAssignment = afterBrkAssignment;
+                    }
+                    else assignment = true;
+                }
+                else {
+                    // We did not save assignments.
+                    // If we can break, then we could not break, so we must break.
+                    // Otherwise, we must not break.
+                    assignment = canBreak(s.maxbr);
+                }
+                SearchState prev = s.prevBreak;
+                s.prevBreak = prev.prevBreak;
+                if (prev.findminovf) {
+                    // If an earlier break is finding minimal overflow, punt to that break.
+                    backtrack = true;
+                }
+                else {
+                    // All earlier breaks have tried their best job,
+                    // so we continue on with our best break assignment.
+                    s.findminovf = false;
                 }
             }
         }
-        if (canBreak(m)) { // now, we can try breaking it
-            if (OptimalCodeWriter.debug)
-                System.err.println("trying breaking at " + this);
-            broken = true;
-            try {
-                return format(next,
-                              lmargin,
-                              lmargin + indent,
-                              rmargin,
-                              fin,
-                              m,
-                              Math.max(level - 1, minLevel),
-                              Math.max(level, minLevelUnified));
+        if (backtrack) {
+            // Reset saved assignments.
+            afterBrkAssignment = null;
+            // Prepare best assignment causing minimal overflow for earlier break.
+            s.forward = false;
+            s.brkAssignment.remove(this);
+            s.afterBrkAssignment =
+                    ConsList.cons(assignment, s.afterBrkAssignment);
+
+            // Memoize overflow results before backtracking.
+            Map<Integer, Pair<Integer, ConsList<Boolean>>> brCache;
+            if (cache.containsKey(s.maxbr))
+                brCache = cache.get(s.maxbr);
+            else {
+                brCache = new HashMap<>();
+                cache.put(s.maxbr, brCache);
             }
-            //  |yyy^
-            //  |  xxxx
-            //  |  xxxxxx
-            //  |  xxx
-            // pos overrun: becomes a width overrun?
-            // width overrun: remains
-            // fin overrun: remains? becomes a width overrun?
-            catch (Overrun o) {
-                o.type = Overrun.WIDTH;
-                throw o;
+            Pair<Integer, ConsList<Boolean>> result =
+                    new Pair<>(s.minovf, s.afterBrkAssignment);
+            brCache.put(s.pos, result);
+        }
+        else {
+            if (findminovf) {
+                // Set backtracking point to this break.
+                s.it = this;
+                // Save provided information.
+                s.prevBreak = s.copy();
+                s.findminovf = true;
+                s.minovf = 0;
+            }
+            s.brkAssignment.put(this, assignment);
+            if (assignment) {
+                // Break is broken.
+                s.pos = s.lmargin + indent;
+                // Since we are breaking, all breaks of lower levels must also be broken.
+                if (s.minbr < level) s.minbr = level - 1;
+                // If this is a unified break, all unified breaks of our level must also be broken.
+                if (unified && s.minbu < level) s.minbu = level;
+            }
+            else {
+                // Break is not broken.
+                s.pos += altlen;
+                // Since we are not breaking, the max break level must be adjusted.
+                if (s.maxbr >= level) {
+                    if (unified) {
+                        // If this is a unified break, the max break level must be less than our level.
+                        s.maxbr = level - 1;
+                    }
+                    else {
+                        // Otherwise, the max break level must be at most our level.
+                        s.maxbr = level;
+                    }
+                }
+                // The max break level of inner block must be less than our level.
+                if (s.maxbi >= level) s.maxbi = level - 1;
             }
         }
-        throw new IllegalArgumentException("internal error: could not either break or not break");
     }
 
     @Override
-    int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin,
-            boolean success, OCItem last) throws IOException {
-        if (broken || !success && pos >= rmargin) {
-            o.println();
-            for (int i = 0; i < lmargin + indent; i++)
-                o.print(" ");
-            //o.write("(" + (lmargin+indent) + ")");
-            return lmargin + indent;
-        }
-        else {
+    int sendOutput(PrintWriter o, int lmargin, int pos,
+            Map<AllowBreak, Boolean> brkAssignment) {
+        if (brkAssignment.containsKey(this) && !brkAssignment.get(this)) {
+            // Do not break.
             o.print(alt);
             return pos + altlen;
         }
+        else {
+            // Break.
+            o.println();
+            for (int i = 0; i < lmargin + indent; i++)
+                o.print(" ");
+            return lmargin + indent;
+        }
     }
 
-    boolean canBreak(MaxLevels m) {
-        return level <= m.maxLevel;
+    boolean canBreak(int maxb) {
+        return level <= maxb;
     }
 
     boolean canLeaveUnbroken(int minLevel, int minLevelUnified) {
         return level > minLevelUnified || !unified && level > minLevel;
     }
 
-    @Override
-    int selfMinIndent(MaxLevels m) {
-        if (canBreak(m))
-            return indent;
-        else return NO_WIDTH;
-    }
+    int[] minBreakLevels = { 0, 0, 0 };
 
     @Override
-    int selfMinPosWidth(MaxLevels m) {
-        if (canBreak(m))
-            return 0;
-        else return altlen;
-    }
-
-    @Override
-    int selfMinWidth(MaxLevels m) {
-        if (canBreak(m))
-            return indent;
-        else return NO_WIDTH;
-    }
-
-    @Override
-    boolean selfContainsBreaks(MaxLevels m) {
-        return canBreak(m);
+    int[] minBreakLevels() {
+        return minBreakLevels;
     }
 
     @Override
     String selfToString() {
+        String result = unified ? "@<" : "<";
+        result += level + ">";
         if (indent == 0)
-            return " ";
-        else return "^[" + indent + "]";
+            return result + " ";
+        else return result + "^" + indent;
     }
 }
 
-/** A Newline is simply a level-1 break that cannot be
- *  left unbroken.
+/**
+ * A Newline is simply an {@code AllowBreak} that must be broken.
  */
 class Newline extends AllowBreak {
-    Newline(int n) {
-        this(n, 1);
-    }
-
     Newline(int n, int level) {
         super(n, level, "\n", 0, true);
         broken = true;
     }
 
-    boolean canLeaveUnbroken() {
+    @Override
+    void selfFormat(SearchState s) {
+        if (!canBreak(s.maxbr))
+            throw new InternalCompilerError("Newline cannot be broken.");
+        // Break is broken.
+        s.pos = s.lmargin + indent;
+        // Since we are breaking, all breaks of lower levels must also be broken.
+        if (s.minbr < level) s.minbr = level - 1;
+        // If this is a unified break, all unified breaks of our level must also be broken.
+        if (unified && s.minbu < level) s.minbu = level;
+    }
+
+    @Override
+    boolean canLeaveUnbroken(int minLevel, int minLevelUnified) {
         return false;
     }
 
@@ -940,33 +925,11 @@ class Newline extends AllowBreak {
         else return "\\n[" + indent + "]";
     }
 
-    // XXX should not need to override sendOutput
-    @Override
-    int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin,
-            boolean success, OCItem last) throws IOException {
-        broken = true; // XXX how can this be necessary?
-        return super.sendOutput(o, lmargin, pos, rmargin, success, last);
-    }
+    int[] minBreakLevels = { level, level > 0 ? level - 1 : 0, level };
 
     @Override
-    int selfMinIndent(MaxLevels m) {
-        if (canBreak(m))
-            return indent;
-        else return NEWLINE_VIOLATION;
-    }
-
-    @Override
-    int selfMinPosWidth(MaxLevels m) {
-        if (canBreak(m))
-            return 0;
-        else return NEWLINE_VIOLATION;
-    }
-
-    @Override
-    int selfMinWidth(MaxLevels m) {
-        if (canBreak(m))
-            return indent;
-        else return NEWLINE_VIOLATION;
+    int[] minBreakLevels() {
+        return minBreakLevels;
     }
 }
 
@@ -975,14 +938,11 @@ class Newline extends AllowBreak {
  * formatted.
  */
 class BlockItem extends OCItem {
-    BlockItem parent;
     OCItem first;
     OCItem last;
     int indent; //@ invariant indent >= 0
 
-    BlockItem(BlockItem parent_, int indent_) {
-        assert indent_ >= 0;
-        parent = parent_;
+    BlockItem(int indent_) {
         first = last = null;
         indent = indent_;
     }
@@ -1009,148 +969,61 @@ class BlockItem extends OCItem {
     }
 
     @Override
-    FormatResult formatN(int lmargin, int pos, int rmargin, int fin,
-            MaxLevels m, int minLevel, int minLevelUnified) throws Overrun {
-        int childfin = fin;
-        if (childfin + getMinPosWidth(next, m) > rmargin) {
-            childfin = rmargin - getMinPosWidth(next, m);
-        }
-        // Keep trying to format while giving the first item in the list
-        // less and less space (childfin) as dictated by the space needs
-        // of the subsequent items. Eventually either the whole list succeeds
-        // or the first child cannot be formatted in the available space.
-        while (true) {
-            FormatResult fr =
-                    format(first,
-                           pos + indent,
-                           pos,
-                           rmargin,
-                           childfin,
-                           new MaxLevels(m.maxLevelInner, m.maxLevelInner),
-                           0,
-                           0);
-            int minLevel2 = Math.max(minLevel, fr.minLevel);
-            int minLevelU2 = Math.max(minLevelUnified, fr.minLevel);
-            try {
-                return format(next,
-                              lmargin,
-                              fr.pos,
-                              rmargin,
-                              fin,
-                              m,
-                              minLevel2,
-                              minLevelU2);
-            }
-            catch (Overrun o) {
-                if (o.type == Overrun.WIDTH) {
-                    o.type = Overrun.FIN;
-                    // Idea: doesn't matter where next item started XXX really?
-                    throw o;
-                }
-                childfin -= o.amount;
-            }
-        }
+    void selfFormat(SearchState s) {
+        // We are going into a block.
+        // Save parameters for the outer block.
+        s.pushBlock(this);
+        // The new indentation is relative to the current position.
+        s.lmargin = s.pos + indent;
+        // The min break levels reset.
+        s.minbr = minBreakLevels()[3];
+        s.minbu = minBreakLevels()[4];
+        // The max break level is now maxbi.
+        s.maxbr = s.maxbi;
     }
 
     @Override
-    int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin,
-            boolean success, OCItem last) throws IOException {
-        OCItem it = first;
+    int sendOutput(PrintWriter o, int lmargin, int pos,
+            Map<AllowBreak, Boolean> brkAssignment) {
         lmargin = pos + indent;
-        if (last != this) {
-            while (it != null) {
-                pos = it.sendOutput(o, lmargin, pos, rmargin, success, last);
-                if (last != null && it == last) {
-                    throw new IOException();
-                }
-                it = it.next;
-            }
-        }
-        else {
-            o.print("...");
-        }
+        for (OCItem it = first; it != null; it = it.next)
+            pos = it.sendOutput(o, lmargin, pos, brkAssignment);
         return pos;
     }
 
-    @Override
-    int selfMinWidth(MaxLevels m) {
-        return getMinWidth(first,
-                           new MaxLevels(m.maxLevelInner, m.maxLevelInner));
-    }
-
-    @Override
-    int selfMinPosWidth(MaxLevels m) {
-        return getMinPosWidth(first,
-                              new MaxLevels(m.maxLevelInner, m.maxLevelInner));
-    }
-
-    @Override
-    int selfMinIndent(MaxLevels m) {
-        return getMinIndent(first,
-                            new MaxLevels(m.maxLevelInner, m.maxLevelInner));
-    }
+    int[] minBreakLevels = null;
 
     /**
-     * Map from maxlevels to either null or non-null, the latter if it can
-     * contain breaks at those maxlevels.
+     * Returns an integer array of length 5 such that
+     * - [0] is the minimum break level that any break in the containing block
+     *   of the containing block of this item must break
+     * - [1] is the minimum break level that any break in the containing block
+     *   of this item must break
+     * - [2] is the minimum break level that any unified break in the containing
+     *   block of this item must break
+     * - [3] is the minimum break level that any break in this block must break
+     * - [4] is the minimum break level that any unified break in this block
+     *   must break
      */
-    Map<MaxLevels, MaxLevels> containsBreaks = new HashMap<>();
-
     @Override
-    boolean selfContainsBreaks(MaxLevels m) {
-        if (containsBreaks.containsKey(m)) {
-            return containsBreaks.get(m) != null;
+    int[] minBreakLevels() {
+        if (minBreakLevels == null) {
+            minBreakLevels = new int[] { 0, 0, 0, 0, 0 };
+            for (OCItem it = first; it != null; it = it.next) {
+                int[] mbls = it.minBreakLevels();
+                if (minBreakLevels[2] < mbls[0]) minBreakLevels[2] = mbls[0];
+                if (minBreakLevels[3] < mbls[1]) minBreakLevels[3] = mbls[1];
+                if (minBreakLevels[4] < mbls[2]) minBreakLevels[4] = mbls[2];
+            }
+            minBreakLevels[0] = minBreakLevels[1] = minBreakLevels[2];
         }
-        boolean result =
-                containsBreaks(first,
-                               new MaxLevels(m.maxLevelInner, m.maxLevelInner));
-        containsBreaks.put(m, result ? m : null);
-        return result;
+        return minBreakLevels;
     }
 
     @Override
     String selfToString() {
-        return first == null
-                ? "[]"
-                : indent == 0 ? "[" + first + "]" : "[" + indent + first + "]";
-    }
-}
-
-class FormatResult {
-    int pos;
-    int minLevel;
-
-    FormatResult(int pos_, int minLevel_) {
-        pos = pos_;
-        minLevel = minLevel_;
-    }
-}
-
-class MaxLevels {
-    int maxLevel;
-    int maxLevelInner;
-
-    MaxLevels(int ml, int mli) {
-        maxLevel = ml;
-        maxLevelInner = mli;
-    }
-
-    @Override
-    public int hashCode() {
-        return maxLevel * 17 + maxLevelInner;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof MaxLevels) {
-            MaxLevels m2 = (MaxLevels) o;
-            return maxLevel == m2.maxLevel && maxLevelInner == m2.maxLevelInner;
-        }
-        else return false;
-    }
-
-    @Override
-    public String toString() {
-        return "[" + maxLevel + "/" + maxLevelInner + "]";
+        if (indent == 0)
+            return "[" + first + "]";
+        else return "[" + indent + first + "]";
     }
 }

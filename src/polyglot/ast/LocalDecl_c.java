@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -73,7 +73,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
             Expr init, Ext ext) {
         super(pos, ext);
-        assert (flags != null && type != null && name != null); // init may be null
+        assert flags != null && type != null && name != null; // init may be null
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -191,8 +191,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /** Reconstruct the declaration. */
-    protected <N extends LocalDecl_c> N reconstruct(N n, TypeNode type,
-            Id name, Expr init) {
+    protected <N extends LocalDecl_c> N reconstruct(N n, TypeNode type, Id name,
+            Expr init) {
         n = type(n, type);
         n = id(n, name);
         n = init(n, init);
@@ -300,11 +300,9 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                                                         .constantValue(init,
                                                                        tc.lang()))) {
                     throw new SemanticException("The type of the variable "
-                                                        + "initializer \""
-                                                        + init.type()
-                                                        + "\" does not match that of "
-                                                        + "the declaration \""
-                                                        + type.type() + "\".",
+                            + "initializer \"" + init.type()
+                            + "\" does not match that of "
+                            + "the declaration \"" + type.type() + "\".",
                                                 init.position());
                 }
             }
@@ -317,7 +315,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         protected ConstantChecker cc;
         protected LocalInstance li;
 
-        AddDependenciesVisitor(JLang lang, ConstantChecker cc, LocalInstance li) {
+        AddDependenciesVisitor(JLang lang, ConstantChecker cc,
+                LocalInstance li) {
             super(lang);
             this.cc = cc;
             this.li = li;
@@ -329,9 +328,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                 Field f = (Field) n;
                 if (!f.fieldInstance().orig().constantValueSet()) {
                     Scheduler scheduler = cc.job().extensionInfo().scheduler();
-                    Goal g =
-                            scheduler.FieldConstantsChecked(f.fieldInstance()
-                                                             .orig());
+                    Goal g = scheduler.FieldConstantsChecked(f.fieldInstance()
+                                                              .orig());
                     throw new MissingDependencyException(g);
                 }
             }
@@ -403,12 +401,13 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         if (printType) {
             print(type, w, tr);
             w.write(" ");
+            w.allowBreak(2, 3, " ", 1);
         }
         tr.print(this, name, w);
 
         if (init != null) {
             w.write(" =");
-            w.allowBreak(2, " ");
+            w.allowBreak(2, 2, " ", 1);
             print(init, w, tr);
         }
 
@@ -452,11 +451,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.LocalDecl(this.position,
-                            this.flags,
-                            this.type,
-                            this.name,
-                            this.init);
+        return nf.LocalDecl(position, flags, type, name, init);
     }
 
 }
