@@ -122,7 +122,7 @@ public class TypeSystem_c implements TypeSystem {
         Class();
         String();
         Throwable();
-        
+
         systemResolver.find("java.lang.Error");
         systemResolver.find("java.lang.Exception");
         systemResolver.find("java.lang.RuntimeException");
@@ -1212,20 +1212,22 @@ public class TypeSystem_c implements TypeSystem {
             // Use the declarations to compare formals.
             Iterator<Instance> j = maximal.iterator();
             first = j.next();
-            ProcedureInstance firstDecl = first;
-            if (first instanceof Declaration) {
-                firstDecl =
-                        (ProcedureInstance) ((Declaration) first).declaration();
-            }
+            // XXX
+//            ProcedureInstance firstDecl = first;
+//            if (first instanceof Declaration) {
+//                firstDecl =
+//                        (ProcedureInstance) ((Declaration) first).declaration();
+//            }
             while (j.hasNext()) {
                 Instance p = j.next();
 
-                ProcedureInstance pDecl = p;
-                if (p instanceof Declaration) {
-                    pDecl = (ProcedureInstance) ((Declaration) p).declaration();
-                }
+//                ProcedureInstance pDecl = p;
+//                if (p instanceof Declaration) {
+//                    pDecl = (ProcedureInstance) ((Declaration) p).declaration();
+//                }
 
-                if (!firstDecl.hasFormals(pDecl.formalTypes())) {
+                if (!first.hasFormals(p.formalTypes())) {
+//                if (!firstDecl.hasFormals(pDecl.formalTypes())) {
                     // not all signatures match; must be ambiguous
                     return maximal;
                 }

@@ -746,7 +746,9 @@ public class New_c extends Expr_c implements New, NewOps {
         for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
             Expr e = i.next();
 
+            w.begin(2);
             print(e, w, tr);
+            w.end();
 
             if (i.hasNext()) {
                 w.write(",");

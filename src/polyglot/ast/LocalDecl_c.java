@@ -400,7 +400,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         w.write(flags.translate());
         if (printType) {
             print(type, w, tr);
-            w.write(" ");
             w.allowBreak(2, 3, " ", 1);
         }
         tr.print(this, name, w);

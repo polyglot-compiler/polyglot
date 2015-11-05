@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -49,8 +49,8 @@ import polyglot.visit.TypeBuilder;
  * A {@code ProcedureDecl} is an immutable representation of a
  * constructor or method declaration as part of a class body.
  */
-public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
-        ProcedureDeclOps {
+public abstract class ProcedureDecl_c extends Term_c
+        implements ProcedureDecl, ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Flags flags;
@@ -81,7 +81,8 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
      */
     @Deprecated
     public ProcedureDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body, Ext ext) {
+            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+            Ext ext) {
         this(pos, flags, name, formals, throwTypes, body, null, ext);
     }
 
@@ -89,7 +90,8 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
             List<Formal> formals, List<TypeNode> throwTypes, Block body,
             Javadoc javadoc, Ext ext) {
         super(pos, ext);
-        assert (flags != null && name != null && formals != null && throwTypes != null); // body may be null
+        assert flags != null && name != null && formals != null
+                && throwTypes != null; // body may be null
         this.flags = flags;
         this.name = name;
         this.formals = ListUtil.copy(formals, true);
@@ -100,7 +102,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     @Override
     public Flags flags() {
-        return this.flags;
+        return flags;
     }
 
     @Override
@@ -117,7 +119,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     @Override
     public Id id() {
-        return this.name;
+        return name;
     }
 
     @Override
@@ -134,7 +136,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     @Override
     public String name() {
-        return this.name.id();
+        return name.id();
     }
 
     @Override
@@ -144,7 +146,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     @Override
     public List<Formal> formals() {
-        return this.formals;
+        return formals;
     }
 
     @Override
@@ -161,7 +163,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     @Override
     public List<TypeNode> throwTypes() {
-        return this.throwTypes;
+        return throwTypes;
     }
 
     @Override
@@ -184,7 +186,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
 
     @Override
     public Block body() {
-        return this.body;
+        return body;
     }
 
     @Override
@@ -208,7 +210,8 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
     public abstract ProcedureInstance procedureInstance();
 
     @Override
-    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb)
+            throws SemanticException {
         return tb.pushCode();
     }
 
@@ -264,6 +267,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (javadoc != null) javadoc.prettyPrint(w, tr);
 
+        w.begin(0);
         ((JLang) tr.lang()).prettyPrintHeader(this, flags(), w, tr);
 
         if (body != null) {
@@ -272,6 +276,7 @@ public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl,
         else {
             w.write(";");
         }
+        w.end();
     }
 
     @Override

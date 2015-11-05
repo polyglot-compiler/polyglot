@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -72,13 +72,13 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     protected void assert_(Position pos, Block tryBlock,
             List<Catch> catchBlocks, Block finallyBlock) {
-        assert (tryBlock != null && catchBlocks != null); // finallyBlock may be null, catchBlocks empty
-        assert (!catchBlocks.isEmpty() || finallyBlock != null); // must be either try-catch or try(-catch)-finally
+        assert tryBlock != null && catchBlocks != null; // finallyBlock may be null, catchBlocks empty
+        assert !catchBlocks.isEmpty() || finallyBlock != null; // must be either try-catch or try(-catch)-finally
     }
 
     @Override
     public Block tryBlock() {
-        return this.tryBlock;
+        return tryBlock;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public List<Catch> catchBlocks() {
-        return this.catchBlocks;
+        return catchBlocks;
     }
 
     @Override
@@ -112,7 +112,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Block finallyBlock() {
-        return this.finallyBlock;
+        return finallyBlock;
     }
 
     @Override
@@ -159,16 +159,16 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     /**
      * Performs exceptionChecking. This is a special method that is called
      * via the exceptionChecker's override method (i.e., doesn't follow the
-     * standard model for visitation.  
+     * standard model for visitation.
      *
-     * @param ec The ExceptionChecker that was run against the 
+     * @param ec The ExceptionChecker that was run against the
      * child node. It contains the exceptions that can be thrown by the try
      * block.
      */
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         ExceptionChecker ecTryBlockEntry = ec;
-        if (this.finallyBlock != null && !this.finallyBlock.reachable()) {
+        if (finallyBlock != null && !finallyBlock.reachable()) {
             // the finally block cannot terminate normally.
             // This implies that exceptions thrown in the try and catch
             // blocks will not propagate upwards.
@@ -204,9 +204,9 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec) {
-        return this.visitChild(this.tryBlock,
-                               ec.lang()
-                                 .constructTryBlockExceptionChecker(this, ec));
+        return this.visitChild(tryBlock,
+                               ec.lang().constructTryBlockExceptionChecker(this,
+                                                                           ec));
     }
 
     @Override
@@ -219,7 +219,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         // an ExceptionChecker indicating that they catch exceptions of the appropriate
         // type.
         for (ListIterator<Catch> i =
-                this.catchBlocks.listIterator(this.catchBlocks.size()); i.hasPrevious();) {
+                catchBlocks.listIterator(catchBlocks.size()); i.hasPrevious();) {
             Catch cb = i.previous();
             Type catchType = cb.catchType();
 
@@ -231,17 +231,16 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     @Override
     public List<Catch> exceptionCheckCatchBlocks(ExceptionChecker ec)
             throws SemanticException {
-        // Walk through our catch blocks, making sure that they each can 
+        // Walk through our catch blocks, making sure that they each can
         // catch something.
         SubtypeSet caught = new SubtypeSet(ec.typeSystem().Throwable());
-        for (Catch cb : this.catchBlocks) {
+        for (Catch cb : catchBlocks) {
             Type catchType = cb.catchType();
 
             // Check if the exception has already been caught.
             if (caught.contains(catchType)) {
-                throw new SemanticException("The exception \""
-                                                    + catchType
-                                                    + "\" has been caught by an earlier catch block.",
+                throw new SemanticException("The exception \"" + catchType
+                        + "\" has been caught by an earlier catch block.",
                                             cb.position());
             }
 
@@ -261,16 +260,16 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Block exceptionCheckFinallyBlock(ExceptionChecker ec) {
-        if (this.finallyBlock == null) {
+        if (finallyBlock == null) {
             return null;
         }
-        Block fb = this.visitChild(this.finallyBlock, ec.push());
+        Block fb = this.visitChild(finallyBlock, ec.push());
 
-        if (!this.finallyBlock.reachable()) {
+        if (!finallyBlock.reachable()) {
             // warn the user
-//              ###Don't warn, some versions of javac don't.              
+//              ###Don't warn, some versions of javac don't.
 //              ec.errorQueue().enqueue(ErrorInfo.WARNING,
-//              "The finally block cannot complete normally", 
+//              "The finally block cannot complete normally",
 //              finallyBlock.position());
         }
 
@@ -305,8 +304,10 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        w.begin(0);
         w.write("try");
         printSubStmt(tryBlock, w, tr);
+        w.end();
 
         for (Catch cb : catchBlocks) {
             w.newline(0);
@@ -315,8 +316,10 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
         if (finallyBlock != null) {
             w.newline(0);
+            w.begin(0);
             w.write("finally");
             printSubStmt(finallyBlock, w, tr);
+            w.end();
         }
     }
 
@@ -362,10 +365,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Try(this.position,
-                      this.tryBlock,
-                      this.catchBlocks,
-                      this.finallyBlock);
+        return nf.Try(position, tryBlock, catchBlocks, finallyBlock);
     }
 
 }

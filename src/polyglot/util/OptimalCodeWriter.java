@@ -663,7 +663,6 @@ class AllowBreak extends OCItem {
     final boolean unified;
     final String alt;
     final int altlen;
-    boolean broken = false;
 
     //@ invariant indent >= 0
     //@ invariant alt != null
@@ -898,7 +897,6 @@ class AllowBreak extends OCItem {
 class Newline extends AllowBreak {
     Newline(int n, int level) {
         super(n, level, "\n", 0, true);
-        broken = true;
     }
 
     @Override
