@@ -53,6 +53,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
      * at this point in the code.
      * 
      * Note: Consider the following code, where A,B,C,D are Exception subclasses.
+     * <pre>
      *    void m() throws A, B {
      *       try {
      *          ...
@@ -60,8 +61,8 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
      *       catch (C ex) { ... }
      *       catch (D ex) { ... }
      *    }
-     *    
-     *  Inside the try-block, the stack of catchable sets is:
+     * </pre>  
+     * Inside the try-block, the stack of catchable sets is:
      *     { C }
      *     { D }
      *     { A, B }
@@ -250,7 +251,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
          * that the Exception type t must be caught.
          * @throws SemanticException 
          */
-        void uncaughtType(Type t, Position pos) throws SemanticException {
+        public void uncaughtType(Type t, Position pos) throws SemanticException {
             throw new SemanticException("The exception \"" + t
                     + "\" must either be caught or declared to be thrown.", pos);
         }
@@ -264,7 +265,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
         }
 
         @Override
-        void uncaughtType(Type t, Position pos) throws SemanticException {
+        public void uncaughtType(Type t, Position pos) throws SemanticException {
             throw new SemanticException("A " + codeType + " cannot "
                     + "throw a \"" + t + "\".", pos);
         }
