@@ -320,6 +320,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Method02.jl5;
         Method03.jl5;
         Method04.jl5;
+        Method05.jl5 (Post, "Xlint");
+        Method06.jl5;
         Negate01.jl5;
         Nested01.jl5;
         Nested02.jl5;
@@ -739,6 +741,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Method02.jl5;
         Method03.jl5;
         Method04.jl5;
+        Method05.jl5;
+        Method06.jl5;
         Negate01.jl5;
         Nested01.jl5;
         Nested02.jl5;

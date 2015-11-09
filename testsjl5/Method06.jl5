@@ -1,0 +1,7 @@
+interface I {
+    Object clone();
+}
+
+abstract class C implements I {
+    public abstract Object clone();
+}
