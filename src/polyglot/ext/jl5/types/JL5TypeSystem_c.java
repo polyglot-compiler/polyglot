@@ -266,11 +266,10 @@ public class JL5TypeSystem_c
                 || JL5Flags.isEnum(container.flags())) {
             access = access.Private();
         }
-        if (container.flags().isProtected()) {
+        else if (container.flags().isProtected()) {
             access = access.Protected();
         }
-        if (container.flags().isPublic()
-                && !JL5Flags.isEnum(container.flags())) {
+        else if (container.flags().isPublic()) {
             access = access.Public();
         }
         return constructorInstance(pos,
