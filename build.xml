@@ -559,8 +559,8 @@
         <!-- Hack to suppress warnings in parser. -->
         <replaceregexp
                 file="${parser.dir}/${parser.class}.java"
-                match="^(public )?class"
-                replace="@SuppressWarnings(&quot;all&quot;)${line.separator}\1class"
+                match="@SuppressWarnings\([^)]*\)"
+                replace="@SuppressWarnings(&quot;all&quot;)"
                 flags="g"
                 byline="true"
         />
@@ -586,6 +586,7 @@
             </compositemapper>
         </uptodate>
         <uptodate property="cup-parser-using-jar.up-to-date">
+            <srcfiles dir="${cup.dir}/lib"/>
             <srcfiles dir="${parser.dir}" includes="${cup.file}"/>
             <compositemapper>
                 <mergemapper to="${parser.dir}/${parser.class}.java"/>
