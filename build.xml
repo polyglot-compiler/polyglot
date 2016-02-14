@@ -505,7 +505,7 @@
                 srcdir="${cup.src}"
                 destdir="${cup.classes}"
                 debug="on"
-                includes="java_cup/**"
+                includes="java_cup/**,parser/**"
                 includeantruntime="false">
             <classpath refid="cup.jar.classpath"/>
         </javac>

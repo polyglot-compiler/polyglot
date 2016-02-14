@@ -92,7 +92,8 @@ public class StateItem {
         List<List<StateItem>> result = new LinkedList<>();
         List<StateItem> init = new LinkedList<>();
         init.add(this);
-        for (SearchState ss : new SearchState(init, lookahead).reverseProduction(false)) {
+        for (SearchState ss : new SearchState(init,
+                                              lookahead).reverseProduction(false)) {
             List<StateItem> seq = new LinkedList<>(ss.sis);
             seq.remove(seq.size() - 1);
             result.add(seq);
@@ -157,16 +158,24 @@ public class StateItem {
                         nextLookahead.retainAll(lookahead);
                     }
                     else { // shift item
-                        symbol nextSym = rhs(prevProd, prevPos);
-                        // Check that lookaheads is compatible with the next
-                        // symbol in the production.
                         if (lookahead != null) {
-                            if (nextSym instanceof terminal
-                                    && !intersect((terminal) nextSym, lookahead))
-                                continue;
-                            if (nextSym instanceof non_terminal
-                                    && !intersect(((non_terminal) nextSym).first_set(),
-                                                  lookahead)) continue;
+                            // Check that lookahead is compatible with the next
+                            // symbol in the production.
+                            boolean applicable = false;
+                            for (int pos = prevPos; !applicable
+                                    && pos < prevLen; pos++) {
+                                symbol nextSym = rhs(prevProd, pos);
+                                if (nextSym instanceof terminal)
+                                    applicable = intersect((terminal) nextSym,
+                                                           lookahead);
+                                else if (nextSym instanceof non_terminal) {
+                                    non_terminal nt = (non_terminal) nextSym;
+                                    applicable = intersect(nt.first_set(),
+                                                           lookahead);
+                                    if (!nt.nullable()) break;
+                                }
+                            }
+                            if (!applicable) continue;
                         }
                         nextLookahead = symbolSet(prevLookahead);
                     }
@@ -297,7 +306,8 @@ public class StateItem {
         revTrans = new HashMap<>();
         for (lalr_state src : lalr_state.all_states()) {
             Map<symbol, lalr_state> transitions = new HashMap<>();
-            for (lalr_transition t = src.transitions(); t != null; t = t.next()) {
+            for (lalr_transition t = src.transitions(); t != null; t =
+                    t.next()) {
                 symbol sym = t.on_symbol();
                 lalr_state dst = t.to_state();
                 transitions.put(sym, dst);
