@@ -93,6 +93,7 @@ ident = ([:jletter:] | "_" ) ([:jletterdigit:] | [:jletter:] | "_" )*
   "nonassoc"    { return symbol("NONASSOC", sym.NONASSOC);          }
   "extends"     { return symbol("EXTENDS", sym.EXTENDS);            }
   "implements"  { return symbol("IMPLEMENTS", sym.IMPLEMENTS);      }
+  "super"       { return symbol("SUPER", sym.SUPER);                }
   {ident}       { return symbol("ID", sym.ID, yytext());            }
   
 }

@@ -59,7 +59,7 @@ terminal
 	LBRACE, RBRACE,
 	
 	/* CUP extensions */
-	EXTENDS, IMPLEMENTS,
+	IMPLEMENTS,
 
 	/* PPG & CUP common */
 	COMMA, SEMI, COLON, COLON_COLON_EQUALS, BAR,
@@ -67,6 +67,7 @@ terminal
 	PERCENT_PREC, DOT,	
 	LBRACK, RBRACK,
 	LT, GT, QUESTION,
+	SUPER, EXTENDS, CLASS,
 	
 	/* CUP-only */
 	PACKAGE, IMPORT, CODE, ACTION, PARSER, NON, INIT, SCAN, WITH, 
@@ -550,6 +551,7 @@ type_id ::=
 |	type_id:t_id LBRACK RBRACK {: RESULT = t_id + "[]"; :}
 |	multipart_id:t_id LT type_id:p_id GT {: RESULT = t_id + "<" + p_id + ">"; :}
 |	multipart_id:t_id LT QUESTION EXTENDS type_id:p_id GT {: RESULT = t_id + "<? extends " + p_id + ">"; :}
+|	multipart_id:t_id LT QUESTION SUPER type_id:p_id GT {: RESULT = t_id + "<? super " + p_id + ">"; :}
 ;
 
 new_term_id ::= 

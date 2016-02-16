@@ -191,7 +191,7 @@ non terminal ClassDecl type_declaration;
 non terminal Flags modifiers_opt, modifiers, modifier;
 // 19.8.1) Class Declaration
 non terminal ClassDecl class_declaration;
-non terminal TypeNode super, super_opt;
+non terminal TypeNode superclass, superclass_opt;
 non terminal List<TypeNode> interfaces, interfaces_opt, interface_type_list;
 non terminal ClassBody class_body;
 non terminal List<ClassMember> class_body_declarations, class_body_declarations_opt;
@@ -562,18 +562,18 @@ modifier ::=
 class_declaration ::=
                     // ClassDecl
         modifiers_opt:a CLASS:n IDENTIFIER:b
-                super_opt:c interfaces_opt:d class_body:e
+                superclass_opt:c interfaces_opt:d class_body:e
             {: RESULT = parser.nf.ClassDecl(parser.pos(n, e),
                 a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(parser.pos(a), parser.pos(n))); :}
     ;
-super ::=
+superclass ::=
                     // TypeNode
         EXTENDS class_type:a
             {: RESULT = a; :}
     ;
-super_opt ::=
+superclass_opt ::=
                     // TypeNode
-    |   super:a
+    |   superclass:a
             {: RESULT = a; :}
     ;
 interfaces ::=
@@ -646,7 +646,7 @@ class_member_declaration ::=
                RESULT = l; :}
         /* repeat the prod for 'class_declaration' here: */
     |   modifiers_opt:a CLASS:n IDENTIFIER:b
-                    super_opt:c interfaces_opt:d class_body:e
+                    superclass_opt:c interfaces_opt:d class_body:e
             {: List<ClassMember> l = new LinkedList<>();
                l.add(parser.nf.ClassDecl(parser.pos(n, e),
                         a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e, parser.javadoc(parser.pos(a), parser.pos(n))));

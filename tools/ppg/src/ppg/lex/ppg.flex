@@ -89,6 +89,7 @@ string_lit_slash={string_lit}\\
 <YYINITIAL> "terminal"      { return t(Constant.TERMINAL); }
 <YYINITIAL> "non"           { return t(Constant.NON); }
 <YYINITIAL> "nonterminal"   { return t(Constant.NONTERMINAL); }
+<YYINITIAL> "super"         { return t(Constant.SUPER); }
 <YYINITIAL> "extends"       { return t(Constant.EXTENDS); }
 <YYINITIAL> "implements"    { return t(Constant.IMPLEMENTS); }
 

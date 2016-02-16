@@ -244,7 +244,7 @@ terminal
   PACKAGE, IMPORT, CODE, ACTION, PARSER, TERMINAL, NON, INIT, SCAN, WITH, 
   START, SEMI, COMMA, STAR, DOT, COLON, COLON_COLON_EQUALS, BAR, PRECEDENCE,
   LEFT, RIGHT, NONASSOC, PERCENT_PREC, LBRACK, RBRACK, NONTERMINAL, GT, LT,
-  QUESTION, EXTENDS, IMPLEMENTS /* CupEx extension */, CLASS
+  QUESTION, SUPER, EXTENDS, IMPLEMENTS /* CupEx extension */, CLASS
   ;
 
 terminal String  ID, CODE_STRING;
@@ -808,6 +808,9 @@ wildcard ::=
          {: RESULT = " ? "; :}
          | QUESTION EXTENDS type_id
          {: RESULT = " ? extends "+multipart_name; multipart_name = new
+         String(); :}
+         | QUESTION SUPER type_id
+         {: RESULT = " ? super "+multipart_name; multipart_name = new
          String(); :}
          ;
 
