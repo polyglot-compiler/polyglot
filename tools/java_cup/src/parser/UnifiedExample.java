@@ -834,15 +834,29 @@ public class UnifiedExample {
                 if (lookaheadRequired) {
                     if (sym != nextSym) {
                         // Need to expand sym to match nextSym
-                        List<Derivation> nextDerivs =
-                                expandFirst(StateItem.trans.get(si)
-                                                           .get(rhs(prod,
-                                                                    pos)));
-                        result.addAll(nextDerivs);
-                        i += nextDerivs.size() - 1;
+                        non_terminal nt = (non_terminal) sym;
+                        if (!nt.nullable()
+                                || nt.first_set().contains(nextSym)) {
+                            List<Derivation> nextDerivs =
+                                    expandFirst(StateItem.trans.get(si)
+                                                               .get(rhs(prod,
+                                                                        pos)));
+                            result.addAll(nextDerivs);
+                            i += nextDerivs.size() - 1;
+                            lookaheadRequired = false;
+                        }
+                        else {
+                            // This nonterminal is nullable and cannot derive nextSym.
+                            // So, this nonterminal must derive the empty string,
+                            // and nextSym must be derived by a later nonterminal.
+                            result.add(new Derivation(sym,
+                                                      Collections.<Derivation> emptyList()));
+                        }
                     }
-                    else result.add(new Derivation(sym));
-                    lookaheadRequired = false;
+                    else {
+                        result.add(new Derivation(sym));
+                        lookaheadRequired = false;
+                    }
                 }
                 else result.add(new Derivation(sym));
             }

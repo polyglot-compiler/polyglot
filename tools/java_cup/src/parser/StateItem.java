@@ -159,23 +159,29 @@ public class StateItem {
                     }
                     else { // shift item
                         if (lookahead != null) {
-                            // Check that lookahead is compatible with the next
-                            // symbol in the production.
+                            // Check that lookahead is compatible with the first
+                            // possible symbols in the rest of the production.
+                            // Alternatively, if the rest of the production is
+                            // nullable, the lookahead must be compatible with
+                            // the lookahead of the corresponding item.
                             boolean applicable = false;
-                            for (int pos = prevPos; !applicable
+                            boolean nullable = true;
+                            for (int pos = prevPos; !applicable && nullable
                                     && pos < prevLen; pos++) {
                                 symbol nextSym = rhs(prevProd, pos);
-                                if (nextSym instanceof terminal)
+                                if (nextSym instanceof terminal) {
                                     applicable = intersect((terminal) nextSym,
                                                            lookahead);
+                                    nullable = false;
+                                }
                                 else if (nextSym instanceof non_terminal) {
                                     non_terminal nt = (non_terminal) nextSym;
                                     applicable = intersect(nt.first_set(),
                                                            lookahead);
-                                    if (!nt.nullable()) break;
+                                    if (!applicable) nullable = nt.nullable();
                                 }
                             }
-                            if (!applicable) continue;
+                            if (!applicable && !nullable) continue;
                         }
                         nextLookahead = symbolSet(prevLookahead);
                     }
