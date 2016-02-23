@@ -143,10 +143,10 @@ public abstract class XMLElement {
             writer.writeStartElement("nonterminal");
             writer.writeAttribute("id", tagname);
             writer.writeAttribute("variant", variant + "");
-//			if (!list.isEmpty()){
+//                      if (!list.isEmpty()){
             Location loc = left();
             if (loc != null) loc.toXML(writer, "left");
-//			}
+//                      }
             for (XMLElement e : list)
                 e.dump(writer);
             loc = right();
