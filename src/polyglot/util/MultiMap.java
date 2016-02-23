@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -33,13 +33,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/** 
- * A {@code MultiMap} is a map that allows the same key to be used to map 
- * to multiple values. 
+/**
+ * A {@code MultiMap} is a map that allows the same key to be used to map
+ * to multiple values.
  * It is therefore an arbitrary binary relation on keys and values.
  */
 public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
-    /* The representation is a mapping from each key to the set of values that 
+    /* The representation is a mapping from each key to the set of values that
      * that key maps to. */
     private Map<K, Set<V>> map = new HashMap<>();
 
@@ -86,7 +86,7 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
         }
     }
 
-    /** 
+    /**
      * Makes {@code key} map to {@code value}, where {@code value}
      * has to be a collection of objects.
      */
@@ -107,7 +107,7 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
     }
 
     /**
-     * Adds all the values in {@code values} into the set associated with 
+     * Adds all the values in {@code values} into the set associated with
      * {@code key}.
      */
     public boolean addAll(K key, Collection<V> values) {
@@ -121,6 +121,7 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
         return original;
     }
 
+    @Override
     public boolean remove(Object key, Object value) {
         Set<V> values = map.get(key);
         if (values == null) {

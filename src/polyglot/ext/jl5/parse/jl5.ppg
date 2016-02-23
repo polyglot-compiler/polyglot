@@ -248,7 +248,7 @@ override qualified_name ::=
 ;
 
 override identifier_opt ::=
-    {: RESULT = null; :}
+    {: :}
     |
     IDENTIFIER:a
      {: RESULT = new JL5Name(parser.nf, parser.ts, parser.pos(a), parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
@@ -294,7 +294,7 @@ type_arguments_opt ::=
     type_arguments:a 
     {: RESULT = a; :}    
     |
-    {: RESULT = null; :}
+    {: :}
     
 ;
 
@@ -468,7 +468,7 @@ override class_declaration ::=
                 a.flags(), a.annotations(), parser.nf.Id(parser.pos(b), b.getIdentifier()), d, e, f, c, parser.javadoc(a.position(), parser.pos(n))); :}
     ;         
 class_body_opt ::=
-        {: RESULT = null; :}
+        {: :}
 	|	
     class_body:a
         {: RESULT = a; :}
@@ -900,7 +900,7 @@ type_bound_opt ::=
     type_bound:a
     {: RESULT = a; :}
     |
-    {: RESULT = null; :}
+    {: :}
 ;
 type_bound ::=
 		EXTENDS reference_type:a additional_bound_list_opt:b
@@ -927,7 +927,7 @@ additional_bound_list_opt ::=
     additional_bound_list:a
     {: RESULT = a; :}
     |
-    {: RESULT = null; :}
+    {: :}
 ;
 additional_bound_list ::=
 		additional_bound:a additional_bound_list:b
@@ -1277,7 +1277,7 @@ annotation_type_element_declaration ::=
 ;
 
 default_value_opt ::=
-        {: RESULT = null; :}
+        {: :}
     |
     DEFAULT element_value:a
         {: RESULT = a; :}

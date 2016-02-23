@@ -105,13 +105,13 @@ compilertest ::=
 testpath_opt ::=
         LBRACK sentence:a RBRACK
             {: RESULT = a; :}
-    | {: RESULT = null; :}
+    | {: :}
     ;
 
 command_line_args_opt ::=
         sentence:a
             {: RESULT = a; :}
-    | {: RESULT = null; :}
+    | {: :}
     ;
 
 filetest_list_opt ::=
@@ -164,7 +164,7 @@ filename_list ::=
     ;
 
 description_opt ::=
-            {: RESULT = null; :}
+            {: :}
     |   sentence:a
             {: RESULT = a; :}
     ;

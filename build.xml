@@ -510,8 +510,17 @@
             <classpath refid="cup.jar.classpath"/>
         </javac>
 
+      <manifest file="${cup.classes}/MANIFEST.MF">
+          <attribute name="Built-By" value="${user.name}"/>
+          <attribute name="Main-Class" value="java_cup.Main"/>
+
+          <attribute name="Implementation-Version" value="${jl.version}"/>
+          <attribute name="Built-Date" value="${now}"/>
+      </manifest>
+
         <!-- install a jar file in the polyglot lib directory -->
-        <jar jarfile="${lib}/java_cup.jar" basedir="${cup.classes}"/>
+        <jar jarfile="${lib}/java_cup.jar" manifest="${cup.classes}/MANIFEST.MF" 
+            basedir="${cup.classes}"/>
     </target>
 
     <!-- Build a CUP parser based on parameters supplied to the target.

@@ -197,7 +197,8 @@ public class ComplexSymbolFactory implements SymbolFactory {
             if (right != null) xright = ((ComplexSymbol) right).xright;
         }
 
-        public ComplexSymbol(String name, int id, Location left, Location right) {
+        public ComplexSymbol(String name, int id, Location left,
+                Location right) {
             super(id, left.offset, right.offset);
             this.name = name;
             xleft = left;
@@ -208,12 +209,12 @@ public class ComplexSymbolFactory implements SymbolFactory {
                 Object value) {
             super(id, left.left, right.right, value);
             this.name = name;
-            if (left != null) xleft = ((ComplexSymbol) left).xleft;
-            if (right != null) xright = ((ComplexSymbol) right).xright;
+            xleft = ((ComplexSymbol) left).xleft;
+            xright = ((ComplexSymbol) right).xright;
         }
 
-        public ComplexSymbol(String name, int id, Location left,
-                Location right, Object value) {
+        public ComplexSymbol(String name, int id, Location left, Location right,
+                Object value) {
             super(id, left.offset, right.offset, value);
             this.name = name;
             xleft = left;
@@ -223,10 +224,8 @@ public class ComplexSymbolFactory implements SymbolFactory {
         public ComplexSymbol(String name, int id, Symbol left, Object value) {
             super(id, left.right, left.right, value);
             this.name = name;
-            if (left != null) {
-                xleft = ((ComplexSymbol) left).xright;
-                xright = ((ComplexSymbol) left).xright;
-            }
+            xleft = ((ComplexSymbol) left).xright;
+            xright = ((ComplexSymbol) left).xright;
         }
 
         public Location getLeft() {
@@ -254,7 +253,8 @@ public class ComplexSymbolFactory implements SymbolFactory {
      * creates a complex symbol with Location objects for left and right boundaries;
      * this is used for terminals without values!
      */
-    public Symbol newSymbol(String name, int id, Location left, Location right) {
+    public Symbol newSymbol(String name, int id, Location left,
+            Location right) {
         return new ComplexSymbol(name, id, left, right);
     }
 

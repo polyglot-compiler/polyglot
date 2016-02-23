@@ -445,7 +445,7 @@ package_declaration_opt ::=
         package_declaration:a
             {: RESULT = a; :}
     |
-            {: RESULT = null; :}
+            {: :}
     ;
 import_declarations_opt ::=
                     // List of Import
@@ -512,7 +512,7 @@ type_declaration ::=
     |   interface_declaration:a
             {: RESULT = a; :}
     |   SEMICOLON
-            {: RESULT = null; :}
+            {: :}
     ;
 
 // 19.7) Productions used only in the LALR(1) grammar
@@ -780,7 +780,7 @@ method_body ::=
         block:a
             {: RESULT = a; :}
     |   SEMICOLON
-            {: RESULT = null; :}
+            {: :}
     ;
 
 // 19.8.4) Static Initializers
@@ -1212,7 +1212,7 @@ statement_expression_list ::=
 
 identifier_opt ::=
                     // Name
-            {: RESULT = null; :}
+            {: :}
     |   IDENTIFIER:a
             {: RESULT = new Name(parser.nf, parser.ts, parser.pos(a),
                 parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
@@ -1698,7 +1698,7 @@ assignment_operator ::=
     ;
 expression_opt ::=
                     // Expr
-            {: RESULT = null; :}
+            {: :}
     |   expression:a
             {: RESULT = a; :}
     ;

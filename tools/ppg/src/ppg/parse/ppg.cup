@@ -159,7 +159,7 @@ include_spec ::=
 
 symbol_list_opt ::=
 	symbol_list:sym_list {: RESULT = sym_list; :}
-|	{: RESULT = null; :}
+|	{: :}
 ;
 
 
@@ -167,7 +167,7 @@ symbol_list_opt ::=
 ppg_precedence_list ::=
 	precedence_list:p_l {: RESULT = p_l; :}
 |	PRECEDENCE SEMI // remove all precedence instructions from grammar
-	{: RESULT = null; :}
+	{: :}
 ;
 
 ppg_start_spec ::=
@@ -242,7 +242,7 @@ nt_id_list ::=
 prod_modifier_opt ::=
 	EXTEND:a	{: RESULT = (String)a.getValue(); :}
 |	OVERRIDE:a	{: RESULT = (String)a.getValue(); :}
-|	/* empty */	{: RESULT = null; :}
+|	/* empty */	{: :}
 ; 
 
 transfer_list ::=
@@ -329,7 +329,7 @@ prod_part ::=
 
 opt_label ::=
 	COLON label_id:labid {: RESULT = labid; :}
-|	/* empty */ {: RESULT = null; :}
+|	/* empty */ {: :}
 ;
 
 label_id ::= 
@@ -359,7 +359,7 @@ cup_spec ::=
 
 package_spec ::= 
 	PACKAGE multipart_id:m_id SEMI {: RESULT = m_id; :}
-|	/* empty */ {: RESULT = null; :}
+|	/* empty */ {: :}
 ;
 
 import_list ::=
@@ -530,7 +530,7 @@ term_id ::= symbol_id:sym {: RESULT = sym; :};
 
 start_spec ::= 
 	START WITH nt_id:start_name SEMI {: RESULT = start_name; :}
-|	/* empty */ {: RESULT = null; :}
+|	/* empty */ {: :}
 ;
 
 multipart_id ::=
