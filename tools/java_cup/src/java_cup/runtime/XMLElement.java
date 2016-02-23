@@ -77,6 +77,10 @@ public abstract class XMLElement {
 
     protected String tagname;
 
+    public String getTagname() {
+        return tagname;
+    }
+
     public abstract Location right();
 
     public abstract Location left();
@@ -84,7 +88,25 @@ public abstract class XMLElement {
     protected abstract void dump(XMLStreamWriter writer)
             throws XMLStreamException;
 
+    public List<XMLElement> getChildren() {
+        return new LinkedList<>();
+    };
+
+    public boolean hasChildren() {
+        return false;
+    };
+
     public static class NonTerminal extends XMLElement {
+        @Override
+        public boolean hasChildren() {
+            return !list.isEmpty();
+        }
+
+        @Override
+        public List<XMLElement> getChildren() {
+            return list;
+        }
+
         @Override
         public List<XMLElement> selectById(String s) {
             LinkedList<XMLElement> response = new LinkedList<>();
@@ -97,6 +119,11 @@ public abstract class XMLElement {
         }
 
         private int variant;
+
+        public int getVariant() {
+            return variant;
+        }
+
         LinkedList<XMLElement> list;
 
         public NonTerminal(String tagname, int variant, XMLElement... l) {
@@ -118,7 +145,7 @@ public abstract class XMLElement {
         public Location right() {
             for (Iterator<XMLElement> it =
                     list.descendingIterator(); it.hasNext();) {
-                Location loc = it.next().left();
+                Location loc = it.next().right();
                 if (loc != null) return loc;
             }
             return null;
@@ -157,6 +184,11 @@ public abstract class XMLElement {
 
     public static class Error extends XMLElement {
         @Override
+        public boolean hasChildren() {
+            return false;
+        }
+
+        @Override
         public List<XMLElement> selectById(String s) {
             return new LinkedList<>();
         }
@@ -193,6 +225,11 @@ public abstract class XMLElement {
     }
 
     public static class Terminal extends XMLElement {
+        @Override
+        public boolean hasChildren() {
+            return false;
+        }
+
         @Override
         public List<XMLElement> selectById(String s) {
             List<XMLElement> ret = new LinkedList<>();
