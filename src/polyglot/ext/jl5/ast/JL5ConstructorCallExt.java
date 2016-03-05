@@ -272,8 +272,8 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             w.write(".");
         }
 
-        w.write(cc.kind().toString());
         super.prettyPrint(w, tr);
+        w.write(cc.kind().toString());
         printArgs(w, tr);
         w.write(";");
     }
