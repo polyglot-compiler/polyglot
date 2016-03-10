@@ -510,17 +510,15 @@
             <classpath refid="cup.jar.classpath"/>
         </javac>
 
-      <manifest file="${cup.classes}/MANIFEST.MF">
-          <attribute name="Built-By" value="${user.name}"/>
-          <attribute name="Main-Class" value="java_cup.Main"/>
-
-          <attribute name="Implementation-Version" value="${jl.version}"/>
-          <attribute name="Built-Date" value="${now}"/>
-      </manifest>
-
         <!-- install a jar file in the polyglot lib directory -->
-        <jar jarfile="${lib}/java_cup.jar" manifest="${cup.classes}/MANIFEST.MF" 
-            basedir="${cup.classes}"/>
+        <jar destfile="${lib}/java_cup.jar">
+            <fileset dir="${cup.classes}"/>
+            <fileset dir="${cup.src}" includes="java_cup/**,parser/**"/>
+            <manifest>
+                <attribute name="Main-Class" value="java_cup.Main"/>
+                <attribute name="Built-Date" value="${now}"/>
+            </manifest>
+        </jar>
     </target>
 
     <!-- Build a CUP parser based on parameters supplied to the target.
@@ -815,24 +813,19 @@
 
     <target name="jar-base" depends="jl,ppg,configure-buildstring">
         <delete file="${lib}/polyglot.jar" failonerror="false"/>
-        <delete file="${classes}/MANIFEST.MF" failonerror="false"/>
 
-        <manifest file="${classes}/MANIFEST.MF">
-            <attribute name="Built-By" value="${user.name}"/>
-            <attribute name="Main-Class" value="polyglot.main.Main"/>
-
-            <attribute name="Implementation-Version" value="${jl.version}"/>
-            <attribute name="Built-Date" value="${now}"/>
-            <attribute name="Class-Path"
-                    value="java_cup.jar polyglot.jar ppg.jar"/>
-        </manifest>
-
-        <jar destfile="${lib}/polyglot.jar"
-                manifest="${classes}/MANIFEST.MF">
+        <jar destfile="${lib}/polyglot.jar">
             <fileset refid="dist-class-files"/>
-        </jar>
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Main-Class" value="polyglot.main.Main"/>
 
-        <delete file="${classes}/MANIFEST.MF" failonerror="false"/>
+                <attribute name="Implementation-Version" value="${jl.version}"/>
+                <attribute name="Built-Date" value="${now}"/>
+                <attribute name="Class-Path"
+                      value="java_cup.jar polyglot.jar ppg.jar"/>
+            </manifest>
+        </jar>
     </target>
 
     <target name="javadoc"
