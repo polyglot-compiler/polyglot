@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -50,7 +50,6 @@ public class PPG {
     }
 
     public static void main(String args[]) {
-        FileReader fileReader;
         String filename = null;
 
         try {
@@ -68,7 +67,7 @@ public class PPG {
                         else throw new Exception("No filename specified after -o");
                     }
                     else // invalid switch
-                    throw new Exception("Invalid switch: " + args[i]);
+                        throw new Exception("Invalid switch: " + args[i]);
                 }
                 else {
                     // not a switch: this must be a filename
@@ -89,28 +88,31 @@ public class PPG {
             usage();
         }
 
-        try {
-            fileReader = new FileReader(filename);
+        try (FileReader fileReader = new FileReader(filename)) {
+            Lexer lex = new Lexer(fileReader, filename);
+
+            Parser parser = new Parser(filename, lex);
+            try {
+                parser.parse();
+            }
+            catch (RuntimeException e) {
+                throw e;
+            }
+            catch (Exception e) {
+                // Used by CUP to indicate an unrecoverable error.
+                System.err.println(HEADER + "Exception: " + e.getMessage());
+                System.exit(1);
+            }
         }
         catch (FileNotFoundException e) {
             System.err.println("Error: " + filename + " is not found.");
-            return;
+            System.exit(1);
         }
-        catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println(HEADER + "Error: No file name given.");
-            return;
-        }
-
-        Lexer lex = new Lexer(fileReader, filename);
-
-        Parser parser = new Parser(filename, lex);
-        try {
-            parser.parse();
-        }
-        catch (Exception e) {
+        catch (IOException e) {
             System.err.println(HEADER + "Exception: " + e.getMessage());
-            return;
+            System.exit(1);
         }
+
         Spec spec = (Spec) Parser.getProgramNode();
 
         File file = new File(filename);
@@ -138,7 +140,7 @@ public class PPG {
             System.exit(1);
         }
         catch (IOException e) {
-            System.err.println(HEADER + "exception: " + e.getMessage());
+            System.err.println(HEADER + "Exception: " + e.getMessage());
             System.exit(1);
         }
     }
