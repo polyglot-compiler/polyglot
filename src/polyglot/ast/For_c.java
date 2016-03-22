@@ -154,7 +154,7 @@ public class For_c extends Loop_c implements For {
                 if (t == null) {
                     t = dt;
                 }
-                else if (!t.equals(dt)) {
+                else if (!t.typeEquals(dt)) {
                     throw new InternalCompilerError("Local variable "
                                                             + "declarations in a for loop initializer must all "
                                                             + "be the same type, in this case "
