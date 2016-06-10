@@ -645,54 +645,148 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      */
     public static class Switch extends OptFlag<Boolean> {
         /**
-         * Does this switch turn something on or off?
-         * For example a switch for flag "-doSomething" would
-         * have on == true. A switch for flag "--dontDoSomething"
-         * would have on == false. In both cases, the Boolean argument
-         * produced by this Swtich would represent whether we do something.
+         * Conceptually, Switches represent boolean variables. This is the value
+         * of that variable when the user specifies the switch on the command
+         * line.
          */
-        protected final boolean on;
+        protected final boolean value;
+
+        /**
+         * Conceptually, Switches represent boolean variables. This is the
+         * (default) value of that variable when the user does not specify the
+         * switch on the command line. Note this can be <i>the same</i> as
+         * {@link #value} if a switch is enabled by default.
+         */
+        protected final boolean defaultValue;
 
         @Override
         public Arg<Boolean> handle(String[] args, int index) {
-            return createArg(index, on);
+            return createArg(index, value);
         }
 
         @Override
         public Arg<Boolean> defaultArg() {
-            return createDefault(!on);
+            return createDefault(defaultValue);
         }
 
-        public Switch(Kind kind, String id, String usage, boolean on) {
+        /**
+         * @param value
+         *          the value of the switch variable when the users specifies
+         *          the switch on the command line.
+         */
+        public Switch(Kind kind, String id, String usage, boolean value) {
+            this(kind, id, usage, value, !value);
+        }
+
+        /**
+         * @param value
+         *          the value of the switch variable when the users specifies
+         *          the switch on the command line.
+         *
+         * @param defaultValue
+         *          the value of the switch variable when the users does not
+         *          specify the switch on the command line. This can be <i>the
+         *          same</i> as {@code value} if the switch is enabled by
+         *          default.
+         */
+        public Switch(Kind kind, String id, String usage, boolean value,
+                boolean defaultValue) {
             super(kind, id, null, usage);
-            this.on = on;
+            this.value = value;
+            this.defaultValue = defaultValue;
         }
 
         public Switch(Kind kind, String id, String usage) {
             this(kind, id, usage, true);
         }
 
-        public Switch(Kind kind, String[] ids, String usage, boolean on) {
+        /**
+         * @param value
+         *          the value of the switch variable when the users specifies
+         *          the switch on the command line.
+         */
+        public Switch(Kind kind, String[] ids, String usage, boolean value) {
+            this(kind, ids, usage, value, !value);
+        }
+
+        /**
+         * @param value
+         *          the value of the switch variable when the users specifies
+         *          the switch on the command line.
+         *
+         * @param defaultValue
+         *          the value of the switch variable when the users does not
+         *          specify the switch on the command line. This can be <i>the
+         *          same</i> as {@code value} if the switch is enabled by
+         *          default.
+         */
+        public Switch(Kind kind, String[] ids, String usage, boolean value,
+                boolean defaultValue) {
             super(kind, ids, null, usage);
-            this.on = on;
+            this.value = value;
+            this.defaultValue = defaultValue;
         }
 
         public Switch(Kind kind, String[] ids, String usage) {
             this(kind, ids, usage, true);
         }
 
-        public Switch(String id, String usage, boolean on) {
+        /**
+         * @param value
+         *          the value of the switch variable when the users specifies
+         *          the switch on the command line.
+         */
+        public Switch(String id, String usage, boolean value) {
+            this(id, usage, value, !value);
+        }
+
+        /**
+         * @param value
+         *          the value of the switch variable when the users specifies
+         *          the switch on the command line.
+         *
+         * @param defaultValue
+         *          the value of the switch variable when the users does not
+         *          specify the switch on the command line. This can be <i>the
+         *          same</i> as {@code value} if the switch is enabled by
+         *          default.
+         */
+        public Switch(String id, String usage, boolean value,
+                boolean defaultValue) {
             super(id, null, usage);
-            this.on = on;
+            this.value = value;
+            this.defaultValue = defaultValue;
         }
 
         public Switch(String id, String usage) {
             this(id, usage, true);
         }
 
-        public Switch(String[] ids, String usage, boolean on) {
+        /**
+         * @param value
+         *          the value of the switch variable when the users specifies
+         *          the switch on the command line.
+         */
+        public Switch(String[] ids, String usage, boolean value) {
+            this(ids, usage, value, !value);
+        }
+
+        /**
+         * @param value
+         *          the value of the switch variable when the users specifies
+         *          the switch on the command line.
+         *
+         * @param defaultValue
+         *          the value of the switch variable when the users does not
+         *          specify the switch on the command line. This can be <i>the
+         *          same</i> as {@code value} if the switch is enabled by
+         *          default.
+         */
+        public Switch(String[] ids, String usage, boolean value,
+                boolean defaultValue) {
             super(ids, null, usage);
-            this.on = on;
+            this.value = value;
+            this.defaultValue = defaultValue;
         }
 
         public Switch(String[] ids, String usage) {

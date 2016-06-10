@@ -559,13 +559,18 @@ public class Options {
      *          The set of source filenames provided on the command line.
      */
     final protected void applyArgs(Set<String> source) throws UsageError {
-        Set<OptFlag<?>> seen = new LinkedHashSet<>();
+        // Set up defaults first.
+        for (OptFlag<?> flag : flags) {
+            Arg<?> arg = flag.defaultArg(arguments);
+            if (arg != null) handleArg(arg);
+        }
+
+        // Let user-specified arguments override the defaults.
         for (Arg<?> arg : arguments) {
             if (arg.flag == null) {
                 handleSourceArg(arg, source);
             }
             else {
-                seen.add(arg.flag);
                 try {
                     handleArg(arg);
                 }
@@ -576,14 +581,6 @@ public class Options {
                     throw new InternalCompilerError("Error while handling arg "
                             + arg + " created by " + arg.flag().getClass(), e);
                 }
-            }
-        }
-        for (OptFlag<?> flag : flags) {
-            if (seen.contains(flag))
-                continue;
-            else {
-                Arg<?> arg = flag.defaultArg(arguments);
-                if (arg != null) handleArg(arg);
             }
         }
     }
