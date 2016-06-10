@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -186,16 +186,22 @@ public class Options {
     }
 
     protected void populateFlags(Set<OptFlag<?>> flags) {
-        flags.add(new OptFlag<Void>(Kind.HELP, new String[] { "--help", "-h",
-                "-help", "-?" }, null, "print this message") {
+        flags.add(new OptFlag<Void>(Kind.HELP,
+                                    new String[] { "--help", "-h", "-help",
+                                            "-?" },
+                                    null,
+                                    "print this message") {
             @Override
-            public Arg<Void> handle(String[] args, int index) throws UsageError {
+            public Arg<Void> handle(String[] args, int index)
+                    throws UsageError {
                 throw new UsageError("", 0);
             }
         });
 
-        flags.add(new OptFlag<Void>(Kind.VERSION, new String[] { "--version",
-                "-version" }, null, "print version info") {
+        flags.add(new OptFlag<Void>(Kind.VERSION,
+                                    new String[] { "--version", "-version" },
+                                    null,
+                                    "print version info") {
             @Override
             public Arg<Void> handle(String[] args, int index) {
                 StringBuffer sb = new StringBuffer();
@@ -261,8 +267,8 @@ public class Options {
                                   "JVM property: java.class.path") {
             @Override
             public Arg<List<File>> defaultArg() {
-                return handle(new String[] { System.getProperty("java.class.path") },
-                              0);
+                return handle(new String[] {
+                        System.getProperty("java.class.path") }, 0);
             }
         });
 
@@ -397,7 +403,8 @@ public class Options {
                              "delete output files after compilation"));
 
         StringBuffer allowedTopics = new StringBuffer("Allowed topics: ");
-        for (Iterator<String> iter = Report.topics.iterator(); iter.hasNext();) {
+        for (Iterator<String> iter =
+                Report.topics.iterator(); iter.hasNext();) {
             allowedTopics.append(iter.next());
             if (iter.hasNext()) {
                 allowedTopics.append(", ");
@@ -446,22 +453,27 @@ public class Options {
     /**
      * A PathFlag<File> that accepts a list of directory names and filters out
      * the invalid ones.
-     * 
+     *
      */
     public static class StdPathFlag extends PathFlag<File> {
         public StdPathFlag(String id, String params, String usage,
                 String defaultValue) {
             super(id, params, usage, defaultValue);
         }
+
         public StdPathFlag(String id, String params, String usage) {
             super(id, params, usage);
         }
+
         public StdPathFlag(String[] ids, String params, String usage) {
             super(ids, params, usage);
         }
-        public StdPathFlag(String[] ids, String params, String usage, String defaultValue) {
+
+        public StdPathFlag(String[] ids, String params, String usage,
+                String defaultValue) {
             super(ids, params, usage, defaultValue);
         }
+
         @Override
         public File handlePathEntry(String entry) {
             File f = new File(entry);
@@ -480,7 +492,7 @@ public class Options {
 
     /**
      * Parse the command line and process arguments.
-     * 
+     *
      * @throws UsageError
      *             if the usage is incorrect.
      */
@@ -505,7 +517,7 @@ public class Options {
 
     /**
      * Process a list of arguments
-     * 
+     *
      * @throws UsageError
      *             if the usage is incorrect.
      */
@@ -520,7 +532,7 @@ public class Options {
     }
 
     protected void postApplyArgs() {
-        // If we are using an external post compiler, 
+        // If we are using an external post compiler,
         // we have to output files to disk
         if (post_compiler != null || keep_output_files) noOutputToFS = false;
     }
@@ -542,7 +554,7 @@ public class Options {
     /**
      * Iterates over arguments parsed from the command line and applies them to
      * this object. Any source arguments are added to {@code source}.
-     * 
+     *
      * @param source
      *          The set of source filenames provided on the command line.
      */
@@ -579,7 +591,7 @@ public class Options {
     /**
      * Iterates over arguments parsed from the command line and applies them to
      * this object. Any source arguments are added to {@code source}.
-     * 
+     *
      * @param source
      *          The set of source filenames provided on the command line.
      */
@@ -633,7 +645,8 @@ public class Options {
             setSourceOutput((File) arg.value());
         }
         else if (ids.contains("-classpath")) {
-            setClasspath(this.<List<File>, File> sccast(arg.value(), File.class));
+            setClasspath(this.<List<File>, File> sccast(arg.value(),
+                                                        File.class));
         }
         else if (ids.contains("-bootclasspath")) {
             setBootclasspath(this.<List<File>, File> sccast(arg.value(),
@@ -867,7 +880,7 @@ public class Options {
 
     /**
      * Parse a command
-     * 
+     *
      * @return the next index to process. i.e., if calling this method processes
      *         two commands, then the return value should be index+2
      */
@@ -965,14 +978,15 @@ public class Options {
     /**
      * Output a flag and a description of its usage in a nice format. This makes
      * it easier for extensions to output their usage in a consistent format.
-     * 
+     *
      * @param out
      *            output PrintStream
      * @param flag
      * @param description
      *            description of the flag.
      */
-    protected void usageForFlag(PrintStream out, String flag, String description) {
+    protected void usageForFlag(PrintStream out, String flag,
+            String description) {
         out.print("  ");
         out.print(flag);
         // cur is where the cursor is on the screen.
@@ -1020,7 +1034,7 @@ public class Options {
      * Output a section of text for usage information. This text will be
      * displayed indented a certain amount from the left, controlled by the
      * field {@code USAGE_SUBSECTION_INDENT}
-     * 
+     *
      * @param out
      *            the output PrintStream
      * @param text
@@ -1061,7 +1075,7 @@ public class Options {
 
     /**
      * Utility method to print a number of spaces to a PrintStream.
-     * 
+     *
      * @param out
      *            output PrintStream
      * @param n
@@ -1077,7 +1091,7 @@ public class Options {
      * Construct the classpath for the post-compiler. This implementation
      * constructs a path from the source output directory, the current
      * directory, the classpath, and the bootclasspath.
-     * 
+     *
      * @return
      */
     public String constructPostCompilerClasspath() {
@@ -1109,15 +1123,12 @@ public class Options {
             File java_home_libdir;
             if (System.getProperty("os.name").indexOf("Mac") != -1) {
                 // XXX: gross!
-                java_home_libdir =
-                        new File(System.getProperty("java.home")
-                                + File.separator + ".." + File.separator
-                                + "Classes");
+                java_home_libdir = new File(System.getProperty("java.home")
+                        + File.separator + ".." + File.separator + "Classes");
             }
             else {
-                java_home_libdir =
-                        new File(System.getProperty("java.home")
-                                + File.separator + "lib");
+                java_home_libdir = new File(System.getProperty("java.home")
+                        + File.separator + "lib");
             }
             File[] files = java_home_libdir.listFiles();
             StringBuilder sb = new StringBuilder();

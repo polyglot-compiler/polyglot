@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -41,13 +41,13 @@ import polyglot.util.InternalCompilerError;
  * An OptFlag represents a command line option. It groups parsing and usage
  * information together so that compilers may easily compose options from
  * multiple extensions.
- * 
+ *
  * @param <T> The type of value parsed by this option.
  */
 public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     /**
      * Remove the flag matching id
-     * @param id 
+     * @param id
      *          command line flag of the OptFlag to remove
      * @param flags
      *          the list of OptFlags
@@ -67,7 +67,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
 
     /**
      * Lookup the flag matching id
-     * @param id 
+     * @param id
      *          command line flag of the OptFlag
      * @param flags
      *          the list of OptFlags
@@ -108,8 +108,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     public static List<Arg<?>> lookupAll(String id, List<Arg<?>> args) {
         List<Arg<?>> matches = new ArrayList<>();
         for (Arg<?> arg : args) {
-            if (arg.flag != null && arg.flag.ids.contains(id))
-                matches.add(arg);
+            if (arg.flag != null && arg.flag.ids.contains(id)) matches.add(arg);
         }
         return matches;
     }
@@ -194,7 +193,8 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            The default value(s) for the flag parameter(s), to be printed
      *            out with help info.
      */
-    public OptFlag(String id, String params, String usage, String defaultValue) {
+    public OptFlag(String id, String params, String usage,
+            String defaultValue) {
         this(new String[] { id }, params, usage, defaultValue);
     }
 
@@ -227,7 +227,8 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            The default value for the flag parameter, to be printed out
      *            with help info.
      */
-    public OptFlag(String[] ids, String params, String usage, int defaultValue) {
+    public OptFlag(String[] ids, String params, String usage,
+            int defaultValue) {
         this(ids, params, usage, Integer.toString(defaultValue));
     }
 
@@ -376,7 +377,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
 
     /**
      * Handles a usage flag.
-     * 
+     *
      * @param args
      *            Arguments from the command line.
      * @param index
@@ -394,8 +395,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
 
     public Arg<T> defaultArg() {
         if (defaultValue != null) {
-            throw new UnsupportedOperationException("Usage for "
-                    + ids()
+            throw new UnsupportedOperationException("Usage for " + ids()
                     + " specifies a default value, but flag does not implement one.");
         }
         return null;
@@ -433,7 +433,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
         /**
          * Allocates a new argument
          * @param flag
-         *      the flag this argument was created by 
+         *      the flag this argument was created by
          * @param next
          *      the index of the next argument in the command line
          * @param value
@@ -491,7 +491,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
 
     /**
      * Outputs this flag and a description of its usage in a nice format.
-     * 
+     *
      * @param out
      *            output PrintStream
      */
@@ -552,7 +552,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     /**
      * A OptFlag that accepts a string param with entries separated by the path
      * separator.
-     * 
+     *
      * @param <T>
      */
     public static abstract class PathFlag<T> extends OptFlag<List<T>> {
@@ -560,7 +560,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
          * Handles an individual entry of a path string
          * @param entry
          *      an entry of the path string
-         * @return 
+         * @return
          *      the value corresponding to the path entry or {@code null} to skip this entry.
          */
         public abstract T handlePathEntry(String entry);
@@ -609,7 +609,8 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             super(kind, ids, params, usage);
         }
 
-        public PathFlag(String id, String params, String usage, int defaultValue) {
+        public PathFlag(String id, String params, String usage,
+                int defaultValue) {
             super(id, params, usage, defaultValue);
         }
 
@@ -639,7 +640,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
 
     /**
      * A Flag that acts as a boolean switch.
-     * 
+     *
      * @param <T>
      */
     public static class Switch extends OptFlag<Boolean> {
@@ -701,7 +702,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
 
     /**
      * A Flag that accepts a integer param.
-     * 
+     *
      * @param <T>
      */
     public static class IntFlag extends OptFlag<Integer> {
@@ -721,7 +722,8 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             super(kind, id, params, usage, defaultValue);
         }
 
-        public IntFlag(OptFlag.Kind kind, String id, String params, String usage) {
+        public IntFlag(OptFlag.Kind kind, String id, String params,
+                String usage) {
             super(kind, id, params, usage);
         }
 
@@ -735,7 +737,8 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             super(kind, ids, params, usage);
         }
 
-        public IntFlag(String id, String params, String usage, int defaultValue) {
+        public IntFlag(String id, String params, String usage,
+                int defaultValue) {
             super(id, params, usage, defaultValue);
         }
 
@@ -756,7 +759,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
 
     /**
      * A Flag that accepts a integer param.
-     * 
+     *
      * @param <T>
      */
     public static class DoubleFlag extends OptFlag<Double> {
