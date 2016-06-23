@@ -267,7 +267,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);
-        Import04.jl5 (Semantic);
+        Import04.jl5;
         Import05.jl5 (Semantic, "Cannot find static member");
         Import06.jl5;
         Import07A.jl5 Import07B.jl5;
@@ -689,7 +689,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Import01.jl5;
         Import02.jl5;
         Import03.jl5 (Semantic);
-        Import04.jl5 (Semantic);
+        Import04.jl5;
         Import05.jl5 (Semantic, "Cannot find static member");
         Import06.jl5;
         Import07A.jl5 Import07B.jl5;
