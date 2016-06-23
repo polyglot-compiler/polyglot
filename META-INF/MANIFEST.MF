@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Polyglot
 Main-Class: polyglot.main.Main
 Bundle-SymbolicName: polyglot
-Bundle-Version: 2.7.0
+Bundle-Version: 2.7.1
 Bundle-Vendor: Polyglot project group
 Export-Package: java_cup.runtime,
  polyglot.ast,

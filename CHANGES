@@ -5,6 +5,16 @@ This file documents changes between releases of Polyglot. More information
 about some releases may be found in the appropriate directory
 doc/release-notes-<version>.
 
+June 23, 2015: Polyglot 2.7.1
+=============================
+
+- Non-backward compatible change: 'super' is now a keyword in PPG.
+
+- CUP was updated to a variant of version 0.11v (20151001).
+
+- Bug fixes to command-line argument handling, the base compiler, generics, and
+  CupEx.
+
 August 1, 2015: Polyglot 2.7.0
 ==============================
 

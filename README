@@ -1,4 +1,4 @@
-             Polyglot Extensible Compiler Framework (Version 2.7.0)
+             Polyglot Extensible Compiler Framework (Version 2.7.1)
              ------------------------------------------------------
 
 Overview
@@ -199,7 +199,7 @@ The Polyglot project is jointly supervised by Prof. Andrew Myers (Cornell
 University), by Prof. Stephen Chong (Harvard University), and by Prof.
 Nathaniel Nystrom (U. Lugano).
 
-Version 2.6 of Polyglot was prepared largely through the work of
+Version 2.7 of Polyglot was prepared largely through the work of
 Chinawat Isradisaikul (Cornell), though many others have contributed
 to it.
 
@@ -263,7 +263,7 @@ This release of the Polyglot distribution is governed by the LGPL
 license as described by the following copyright notice.
 
 Polyglot extensible compiler framework
-Copyright (C) 2000-2012 Polyglot project group, Cornell University
+Copyright (C) 2000-2016 Polyglot project group, Cornell University
 Copyright (C) 2006-2012 IBM Corporation
 
 This library is free software; you can redistribute it and/or
@@ -301,14 +301,14 @@ released under the Eclipse Public License.
 
 CUP Parser Generator Copyright Notice, License, and Disclaimer
 ---------------------------------------------------------------
-Copyright 1996-1999 by Scott Hudson, Frank Flannery, C. Scott Ananian
-Permission to use, copy, modify, and distribute this software and its
-documentation for any purpose and without fee is hereby granted, provided that
-the above copyright notice appear in all copies and that both the copyright
-notice and this permission notice and warranty disclaimer appear in supporting
-documentation, and that the names of the authors or their employers not be
-used in advertising or publicity pertaining to distribution of the software
-without specific, written prior permission.
+Copyright 1996-2015 by C. Scott Ananian, Frank Flannery, Dan Wang, Andrew W.
+Appel, and Michael Petter. Permission to use, copy, modify, and distribute this
+software and its documentation for any purpose and without fee is hereby
+granted, provided that the above copyright notice appear in all copies and that
+both the copyright notice and this permission notice and warranty disclaimer
+appear in supporting documentation, and that the names of the authors or their
+employers not be used in advertising or publicity pertaining to distribution of
+the software without specific, written prior permission.
 
 The authors and their employers disclaim all warranties with regard to this
 software, including all implied warranties of merchantability and fitness.
@@ -321,9 +321,9 @@ performance of this software.
 
 BLOAT Copyright Notice, License, and Disclaimer
 -----------------------------------------------
-All files in the distribution of BLOAT (Bytecode Level Optimization
-and Analysis tool for Java(tm)) are Copyright 1997-2001 by the Purdue
-Research Foundation of Purdue University.
+Polyglot includes code dervied from BLOAT (Bytecode Level Optimization and
+Analysis tool for Java(tm)). All files in the distribution of BLOAT are
+Copyright 1997-2001 by the Purdue Research Foundation of Purdue University.
 
 BLOAT was written by Nathaniel Nystrom, David Whitlock, and Antony Hosking
 at Purdue University.  BLOAT is licensed under the LGPL and has the same
@@ -337,4 +337,4 @@ The Base64 code (polyglot.util.Base64) is derived from public domain
 code by Robert Harder <rob@iharder.net>.  See http://iharder.net/base64.
 
 
-Java is a trademark of Sun Microsystems, Inc.
+Java is a trademark of Oracle Corporation.
