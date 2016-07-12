@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -51,7 +51,7 @@ import polyglot.visit.TypeChecker;
 
 /**
  * A {@code SourceFile} is an immutable representations of a Java
- * language source file.  It consists of a package name, a list of 
+ * language source file.  It consists of a package name, a list of
  * {@code Import}s, and a list of {@code GlobalDecl}s.
  */
 public class SourceFile_c extends Node_c implements SourceFile {
@@ -72,7 +72,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
     public SourceFile_c(Position pos, PackageNode package_,
             List<Import> imports, List<TopLevelDecl> decls, Ext ext) {
         super(pos, ext);
-        assert (imports != null && decls != null); // package_ may be null, imports and decls empty
+        assert imports != null && decls != null; // package_ may be null, imports and decls empty
         this.package_ = package_;
         this.imports = ListUtil.copy(imports, true);
         this.decls = ListUtil.copy(decls, true);
@@ -80,12 +80,12 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public boolean isDisambiguated() {
-        return super.isDisambiguated() && this.importTable != null;
+        return super.isDisambiguated() && importTable != null;
     }
 
     @Override
     public Source source() {
-        return this.source;
+        return source;
     }
 
     @Override
@@ -102,7 +102,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public PackageNode package_() {
-        return this.package_;
+        return package_;
     }
 
     @Override
@@ -119,7 +119,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public List<Import> imports() {
-        return this.imports;
+        return imports;
     }
 
     @Override
@@ -136,7 +136,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public List<TopLevelDecl> decls() {
-        return this.decls;
+        return decls;
     }
 
     @Override
@@ -153,7 +153,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
 
     @Override
     public ImportTable importTable() {
-        return this.importTable;
+        return importTable;
     }
 
     @Override
@@ -191,7 +191,8 @@ public class SourceFile_c extends Node_c implements SourceFile {
      * field before we recurse into the declarations.
      */
     @Override
-    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb)
+            throws SemanticException {
         TypeSystem ts = tb.typeSystem();
         Package pkg = null;
         if (package_ != null) {
@@ -259,9 +260,8 @@ public class SourceFile_c extends Node_c implements SourceFile {
                 Named importedType = importedTypes.get(name);
                 if (!ts.equals(named, importedType)) {
                     throw new SemanticException(name
-                                                        + " is already defined in a single-type import as type "
-                                                        + importedType + ".",
-                                                i.position());
+                            + " is already defined in a single-type import as type "
+                            + importedType + ".", i.position());
                 }
             }
             else importedTypes.put(name, named);
@@ -327,26 +327,26 @@ public class SourceFile_c extends Node_c implements SourceFile {
             throws SemanticException {
         /*
         SourceFile n = this;
-        
+
         // Disambiguate imports and package declarations.
         OuterScopeDisambiguator osd = new OuterScopeDisambiguator(ar);
         n = (SourceFile) osd.visitEdgeNoOverride(parent, n);
         if (osd.hasErrors()) throw new SemanticException();
-
+        
         // Ensure supertyperts and signatures are disambiguated for all
-        // classes visible from the outer scope. 
+        // classes visible from the outer scope.
         SupertypeDisambiguator sud = new SupertypeDisambiguator(ar);
         n = (SourceFile) sud.visitEdgeNoOverride(parent, n);
         if (sud.hasErrors()) throw new SemanticException();
-
+        
         SignatureDisambiguator sid = new SignatureDisambiguator(ar);
         n = (SourceFile) sid.visitEdgeNoOverride(parent, n);
         if (sid.hasErrors()) throw new SemanticException();
-        
+
         // Now type check the children.
         n = (SourceFile) ar.visitEdgeNoOverride(parent, n);
         if (ar.hasErrors()) throw new SemanticException();
-        
+
         return n.disambiguate(ar);
          */
         return null;
@@ -355,18 +355,15 @@ public class SourceFile_c extends Node_c implements SourceFile {
     @Override
     public void dump(CodeWriter w) {
         super.dump(w);
-        w.begin(0);
         w.allowBreak(4, " ");
+        w.begin(0);
         w.write("(import-table " + importTable + ")");
         w.end();
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.SourceFile(this.position,
-                             this.package_,
-                             this.imports,
-                             this.decls).source(this.source);
+        return nf.SourceFile(position, package_, imports, decls).source(source);
     }
 
 }
