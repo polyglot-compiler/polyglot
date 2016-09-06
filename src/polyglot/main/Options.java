@@ -763,7 +763,7 @@ public class Options {
     }
 
     protected void addBootCP(List<File> value) {
-        bootclasspathDirectories().addAll(value);
+        bootclasspathDirectories().addAll(0, value);
     }
 
     protected void setSourcepath(List<File> value) {
