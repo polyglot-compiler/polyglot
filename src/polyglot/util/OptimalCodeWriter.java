@@ -710,12 +710,53 @@ class AllowBreak extends OCItem {
         unified = u;
     }
 
+
+    int minovf;
+    ConsList<Boolean> afterBrkAssignment;
+
     /* maxbr -> maxbi -> pos -> minovf * afterBrkAssignment */
     Map<Integer, Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>>> cache =
             new HashMap<>();
 
-    int minovf;
-    ConsList<Boolean> afterBrkAssignment;
+    /** Get results from state s into cache */
+    Pair<Integer, ConsList<Boolean>> cacheGet(SearchState s) {
+        if (cache.containsKey(s.maxbr)) {
+            Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache =
+                    cache.get(s.maxbr);
+            if (brCache.containsKey(s.maxbi)) {
+                Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache =
+                        brCache.get(s.maxbi);
+                if (biCache.containsKey(s.pos)) {
+                    Pair<Integer, ConsList<Boolean>> result =
+                            biCache.get(s.pos);
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Put results of state s into cache */
+    void cachePut(SearchState s) {
+        // Memoize overflow results before backtracking.
+        Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache;
+        if (cache.containsKey(s.maxbr))
+            brCache = cache.get(s.maxbr);
+        else {
+            brCache = new HashMap<>();
+            cache.put(s.maxbr, brCache);
+        }
+        Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache;
+        if (brCache.containsKey(s.maxbi))
+            biCache = brCache.get(s.maxbi);
+        else {
+            biCache = new HashMap<>();
+            brCache.put(s.maxbi, biCache);
+        }
+        Pair<Integer, ConsList<Boolean>> result =
+                new Pair<>(s.minovf, s.afterBrkAssignment);
+        biCache.put(s.pos, result);
+    }
 
     @Override
     void selfFormat(SearchState s) {
@@ -727,21 +768,12 @@ class AllowBreak extends OCItem {
                 // First, check the cache if we have tried the given
                 // search parameters.  If so, just return the memoized
                 // result and backtrack.
-                if (cache.containsKey(s.maxbr)) {
-                    Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache =
-                            cache.get(s.maxbr);
-                    if (brCache.containsKey(s.maxbi)) {
-                        Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache =
-                                brCache.get(s.maxbi);
-                        if (biCache.containsKey(s.pos)) {
-                            Pair<Integer, ConsList<Boolean>> result =
-                                    biCache.get(s.pos);
-                            s.forward = false;
-                            s.minovf = result.part1();
-                            s.afterBrkAssignment = result.part2();
-                            return;
-                        }
-                    }
+                Pair<Integer, ConsList<Boolean>> result = cacheGet(s);
+                if (result != null) {
+                    s.forward = false;
+                    s.minovf = result.part1();
+                    s.afterBrkAssignment = result.part2();
+                    return;
                 }
             }
             int rpos = s.pos + altlen;
@@ -834,23 +866,7 @@ class AllowBreak extends OCItem {
                     ConsList.cons(assignment, s.afterBrkAssignment);
 
             // Memoize overflow results before backtracking.
-            Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache;
-            if (cache.containsKey(s.maxbr))
-                brCache = cache.get(s.maxbr);
-            else {
-                brCache = new HashMap<>();
-                cache.put(s.maxbr, brCache);
-            }
-            Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache;
-            if (brCache.containsKey(s.maxbi))
-                biCache = brCache.get(s.maxbi);
-            else {
-                biCache = new HashMap<>();
-                brCache.put(s.maxbi, biCache);
-            }
-            Pair<Integer, ConsList<Boolean>> result =
-                    new Pair<>(s.minovf, s.afterBrkAssignment);
-            biCache.put(s.pos, result);
+            cachePut(s);
         }
         else {
             s.forward = true;
