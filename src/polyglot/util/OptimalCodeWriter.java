@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -311,12 +312,34 @@ class ConsList<T> {
     public String toString() {
         return "[" + toStringAux() + "]";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ConsList<?>) {
+            ConsList<?> l = (ConsList<?>) o;
+            if (length() != l.length()) return false;
+            if (elem == null || l.elem == null) {
+                if (elem != l.elem) return false;
+            }
+            else if (!elem.equals(l.elem)) return false;
+            if (next == null || l.next == null) return next == l.next;
+            return next.equals(l.next);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = 0;
+        if (next == null) hc = next.hashCode() * 31;
+        return hc + elem.hashCode();
+    }
 }
 
 class SearchState implements Cloneable {
 
     int lmargin, rmargin, pos;
-    int minbr, minbu, maxbr, maxbi;
+    int minbr, minbu, minbo, maxbr, maxbi;
     boolean forward;
     boolean findminovf;
     int minovf;
@@ -326,23 +349,24 @@ class SearchState implements Cloneable {
 
     ConsList<BlockItem> blks;
     ConsList<Integer> lmargins, rmargins;
-    ConsList<Integer> minbrs, minbus, maxbrs, maxbis;
+    ConsList<Integer> minbrs, minbus, minbos, maxbrs, maxbis;
 
     AllowBreak it;
     SearchState prevBreak;
 
     SearchState(int lmargin, int rmargin, int pos, int minbr, int minbu,
-            int maxbr, int maxbi) {
+            int minbo, int maxbr, int maxbi) {
         this.lmargin = lmargin;
         this.rmargin = rmargin;
         this.pos = pos;
         this.minbr = minbr;
         this.minbu = minbu;
+        this.minbo = minbo;
         this.maxbr = maxbr;
         this.maxbi = maxbi;
         forward = true;
         findminovf = false;
-        brkAssignment = new HashMap<>();
+        brkAssignment = new LinkedHashMap<>();
         afterBrkAssignment = ConsList.empty();
 
         blks = ConsList.empty();
@@ -350,6 +374,7 @@ class SearchState implements Cloneable {
         rmargins = ConsList.empty();
         minbrs = ConsList.empty();
         minbus = ConsList.empty();
+        minbos = ConsList.empty();
         maxbrs = ConsList.empty();
         maxbis = ConsList.empty();
     }
@@ -360,6 +385,7 @@ class SearchState implements Cloneable {
         rmargins = ConsList.cons(rmargin, rmargins);
         minbrs = ConsList.cons(minbr, minbrs);
         minbus = ConsList.cons(minbu, minbus);
+        minbos = ConsList.cons(minbo, minbos);
         maxbrs = ConsList.cons(maxbr, maxbrs);
         maxbis = ConsList.cons(maxbi, maxbis);
     }
@@ -377,8 +403,11 @@ class SearchState implements Cloneable {
         int outerminbu = minbus.elem;
         minbus = minbus.next;
         // The min break levels are the max required levels so far.
+        minbr = minbu = minbo;
         if (minbr < outerminbr) minbr = outerminbr;
         if (minbu < outerminbu) minbu = outerminbu;
+        minbo = minbos.elem;
+        minbos = minbos.next;
         maxbr = maxbrs.elem;
         maxbrs = maxbrs.next;
         maxbi = maxbis.elem;
@@ -422,6 +451,7 @@ abstract class OCItem {
         SearchState s =
                 new SearchState(0,
                                 rmargin,
+                                0,
                                 0,
                                 0,
                                 0,
@@ -469,6 +499,7 @@ abstract class OCItem {
                 s.pos = prev.pos;
                 s.minbr = prev.minbr;
                 s.minbu = prev.minbu;
+                s.minbo = prev.minbo;
                 s.maxbr = prev.maxbr;
                 s.maxbi = prev.maxbi;
                 s.blks = prev.blks;
@@ -476,6 +507,7 @@ abstract class OCItem {
                 s.rmargins = prev.rmargins;
                 s.minbrs = prev.minbrs;
                 s.minbus = prev.minbus;
+                s.minbos = prev.minbos;
                 s.maxbrs = prev.maxbrs;
                 s.maxbis = prev.maxbis;
             }
@@ -609,16 +641,17 @@ class TextItem extends OCItem {
 
     @Override
     void selfFormat(SearchState s) {
-        if (s.findminovf && s.pos + length > s.rmargin) {
+        int rpos = s.pos + length;
+        if (s.findminovf && rpos > s.rmargin) {
             // If break assignments causing minimal overflow is being sought,
             // and this item overflows, backtrack.
             s.forward = false;
-            s.minovf = s.pos + length - s.rmargin;
+            s.minovf = rpos - s.rmargin;
         }
         else {
             // Otherwise, all preceding break assignments have done their best jobs,
             // so move forward.
-            s.pos += length;
+            s.pos = rpos;
         }
     }
 
@@ -677,8 +710,8 @@ class AllowBreak extends OCItem {
         unified = u;
     }
 
-    /* maxbr -> pos -> minovf * afterBrkAssignment */
-    Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> cache =
+    /* maxbr -> maxbi -> pos -> minovf * afterBrkAssignment */
+    Map<Integer, Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>>> cache =
             new HashMap<>();
 
     int minovf;
@@ -691,30 +724,34 @@ class AllowBreak extends OCItem {
         boolean assignment;
         if (s.forward) {
             if (s.findminovf) {
-                // First, check the cache if we have done tried the given
+                // First, check the cache if we have tried the given
                 // search parameters.  If so, just return the memoized
                 // result and backtrack.
                 if (cache.containsKey(s.maxbr)) {
-                    Map<Integer, Pair<Integer, ConsList<Boolean>>> brCache =
+                    Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache =
                             cache.get(s.maxbr);
-                    if (brCache.containsKey(s.pos)) {
-                        Pair<Integer, ConsList<Boolean>> result =
-                                brCache.get(s.pos);
-                        s.forward = false;
-                        s.minovf = result.part1();
-                        s.afterBrkAssignment = result.part2();
-                        return;
+                    if (brCache.containsKey(s.maxbi)) {
+                        Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache =
+                                brCache.get(s.maxbi);
+                        if (biCache.containsKey(s.pos)) {
+                            Pair<Integer, ConsList<Boolean>> result =
+                                    biCache.get(s.pos);
+                            s.forward = false;
+                            s.minovf = result.part1();
+                            s.afterBrkAssignment = result.part2();
+                            return;
+                        }
                     }
                 }
             }
+            int rpos = s.pos + altlen;
             // First, check if there is already an assignment for us.
             if (s.afterBrkAssignment.length() > 0) {
                 // Just take the specified assignment.
                 assignment = s.afterBrkAssignment.elem;
                 s.afterBrkAssignment = s.afterBrkAssignment.next;
             }
-            else if (canLeaveUnbroken(s.minbr, s.minbu)
-                    && s.pos + altlen <= s.rmargin) {
+            else if (canLeaveUnbroken(s.minbr, s.minbu) && rpos <= s.rmargin) {
                 // This break can be left unbroken without causing immediate overflow.
                 assignment = false;
                 findminovf = true;
@@ -733,7 +770,7 @@ class AllowBreak extends OCItem {
                     // If an earlier break is finding minimal overflow, punt to that break.
                     backtrack = true;
                     // Since we could not break, the amount of minimal overflow is by not breaking.
-                    s.minovf = s.pos + altlen - s.rmargin;
+                    s.minovf = rpos - s.rmargin;
                 }
             }
             else throw new InternalCompilerError("Could not either break or not break."
@@ -741,9 +778,6 @@ class AllowBreak extends OCItem {
         }
         else {
             // Later item failed to stay within width limit
-            // Plan to move forward for now.
-            // If this is impossible, later code will reset.
-            s.forward = true;
             if (!s.brkAssignment.get(this) && canBreak(s.maxbr)) {
                 // We tried not breaking and did not work.
                 // Save later assignments that cause the overflow when not breaking.
@@ -770,6 +804,8 @@ class AllowBreak extends OCItem {
                         s.afterBrkAssignment = afterBrkAssignment;
                     }
                     else assignment = true;
+                    minovf = Integer.MAX_VALUE;
+                    afterBrkAssignment = null;
                 }
                 else {
                     // We did not save assignments.
@@ -791,27 +827,33 @@ class AllowBreak extends OCItem {
             }
         }
         if (backtrack) {
-            // Reset saved assignments.
-            afterBrkAssignment = null;
-            // Prepare best assignment causing minimal overflow for earlier break.
             s.forward = false;
+            // Prepare best assignment causing minimal overflow for earlier break.
             s.brkAssignment.remove(this);
             s.afterBrkAssignment =
                     ConsList.cons(assignment, s.afterBrkAssignment);
 
             // Memoize overflow results before backtracking.
-            Map<Integer, Pair<Integer, ConsList<Boolean>>> brCache;
+            Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache;
             if (cache.containsKey(s.maxbr))
                 brCache = cache.get(s.maxbr);
             else {
                 brCache = new HashMap<>();
                 cache.put(s.maxbr, brCache);
             }
+            Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache;
+            if (brCache.containsKey(s.maxbi))
+                biCache = brCache.get(s.maxbi);
+            else {
+                biCache = new HashMap<>();
+                brCache.put(s.maxbi, biCache);
+            }
             Pair<Integer, ConsList<Boolean>> result =
                     new Pair<>(s.minovf, s.afterBrkAssignment);
-            brCache.put(s.pos, result);
+            biCache.put(s.pos, result);
         }
         else {
+            s.forward = true;
             if (findminovf) {
                 // Set backtracking point to this break.
                 s.it = this;
@@ -828,6 +870,8 @@ class AllowBreak extends OCItem {
                 if (s.minbr < level) s.minbr = level - 1;
                 // If this is a unified break, all unified breaks of our level must also be broken.
                 if (unified && s.minbu < level) s.minbu = level;
+                // The min break level of outer block must be at least this level.
+                if (s.minbo < level) s.minbo = level;
             }
             else {
                 // Break is not broken.
@@ -885,9 +929,8 @@ class AllowBreak extends OCItem {
     String selfToString() {
         String result = unified ? "@<" : "<";
         result += level + ">";
-        if (indent == 0)
-            return result + " ";
-        else return result + "^" + indent;
+        if (indent > 0) result += "^" + indent;
+        return result + " ";
     }
 }
 
@@ -909,6 +952,8 @@ class Newline extends AllowBreak {
         if (s.minbr < level) s.minbr = level - 1;
         // If this is a unified break, all unified breaks of our level must also be broken.
         if (unified && s.minbu < level) s.minbu = level;
+        // The min break level of outer block must be at least this level.
+        if (s.minbo < level) s.minbo = level;
     }
 
     @Override
@@ -974,8 +1019,10 @@ class BlockItem extends OCItem {
         // The new indentation is relative to the current position.
         s.lmargin = s.pos + indent;
         // The min break levels reset.
-        s.minbr = minBreakLevels()[3];
-        s.minbu = minBreakLevels()[4];
+        int[] minBreakLevels = minBreakLevels();
+        s.minbr = minBreakLevels[3];
+        s.minbu = minBreakLevels[4];
+        s.minbo = minBreakLevels[1];
         // The max break level is now maxbi.
         s.maxbr = s.maxbi;
     }
