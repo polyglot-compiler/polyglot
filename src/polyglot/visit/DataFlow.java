@@ -976,7 +976,7 @@ public abstract class DataFlow<FlowItem extends DataFlow.Item> extends
                 FlowGraphSource<FlowItem> fgs = flowgraphStack.getFirst();
                 if (fgs.source().equals(old)) {
                     // we are leaving the code decl that pushed this flowgraph 
-                    // on the stack. pop tbe stack.
+                    // on the stack. pop the stack.
                     flowgraphStack.removeFirst();
                 }
             }

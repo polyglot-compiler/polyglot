@@ -129,11 +129,11 @@ public class DeadCodeEliminator extends
             liveDecls.addAll(dfi.liveDecls);
         }
 
-        protected boolean needDecl(LocalInstance li) {
+        public boolean needDecl(LocalInstance li) {
             return liveDecls.contains(li);
         }
 
-        protected boolean needDef(LocalInstance li) {
+        public boolean needDef(LocalInstance li) {
             return liveVars.contains(li);
         }
 
@@ -264,7 +264,7 @@ public class DeadCodeEliminator extends
                 + "never be called.");
     }
 
-    private DataFlowItem getItem(Term n) {
+    protected DataFlowItem getItem(Term n) {
         FlowGraph<DataFlowItem> g = currentFlowGraph();
         if (g == null) return null;
 
