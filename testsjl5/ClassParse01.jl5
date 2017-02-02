@@ -1,0 +1,8 @@
+import polyglot.ast.Term_c;
+import java.util.List;
+
+class ClassParse01 {
+  void m(List<Term_c> l, Term_c alt) {
+    Term_c.listChild(l, alt);
+  }
+}
