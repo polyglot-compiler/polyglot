@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -63,7 +63,7 @@ public class JL5Signature extends Attribute {
 
     /**
      * Grammar:
-     * class_sig = 
+     * class_sig =
      *  formal_type_params_opt super_class_sig super_inter_sig_list_opt
      * formal_type_params_opt =
      *  * empty *
@@ -75,17 +75,17 @@ public class JL5Signature extends Attribute {
      *  ID class_bound inter_bound_list_opt
      * class_bound =
      *  COLON field_type_sig_opt
-     * inter_bound_list_opt = 
+     * inter_bound_list_opt =
      *  * empty *
      *  | inter_bound_list
-     * inter_bound_list = 
+     * inter_bound_list =
      *  inter_bound
      *  inter_bound_list inter_bound
-     * inter_bound = 
+     * inter_bound =
      *  COLON field_type_sig
      * super_class_sig =
      *  class_type_sig
-     * super_inter_sig_list_opt = 
+     * super_inter_sig_list_opt =
      *  * empty *
      *  | super_inter_sig_list
      * super_inter_sig_list =
@@ -98,7 +98,7 @@ public class JL5Signature extends Attribute {
      *  | array_type_sig
      *  | type_var_sig
      * class_type_sig =
-     *  L pack_spec_list_opt simple_class_type_sig 
+     *  L pack_spec_list_opt simple_class_type_sig
      *      class_type_sig_suffix_list_opt SEMI_COLON
      * pack_spec_list_opt =
      *  * empty *
@@ -108,7 +108,7 @@ public class JL5Signature extends Attribute {
      *  | pack_spec_list pack_spec
      * pack_spec =
      *  ID SLASH
-     * simple_class_type_sig = 
+     * simple_class_type_sig =
      *  ID type_args_opt
      * class_type_sig_suffix_list_opt =
      *  * empty *
@@ -122,16 +122,16 @@ public class JL5Signature extends Attribute {
      *  T ID SEMI_COLON
      * type_args =
      *  LEFT_ANGLE type_arg_list RIGHT_ANGLE
-     * type_arg_list = 
+     * type_arg_list =
      *  type_arg
      *  | type_arg_list type_arg
      * type_arg =
      *  wild_card_ind_opt field_type_sig
      *  | STAR
-     * wild_card_ind_opt = 
+     * wild_card_ind_opt =
      *  * empty *
      *  | wild_card_ind
-     * wild_card_ind = 
+     * wild_card_ind =
      *  PLUS
      *  | MINUS
      * array_type_sig =
@@ -139,33 +139,33 @@ public class JL5Signature extends Attribute {
      * type_sig =
      *  field_type_sig
      *  | base_type
-     * 
+     *
      * method_type_sig =
-     *  formal_type_params_opt LEFT_BRACE type_sig_list_opt RIGHT_BRACE 
+     *  formal_type_params_opt LEFT_BRACE type_sig_list_opt RIGHT_BRACE
      *      return_type throws_sig_list_opt
      * return_type =
      *  type_sig
      *  | V
-     * throws_sig_list_opt = 
+     * throws_sig_list_opt =
      *  * empty *
      *  | throws_sig_list
      * throws_sig_list =
-     *  throws_sig 
+     *  throws_sig
      *  | throws_sig_list throws_sig
      * throws_sig =
      *  HAT class_type_sig
      *  | HAT type_var_sig
-     * 
+     *
      * base_type =
-     *  B | C | D | F | I | J | S | Z 
-     *  
+     *  B | C | D | F | I | J | S | Z
+     *
      */
 
     JL5Signature(ClassFile clazz, DataInputStream in, int nameIndex, int length)
             throws IOException {
         super(nameIndex, length);
-        this.index = in.readUnsignedShort();
-        this.cls = clazz;
+        index = in.readUnsignedShort();
+        cls = clazz;
     }
 
     // tokens
@@ -215,7 +215,7 @@ public class JL5Signature extends Attribute {
             return superType;
         }
 
-        protected List<ClassType> interfaces; // list of types 
+        protected List<ClassType> interfaces; // list of types
 
         public List<ClassType> interfaces() {
             return interfaces;
@@ -298,8 +298,8 @@ public class JL5Signature extends Attribute {
             //pos++;
         }
         return new Result<>(new ClassSig(fres == null
-                                                 ? new ArrayList<TypeVariable>()
-                                                 : (List<TypeVariable>) fres.result(),
+                ? new ArrayList<TypeVariable>()
+                : (List<TypeVariable>) fres.result(),
                                          sres.result(),
                                          superInterfaces),
                             pos);
@@ -338,7 +338,8 @@ public class JL5Signature extends Attribute {
         return new Result<>(list, pos);
     }
 
-    public Result<List<TypeVariable>> formalTypeParamList(String value, int pos) {
+    public Result<List<TypeVariable>> formalTypeParamList(String value,
+            int pos) {
         //System.err.println("### Parsing formal type param list " + value.substring(pos));
         typeVars = null;
         int oldpos = pos;
@@ -382,7 +383,9 @@ public class JL5Signature extends Attribute {
         List<ReferenceType> bounds = new ArrayList<>();
         Result<? extends ReferenceType> cres = classBound(value, pos);
         pos = cres.pos();
-        if (!cres.result().equals(ts.Object())) bounds.add(cres.result());
+        ReferenceType cresResult = cres.result();
+        if (cresResult != null && !cresResult.equals(ts.Object()))
+            bounds.add(cresResult);
         Result<? extends ReferenceType> ires = null;
         token = value.charAt(pos);
         while (token != RIGHT_ANGLE) {
@@ -440,7 +443,7 @@ public class JL5Signature extends Attribute {
         token = value.charAt(pos);
         while (token != SEMI_COLON) {
             switch (token) {
-            case SLASH: { // id is a package 
+            case SLASH: { // id is a package
                 className += id;
                 className += ".";
                 id = "";
@@ -486,10 +489,10 @@ public class JL5Signature extends Attribute {
             throw new InternalCompilerError("could not load " + className, e);
         }
         // look up in the map the last part of className, i.e., the part after the last '.'.
-        // This means that java.util.Map$Entry will go to 
+        // This means that java.util.Map$Entry will go to
         String lookupClassName =
                 className.substring(className.lastIndexOf('.') + 1);
-        //System.err.println("Now looking up " + ct.name() + " with class name '" + className +"'  in classArgsMap " + classArgsMap + "  " + classArgsMap.containsKey(className) + "  " + createTypeVars);        
+        //System.err.println("Now looking up " + ct.name() + " with class name '" + className +"'  in classArgsMap " + classArgsMap + "  " + classArgsMap.containsKey(className) + "  " + createTypeVars);
 //        if (!className.equals(ct.name())) {
 //            System.err.println("---- uh oh:   " + className + "   " + ct.name() +"   " + lookupClassName +"  " +classArgsMap);
 //        }
@@ -497,10 +500,9 @@ public class JL5Signature extends Attribute {
             JL5ParsedClassType pct = parsedClassTypeForClass(ct);
             if (!createTypeVars) {
                 try {
-                    ct =
-                            ts.instantiate(position,
-                                           pct,
-                                           classArgsMap.get(lookupClassName));
+                    ct = ts.instantiate(position,
+                                        pct,
+                                        classArgsMap.get(lookupClassName));
                 }
                 catch (SemanticException e) {
                     throw new InternalCompilerError(e);
@@ -602,7 +604,8 @@ public class JL5Signature extends Attribute {
             Result<? extends Type> fres = fieldTypeSig(value, ++pos);
             return new Result<>(ts.wildCardType(position,
                                                 (ReferenceType) fres.result(),
-                                                null), fres.pos());
+                                                null),
+                                fres.pos());
         }
         case MINUS: {
             Result<? extends Type> fres = fieldTypeSig(value, ++pos);
@@ -690,13 +693,12 @@ public class JL5Signature extends Attribute {
         Result<? extends Type> rres = returnType(value, pos);
         pos = rres.pos();
         Result<List<ReferenceType>> tres = null;
-        if ((pos < value.length()) && ((token = value.charAt(pos)) == HAT)) {
+        if (pos < value.length() && (token = value.charAt(pos)) == HAT) {
             tres = throwsSigList(value, pos);
             pos = tres.pos();
         }
         return new Result<>(new MethodSig(fres == null
-                                                  ? new ArrayList<TypeVariable>()
-                                                  : fres.result(),
+                ? new ArrayList<TypeVariable>() : fres.result(),
                                           ares == null
                                                   ? new ArrayList<Type>()
                                                   : ares.result(),
@@ -708,7 +710,7 @@ public class JL5Signature extends Attribute {
     }
 
     // returnType used in methodSig
-    // starts pointing at char 
+    // starts pointing at char
     // ends after (may be end of string
     public Result<? extends Type> returnType(String value, int pos) {
         //System.err.println("### Parsing return type sig " + value.substring(pos));
@@ -737,7 +739,7 @@ public class JL5Signature extends Attribute {
 
     // list of throwSigs ^L...;^L...;^T...;
     // starts at ^ may advance beyond end of string
-    // this is okay as throwsSigList is last part 
+    // this is okay as throwsSigList is last part
     // of methodTypeSig
     public Result<List<ReferenceType>> throwsSigList(String value, int pos) {
         List<ReferenceType> throwsList = new ArrayList<>();
@@ -751,7 +753,7 @@ public class JL5Signature extends Attribute {
 
     // throwsSig used in throwsSigList
     // ^L...; or ^T...;
-    // starts at ^ and advances past ; 
+    // starts at ^ and advances past ;
     public Result<? extends ReferenceType> throwsSig(String value, int pos) {
         char token = value.charAt(pos);
         switch (token) {
@@ -801,7 +803,7 @@ public class JL5Signature extends Attribute {
 
     public void parseClassSignature(TypeSystem ts, Position pos) {
         this.ts = (JL5TypeSystem) ts;
-        this.position = pos;
+        position = pos;
         String sigValue = (String) cls.getConstants()[index].value();
         classSignature = classSig(sigValue, 0).result();
     }
@@ -809,30 +811,30 @@ public class JL5Signature extends Attribute {
     public List<TypeVariable> parseClassTypeVariables(TypeSystem ts,
             Position pos) {
         this.ts = (JL5TypeSystem) ts;
-        this.position = pos;
+        position = pos;
         String sigValue = (String) cls.getConstants()[index].value();
-        char token = sigValue.charAt(0);
-        ;
+        char token = sigValue.charAt(0);;
         List<TypeVariable> results = null;
         if (token == LEFT_ANGLE) {
-            results = this.createFormalTypeParamList(sigValue, 1).result();
+            results = createFormalTypeParamList(sigValue, 1).result();
         }
-        this.typeVars = results;
+        typeVars = results;
         return results;
     }
 
-    public void parseMethodSignature(TypeSystem ts, Position pos, ClassType ct) {
+    public void parseMethodSignature(TypeSystem ts, Position pos,
+            ClassType ct) {
         this.ts = (JL5TypeSystem) ts;
-        this.position = pos;
-        this.curClass = ct;
+        position = pos;
+        curClass = ct;
         String sigValue = (String) cls.getConstants()[index].value();
         methodSignature = methodTypeSig(sigValue, 0).result();
     }
 
     public void parseFieldSignature(TypeSystem ts, Position pos, ClassType ct) {
         this.ts = (JL5TypeSystem) ts;
-        this.position = pos;
-        this.curClass = ct;
+        position = pos;
+        curClass = ct;
         String sigValue = (String) cls.getConstants()[index].value();
         fieldSignature = new FieldSig();
         fieldSignature.type = fieldTypeSig(sigValue, 0).result();
