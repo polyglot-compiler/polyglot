@@ -1,0 +1,142 @@
+#!/bin/sh
+
+prg=`basename "$0"`
+dir=`dirname "$0"`/..
+
+usage() {
+  compiler "--help"
+  cat <<EOF
+  -j <jvm-options>         pass options to the Java VM
+  -J <jvm>                 use a different Java VM (default java in path)
+  -V                       echo the java command
+EOF
+}
+
+fixpath() {
+  windows=0
+
+  if [ `uname | grep -c CYGWIN` -ne 0 ]; then
+    windows=1
+  fi
+
+  cp="$1"
+
+  if [ "$windows" = 1 ]; then 
+    cygpath -pw "$cp"
+  else
+    echo "$cp"
+  fi
+}
+
+unixfilename() {
+  windows=0
+
+  if [ `uname | grep -c CYGWIN` -ne 0 ]; then
+    windows=1
+  fi
+
+  cp="$1"
+
+  if [ "$windows" = 1 ]; then 
+    cygpath -u "$cp"
+  else
+    echo "$cp"
+  fi
+}
+
+unixpath() {
+  windows=0
+
+  if [ `uname | grep -c CYGWIN` -ne 0 ]; then
+    windows=1
+  fi
+
+  cp="$1"
+
+  if [ "$windows" = 1 ]; then 
+    cygpath -pu "$cp"
+  else
+    echo "$cp"
+  fi
+}
+
+extra_cp=
+args=
+vmargs=-ea
+classpath=
+java=java
+
+compiler() {
+  eval "$java" "$vmargs" -classpath "'$classpath'" efg.Main "$@"
+}
+compilerprint() {
+  echo "$java" "$vmargs" -classpath "'$classpath'" efg.Main "$@"
+}
+
+dir=`unixfilename "$dir"`
+
+while true; do
+    case "$1" in
+        "")
+            break
+            ;;
+        -V)
+            verbose=1
+            shift
+            ;;
+        -classpath|-cp)
+            shift
+            if [ -z "$extra_cp" ]; then
+	            extra_cp="`unixpath "$1"`"
+            else
+	            extra_cp="$extra_cp:`unixpath "$1"`"
+            fi
+            shift
+            ;;
+        -j)
+            shift
+            vmargs="$vmargs '$1'"
+            shift
+            ;;
+        -J)
+            shift
+            java="'$1'"
+            shift
+            ;;
+        -h)
+            usage=1
+            break
+            ;;
+        -rdebug)
+          shift
+          vmargs="${vmargs} -Xdebug -Xrunjdwp:transport=dt_socket,address=6666,server=y,suspend=y"
+          ;;
+        *)
+            args="$args '$1'"
+            shift
+            ;;
+    esac
+done
+
+unixclasspath=`unixpath $CLASSPATH`
+classpath="$extra_cp"
+classpath="$classpath:$dir/classes:$dir/lib/polyglot.jar:$dir/tools/java_cup/classes"
+classpath="$classpath:$dir/tools/efg/classes:$dir/tools/lib/efg.jar"
+
+PATH_unix=`unixpath $PATH`
+
+classpath="$classpath:$unixclasspath"
+
+classpath=`fixpath "$classpath"`
+
+
+if [ "$usage" = 1 ]; then
+  usage
+  exit 0
+fi
+
+if [ "$verbose" = 1 ]; then
+    compilerprint "$args"
+fi
+
+compiler "$args"

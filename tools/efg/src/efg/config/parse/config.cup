@@ -1,0 +1,279 @@
+package efg.config.parse;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import efg.config.ast.Config;
+import efg.config.ast.FactoryMapping;
+import efg.config.ast.FactoryName;
+import efg.config.ast.Name;
+import efg.config.ast.Node;
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.lr_parser;
+import java_cup.runtime.Symbol;
+import polyglot.lex.Identifier;
+import polyglot.lex.Token;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.Pair;
+import polyglot.util.Position;
+
+parser Grm extends lr_parser {:
+    public final Lexer lexer;
+    public final ErrorQueue eq;
+
+    public Grm(Lexer l, ErrorQueue q) {
+        super(new ComplexSymbolFactory());
+        this.lexer = l;
+        this.eq = q;
+    }
+
+    /**
+     * Override the default CUP routine.
+     */
+    @Override
+    public void syntax_error (java_cup.runtime.Symbol current) {
+        Position p = ((Token) current.value).getPosition();
+        report_error ("Syntax error: unexpected " + current.value + ".", p);
+    }
+
+    /**
+     * Override the default CUP routine.
+     */
+    @Override
+    public void report_error (String message, Object info) {
+        if (info instanceof Position)
+            eq.enqueue (ErrorInfo.SYNTAX_ERROR, message, (Position) info);
+        else
+            eq.enqueue (ErrorInfo.SYNTAX_ERROR, message);
+    }
+
+    public Symbol nextSymbol() throws java.io.IOException {
+        Token t = lexer.nextToken();
+        return new Symbol(t.symbol(), t);
+    }
+
+    public Position pos(Token t) {
+        return t == null ? null : t.getPosition();
+    }
+
+    public Position pos(Node n) {
+        return n == null ? null : n.pos;
+    }
+
+    public Position pos(Object first, Object last) {
+        Position fpos = pos(first);
+        Position epos = pos(last);
+
+        if (fpos != null && epos != null) {
+            return new Position(fpos, epos);
+        }
+
+        return fpos;
+    }
+
+    protected Position pos(Object o) {
+        if (o instanceof Node) {
+            return pos((Node) o);
+        }
+        else if (o instanceof Token) {
+            return pos((Token) o);
+        } else {
+            return null;
+        }
+    }
+:};
+
+scan with {: return nextSymbol(); :};
+
+terminal Token BOOLEAN;
+terminal Token BYTE, SHORT, INT, LONG, CHAR;
+terminal Token FLOAT, DOUBLE;
+terminal Token LBRACK, RBRACK;
+terminal Identifier IDENTIFIER;
+terminal Token DOT;
+terminal Token SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ;
+terminal Token LPAREN, RPAREN, COLON;
+terminal Token PACKAGE;
+terminal Token IMPORT;
+terminal Token PUBLIC, PROTECTED, PRIVATE;
+terminal Token STATIC;
+terminal Token ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
+terminal Token CLASS;
+terminal Token EXTENDS;
+terminal Token IMPLEMENTS;
+terminal Token VOID;
+terminal Token THROWS;
+terminal Token THIS, SUPER;
+terminal Token INTERFACE;
+terminal Token IF, ELSE;
+terminal Token SWITCH;
+terminal Token CASE, DEFAULT;
+terminal Token DO, WHILE;
+terminal Token FOR;
+terminal Token BREAK;
+terminal Token CONTINUE;
+terminal Token RETURN;
+terminal Token THROW;
+terminal Token TRY;
+terminal Token CATCH;
+terminal Token FINALLY;
+terminal Token NEW;
+terminal Token PLUSPLUS;
+terminal Token MINUSMINUS;
+terminal Token PLUS, MINUS, COMP, NOT, DIV, MOD;
+terminal Token LSHIFT, RSHIFT, URSHIFT;
+terminal Token LT, GT, LTEQ, GTEQ, INSTANCEOF;
+terminal Token EQEQ, NOTEQ;
+terminal Token AND;
+terminal Token XOR;
+terminal Token OR;
+terminal Token ANDAND;
+terminal Token OROR;
+terminal Token QUESTION;
+terminal Token MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ;
+terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ;
+terminal Token ANDEQ, XOREQ, OREQ;
+terminal polyglot.lex.IntegerLiteral INTEGER_LITERAL;
+terminal polyglot.lex.IntegerLiteral INTEGER_LITERAL_BD;
+terminal polyglot.lex.LongLiteral LONG_LITERAL;
+terminal polyglot.lex.LongLiteral LONG_LITERAL_BD;
+terminal polyglot.lex.DoubleLiteral DOUBLE_LITERAL;
+terminal polyglot.lex.FloatLiteral FLOAT_LITERAL;
+terminal polyglot.lex.BooleanLiteral BOOLEAN_LITERAL;
+terminal polyglot.lex.CharacterLiteral CHARACTER_LITERAL;
+terminal polyglot.lex.StringLiteral STRING_LITERAL;
+terminal polyglot.lex.NullLiteral NULL_LITERAL;
+terminal Token CONST, GOTO;
+terminal Token STRICTFP;
+terminal Token ASSERT;
+terminal Token ELLIPSIS;
+terminal Token ENUM;
+terminal Token AT;
+terminal Token LANGUAGE;
+terminal Token ARROW;
+
+non terminal Config goal;
+non terminal Config conf_file;
+non terminal Name language_declaration;
+non terminal Pair<Name, Name> extends_declaration_opt;
+non terminal Name package_declaration;
+non terminal Name identifier;
+non terminal Name name;
+non terminal List<FactoryMapping> factory_mappings;
+non terminal FactoryMapping factory_mapping;
+non terminal List<FactoryName> factory_names;
+non terminal FactoryName factory_name;
+
+start with goal;
+
+goal ::=
+        // Config
+        conf_file:a {:
+            if (!parser.eq.hasErrors()) RESULT = a;
+        :}
+    ;
+
+conf_file ::=
+        // Config
+        language_declaration:a
+        extends_declaration_opt:b
+        package_declaration:c
+        factory_mappings:d {:
+            RESULT = new Config(a, b, c, d);
+        :}
+    ;
+
+language_declaration ::=
+        // Name
+        LANGUAGE identifier:a SEMICOLON {:
+            RESULT = a;
+        :}
+    ;
+
+extends_declaration_opt ::=
+        // Pair<Name, Name>
+    |   INTERFACE EXTENDS name:a SEMICOLON
+        ABSTRACT CLASS EXTENDS name:b SEMICOLON {:
+            RESULT = new Pair<>(a, b);
+        :}
+    ;
+
+package_declaration ::=
+        // Name
+        PACKAGE name:a SEMICOLON {:
+            RESULT = a;
+        :}
+    ;
+
+identifier ::=
+        // Name
+        IDENTIFIER:a {:
+            RESULT = new Name(a);
+        :}
+    |   LANGUAGE:a {:
+            RESULT = new Name(parser.pos(a), "language");
+        :}
+    ;
+
+name ::=
+        // Name
+        identifier:a {:
+            RESULT = a;
+        :}
+    |   name:a DOT identifier:b {:
+            RESULT = new Name(parser.pos(a, b), a.name + "." + b.name);
+        :}
+    ;
+
+factory_mappings ::=
+        // List<FactoryMapping>
+        {:
+            RESULT = new ArrayList<>();
+        :}
+    |   factory_mapping:a factory_mappings:b {:
+            b.add(a);
+            RESULT = b;
+        :}
+    ;
+
+factory_mapping ::=
+        // FactoryMapping
+        name:a SEMICOLON {:
+            RESULT = new FactoryMapping(parser.pos(a), a);
+        :}
+    |   name:a EXTENDS name:b SEMICOLON {:
+            RESULT = new FactoryMapping(parser.pos(a), a, b);
+        :}
+    |   name:a LBRACE factory_names:b RBRACE {:
+            RESULT = new FactoryMapping(parser.pos(a, b), a, b);
+        :}
+    |   name:a EXTENDS name:b LBRACE factory_names:c RBRACE {:
+            RESULT = new FactoryMapping(parser.pos(a, b), a, b, c);
+        :}
+    ;
+
+factory_names ::=
+        // List<FactoryName>
+        {:
+            RESULT = new ArrayList<>();
+        :}
+    |   factory_name:a {:
+            RESULT = new ArrayList<>();
+            RESULT.add(a);
+        :}
+    |   factory_name:a COMMA factory_names:b {:
+            b.add(a);
+            RESULT = b;
+        :}
+    ;
+
+factory_name ::=
+        // FactoryName
+        identifier:a {:
+            RESULT = new FactoryName(parser.pos(a), a);
+        :}
+    |   identifier:a ARROW identifier:b {:
+            RESULT = new FactoryName(parser.pos(a, b), a, b);
+        :}
+    ;
