@@ -105,7 +105,7 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
             }
             e = composeExts(e, e2);
         }
-        return postResource(e);
+        return postExtResource(e);
     }
 
     @Override
@@ -122,7 +122,7 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
             }
             e = composeExts(e, e2);
         }
-        return postTryWithResources(e);
+        return postExtTryWithResources(e);
     }
 
     protected Ext extAmbDiamondTypeNodeImpl() {
@@ -157,11 +157,11 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
         return postExtCatch(e);
     }
 
-    protected Ext postResource(Ext e) {
+    protected Ext postExtResource(Ext e) {
         return postExtLocalDecl(e);
     }
 
-    protected Ext postTryWithResources(Ext e) {
+    protected Ext postExtTryWithResources(Ext e) {
         return postExtTry(e);
     }
 }
