@@ -283,7 +283,7 @@ public abstract class JL5AbstractExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext extEnumConstantDeclImpl() {
-        return this.extTermImpl();
+        return this.extClassMemberImpl();
     }
 
     protected Ext extEnumConstantImpl() {
@@ -294,36 +294,36 @@ public abstract class JL5AbstractExtFactory_c extends AbstractExtFactory_c
         return this.extTypeNodeImpl();
     }
 
-    public Ext postExtAmbTypeInstantiation(Ext ext) {
+    protected Ext postExtAmbTypeInstantiation(Ext ext) {
         return this.postExtTypeNode(ext);
     }
 
-    public Ext postExtAmbWildCard(Ext ext) {
+    protected Ext postExtAmbWildCard(Ext ext) {
         return this.postExtTypeNode(ext);
     }
 
-    public Ext postExtEnumDecl(Ext ext) {
+    protected Ext postExtEnumDecl(Ext ext) {
         return this.postExtClassDecl(ext);
     }
 
-    public Ext postExtExtendedFor(Ext ext) {
+    protected Ext postExtExtendedFor(Ext ext) {
         return this.postExtLoop(ext);
     }
 
-    public Ext postExtEnumConstantDecl(Ext ext) {
+    protected Ext postExtEnumConstantDecl(Ext ext) {
         return this.postExtClassMember(ext);
     }
 
-    public Ext postExtEnumConstant(Ext ext) {
+    protected Ext postExtEnumConstant(Ext ext) {
         return this.postExtField(ext);
     }
 
-    public Ext postExtParamTypeNode(Ext ext) {
+    protected Ext postExtParamTypeNode(Ext ext) {
         return this.postExtTypeNode(ext);
     }
 
     protected Ext extAnnotationElemDeclImpl() {
-        return this.extClassMemberImpl();
+        return this.extMethodDeclImpl();
     }
 
     protected Ext extNormalAnnotationElemImpl() {
@@ -347,27 +347,27 @@ public abstract class JL5AbstractExtFactory_c extends AbstractExtFactory_c
     }
 
     protected Ext postExtAnnotationElemDecl(Ext ext) {
-        return ext;
+        return this.postExtMethodDecl(ext);
     }
 
     protected Ext postExtNormalAnnotationElem(Ext ext) {
-        return ext;
+        return this.postExtTerm(ext);
     }
 
     protected Ext postExtMarkerAnnotationElem(Ext ext) {
-        return ext;
+        return this.postExtNormalAnnotationElem(ext);
     }
 
     protected Ext postExtSingleElementAnnotationElem(Ext ext) {
-        return ext;
+        return this.postExtNormalAnnotationElem(ext);
     }
 
     protected Ext postExtElementValuePair(Ext ext) {
-        return ext;
+        return this.postExtTerm(ext);
     }
 
     protected Ext postExtElementValueArrayInit(Ext ext) {
-        return ext;
+        return this.postExtTerm(ext);
     }
 
 }
