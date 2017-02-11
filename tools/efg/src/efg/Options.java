@@ -54,6 +54,14 @@ public class Options extends JL5Options {
         }
     }
 
+    @Override
+    protected void postApplyArgs() {
+        super.postApplyArgs();
+
+        // Don't call javac.
+        setOutputOnly(true);
+    }
+
     public File confFile() {
         return confFile;
     }
