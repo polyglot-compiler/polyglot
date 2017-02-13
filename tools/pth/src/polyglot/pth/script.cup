@@ -1,32 +1,36 @@
 package polyglot.pth;
 
+import java_cup.runtime.ComplexSymbolFactory;
+
 import java.io.*;
 import java.util.*;
 
-action code {:
-:}
-
 parser code {:
-    Lexer_c lexer;
-    public Grm(String filename) {
-        this(new File(filename));
+    protected TestFactory tf;
+
+    public Grm(TestFactory tf, String filename) {
+        this(tf, new File(filename));
     }
-    public Grm(File file) {
-        this();
+
+    public Grm(TestFactory tf, File file) {
+        this(tf, lexer(file));
+    }
+
+    public Grm(TestFactory tf, Lexer_c l) {
+        this(l, new ComplexSymbolFactory());
+        this.tf = tf;
+    }
+
+    protected static Lexer_c lexer(File file) {
         try {
-            lexer = new Lexer_c(new FileReader(file));
+            return new Lexer_c(new FileReader(file));
         }
-        catch (Exception e) {
+        catch (IOException e) {
             System.out.println("open script file (" + file.getName() +") error: " + e);
-            lexer = new Lexer_c(new InputStreamReader(System.in));
+            return new Lexer_c(new InputStreamReader(System.in));
         }
     }
 
-    public Grm(Lexer_c l) {
-        this();
-        lexer = l;
-    }
-    
     public static int findErrorKind(String s) {
       s = s.toLowerCase();
       for (int i = 0; i < 10; i++) {
@@ -38,10 +42,6 @@ parser code {:
     }
 :}
 
-scan with {:
-    return lexer.next_token();
-:}
-
 
 terminal String IDENT;
 terminal String STRING_LITERAL;
@@ -51,10 +51,14 @@ terminal LBRACE, RBRACE;
 terminal SEMICOLON, COMMA;
 terminal PLUS;
 
-non terminal List<SourceFileTest> goal;
-non terminal List<SourceFileTest> compilertest_list_opt;
-non terminal List<SourceFileTest> compilertest_list;
-non terminal List<SourceFileTest> compilertest;
+terminal BUILD;
+
+non terminal List<Test> goal;
+non terminal List<Test> command_list_opt;
+non terminal List<Test> command_list;
+non terminal Test command;
+non terminal SourceFileTestCollection compilertest;
+non terminal String testname_opt;
 non terminal String testpath_opt;
 non terminal String command_line_args_opt;
 non terminal List<SourceFileTest> filetest_list_opt;
@@ -71,35 +75,49 @@ non terminal ExpectedFailure failure;
 start with goal;
 
 goal ::=
-        compilertest_list_opt:a
+        command_list_opt:a
             {: RESULT = a; :}
     ;
 
-compilertest_list_opt ::=
+command_list_opt ::=
         {: RESULT = Collections.emptyList(); :}
-    |   compilertest_list:a {: RESULT = a; :}
+    |   command_list:a {: RESULT = a; :}
     ;
 
-compilertest_list ::=
-        compilertest:a
+command_list ::=
+        command:a
+            {: 
+               List<Test> l = new LinkedList<>();
+               l.add(a);
+               RESULT = l;
+            :}
+    |   command_list:a command:b
+            {: a.add(b); RESULT = a; :}
+    ;
+
+command ::=
+        BUILD
+            {: 
+               RESULT = tf.BuildTest();
+            :}
+    |   compilertest:a
             {: 
                RESULT = a;
             :}
-    |   compilertest:a compilertest_list:b
-            {: b.addAll(0, a); RESULT = b; :}
     ;
 
 compilertest ::=
-        IDENT:a testpath_opt:b command_line_args_opt:c LBRACE filetest_list_opt:d RBRACE
-            {: String extClassName = a;
-               
-		        for (SourceFileTest sft : d) {
-		            sft.setTestDir(b);
-		            sft.setExtensionClassname(extClassName);
-		            sft.setExtraCmdLineArgs(c);
-		        }
-               RESULT = d; :}
-	    
+        IDENT:a testname_opt:b testpath_opt:c command_line_args_opt:d LBRACE
+                filetest_list_opt:e RBRACE
+            {: 
+               RESULT = tf.SourceFileTestCollection(a, b, c, d, e);
+            :}
+    ;
+
+testname_opt ::=
+        LPAREN sentence:a RPAREN
+            {: RESULT = a; :}
+    | {: :}
     ;
 
 testpath_opt ::=
@@ -120,12 +138,7 @@ filetest_list_opt ::=
     ;
 
 filetest_list ::=
-        filetest:a
-            {: List<SourceFileTest> list = new LinkedList<>();
-               list.add(a);
-               RESULT = list;
-            :}
-    |   filetest:a SEMICOLON
+        filetest:a SEMICOLON
             {: List<SourceFileTest> list = new LinkedList<>();
                list.add(a);
                RESULT = list;
@@ -135,12 +148,14 @@ filetest_list ::=
     ;
 
 filetest ::=
-        compilation_unit_list:a description_opt:b failure_set_opt:d
-            {: SourceFileTest sft = new SourceFileTest(a);
-               sft.setDescription(b);
-               sft.setExpectedFailures(d);
+            {: SourceFileTest sft =
+                    tf.SourceFileTest(Collections.singletonList(
+                        Collections.<String> emptyList()), Collections.<ExpectedFailure> emptyList());
                RESULT = sft; :}
-	    
+    |   compilation_unit_list:a description_opt:b failure_set_opt:d
+            {: SourceFileTest sft = tf.SourceFileTest(a, d);
+               sft.setDescription(b);
+               RESULT = sft; :}
     ;
 
 compilation_unit_list ::=
@@ -194,7 +209,7 @@ failure_set ::=
                l.add(a);
                RESULT = l;
             :}
-    |   failure_set:a  COMMA failure:b
+    |   failure_set:a COMMA failure:b
             {: a.add(b); RESULT = a; :}
     ;
 

@@ -1,24 +1,50 @@
 package polyglot.pth;
 
 import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory.Location;
 import java_cup.runtime.Symbol;
 
 @SuppressWarnings({"unused", "fallthrough", "all"})
 %%
-%cup
 %public
 %class Lexer_c
+%cup
+
+%unicode
+
+%line
+%column
 
 %{
   private static ComplexSymbolFactory csf = new ComplexSymbolFactory();
   StringBuffer string = new StringBuffer();
 
   private Symbol sym(String name, int id) {
-    return csf.newSymbol(name, id);
+    return csf.newSymbol(name, id, beginPos(), endPos());
   }
 
   private Symbol sym(String name, int id, Object o) {
-    return csf.newSymbol(name, id, o);
+    return csf.newSymbol(name, id, beginPos(), endPos(), o);
+  }
+
+  private Position beginPos() {
+    return new Position(yyline+1, yycolumn+1);
+  }
+
+  private Position endPos() {
+    int len = yytext().length();
+    return new Position(yyline+1, yycolumn+1+len);
+  }
+
+  private static class Position extends Location {
+    public Position(int line, int column) {
+      super(line, column);
+    }
+
+    @Override
+    public String toString() {
+      return getLine() + ":" + getColumn();
+    }
   }
 %}
 
@@ -43,6 +69,7 @@ IDENT                = [a-zA-Z0-9_\:\.\$\/\\\-]+
 %%
 <YYINITIAL> {
    /* identifiers */
+   "build"                        { return sym("build", sym.BUILD); }
    {IDENT}                        { return sym("ID", sym.IDENT, yytext()); }
 
    /* literals */
@@ -76,13 +103,14 @@ IDENT                = [a-zA-Z0-9_\:\.\$\/\\\-]+
 
    \\r                            { string.append('\r'); }
    \\\"                           { string.append('\"'); }
-   \\                             { string.append('\\'); }
+   \\\\                           { string.append('\\'); }
 }
 
 \^Cd   { return sym("EOF", sym.EOF); }
 
 /* error fallback */
-[^]                               { throw new Error("Illegal character <"+
-                                                     yytext()+">"); }
+[^]                               { throw new Error(beginPos() +
+                                                    ": Illegal character <"+
+                                                    yytext()+">"); }
 
 

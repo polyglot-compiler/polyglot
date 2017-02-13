@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -27,13 +27,14 @@ package polyglot.pth;
 
 import java.io.PrintStream;
 
+import polyglot.pth.polyglot.PolyglotSourceFileTest;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.SilentErrorQueue;
 import polyglot.util.StdErrorQueue;
 
 /**
- * 
+ *
  */
 public class VerboseOutputController extends OutputController {
     private boolean alwaysShowErrorQ;
@@ -61,12 +62,32 @@ public class VerboseOutputController extends OutputController {
     @Override
     protected void finishScriptTestSuite(ScriptTestSuite sts) {
         out.println("Test script " + sts.getName() + " finished");
-        if (!sts.success() && sts.failureMessage != null) {
-            out.println(sts.failureMessage);
+        if (!sts.success() && sts.getFailureMessage() != null) {
+            out.println(sts.getFailureMessage());
         }
 
-        out.println("  " + sts.getSuccesfulTestCount() + " out of "
+        out.println("  " + sts.getSuccessfulTestCount() + " out of "
                 + sts.getTotalTestCount() + " tests succeeded.");
+    }
+
+    @Override
+    protected void startSourceFileTestCollection(
+            SourceFileTestCollection sftc) {
+        println("Test collection: " + sftc.getName());
+        beginBlock();
+    }
+
+    @Override
+    protected void finishSourceFileTestCollection(
+            SourceFileTestCollection sftc) {
+        endBlock();
+        String notice = sftc.getNotice();
+        if (notice != null) println(notice);
+
+        if (!sftc.success() && sftc.getFailureMessage() != null)
+            println(sftc.getFailureMessage());
+
+        println(sftc.getSummary());
     }
 
     @Override
@@ -84,20 +105,21 @@ public class VerboseOutputController extends OutputController {
     }
 
     @Override
-    protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) {
+    protected void finishSourceFileTest(SourceFileTest sft) {
         if (sft.success()) {
             out.println("    Test completed OK");
         }
         else {
             out.print("    Test failed");
-            if (sft.getFailureMessage() != null) {
-                out.println(": " + sft.getFailureMessage());
-            }
-            else {
-                out.println();
-            }
+            String msg = sft.getFailureMessage();
+            if (msg != null)
+                println(": " + msg);
+            else println(" (no message)");
         }
         if (alwaysShowErrorQ || !sft.success()) {
+            // TODO
+            PolyglotSourceFileTest psft = (PolyglotSourceFileTest) sft;
+            ErrorQueue eq = psft.errorQueue();
             StdErrorQueue stdeq =
                     new StdErrorQueue(out, eq.errorCount() + 1, sft.getName());
 
@@ -110,46 +132,65 @@ public class VerboseOutputController extends OutputController {
                 out.println("-----------------------------");
             }
         }
+        if (!Main.options.suppressCompilerOutputs) {
+            String stdout = sft.getCompilerStdout();
+            if (stdout != null) {
+                println("[Compiler's standard output:");
+                print(stdout);
+                println("]");
+            }
+            String stderr = sft.getCompilerStderr();
+            if (stderr != null) {
+                println("[Compiler's standard error:");
+                print(stderr);
+                println("]");
+            }
+        }
     }
 
     @Override
-    public void displayTestSuiteResults(String suiteName, TestSuite ts) {
-        TestSuiteResult tsr = ts.getTestSuiteResult();
-        if (tsr == null || tsr.testResults.isEmpty()) {
-            out.println("No test results for " + suiteName);
-            return;
-        }
+    protected void startBuildTest(BuildTest b) {
+        print(b.getName() + ": ");
+        beginBlock();
+    }
 
-        out.println("Test script " + tsr.testName);
-        out.println("  Last run    : " + getDateDisplay(tsr.dateTestRun));
-        out.println("  Last success: " + getDateDisplay(tsr.dateLastSuccess));
+    @Override
+    protected void finishBuildTest(BuildTest b) {
+        endBlock();
+        String notice = b.getNotice();
+        if (notice != null) println(notice);
 
-        int total = 0;
-        int lastSuccess = 0;
-        int neverRun = 0;
-        int neverSuccess = 0;
-        for (Test t : ts.getTests()) {
-            String testName = t.getName();
-            TestResult tr = tsr.testResults.get(t.getUniqueId());
-            if (TestSuite.executeTest(testName, tr)) {
-                displayTestResults(tr, testName);
-            }
-            total++;
-            if (tr != null && tr.dateLastSuccess != null
-                    && tr.dateLastSuccess.equals(tr.dateTestRun)) {
-                lastSuccess++;
-            }
-            if (tr == null || tr.dateTestRun == null) {
-                neverRun++;
-            }
-            if (tr == null || tr.dateLastSuccess == null) {
-                neverSuccess++;
-            }
-        }
-        out.println("Total tests: " + total);
-        out.println("   Succeeded last run: " + lastSuccess);
-        out.println("   Never run         : " + neverRun);
-        out.println("   Never succeeded   : " + neverSuccess);
+        if (b.success())
+            println("OK");
+        else if (b.getFailureMessage() != null)
+            println(b.getFailureMessage());
+        else println("Failed (no message)");
+    }
+
+    @Override
+    public void printNoTestResults(String suiteName) {
+        println("No test results for " + suiteName);
+    }
+
+    @Override
+    public void printTestSuiteHeader(TestSuiteResult tsr) {
+        print("Test suite \"" + tsr.testName + "\"");
+        println("    Last run: " + getDateDisplay(tsr.dateTestRun));
+        println("Contains tests:");
+        beginBlock();
+    }
+
+    @Override
+    public void printTestSuiteFooter(int total, int grandTotal, int lastSuccess,
+            int neverRun, int neverSuccess) {
+        endBlock();
+        print("Total tests displayed: " + total);
+        if (total != grandTotal)
+            print(" (out of " + grandTotal + " in script)");
+        println();
+        println("   Succeeded last run: " + lastSuccess);
+        println("   Never run         : " + neverRun);
+        println("   Never succeeded   : " + neverSuccess);
     }
 
     @Override

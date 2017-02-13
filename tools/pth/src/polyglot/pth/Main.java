@@ -13,29 +13,32 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
  ******************************************************************************/
 package polyglot.pth;
 
+import polyglot.pth.polyglot.PolyglotTestFactory;
+
 /**
  *  Main program for the Polyglot Test Harness
  */
 public class Main {
     public static void main(String[] args) {
-        new Main().start(args);
+        boolean okay = new Main().start(args);
+        if (options.nonzeroExitCodeOnFailedTests && !okay) System.exit(1);
     }
 
     public static Options options;
 
-    public void start(String[] args) {
+    public boolean start(String[] args) {
         options = new Options();
         try {
             options.parseCommandLine(args);
@@ -52,16 +55,22 @@ public class Main {
 
         OutputController outCtrl = createOutputController(options);
 
+        // TODO refactor
+        TestFactory tf = new PolyglotTestFactory();
+        PDFReporter pdfReporter = null;
+        if (options.pdffilename != null)
+            pdfReporter = new PDFReporter(options.pdffilename);
+        boolean okay = true;
         for (String filename : options.inputFilenames) {
-            ScriptTestSuite t = new ScriptTestSuite(filename);
+            ScriptTestSuite t = new ScriptTestSuite(tf, filename);
             t.setOutputController(outCtrl);
-            if (options.showResultsOnly) {
-                outCtrl.displayTestSuiteResults(t.getName(), t);
-            }
-            else {
-                t.run();
-            }
+            t.setPDFReporter(pdfReporter);
+            if (options.showResultsOnly)
+                t.displayTestResult(outCtrl);
+            else okay = okay && t.run();
         }
+        if (pdfReporter != null) pdfReporter.flush();
+        return okay;
     }
 
     protected OutputController createOutputController(Options options) {
@@ -91,10 +100,10 @@ public class Main {
                                              false,
                                              false,
                                              true);
-        case 8:
-            return new VerboseOutputController(System.out, false);
-        case 9:
-            return new VerboseOutputController(System.out, true);
+//        case 8:
+//            return new VerboseOutputController(System.out, false);
+//        case 9:
+//            return new VerboseOutputController(System.out, true);
 
         default:
             return new StdOutputController(System.out);
