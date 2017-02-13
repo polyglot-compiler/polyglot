@@ -39,6 +39,11 @@
     <property name="ppg.classes" location="${ppg.dir}/classes"/>
     <property name="ppg.src" location="${ppg.dir}/src"/>
 
+    <!-- efg (ExtFactory generator) directory -->
+    <property name="efg.dir" location="${tools.dir}/efg"/>
+    <property name="efg.classes" location="${efg.dir}/classes"/>
+    <property name="efg.src" location="${efg.dir}/src"/>
+
     <!-- java_cup directory -->
     <property name="cup.dir" location="${tools.dir}/java_cup"/>
     <property name="cup.classes" location="${cup.dir}/classes"/>
@@ -160,6 +165,7 @@
         <chmod perm="+x" file="${bin}/jl5c"/>
         <chmod perm="+x" file="${bin}/jl7c"/>
         <chmod perm="+x" file="${bin}/pth"/>
+        <chmod perm="+x" file="${bin}/efg"/>
         <property name="bin.up-to-date" value="true"/>
     </target>
 
@@ -176,15 +182,16 @@
         <mkdir dir="${cup.classes}"/>
         <mkdir dir="${ppg.classes}"/>
         <mkdir dir="${pth.classes}"/>
+        <mkdir dir="${efg.classes}"/>
     </target>
 
     <!-- build everything -->
     <target name="all" depends="jar-all" description="Build everything"/>
 
-    <!-- build the base compiler, qq, and pth -->
+    <!-- build the base compiler, qq, pth, and efg -->
     <target name="compile"
-            depends="base,pth"
-            description="Build the base compiler, qq, and pth"/>
+            depends="base,pth,efg"
+            description="Build the base compiler, qq, pth, and efg"/>
 
     <!-- build the base compiler -->
     <target name="base"
@@ -194,14 +201,14 @@
 
     <!-- compile everything -->
     <target name="compile-all"
-            depends="base,compile-ppg,compile-pth,examples"
-            description="Compile the base compiler, ppg, pth, and the examples"
+            depends="base,compile-ppg,compile-pth,compile-efg,examples"
+            description="Compile the base compiler, ppg, pth, efg, and the examples"
     />
 
     <!-- build all the jars -->
     <target name="jar-all"
-            depends="jar,jar-pth,jar-ppg,jar-examples"
-            description="Build polyglot.jar ppg.jar pth.jar and examples"/>
+            depends="jar,jar-pth,jar-ppg,jar-efg,jar-examples"
+            description="Build polyglot.jar ppg.jar pth.jar efg.jar and examples"/>
 
     <!-- install the jars in the examples -->
     <target name="install-jars-in-examples" depends="jar">
@@ -386,6 +393,7 @@
         <delete file="${lib}/java_cup.jar"/>
         <delete file="${lib}/ppg.jar"/>
         <delete file="${lib}/pth.jar"/>
+        <delete file="${lib}/efg.jar"/>
     </target>
 
     <target name="clean"
@@ -397,6 +405,9 @@
                 includeemptydirs="true"
                 failonerror="false"/>
         <delete dir="${ppg.classes}"
+                includeemptydirs="true"
+                failonerror="false"/>
+        <delete dir="${efg.classes}"
                 includeemptydirs="true"
                 failonerror="false"/>
         <delete dir="${cup.classes}"
@@ -443,6 +454,13 @@
                 <include name="polyglot/pth/Grm.java"/>
                 <include name="polyglot/pth/sym.java"/>
                 <include name="polyglot/pth/Lexer_c.java"/>
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${efg.src}">
+                <include name="efg/parse/Grm.java"/>
+                <include name="efg/parse/sym.java"/>
+                <include name="efg/parse/Lexer_c.java"/>
             </fileset>
         </delete>
         <delete>
@@ -854,6 +872,9 @@
             <packageset dir="${pth.src}" defaultexcludes="yes">
                 <include name="polyglot/pth/**"/>
             </packageset>
+            <packageset dir="${efg.src}" defaultexcludes="yes">
+                <include name="polyglot/efg/**"/>
+            </packageset>
             <classpath refid="standard.classpath"/>
         </javadoc>
     </target>
@@ -932,6 +953,54 @@
             depends="jar-ppg"
             description="Builds the ppg (Polyglot Parser Generator) tool"/>
 
+    <!-- compile efg (ExtFactory generator) -->
+    <target name="compile-efg" depends="compile-base">
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${efg.src}/efg/parse"/>
+            <param name="lexer.class" value="Lexer_c"/>
+            <param name="jflex.file" value="efg.flex"/>
+        </antcall>
+        <antcall target="ppg-parser">
+            <param name="parser.dir" value="${efg.src}/efg/parse"/>
+            <param name="ppg.file" value="efg.ppg"/>
+            <param name="cup.file" value="efg_ppg.cup"/>
+            <param name="parser.class" value="Grm"/>
+            <param name="symbol.class" value="sym"/>
+        </antcall>
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${efg.src}/efg/config/parse"/>
+            <param name="lexer.class" value="Lexer"/>
+            <param name="jflex.file" value="config.flex"/>
+        </antcall>
+        <antcall target="cup-parser">
+            <param name="parser.dir" value="${efg.src}/efg/config/parse"/>
+            <param name="cup.file" value="config.cup"/>
+            <param name="parser.class" value="Grm"/>
+            <param name="symbol.class" value="sym"/>
+        </antcall>
+        <javac source="1.7"
+                target="1.7"
+                srcdir="${efg.src}"
+                destdir="${efg.classes}"
+                debug="on"
+                includes="efg/**"
+                includeantruntime="false">
+            <classpath refid="standard.classpath"/>
+        </javac>
+    </target>
+
+    <!-- create jar efg (ExtFactory generator) -->
+    <target name="jar-efg" depends="compile-efg" description="Builds efg.jar">
+        <jar jarfile="${lib}/efg.jar"
+                basedir="${efg.classes}"
+                includes="efg/**"/>
+    </target>
+
+    <!-- create efg (ExtFactory generator) -->
+    <target name="efg"
+            depends="jar-efg"
+            description="Builds the efg (ExtFactory generator) tool"/>
+
 
     <!-- Distribution targets -->
 
@@ -975,7 +1044,7 @@
 
     <!-- make the LGPL source distribution in a tmp directory -->
     <target name="src-dist-tmp"
-            depends="jar-base,jar-pth,jar-ppg,javadoc,mkdir-tmp">
+            depends="jar-base,jar-pth,jar-ppg,jar-efg,javadoc,mkdir-tmp">
         <copy todir="${tmp}/src" includeemptydirs="false">
             <fileset refid="dist-src-files"/>
         </copy>
@@ -986,7 +1055,7 @@
 
         <copy todir="${tmp}/tools" includeEmptyDirs="false">
             <fileset dir="${basedir}/tools"
-                    includes="pth/**,ppg/**,java_cup/**"
+                    includes="pth/**,ppg/**,efg/**,java_cup/**"
                     excludes="**/classes,**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results"/>
         </copy>
         <copy todir="${tmp}/eclipse" includeEmptyDirs="false">
@@ -1026,6 +1095,7 @@
         <copy file="${bin}/jl5c" todir="${tmp}/bin"/>
         <copy file="${bin}/jl7c" todir="${tmp}/bin"/>
         <copy file="${bin}/pth" todir="${tmp}/bin"/>
+        <copy file="${bin}/efg" todir="${tmp}/bin"/>
         <mkdir dir="${tmp}/doc/release-notes-2.0"/>
         <copy todir="${tmp}/doc/release-notes-2.0">
             <fileset dir="doc/release-notes-2.0"/>
@@ -1049,6 +1119,7 @@
         <copy file="${lib}/polyglot.jar" todir="${tmp}/lib"/>
         <copy file="${lib}/pth.jar" todir="${tmp}/lib"/>
         <copy file="${lib}/ppg.jar" todir="${tmp}/lib"/>
+        <copy file="${lib}/efg.jar" todir="${tmp}/lib"/>
         <copy file="${lib}/java_cup.jar" todir="${tmp}/lib"/>
         <copy file="${lib}/jflex.jar" todir="${tmp}/lib"/>
         <copy file="build.xml" todir="${tmp}"/>
@@ -1062,12 +1133,12 @@
         <!-- these don't seem to work on Windows -->
         <chmod perm="ug=rw,o="
                 dir="${tmp}"
-                excludes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c,${bin}/pth"
+                excludes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c,${bin}/pth,${bin}/efg"
                 verbose="true"
                 maxparallel="100"/>
         <chmod perm="ug=rwx,o="
                 dir="${tmp}"
-                includes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c,${bin}/pth"/>
+                includes="${bin}/jlc,${bin}/jl5c,${bin}/jl7c,${bin}/pth,${bin}/efg"/>
     </target>
 
     <target name="mkdir-tmp">

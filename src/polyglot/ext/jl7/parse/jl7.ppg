@@ -91,7 +91,6 @@ resource ::=
 ;
 
 finally_opt ::=
-	{: RESULT = null; :}
 	| finally:a {: RESULT = a; :}
 ;
 

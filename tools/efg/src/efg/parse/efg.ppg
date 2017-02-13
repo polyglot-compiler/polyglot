@@ -1,0 +1,79 @@
+include "polyglot/ext/jl7/parse/jl7.ppg"
+
+package efg.parse;
+
+import efg.ast.EfgNodeFactory;
+
+parser Grm extends polyglot.ext.jl7.parse.Grm {:
+  public final EfgNodeFactory nf;
+  public final JL7TypeSystem ts;
+
+  public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+    super(l, t, n, q);
+    this.nf = (EfgNodeFactory) n;
+    this.ts = (JL7TypeSystem) t;
+  }
+:};
+
+non terminal Object body;
+non terminal Object body_contents;
+non terminal Object non_brace_body_token;
+
+start with goal;
+
+// An open brace matched with its closing brace, with some stuff in between.
+body ::=
+    LBRACE body_contents RBRACE
+  ;
+
+// The contents of a body.
+body_contents ::=
+  | body body_contents
+  | non_brace_body_token body_contents
+  ;
+
+// The non-brace tokens that can appear in a body.
+non_brace_body_token ::=
+    BOOLEAN | BYTE | SHORT | INT | LONG | CHAR | FLOAT | DOUBLE | VOID
+  | LBRACK | RBRACK
+  | IDENTIFIER | DOT | SEMICOLON
+  | MULT | PLUS | MINUS | COMP | NOT | DIV | MOD
+  | LSHIFT | RSHIFT | URSHIFT
+  | LT | GT | LTEQ | GTEQ | INSTANCEOF | EQEQ | NOTEQ
+  | AND | XOR | OR | ANDAND | OROR
+  | PLUSPLUS | MINUSMINUS
+  | MULTEQ | DIVEQ | MODEQ | PLUSEQ | MINUSEQ
+  | LSHIFTEQ | RSHIFTEQ | URSHIFTEQ
+  | ANDEQ | XOREQ | OREQ
+  | COMMA | EQ | QUESTION | COLON
+  | LPAREN | RPAREN
+  | PUBLIC | PROTECTED | PRIVATE
+  | STATIC | ABSTRACT | FINAL | NATIVE | SYNCHRONIZED | TRANSIENT | VOLATILE
+  | STRICTFP | ASSERT
+  | CLASS | INTERFACE | EXTENDS | IMPLEMENTS | THROWS
+  | THIS | SUPER
+  | IF | ELSE | SWITCH | CASE | DEFAULT
+  | DO | WHILE | FOR | BREAK | CONTINUE
+  | RETURN | THROW | TRY | CATCH | FINALLY
+  | NEW | ELLIPSIS | ENUM | AT
+  | INTEGER_LITERAL | INTEGER_LITERAL_BD
+  | LONG_LITERAL | LONG_LITERAL_BD
+  | DOUBLE_LITERAL | FLOAT_LITERAL
+  | BOOLEAN_LITERAL | CHARACTER_LITERAL | STRING_LITERAL | NULL_LITERAL
+  | JAVADOC
+  ;
+
+// Adjust the class_body and interface_body productions so we ignore class and
+// interface bodies.
+override class_body ::=
+    body {:
+      RESULT = parser.nf.ClassBody(Position.compilerGenerated(),
+          new ArrayList<ClassMember>());
+    :}
+  ;
+override interface_body ::=
+    body {:
+      RESULT = parser.nf.ClassBody(Position.compilerGenerated(),
+          new ArrayList<ClassMember>());
+    :}
+  ;

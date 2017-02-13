@@ -1,0 +1,164 @@
+efg is a tool for generating the ExtFactory and AbstractExtFactory for a
+Polyglot extension.
+
+Usage
+-----
+
+  bin/efg -conf CONF_FILE OPTION... FILE...
+
+  Generate an extension factory interface, and an abstract implementation of
+  that interface, for the top-level AST interface declarations found in the
+  FILEs, and using the configuration found in CONF_FILE.
+
+  Most options to the Polyglot base compiler are supported, including:
+
+    -d DIR
+        write output to DIR
+
+    -sourcepath PATH
+        search PATH for additional source files when resolving types
+
+    -classpath PATH
+        search PATH for class files when resolving types
+
+  ExtFactory methods are generated for all top-level AST interfaces given on
+  the command line, as well as any other top-level AST interfaces found in
+  source files when resolving type dependencies.
+
+  The simplest configuration file contains a two-line header:
+
+      language MyLang;
+      package lang.ast;
+
+  This instructs efg to generate an extension factory interface with the
+  following header. The above "language" declaration is used to name the
+  interface and the "package" declaration is copied.
+
+      package lang.ast;
+      public interface MyLangExtFactory
+              extends polyglot.ast.ExtFactory {
+          ...
+      }
+
+  Similarly, the abstract implementation is created with this header:
+
+      package lang.ast;
+      public abstract class MyLangAbstractExtFactory_c
+              extends polyglot.ast.AbstractExtFactory_c
+              implements MyLangExtFactory {
+          ...
+      }
+
+  By default, the interface and abstract class extend their counterparts in the
+  base language. This can be overridden with "interface extends" and "abstract
+  class extends" clauses in the configuration header, as follows:
+
+      language MyLang;
+      interface extends superLang.ast.SuperExtFactory;
+      abstract class extends superLang.ast.AbstractSuperExtFactory_c;
+      package lang.ast;
+
+  By default, every top-level AST interface encountered in a source file
+  produces four methods. For instance, encountering an AST interface named
+  MyNode would produce the following declaration in the generated ExtFactory
+  interface.
+
+      Ext extMyNode();
+
+  The following three methods would also be produced in the generated
+  AbstractExtFactory implementation.
+
+      @Override
+      public final Ext extMyNode() {
+          Ext e = extMyNodeImpl();
+          if (nextExtFactory() != null) {
+              Ext e2;
+              if (nextExtFactory() instanceof MyLangExtFactory) {
+                  e2 = ((MyLangExtFactory) nextExtFactory()).extMyNode();
+              }
+              else {
+                  e2 = nextExtFactory().extBaseNodeType();
+              }
+              e = composeExts(e, e2);
+          }
+          return postExtMyNode(e);
+      }
+
+      protected Ext extMyNodeImpl() {
+          return extDelegateImpl();
+      }
+
+      protected Ext postExtMyNode(Ext ext) {
+          return postExtDelegate(ext);
+      }
+
+  In the body of extMyNode(), the call extBaseNodeType() invokes the extension
+  factory method for the base node type of MyNode. In the ExtFactory design
+  pattern, the base node type is typically the most specific supertype of
+  MyNode for which the Polyglot base compiler has an extension factory method.
+  This most specific supertype is determined automatically by efg. It is
+  possible for efg to find zero or multiple base node types. In these cases,
+  the user must specify the base node type. This is done with a declaration in
+  the body of the configuration file. For instance, the following specifies
+  LocalDecl as the base node type of MyNode. The name "MyNode" is automatically
+  qualified with the package declaration in the configuration file's header.
+
+      MyNode extends polyglot.ast.LocalDecl;
+
+  The bodies of extMyNodeImpl() and postExtMyNode() have method calls whose
+  names refer to a Delegate. The ExtFactory design pattern says that this
+  corresponds to the most specific node type for which a different extension
+  factory method exists. The delegate is determined automatically by efg.
+
+  In cases where efg is unable to find a unique delegate, the configuration
+  file must specify one. For instance, the following declaration says that the
+  MyNode type has a factory method named MyNode that delegates its "impl" and
+  "post" methods to those of LocalDecl.
+
+      MyNode {
+          MyNode -> LocalDecl
+      }
+
+  It is worth noting that "LocalDecl" here refers to (part of) a method name,
+  and need not correspond to an AST node type.
+
+      MyNode extends polyglot.ast.LocalDecl {
+          MyNode -> LocalDecl
+      }
+
+  By default, the names of the generated methods are derived from the name of
+  the node type, but this can be overridden. For instance, to generate
+  extTheirNode(), extTheirNodeImpl(), and postExtTheirNode(), the configuration
+  file can declare:
+
+      MyNode {
+          TheirNode
+      }
+
+  More than one set of methods can be generated:
+
+      MyNode {
+          YourNode,
+          TheirNode
+      }
+
+  Naturally, all of the above can be combined:
+
+      MyNode extends polyglot.ast.LocalDecl {
+          MyNode -> LocalDecl,
+          YourNode -> ClassDecl,
+          TheirNode
+      }
+
+  To avoid generating any methods for MyNode, give an empty set of factory
+  method names:
+
+      MyNode {}
+
+  Finally, by default, efg only generates methods for AST interfaces. To also
+  generate methods for a specific type just add a declaration for that type:
+
+      MyOtherNode_c;
+
+  This will generate methods analogous to the defaults given above, but these
+  defaults can also be overridden.
