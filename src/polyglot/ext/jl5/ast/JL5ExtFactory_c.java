@@ -44,6 +44,12 @@ public final class JL5ExtFactory_c extends JL5AbstractExtFactory_c {
     }
 
     @Override
+    protected Ext extAnnotationElemDeclImpl() {
+        // AnnotationElemDecl doesn't use JL5MethodDeclExt; bypass.
+        return extClassMemberImpl();
+    }
+
+    @Override
     protected Ext extAssertImpl() {
         return new JL5AssertExt();
     }
