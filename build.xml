@@ -77,6 +77,11 @@
         <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
     </path>
 
+    <!-- classpath to use when compiling pth -->
+    <path id="pth.classpath">
+        <pathelement location="${lib}/itextpdf.jar"/>
+    </path>
+
     <!-- classpath to use when bootstrapping java_cup.jar -->
     <path id="cup.jar.classpath">
         <pathelement location="${classes}"/>
@@ -141,6 +146,12 @@
                 message="${cup.dir}/lib/java_cup.jar not found."/>
         <fail unless="jflex.jar.exists"
                 message="${lib}/jflex.jar not found."/>
+    </target>
+
+    <target name="check-pth-jars">
+        <available file="${lib}/itextpdf.jar" property="itextpdf.jar.exists"/>
+        <fail unless="itextpdf.jar.exists"
+                message="${lib}/itextpdf.jar not found."/>
     </target>
 
     <!-- create appropriate executables in the bin directory -->
@@ -848,7 +859,7 @@
     </target>
 
     <!-- compile pth (Polyglot Test Harness) -->
-    <target name="compile-pth" depends="compile-base">
+    <target name="compile-pth" depends="compile-base,check-pth-jars">
         <antcall target="jflex-lexer">
             <param name="lexer.dir" value="${pth.src}/polyglot/pth"/>
             <param name="lexer.class" value="Lexer_c"/>
@@ -868,6 +879,7 @@
                 includes="polyglot/**"
                 includeantruntime="false">
             <classpath refid="standard.classpath"/>
+            <classpath refid="pth.classpath"/>
         </javac>
     </target>
 
