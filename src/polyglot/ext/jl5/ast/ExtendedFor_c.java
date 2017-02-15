@@ -190,7 +190,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
                     if (next instanceof Local
                             && decl.localInstance()
                                    .equals(((Local) next).localInstance())) {
-                        throw new SemanticException("Varaible: " + next
+                        throw new SemanticException("Variable: " + next
                                 + " may not have been initialized",
                                                     next.position());
                     }
