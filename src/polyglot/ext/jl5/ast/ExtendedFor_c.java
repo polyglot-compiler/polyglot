@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -66,14 +66,14 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 
     public ExtendedFor_c(Position pos, LocalDecl decl, Expr expr, Stmt body) {
         super(pos, null, body);
-        assert (decl != null && expr != null);
+        assert decl != null && expr != null;
         this.decl = decl;
         this.expr = expr;
     }
 
     @Override
     public LocalDecl decl() {
-        return this.decl;
+        return decl;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 
     @Override
     public Expr expr() {
-        return this.expr;
+        return expr;
     }
 
     @Override
@@ -169,8 +169,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
                                             t.toReference());
             if (iterableType == null) {
                 throw new InternalCompilerError("Cannot find generic supertype of Iterable for "
-                                                        + t.toReference(),
-                                                position);
+                        + t.toReference(), position);
             }
             elementType = iterableType.actuals().get(0);
         }
@@ -180,7 +179,8 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         }
 
         if (expr instanceof Local
-                && decl.localInstance().equals(((Local) expr).localInstance())) {
+                && decl.localInstance()
+                       .equals(((Local) expr).localInstance())) {
             throw new SemanticException("Variable: " + expr
                     + " may not have been initialized", expr.position());
         }
@@ -190,9 +190,8 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
                     if (next instanceof Local
                             && decl.localInstance()
                                    .equals(((Local) next).localInstance())) {
-                        throw new SemanticException("Varaible: "
-                                                            + next
-                                                            + " may not have been initialized",
+                        throw new SemanticException("Varaible: " + next
+                                + " may not have been initialized",
                                                     next.position());
                     }
                 }
