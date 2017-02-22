@@ -892,6 +892,8 @@
             <param name="symbol.class" value="sym"/>
             <param name="cup.file" value="script.cup"/>
         </antcall>
+        <copy file="${pth.src}/polyglot/pth/script.cup"
+                todir="${pth.classes}/polyglot/pth"/>
         <javac source="1.7"
                 target="1.7"
                 srcdir="${pth.src}"

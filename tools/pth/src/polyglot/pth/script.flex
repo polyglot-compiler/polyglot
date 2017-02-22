@@ -8,6 +8,7 @@ import java_cup.runtime.Symbol;
 %%
 %public
 %class Lexer_c
+%implements Lexer
 %cup
 
 %unicode

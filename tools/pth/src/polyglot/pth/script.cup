@@ -13,21 +13,21 @@ parser code {:
     }
 
     public Grm(TestFactory tf, File file) {
-        this(tf, lexer(file));
+        this(tf, lexer(tf, file));
     }
 
-    public Grm(TestFactory tf, Lexer_c l) {
+    public Grm(TestFactory tf, Lexer l) {
         this(l, new ComplexSymbolFactory());
         this.tf = tf;
     }
 
-    protected static Lexer_c lexer(File file) {
+    protected static Lexer lexer(TestFactory tf, File file) {
         try {
-            return new Lexer_c(new FileReader(file));
+            return tf.Lexer(new FileReader(file));
         }
         catch (IOException e) {
             System.out.println("open script file (" + file.getName() +") error: " + e);
-            return new Lexer_c(new InputStreamReader(System.in));
+            return tf.Lexer(new InputStreamReader(System.in));
         }
     }
 

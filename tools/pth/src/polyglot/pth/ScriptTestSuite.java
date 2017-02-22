@@ -88,7 +88,7 @@ public class ScriptTestSuite extends TestSuite<Test> {
     }
 
     protected boolean parseScript() {
-        Grm grm = new Grm(tf, scriptFile);
+        Grm grm = tf.Grm(scriptFile);
         try {
             List<Test> value = grm.parse().<List<Test>> value();
             tests = value;
