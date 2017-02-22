@@ -56,7 +56,7 @@ public class Main {
         OutputController outCtrl = createOutputController(options);
 
         // TODO refactor
-        TestFactory tf = new PolyglotTestFactory();
+        TestFactory tf = TestFactory();
         PDFReporter pdfReporter = null;
         if (options.pdffilename != null)
             pdfReporter = new PDFReporter(options.pdffilename);
@@ -71,6 +71,13 @@ public class Main {
         }
         if (pdfReporter != null) pdfReporter.flush();
         return okay;
+    }
+
+    /**
+     * Factory method for creating a test factory.
+     */
+    protected TestFactory TestFactory() {
+        return new PolyglotTestFactory();
     }
 
     protected OutputController createOutputController(Options options) {
