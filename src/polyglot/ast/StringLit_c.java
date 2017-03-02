@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -26,7 +26,6 @@
 
 package polyglot.ast;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,8 +38,8 @@ import polyglot.util.StringUtil;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-/** 
- * A {@code StringLit} represents an immutable instance of a 
+/**
+ * A {@code StringLit} represents an immutable instance of a
  * {@code String} which corresponds to a literal string in Java code.
  */
 public class StringLit_c extends Lit_c implements StringLit {
@@ -95,38 +94,16 @@ public class StringLit_c extends Lit_c implements StringLit {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        List<String> l = breakupString();
-
-        // If we break up the string, parenthesize it to avoid precedence bugs.
-        if (l.size() > 1) {
-            w.write("(");
-        }
-
         w.begin(0);
-
-        for (Iterator<String> i = l.iterator(); i.hasNext();) {
-            String s = i.next();
-
-            w.write("\"");
-            w.write(StringUtil.escape(s));
-            w.write("\"");
-
-            if (i.hasNext()) {
-                w.write(" +");
-                w.allowBreak(0);
-            }
-        }
-
+        w.write("\"");
+        w.write(StringUtil.escape(value));
+        w.write("\"");
         w.end();
-
-        if (l.size() > 1) {
-            w.write(")");
-        }
     }
 
     /**
      * Break a long string literal into a concatenation of small string
-     * literals.  This avoids messing up the pretty printer and editors. 
+     * literals.  This avoids messing up the pretty printer and editors.
      */
     protected List<String> breakupString() {
         List<String> result = new LinkedList<>();

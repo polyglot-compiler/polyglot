@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -43,7 +43,7 @@ import polyglot.visit.TypeChecker;
 
 /**
  * An immutable representation of a Java language {@code if} statement.
- * Contains an expression whose value is tested, a ``then'' statement 
+ * Contains an expression whose value is tested, a ``then'' statement
  * (consequent), and optionally an ``else'' statement (alternate).
  */
 public class If_c extends Stmt_c implements If {
@@ -61,7 +61,7 @@ public class If_c extends Stmt_c implements If {
     public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative,
             Ext ext) {
         super(pos, ext);
-        assert (cond != null && consequent != null); // alternative may be null;
+        assert cond != null && consequent != null; // alternative may be null;
         this.cond = cond;
         this.consequent = consequent;
         this.alternative = alternative;
@@ -69,7 +69,7 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public Expr cond() {
-        return this.cond;
+        return cond;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public Stmt consequent() {
-        return this.consequent;
+        return consequent;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public Stmt alternative() {
-        return this.alternative;
+        return alternative;
     }
 
     @Override
@@ -181,14 +181,12 @@ public class If_c extends Stmt_c implements If {
                 w.allowBreak(0, " ");
             }
 
-            if (alternative instanceof Block) {
-                w.write("else ");
+            w.write("else");
+            if (alternative instanceof If) {
+                w.write(" ");
                 print(alternative, w, tr);
             }
-            else {
-                w.write("else");
-                printSubStmt(alternative, w, tr);
-            }
+            else printSubStmt(alternative, w, tr);
         }
     }
 
@@ -203,7 +201,8 @@ public class If_c extends Stmt_c implements If {
             // the condition is a constant expression.
             // That means that one branch is dead code
             boolean condConstantValue =
-                    ((Boolean) v.lang().constantValue(cond, v.lang())).booleanValue();
+                    ((Boolean) v.lang().constantValue(cond,
+                                                      v.lang())).booleanValue();
             if (condConstantValue) {
                 // the condition is constantly true.
                 // the alternative won't be executed.
@@ -257,10 +256,7 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.If(this.position,
-                     this.cond,
-                     this.consequent,
-                     this.alternative);
+        return nf.If(position, cond, consequent, alternative);
     }
 
 }
