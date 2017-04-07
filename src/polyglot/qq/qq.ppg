@@ -220,6 +220,11 @@ extend method_invocation ::=
         COMMA_TYPE:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
         {: RESULT = parser.nf.Call(parser.pos(a,d), (TypeNode)a.node(), parser.nf.Id(parser.pos(b), b.getIdentifier()), c); :}
     ;
+
+extend array_creation_expression ::=
+        NEW:n COMMA_TYPE:a array_initializer:c
+        {: RESULT = parser.nf.NewArray(parser.pos(n,c), (TypeNode)a.node(), 0, c); :}
+    ;
     
 extend formal_parameter_list ::=
 	COMMA_LIST:a
@@ -244,4 +249,9 @@ extend class_type_list ::=
 extend argument_list ::=
 	COMMA_LIST:a
 	    {: RESULT = a.<Expr> list(); :}
+    ;
+
+extend variable_initializers ::=
+        COMMA_LIST:a
+            {: RESULT = a.<Expr> list(); :}
     ;
