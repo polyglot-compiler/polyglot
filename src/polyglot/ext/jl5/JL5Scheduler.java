@@ -319,8 +319,8 @@ public class JL5Scheduler extends JLScheduler {
     }
 
     @Override
-    public Goal Serialized(Job job) {
-        Goal g = super.Serialized(job);
+    public Goal Validated(Job job) {
+        Goal g = super.Validated(job);
         try {
             g.addPrerequisiteGoal(AnnotationCheck(job), this);
         }
