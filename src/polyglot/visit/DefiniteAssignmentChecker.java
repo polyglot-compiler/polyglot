@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -72,26 +72,30 @@ import polyglot.visit.FlowGraph.EdgeKey;
 import polyglot.visit.FlowGraph.Peer;
 
 /**
- * Visitor which checks that all local variables must be defined before use, 
+ * Visitor which checks that all local variables must be defined before use,
  * and that final variables and fields are initialized correctly.
- * 
+ *
  * The checking of the rules is implemented in the methods leaveCall(Node)
  * and check(FlowGraph, Term, Item, Item).
- * 
+ *
  * If language extensions have new constructs that use local variables, they can
  * override the method {@code checkOther} to check that the uses of these
  * local variables are correctly initialized. (The implementation of the method will
  * probably call checkLocalInstanceInit to see if the local used is initialized).
- * 
+ *
  * If language extensions have new constructs that assign to local variables,
- * they can override the method {@code flowOther} to capture the way 
+ * they can override the method {@code flowOther} to capture the way
  * the new construct's initialization behavior.
- * 
+ *
  */
-public class DefiniteAssignmentChecker extends
-        DataFlow<DefiniteAssignmentChecker.FlowItem> {
+public class DefiniteAssignmentChecker
+        extends DataFlow<DefiniteAssignmentChecker.FlowItem> {
     public DefiniteAssignmentChecker(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, ts, nf, true /* forward analysis */, false /* perform dataflow when leaving CodeDecls, not when entering */);
+        super(job,
+              ts,
+              nf,
+              true /* forward analysis */,
+              false /* perform dataflow when leaving CodeDecls, not when entering */);
     }
 
     protected ClassBodyInfo currCBI = null;
@@ -99,13 +103,13 @@ public class DefiniteAssignmentChecker extends
     /**
      * This class is just a data structure containing relevant information
      * needed for performing initialization checking of a class declaration.
-     * 
+     *
      * These objects form a stack, since class declarations can be nested.
      */
     protected static class ClassBodyInfo {
-        /** 
+        /**
          * The info for the outer ClassBody. The {@code ClassBodyInfo}s
-         * form a stack. 
+         * form a stack.
          */
         public ClassBodyInfo outer = null;
 
@@ -115,10 +119,10 @@ public class DefiniteAssignmentChecker extends
         /** The current class being processed. */
         public ClassType currClass = null;
 
-        /** 
+        /**
          * A Map of all the final fields in the class currently being processed
          * to DefiniteAssignments. This Map is used as the basis for the Maps returned
-         * in createInitialItem(). 
+         * in createInitialItem().
          * */
         public Map<FieldInstance, AssignmentStatus> currClassFinalFieldAssStatuses =
                 new HashMap<>();
@@ -145,7 +149,7 @@ public class DefiniteAssignmentChecker extends
 
         /**
          * Map from ConstructorInstances to Sets of FieldInstances, detailing
-         * which final non-static fields each constructor initializes. 
+         * which final non-static fields each constructor initializes.
          * This is used in checking the initialization of final fields.
          */
         public Map<ConstructorInstance, Set<FieldInstance>> fieldsConstructorInitializes =
@@ -159,23 +163,23 @@ public class DefiniteAssignmentChecker extends
         public Set<LocalInstance> outerLocalsUsed = new HashSet<>();
 
         /**
-         * Map from {@code ClassBody}s to {@code Set}s of 
+         * Map from {@code ClassBody}s to {@code Set}s of
          * {@code LocalInstance}s. If localsUsedInClassBodies(C) = S, then
-         * the class body C is an inner class declared in the current code 
+         * the class body C is an inner class declared in the current code
          * declaration, and S is the set of LocalInstances that are defined
          * in the current code declaration, but are used in the declaration
          * of the class C. We need this information in order to ensure that
          * these local variables are definitely assigned before the class
-         * declaration of C. 
+         * declaration of C.
          */
         public Map<ClassBody, Set<LocalInstance>> localsUsedInClassBodies =
                 new HashMap<>();
 
         /**
-         * Set of LocalInstances that we have seen declarations for in this 
+         * Set of LocalInstances that we have seen declarations for in this
          * class. This set allows us to determine which local instances
          * are simply being used before they are declared (if they are used in
-         * their own initialization) or are locals declared in an enclosing 
+         * their own initialization) or are locals declared in an enclosing
          * class.
          */
         public Set<LocalInstance> localDeclarations = new HashSet<>();
@@ -189,8 +193,8 @@ public class DefiniteAssignmentChecker extends
     protected static class AssignmentStatus {
         public static final AssignmentStatus ASS_UNASS =
                 new AssignmentStatus(true, true);
-        public static final AssignmentStatus ASS = new AssignmentStatus(true,
-                                                                        false);
+        public static final AssignmentStatus ASS =
+                new AssignmentStatus(true, false);
         public static final AssignmentStatus UNASS =
                 new AssignmentStatus(false, true);
         public static final AssignmentStatus NEITHER =
@@ -214,18 +218,17 @@ public class DefiniteAssignmentChecker extends
         @Override
         public boolean equals(Object o) {
             if (o instanceof AssignmentStatus) {
-                return this.definitelyAssigned == ((AssignmentStatus) o).definitelyAssigned
-                        && this.definitelyUnassigned == ((AssignmentStatus) o).definitelyUnassigned;
+                return definitelyAssigned == ((AssignmentStatus) o).definitelyAssigned
+                        && definitelyUnassigned == ((AssignmentStatus) o).definitelyUnassigned;
             }
             return false;
         }
 
         @Override
         public String toString() {
-            return "["
-                    + (this.definitelyAssigned ? "definitely assigned " : "")
-                    + (this.definitelyUnassigned
-                            ? "definitely unassigned " : "") + "]";
+            return "[" + (definitelyAssigned ? "definitely assigned " : "")
+                    + (definitelyUnassigned ? "definitely unassigned " : "")
+                    + "]";
         }
 
         public static AssignmentStatus join(AssignmentStatus as1,
@@ -253,7 +256,7 @@ public class DefiniteAssignmentChecker extends
      * been initialized. These min and max counts are then used to determine
      * if variables have been initialized before use, and that final variables
      * are not initialized too many times.
-     * 
+     *
      * This class is immutable.
      */
     protected static class FlowItem extends DataFlow.Item {
@@ -261,14 +264,14 @@ public class DefiniteAssignmentChecker extends
         public final boolean normalTermination;
 
         FlowItem(Map<VarInstance, AssignmentStatus> m) {
-            this.assignmentStatus = Collections.unmodifiableMap(m);
-            this.normalTermination = true;
+            assignmentStatus = Collections.unmodifiableMap(m);
+            normalTermination = true;
         }
 
         FlowItem(Map<VarInstance, AssignmentStatus> m,
                 boolean canTerminateNormally) {
-            this.assignmentStatus = Collections.unmodifiableMap(m);
-            this.normalTermination = canTerminateNormally;
+            assignmentStatus = Collections.unmodifiableMap(m);
+            normalTermination = canTerminateNormally;
         }
 
         @Override
@@ -279,14 +282,14 @@ public class DefiniteAssignmentChecker extends
         @Override
         public boolean equals(Object o) {
             if (o instanceof FlowItem) {
-                return this.assignmentStatus.equals(((FlowItem) o).assignmentStatus);
+                return assignmentStatus.equals(((FlowItem) o).assignmentStatus);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return (assignmentStatus.hashCode());
+            return assignmentStatus.hashCode();
         }
 
     }
@@ -308,7 +311,7 @@ public class DefiniteAssignmentChecker extends
 
     /**
      * Overridden superclass method.
-     * 
+     *
      * Set up the state that must be tracked during a Class Declaration.
      */
     @Override
@@ -338,21 +341,21 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Postpone the checking of constructors until the end of the class 
-     * declaration is encountered, to ensure that all initializers are 
+     * Postpone the checking of constructors until the end of the class
+     * declaration is encountered, to ensure that all initializers are
      * processed first.
-     * 
+     *
      * Also, at the end of the class declaration, check that all static final
      * fields have been initialized at least once, and that for each constructor
      * all non-static final fields must have been initialized at least once,
      * taking into account the constructor calls.
-     * 
+     *
      */
     @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
             throws SemanticException {
         if (n instanceof ConstructorDecl) {
-            // postpone the checking of the constructors until all the 
+            // postpone the checking of the constructors until all the
             // initializer blocks have been processed.
             currCBI.allConstructors.add((ConstructorDecl) n);
             return n;
@@ -372,7 +375,7 @@ public class DefiniteAssignmentChecker extends
                 }
 
                 // check that all static fields have been initialized exactly
-                // once 
+                // once
                 checkStaticFinalFieldsInit((ClassBody) n);
 
                 // check that at the end of each constructor all non-static
@@ -402,7 +405,7 @@ public class DefiniteAssignmentChecker extends
         currCBI = newCDI;
 
         // set up currClassFinalFieldAssStatuses to contain mappings
-        // for all the final fields of the class.            
+        // for all the final fields of the class.
         for (ClassMember cm : n.members()) {
             if (cm instanceof FieldDecl) {
                 FieldDecl fd = (FieldDecl) cm;
@@ -430,21 +433,20 @@ public class DefiniteAssignmentChecker extends
 
     /**
      * Check that each static final field is initialized exactly once.
-     * 
+     *
      * @param cb The ClassBody of the class declaring the fields to check.
      * @throws SemanticException
      */
     protected void checkStaticFinalFieldsInit(ClassBody cb)
             throws SemanticException {
-        // check that all static fields have been initialized exactly once.             
+        // check that all static fields have been initialized exactly once.
         for (Entry<FieldInstance, AssignmentStatus> e : currCBI.currClassFinalFieldAssStatuses.entrySet()) {
             FieldInstance fi = e.getKey();
             if (fi.flags().isStatic() && fi.flags().isFinal()) {
                 AssignmentStatus defAss = e.getValue();
                 if (!defAss.definitelyAssigned) {
-                    throw new SemanticException("Final field \""
-                                                        + fi.name()
-                                                        + "\" might not have been initialized",
+                    throw new SemanticException("Final field \"" + fi.name()
+                            + "\" might not have been initialized",
                                                 cb.position());
                 }
             }
@@ -453,15 +455,15 @@ public class DefiniteAssignmentChecker extends
 
     /**
      * Check that each non static final field has been initialized exactly once,
-     * taking into account the fact that constructors may call other 
-     * constructors. 
-     * 
+     * taking into account the fact that constructors may call other
+     * constructors.
+     *
      * @param cb The ClassBody of the class declaring the fields to check.
      * @throws SemanticException
      */
     protected void checkNonStaticFinalFieldsInit(ClassBody cb)
             throws SemanticException {
-        // for each non-static final field instance, check that all 
+        // for each non-static final field instance, check that all
         // constructors initialize it exactly once, taking into account constructor calls.
         for (FieldInstance fi : currCBI.currClassFinalFieldAssStatuses.keySet()) {
             if (fi.flags().isFinal() && !fi.flags().isStatic()) {
@@ -489,8 +491,8 @@ public class DefiniteAssignmentChecker extends
                         if (s != null && s.contains(fi)) {
                             if (isInitialized) {
                                 throw new SemanticException("Final field \""
-                                                                    + fi.name()
-                                                                    + "\" might have already been initialized",
+                                        + fi.name()
+                                        + "\" might have already been initialized",
                                                             cd.position());
                             }
                             isInitialized = true;
@@ -501,8 +503,8 @@ public class DefiniteAssignmentChecker extends
                         // check whether this constructor can terminate normally.
                         if (!currCBI.constructorsCannotTerminateNormally.contains(cd)) {
                             throw new SemanticException("Final field \""
-                                                                + fi.name()
-                                                                + "\" might not have been initialized",
+                                    + fi.name()
+                                    + "\" might not have been initialized",
                                                         ciStart.position());
                         }
                         else {
@@ -517,12 +519,12 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Construct a flow graph for the {@code Expr} provided, and call 
-     * {@code dataflow(FlowGraph)}. Is also responsible for calling 
+     * Construct a flow graph for the {@code Expr} provided, and call
+     * {@code dataflow(FlowGraph)}. Is also responsible for calling
      * {@code post(FlowGraph, Term)} after
      * {@code dataflow(FlowGraph)} has been called.
      * There is no need to push a CFG onto the stack, as dataflow is not
-     * performed on entry in this analysis. 
+     * performed on entry in this analysis.
      */
     protected void dataflow(Expr root) throws SemanticException {
         // Build the control flow graph.
@@ -561,13 +563,13 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * The confluence operator for {@code Initializer}s and 
-     * {@code Constructor}s needs to be a 
-     * little special, as we are only concerned with non-exceptional flows in 
+     * The confluence operator for {@code Initializer}s and
+     * {@code Constructor}s needs to be a
+     * little special, as we are only concerned with non-exceptional flows in
      * these cases.
      * This method ensures that a slightly different confluence is performed
-     * for these {@code Term}s, otherwise 
-     * {@code confluence(List, Term)} is called instead. 
+     * for these {@code Term}s, otherwise
+     * {@code confluence(List, Term)} is called instead.
      */
     @Override
     protected FlowItem confluence(List<FlowItem> items, List<EdgeKey> itemKeys,
@@ -596,7 +598,7 @@ public class DefiniteAssignmentChecker extends
      * inItems. However, if two or more of the AssignmentStatus maps from
      * the inItems each have a DefiniteAssignments entry for the same
      * VarInstance, the conflict must be resolved, by using the
-     * minimum of all mins and the maximum of all maxs. 
+     * minimum of all mins and the maximum of all maxs.
      */
     @Override
     public FlowItem confluence(List<FlowItem> inItems, Peer<FlowItem> peer,
@@ -628,35 +630,35 @@ public class DefiniteAssignmentChecker extends
     protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems,
             List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph,
             Peer<FlowItem> peer) {
-        return this.flowToBooleanFlow(inItems, inItemKeys, graph, peer);
+        return flowToBooleanFlow(inItems, inItemKeys, graph, peer);
     }
 
     /**
      * Perform the appropriate flow operations for the Terms. This method
      * delegates to other appropriate methods in this class, for modularity.
-     * 
+     *
      * To summarize:
-     * - Formals: declaration of a Formal param, just insert a new 
+     * - Formals: declaration of a Formal param, just insert a new
      *              DefiniteAssignment for the LocalInstance.
-     * - LocalDecl: a declaration of a local variable, just insert a new 
+     * - LocalDecl: a declaration of a local variable, just insert a new
      *              DefiniteAssignment for the LocalInstance as appropriate
      *              based on whether the declaration has an initializer or not.
      * - Assign: if the LHS of the assign is a local var or a field that we
      *              are interested in, then increment the min and max counts
-     *              for that local var or field.   
+     *              for that local var or field.
      */
     @Override
     public Map<EdgeKey, FlowItem> flow(FlowItem trueItem, FlowItem falseItem,
-            FlowItem otherItem, FlowGraph<FlowItem> graph, Peer<FlowItem> peer) {
-        FlowItem inItem =
-                safeConfluence(trueItem,
-                               FlowGraph.EDGE_KEY_TRUE,
-                               falseItem,
-                               FlowGraph.EDGE_KEY_FALSE,
-                               otherItem,
-                               FlowGraph.EDGE_KEY_OTHER,
-                               peer,
-                               graph);
+            FlowItem otherItem, FlowGraph<FlowItem> graph,
+            Peer<FlowItem> peer) {
+        FlowItem inItem = safeConfluence(trueItem,
+                                         FlowGraph.EDGE_KEY_TRUE,
+                                         falseItem,
+                                         FlowGraph.EDGE_KEY_FALSE,
+                                         otherItem,
+                                         FlowGraph.EDGE_KEY_OTHER,
+                                         peer,
+                                         graph);
 
         Node n = peer.node();
         if (peer.isEntry()) {
@@ -685,47 +687,42 @@ public class DefiniteAssignmentChecker extends
         }
         else if (n instanceof LocalDecl) {
             // local variable declaration.
-            ret =
-                    flowLocalDecl(inDFItem,
-                                  graph,
-                                  (LocalDecl) n,
-                                  peer.succEdgeKeys());
+            ret = flowLocalDecl(inDFItem,
+                                graph,
+                                (LocalDecl) n,
+                                peer.succEdgeKeys());
         }
         else if (n instanceof LocalAssign) {
             // assignment to a local variable
-            ret =
-                    flowLocalAssign(inDFItem,
-                                    graph,
-                                    (LocalAssign) n,
-                                    peer.succEdgeKeys());
+            ret = flowLocalAssign(inDFItem,
+                                  graph,
+                                  (LocalAssign) n,
+                                  peer.succEdgeKeys());
         }
         else if (n instanceof FieldAssign) {
             // assignment to a field
-            ret =
-                    flowFieldAssign(inDFItem,
-                                    graph,
-                                    (FieldAssign) n,
-                                    peer.succEdgeKeys());
+            ret = flowFieldAssign(inDFItem,
+                                  graph,
+                                  (FieldAssign) n,
+                                  peer.succEdgeKeys());
         }
         else if (n instanceof ConstructorCall) {
             // call to another constructor.
-            ret =
-                    flowConstructorCall(inDFItem,
-                                        graph,
-                                        (ConstructorCall) n,
-                                        peer.succEdgeKeys());
+            ret = flowConstructorCall(inDFItem,
+                                      graph,
+                                      (ConstructorCall) n,
+                                      peer.succEdgeKeys());
         }
-        else if (n instanceof Expr
-                && ((Expr) n).type().isBoolean()
-                && (n instanceof Binary || n instanceof Conditional || n instanceof Unary)) {
+        else if (n instanceof Expr && ((Expr) n).type().isBoolean()
+                && (n instanceof Binary || n instanceof Conditional
+                        || n instanceof Unary)) {
             if (trueItem == null) trueItem = inDFItem;
             if (falseItem == null) falseItem = inDFItem;
-            ret =
-                    flowBooleanConditions(trueItem,
-                                          falseItem,
-                                          inDFItem,
-                                          graph,
-                                          peer);
+            ret = flowBooleanConditions(trueItem,
+                                        falseItem,
+                                        inDFItem,
+                                        graph,
+                                        peer);
         }
         else {
             ret = flowOther(inDFItem, graph, n, peer.succEdgeKeys());
@@ -738,17 +735,15 @@ public class DefiniteAssignmentChecker extends
             if (lang().isConstant(e, lang()) && e.type().isBoolean()) {
                 if (Boolean.TRUE.equals(lang().constantValue(e, lang()))) {
                     // the false branch is dead
-                    ret =
-                            remap(ret,
-                                  FlowGraph.EDGE_KEY_FALSE,
-                                  AssignmentStatus.ASS_UNASS);
+                    ret = remap(ret,
+                                FlowGraph.EDGE_KEY_FALSE,
+                                AssignmentStatus.ASS_UNASS);
                 }
                 else {
                     // the true branch is dead
-                    ret =
-                            remap(ret,
-                                  FlowGraph.EDGE_KEY_TRUE,
-                                  AssignmentStatus.ASS_UNASS);
+                    ret = remap(ret,
+                                FlowGraph.EDGE_KEY_TRUE,
+                                AssignmentStatus.ASS_UNASS);
                 }
             }
         }
@@ -774,14 +769,14 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Perform the appropriate flow operations for declaration of a formal 
+     * Perform the appropriate flow operations for declaration of a formal
      * parameter
      */
     protected Map<EdgeKey, FlowItem> flowFormal(FlowItem inItem,
             FlowGraph<FlowItem> graph, Formal f, Set<EdgeKey> succEdgeKeys) {
         Map<VarInstance, AssignmentStatus> m =
                 new HashMap<>(inItem.assignmentStatus);
-        // a formal argument is always defined.            
+        // a formal argument is always defined.
         m.put(f.localInstance().orig(), AssignmentStatus.ASS);
 
         // record the fact that we have seen the formal declaration
@@ -791,11 +786,12 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Perform the appropriate flow operations for declaration of a local 
+     * Perform the appropriate flow operations for declaration of a local
      * variable
      */
     protected Map<EdgeKey, FlowItem> flowLocalDecl(FlowItem inItem,
-            FlowGraph<FlowItem> graph, LocalDecl ld, Set<EdgeKey> succEdgeKeys) {
+            FlowGraph<FlowItem> graph, LocalDecl ld,
+            Set<EdgeKey> succEdgeKeys) {
         Map<VarInstance, AssignmentStatus> m =
                 new HashMap<>(inItem.assignmentStatus);
         AssignmentStatus assStatus = m.get(ld.localInstance().orig());
@@ -815,7 +811,7 @@ public class DefiniteAssignmentChecker extends
         // initCount not null? Has this variable been assigned in its own
         // initialization, or is this a declaration inside a loop body?
         // XXX@@@ THIS IS A BUG THAT NEEDS TO BE FIXED.
-        // Currently, the declaration "final int i = (i=5);" will 
+        // Currently, the declaration "final int i = (i=5);" will
         // not be rejected, as we cannot distinguish between that and
         // "while (true) {final int i = 4;}"
 //        }
@@ -827,11 +823,12 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Perform the appropriate flow operations for assignment to a local 
+     * Perform the appropriate flow operations for assignment to a local
      * variable
      */
     protected Map<EdgeKey, FlowItem> flowLocalAssign(FlowItem inItem,
-            FlowGraph<FlowItem> graph, LocalAssign a, Set<EdgeKey> succEdgeKeys) {
+            FlowGraph<FlowItem> graph, LocalAssign a,
+            Set<EdgeKey> succEdgeKeys) {
         Local l = a.left();
         Map<VarInstance, AssignmentStatus> m =
                 new HashMap<>(inItem.assignmentStatus);
@@ -847,12 +844,13 @@ public class DefiniteAssignmentChecker extends
      * Perform the appropriate flow operations for assignment to a field
      */
     protected Map<EdgeKey, FlowItem> flowFieldAssign(FlowItem inItem,
-            FlowGraph<FlowItem> graph, FieldAssign a, Set<EdgeKey> succEdgeKeys) {
+            FlowGraph<FlowItem> graph, FieldAssign a,
+            Set<EdgeKey> succEdgeKeys) {
         Field f = a.left();
         FieldInstance fi = f.fieldInstance();
 
         if (fi.flags().isFinal() && isFieldsTargetAppropriate(f)) {
-            // this field is final and the target for this field is 
+            // this field is final and the target for this field is
             // appropriate for what we are interested in.
             Map<VarInstance, AssignmentStatus> m =
                     new HashMap<>(inItem.assignmentStatus);
@@ -919,19 +917,19 @@ public class DefiniteAssignmentChecker extends
 
     /**
      * Check that the conditions of initialization are not broken.
-     * 
+     *
      * To summarize the conditions:
      * - Local variables must be initialized before use, (i.e. min count > 0)
-     * - Final local variables (including Formals) cannot be assigned to more 
+     * - Final local variables (including Formals) cannot be assigned to more
      *               than once (i.e. max count <= 1)
      * - Final non-static fields whose target is this cannot be assigned to
-     *               more than once 
-     * - Final static fields whose target is the current class cannot be 
+     *               more than once
+     * - Final static fields whose target is the current class cannot be
      *               assigned to more than once
-     *               
-     * 
-     * This method is also responsible for maintaining state between the 
-     * dataflows over Initializers, by copying back the appropriate 
+     *
+     *
+     * This method is also responsible for maintaining state between the
+     * dataflows over Initializers, by copying back the appropriate
      * DefiniteAssignments to the map currClassFinalFieldInitCounts.
      */
     @Override
@@ -940,8 +938,8 @@ public class DefiniteAssignmentChecker extends
             throws SemanticException {
         FlowItem dfIn = inItem;
         if (dfIn == null) {
-            // There is no input data flow item. This can happen if we are 
-            // checking an unreachable term, and so no Items have flowed 
+            // There is no input data flow item. This can happen if we are
+            // checking an unreachable term, and so no Items have flowed
             // through the term. For example, in the code fragment:
             //     a: do { break a; } while (++i < 10);
             // the expression "++i < 10" is unreachable, but the as there is
@@ -1012,21 +1010,21 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Perform necessary actions upon seeing the FieldDecl 
+     * Perform necessary actions upon seeing the FieldDecl
      * {@code fd}.
      */
     protected void finishFieldDecl(FlowGraph<FlowItem> graph, FieldDecl fd,
             FlowItem dfIn, FlowItem dfOut) {
         // We are finishing the checking of a field declaration.
         // We need to copy back the init counts of any fields back into
-        // currClassFinalFieldInitCounts, so that the counts are 
+        // currClassFinalFieldInitCounts, so that the counts are
         // correct for the next field declaration, initializer, or constructor.
         for (Entry<VarInstance, AssignmentStatus> e : dfOut.assignmentStatus.entrySet()) {
             if (e.getKey() instanceof FieldInstance) {
                 FieldInstance fi = (FieldInstance) e.getKey();
                 if (fi.flags().isFinal()) {
                     // we don't need to join the init counts, as all
-                    // dataflows will go through all of the 
+                    // dataflows will go through all of the
                     // initializers
                     currCBI.currClassFinalFieldAssStatuses.put(fi.orig(),
                                                                e.getValue());
@@ -1036,7 +1034,7 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Perform necessary actions upon seeing the ConstructorDecl 
+     * Perform necessary actions upon seeing the ConstructorDecl
      * {@code cd}.
      */
     protected void finishConstructorDecl(FlowGraph<FlowItem> graph,
@@ -1063,7 +1061,7 @@ public class DefiniteAssignmentChecker extends
             if (e.getKey() instanceof FieldInstance
                     && ((FieldInstance) e.getKey()).flags().isFinal()
                     && !((FieldInstance) e.getKey()).flags().isStatic()) {
-                // we have a final non-static field                           
+                // we have a final non-static field
                 FieldInstance fi = (FieldInstance) e.getKey();
                 AssignmentStatus initCount = e.getValue();
                 AssignmentStatus origInitCount =
@@ -1085,21 +1083,21 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Perform necessary actions upon seeing the Initializer 
+     * Perform necessary actions upon seeing the Initializer
      * {@code initializer}.
      */
     protected void finishInitializer(FlowGraph<FlowItem> graph,
             Initializer initializer, FlowItem dfIn, FlowItem dfOut) {
         // We are finishing the checking of an initializer.
         // We need to copy back the init counts of any fields back into
-        // currClassFinalFieldInitCounts, so that the counts are 
+        // currClassFinalFieldInitCounts, so that the counts are
         // correct for the next field declaration, initializer, or constructor.
         for (Entry<VarInstance, AssignmentStatus> e : dfOut.assignmentStatus.entrySet()) {
             if (e.getKey() instanceof FieldInstance) {
                 FieldInstance fi = (FieldInstance) e.getKey();
                 if (fi.flags().isFinal()) {
                     // we don't need to join the init counts, as all
-                    // dataflows will go through all of the 
+                    // dataflows will go through all of the
                     // initializers
                     currCBI.currClassFinalFieldAssStatuses.put(fi.orig(),
                                                                e.getValue());
@@ -1121,14 +1119,14 @@ public class DefiniteAssignmentChecker extends
         if (fi.flags().isFinal()
                 && ts.typeEquals(currCBI.currClass, fi.container())) {
             if ((currCBI.currCodeDecl instanceof FieldDecl
-                    || currCBI.currCodeDecl instanceof ConstructorDecl || currCBI.currCodeDecl instanceof Initializer)
+                    || currCBI.currCodeDecl instanceof ConstructorDecl
+                    || currCBI.currCodeDecl instanceof Initializer)
                     && isFieldsTargetAppropriate(f)) {
                 AssignmentStatus initCount =
                         dfIn.assignmentStatus.get(fi.orig());
                 if (initCount == null || !initCount.definitelyAssigned) {
-                    throw new SemanticException("Final field \""
-                                                        + f.name()
-                                                        + "\" might not have been initialized",
+                    throw new SemanticException("Final field \"" + f.name()
+                            + "\" might not have been initialized",
                                                 f.position());
                 }
             }
@@ -1155,7 +1153,7 @@ public class DefiniteAssignmentChecker extends
             AssignmentStatus initCount =
                     dfIn.assignmentStatus.get(l.localInstance().orig());
             if (initCount == null || !initCount.definitelyAssigned) {
-                // the local variable may not have been initialized. 
+                // the local variable may not have been initialized.
                 // However, we only want to complain if the local is reachable
                 if (l.reachable()) {
                     throw new SemanticException("Local variable \"" + l.name()
@@ -1169,7 +1167,7 @@ public class DefiniteAssignmentChecker extends
             Position pos) throws SemanticException {
         AssignmentStatus initCount = dfIn.assignmentStatus.get(li.orig());
         if (initCount != null && !initCount.definitelyAssigned) {
-            // the local variable may not have been initialized. 
+            // the local variable may not have been initialized.
             throw new SemanticException("Local variable \"" + li.name()
                     + "\" may not have been initialized", pos);
         }
@@ -1178,9 +1176,8 @@ public class DefiniteAssignmentChecker extends
     /**
      * Check that the assignment to a local variable is correct.
      */
-    protected void checkLocalAssign(FlowGraph<FlowItem> graph,
-            LocalInstance li, Position pos, FlowItem dfIn)
-            throws SemanticException {
+    protected void checkLocalAssign(FlowGraph<FlowItem> graph, LocalInstance li,
+            Position pos, FlowItem dfIn) throws SemanticException {
         if (!currCBI.localDeclarations.contains(li.orig())) {
             throw new SemanticException("Final local variable \"" + li.name()
                     + "\" cannot be assigned to in an inner class.", pos);
@@ -1205,32 +1202,31 @@ public class DefiniteAssignmentChecker extends
         FieldInstance fi = f.fieldInstance();
         if (fi.flags().isFinal()) {
             if ((currCBI.currCodeDecl instanceof FieldDecl
-                    || currCBI.currCodeDecl instanceof ConstructorDecl || currCBI.currCodeDecl instanceof Initializer)
+                    || currCBI.currCodeDecl instanceof ConstructorDecl
+                    || currCBI.currCodeDecl instanceof Initializer)
                     && isFieldsTargetAppropriate(f)) {
-                // we are in a constructor or initializer block and 
+                // we are in a constructor or initializer block and
                 // if the field is static then the target is the class
                 // at hand, and if it is not static then the
-                // target of the field is this. 
-                // So a final field in this situation can be 
-                // assigned to at most once.                    
+                // target of the field is this.
+                // So a final field in this situation can be
+                // assigned to at most once.
                 AssignmentStatus initCount =
                         dfIn.assignmentStatus.get(fi.orig());
                 if (initCount == null) {
                     // This should not happen.
                     throw new InternalCompilerError("Dataflow information not found for field \""
-                                                            + fi.name() + "\".",
-                                                    a.position());
+                            + fi.name() + "\".", a.position());
                 }
                 if (!initCount.definitelyUnassigned) {
-                    throw new SemanticException("Final field \""
-                                                        + fi.name()
-                                                        + "\" might already have been initialized",
+                    throw new SemanticException("Final field \"" + fi.name()
+                            + "\" might already have been initialized",
                                                 a.position());
                 }
             }
             else {
                 // not in a constructor or initializer, or the target is
-                // not appropriate. So we cannot assign 
+                // not appropriate. So we cannot assign
                 // to a final field at all.
                 throw new SemanticException("Cannot assign a value "
                         + "to final field \"" + fi.name() + "\" of \""
@@ -1240,8 +1236,8 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Check that the set of {@code LocalInstance}s 
-     * {@code localsUsed}, which is the set of locals used in the inner 
+     * Check that the set of {@code LocalInstance}s
+     * {@code localsUsed}, which is the set of locals used in the inner
      * class declared by {@code cb}
      * are initialized before the class declaration.
      * @throws SemanticException
@@ -1258,8 +1254,8 @@ public class DefiniteAssignmentChecker extends
     }
 
     /**
-     * Check that the set of {@code LocalInstance}s 
-     * {@code localsUsed}, which is the set of locals used in the inner 
+     * Check that the set of {@code LocalInstance}s
+     * {@code localsUsed}, which is the set of locals used in the inner
      * class declared by {@code cb}
      * are initialized before the class declaration.
      */
@@ -1276,7 +1272,7 @@ public class DefiniteAssignmentChecker extends
                 // initCount will in general not be null, as the local variable
                 // li is declared in the current class; however, if the inner
                 // class is declared in the initializer of the local variable
-                // declaration, then initCount could in fact be null, as we 
+                // declaration, then initCount could in fact be null, as we
                 // leave the inner class before we have performed flowLocalDecl
                 // for the local variable declaration.
 
@@ -1289,7 +1285,7 @@ public class DefiniteAssignmentChecker extends
 
     /**
      * Allow subclasses to override the checking of other nodes, if needed.
-     * @throws SemanticException 
+     * @throws SemanticException
      */
     protected void checkOther(FlowGraph<FlowItem> graph, Node n, FlowItem dfIn)
             throws SemanticException {
