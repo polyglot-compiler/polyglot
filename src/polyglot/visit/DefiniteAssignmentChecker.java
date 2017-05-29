@@ -447,7 +447,7 @@ public class DefiniteAssignmentChecker
                 if (!defAss.definitelyAssigned) {
                     throw new SemanticException("Final field \"" + fi.name()
                             + "\" might not have been initialized",
-                                                cb.position());
+                                                fi.position());
                 }
             }
         }
@@ -505,7 +505,7 @@ public class DefiniteAssignmentChecker
                             throw new SemanticException("Final field \""
                                     + fi.name()
                                     + "\" might not have been initialized",
-                                                        ciStart.position());
+                                                        fi.position());
                         }
                         else {
                             // Even though the final field may not be initialized, the constructor
