@@ -260,7 +260,7 @@ public class DefiniteAssignmentChecker
      * This class is immutable.
      */
     protected static class FlowItem extends DataFlow.Item {
-        public Map<VarInstance, AssignmentStatus> assignmentStatus;
+        public final Map<VarInstance, AssignmentStatus> assignmentStatus;
         public final boolean normalTermination;
 
         FlowItem(Map<VarInstance, AssignmentStatus> m) {
