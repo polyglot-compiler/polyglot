@@ -86,7 +86,9 @@ import polyglot.visit.FlowGraph.Peer;
  * they can override the method {@code flowOther} to capture the way 
  * the new construct's initialization behavior.
  * 
+ * @deprecated Use {@link DefiniteAssignmentChecker} instead.
  */
+@Deprecated
 public class InitChecker extends DataFlow<InitChecker.FlowItem> {
     public InitChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf, true /* forward analysis */, false /* perform dataflow when leaving CodeDecls, not when entering */);

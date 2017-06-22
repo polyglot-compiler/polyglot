@@ -39,6 +39,10 @@ import polyglot.util.InternalCompilerError;
 import polyglot.visit.InitChecker;
 import polyglot.visit.NodeVisitor;
 
+/**
+ * @deprecated Use {@link JL5DefiniteAssignmentChecker} instead.
+ */
+@Deprecated
 public class JL5InitChecker extends InitChecker {
     public JL5InitChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
