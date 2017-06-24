@@ -66,7 +66,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * initialization checking of a class declaration. These objects form a
      * stack, since class declarations can be nested.
      */
-    protected static abstract class ClassBodyInfo<This extends ClassBodyInfo<This>> {
+    public static abstract class ClassBodyInfo<This extends ClassBodyInfo<This>> {
         /**
          * The {@link ClassBodyInfo} for the outer {@link ClassBody}. This forms
          * a stack.
