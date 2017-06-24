@@ -163,7 +163,7 @@ public class DefiniteAssignmentChecker extends
                             throw new SemanticException("Final field \""
                                     + fi.name()
                                     + "\" might not have been initialized",
-                                                        cd.position());
+                                                        cd.position().endOf());
                         }
                         else {
                             // Even though the final field may not be initialized, the constructor
