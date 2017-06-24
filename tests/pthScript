@@ -441,6 +441,7 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
 		       (Semantic, "Illegal forward ref"), 
 		       (Semantic, "Illegal forward ref"), 
 		       (Semantic, "Illegal forward ref"); 
+	DefAssign01.jl (Semantic, "Final field \"x\" might not have been initialized");
 }
 
 polyglot.frontend.JLExtensionInfo "-d out -postopts \"-source 1.4\"" {
