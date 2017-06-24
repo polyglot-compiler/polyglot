@@ -799,7 +799,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
                 checkClassBody(graph, (ClassBody) n, dfIn, dfOut);
             }
             else {
-                checkOther(graph, n, dfIn);
+                checkOther(graph, n, dfIn, dfOut);
             }
         }
         else {
@@ -883,8 +883,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * Allow subclasses to override the checking of other nodes, if needed.
      * @throws SemanticException
      */
-    protected void checkOther(FlowGraph<FlowItem> graph, Node n, FlowItem dfIn)
-            throws SemanticException {
+    protected void checkOther(FlowGraph<FlowItem> graph, Node n, FlowItem dfIn,
+            FlowItem dfOut) throws SemanticException {
     }
 
     /**
