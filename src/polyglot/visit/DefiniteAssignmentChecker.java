@@ -26,6 +26,7 @@
 
 package polyglot.visit;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -44,6 +45,7 @@ import polyglot.types.FieldInstance;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -65,7 +67,7 @@ import polyglot.util.Position;
  *
  */
 public class DefiniteAssignmentChecker extends
-        AbstractAssignmentChecker<DefiniteAssignmentChecker.ClassBodyInfo> {
+        AbstractAssignmentChecker<DefiniteAssignmentChecker.ClassBodyInfo, AbstractAssignmentChecker.FlowItem> {
     public DefiniteAssignmentChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
@@ -75,6 +77,12 @@ public class DefiniteAssignmentChecker extends
         public ClassBodyInfo(ClassBodyInfo outer, ClassType curClass) {
             super(outer, curClass);
         }
+    }
+
+    @Override
+    protected FlowItem newFlowItem(Map<VarInstance, AssignmentStatus> map,
+            boolean canTerminateNormally) {
+        return new FlowItem(map, canTerminateNormally);
     }
 
     @Override
@@ -192,7 +200,7 @@ public class DefiniteAssignmentChecker extends
             if ((curCBI.curCodeDecl instanceof FieldDecl
                     || curCBI.curCodeDecl instanceof ConstructorDecl
                     || curCBI.curCodeDecl instanceof Initializer)
-                    && isFieldsTargetAppropriate(f)) {
+                    && isFieldsTargetAppropriate(graph, f)) {
                 AssignmentStatus initCount =
                         dfIn.assignmentStatus.get(fi.orig());
                 if (initCount == null || !initCount.definitelyAssigned) {
@@ -269,7 +277,7 @@ public class DefiniteAssignmentChecker extends
             if ((curCBI.curCodeDecl instanceof FieldDecl
                     || curCBI.curCodeDecl instanceof ConstructorDecl
                     || curCBI.curCodeDecl instanceof Initializer)
-                    && isFieldsTargetAppropriate(f)
+                    && isFieldsTargetAppropriate(graph, f)
                     && ts.equals(curCBI.curClass, fi.container())) {
                 // we are in a constructor or initializer block and
                 // if the field is static then the target is the class

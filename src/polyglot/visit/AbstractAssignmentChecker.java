@@ -49,8 +49,8 @@ import polyglot.visit.FlowGraph.Peer;
 /**
  * A visitor that checks that variables are initialized correctly.
  */
-public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentChecker.ClassBodyInfo<CBI>>
-        extends DataFlow<AbstractAssignmentChecker.FlowItem> {
+public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentChecker.ClassBodyInfo<CBI>, FI extends AbstractAssignmentChecker.FlowItem>
+        extends DataFlow<FI> {
     public AbstractAssignmentChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job,
               ts,
@@ -210,7 +210,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * VarInstance}s to their corresponding {@link AssignmentStatus}. This class
      * is immutable.
      */
-    protected static class FlowItem extends DataFlow.Item {
+    public static class FlowItem extends DataFlow.Item {
         public final Map<VarInstance, AssignmentStatus> assignmentStatus;
 
         /**
@@ -218,11 +218,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
          */
         public final boolean normalTermination;
 
-        FlowItem(Map<VarInstance, AssignmentStatus> map) {
-            this(map, true);
-        }
-
-        FlowItem(Map<VarInstance, AssignmentStatus> map,
+        protected FlowItem(Map<VarInstance, AssignmentStatus> map,
                 boolean canTerminateNormally) {
             assignmentStatus = Collections.unmodifiableMap(new HashMap<>(map));
             normalTermination = canTerminateNormally;
@@ -248,11 +244,44 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
         }
     }
 
-    protected static final FlowItem BOTTOM =
-            new FlowItem(Collections.<VarInstance, AssignmentStatus> emptyMap());
+    /**
+     * Factory method for creating a new flow item from the given map.
+     */
+    protected FI newFlowItem(Map<VarInstance, AssignmentStatus> map) {
+        return newFlowItem(map, true);
+    }
+
+    /**
+     * Factory method for creating a new flow item from the given map.
+     *
+     * @param canTerminateNormally indicates whether the current path for the
+     *         flow item can terminate normally.
+     */
+    protected abstract FI newFlowItem(Map<VarInstance, AssignmentStatus> map,
+            boolean canTerminateNormally);
+
+    /**
+     * Reconstructs a flow item by replacing the assignment-status map.
+     *
+     * @param fi the flow item to reconstruct.
+     * @param map the assignment-status map to use in the reconstructed object.
+     */
+    protected FI reconstructFlowItem(FI fi,
+            Map<VarInstance, AssignmentStatus> map) {
+        return newFlowItem(map, fi.normalTermination);
+    }
+
+    protected final FI BOTTOM = BOTTOM();
+
+    /**
+     * Constructs the flow item at the bottom of the lattice.
+     */
+    protected FI BOTTOM() {
+        return newFlowItem(Collections.<VarInstance, AssignmentStatus> emptyMap());
+    }
 
     @Override
-    protected FlowGraph<FlowItem> initGraph(CodeNode code, Term root) {
+    protected FlowGraph<FI> initGraph(CodeNode code, Term root) {
         curCBI.curCodeDecl = code;
         return new FlowGraph<>(root, forward);
     }
@@ -381,16 +410,15 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      */
     protected void dataflow(Expr root) throws SemanticException {
         // Build the control flow graph.
-        FlowGraph<FlowItem> g = new FlowGraph<>(root, forward);
-        CFGBuilder<FlowItem> v = createCFGBuilder(ts, g);
+        FlowGraph<FI> g = new FlowGraph<>(root, forward);
+        CFGBuilder<FI> v = createCFGBuilder(ts, g);
         v.visitGraph();
         dataflow(g);
         post(g, root);
     }
 
     @Override
-    public FlowItem createInitialItem(FlowGraph<FlowItem> graph, Term node,
-            boolean entry) {
+    public FI createInitialItem(FlowGraph<FI> graph, Term node, boolean entry) {
         if (node == graph.root() && entry) {
             return createInitDFI();
         }
@@ -401,14 +429,13 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * Creates the initial dataflow item from {@link
      * ClassBodyInfo#curClassFieldAsgtStatuses}.
      */
-    protected FlowItem createInitDFI() {
-        return new FlowItem(new HashMap<VarInstance, AssignmentStatus>(curCBI.curClassFieldAsgtStatuses));
+    protected FI createInitDFI() {
+        return newFlowItem(new HashMap<VarInstance, AssignmentStatus>(curCBI.curClassFieldAsgtStatuses));
     }
 
     @Override
-    protected CFGBuilder<FlowItem> createCFGBuilder(TypeSystem ts,
-            FlowGraph<FlowItem> g) {
-        CFGBuilder<FlowItem> v = new CFGBuilder<>(lang(), ts, g, this);
+    protected CFGBuilder<FI> createCFGBuilder(TypeSystem ts, FlowGraph<FI> g) {
+        CFGBuilder<FI> v = new CFGBuilder<>(lang(), ts, g, this);
         // skip dead loops bodies and dead if branches. See JLS 2nd edition, Section 16.
 //        v = v.skipDeadIfBranches(true);
 //        v = v.skipDeadLoopBodies(true);
@@ -424,16 +451,16 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * {@link #confluence(List, Peer, FlowGraph)} is called instead.
      */
     @Override
-    protected FlowItem confluence(List<FlowItem> items, List<EdgeKey> itemKeys,
-            Peer<FlowItem> peer, FlowGraph<FlowItem> graph) {
+    protected FI confluence(List<FI> items, List<EdgeKey> itemKeys,
+            Peer<FI> peer, FlowGraph<FI> graph) {
         Node node = peer.node();
         if (node instanceof Initializer || node instanceof ConstructorDecl) {
-            List<FlowItem> filtered = filterItemsNonException(items, itemKeys);
+            List<FI> filtered = filterItemsNonException(items, itemKeys);
             if (filtered.isEmpty()) {
                 // Record the fact that this dataflow item was not produced for
                 // a node that can be reached by normal termination.
-                return new FlowItem(new HashMap<VarInstance, AssignmentStatus>(curCBI.curClassFieldAsgtStatuses),
-                                    false);
+                return newFlowItem(new HashMap<VarInstance, AssignmentStatus>(curCBI.curClassFieldAsgtStatuses),
+                                   false);
             }
 
             if (filtered.size() == 1) {
@@ -453,11 +480,11 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * minimum of all mins and the maximum of all maxes.
      */
     @Override
-    protected FlowItem confluence(List<FlowItem> inItems, Peer<FlowItem> peer,
-            FlowGraph<FlowItem> graph) {
+    protected FI confluence(List<FI> inItems, Peer<FI> peer,
+            FlowGraph<FI> graph) {
         // Resolve any conflicts pairwise.
         Map<VarInstance, AssignmentStatus> m = null;
-        for (FlowItem itm : inItems) {
+        for (FI itm : inItems) {
             if (itm == BOTTOM) continue;
             if (m == null) {
                 m = new HashMap<>(itm.assignmentStatus);
@@ -475,13 +502,12 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
 
         if (m == null) return BOTTOM;
 
-        return new FlowItem(m);
+        return newFlowItem(m);
     }
 
     @Override
-    protected Map<EdgeKey, FlowItem> flow(List<FlowItem> inItems,
-            List<EdgeKey> inItemKeys, FlowGraph<FlowItem> graph,
-            Peer<FlowItem> peer) {
+    protected Map<EdgeKey, FI> flow(List<FI> inItems, List<EdgeKey> inItemKeys,
+            FlowGraph<FI> graph, Peer<FI> peer) {
         return flowToBooleanFlow(inItems, inItemKeys, graph, peer);
     }
 
@@ -502,17 +528,16 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * </ul>
      */
     @Override
-    protected Map<EdgeKey, FlowItem> flow(FlowItem trueItem, FlowItem falseItem,
-            FlowItem otherItem, FlowGraph<FlowItem> graph,
-            Peer<FlowItem> peer) {
-        FlowItem inItem = safeConfluence(trueItem,
-                                         FlowGraph.EDGE_KEY_TRUE,
-                                         falseItem,
-                                         FlowGraph.EDGE_KEY_FALSE,
-                                         otherItem,
-                                         FlowGraph.EDGE_KEY_OTHER,
-                                         peer,
-                                         graph);
+    protected Map<EdgeKey, FI> flow(FI trueItem, FI falseItem, FI otherItem,
+            FlowGraph<FI> graph, Peer<FI> peer) {
+        FI inItem = safeConfluence(trueItem,
+                                   FlowGraph.EDGE_KEY_TRUE,
+                                   falseItem,
+                                   FlowGraph.EDGE_KEY_FALSE,
+                                   otherItem,
+                                   FlowGraph.EDGE_KEY_OTHER,
+                                   peer,
+                                   graph);
 
         Node n = peer.node();
         if (peer.isEntry()) {
@@ -523,7 +548,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
                             new HashMap<>(inItem.assignmentStatus);
 
                     newAsgtStatus.remove(ld.localInstance());
-                    inItem = new FlowItem(newAsgtStatus);
+                    inItem = newFlowItem(newAsgtStatus);
                 }
             }
             return itemToMap(inItem, peer.succEdgeKeys());
@@ -533,8 +558,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
             return itemToMap(BOTTOM, peer.succEdgeKeys());
         }
 
-        FlowItem inDFItem = inItem;
-        Map<EdgeKey, FlowItem> ret = null;
+        FI inDFItem = inItem;
+        Map<EdgeKey, FI> ret = null;
         if (n instanceof Formal) {
             // formal argument declaration.
             ret = flowFormal(inDFItem, graph, (Formal) n, peer.succEdgeKeys());
@@ -604,9 +629,9 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
         return ret;
     }
 
-    private Map<EdgeKey, FlowItem> remap(Map<EdgeKey, FlowItem> m, EdgeKey ek,
+    private Map<EdgeKey, FI> remap(Map<EdgeKey, FI> m, EdgeKey ek,
             AssignmentStatus asgtStatus) {
-        FlowItem fi = m.get(ek);
+        FI fi = m.get(ek);
         if (fi == null) {
             return m;
         }
@@ -616,8 +641,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
             assignmentStatus.put(vi, asgtStatus);
         }
 
-        FlowItem newFI = new FlowItem(assignmentStatus, fi.normalTermination);
-        Map<EdgeKey, FlowItem> newM = new HashMap<>(m);
+        FI newFI = reconstructFlowItem(fi, assignmentStatus);
+        Map<EdgeKey, FI> newM = new HashMap<>(m);
         newM.put(ek, newFI);
         return newM;
     }
@@ -625,8 +650,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
     /**
      * Performs the appropriate flow operations for a {@link Formal}.
      */
-    protected Map<EdgeKey, FlowItem> flowFormal(FlowItem inItem,
-            FlowGraph<FlowItem> graph, Formal f, Set<EdgeKey> succEdgeKeys) {
+    protected Map<EdgeKey, FI> flowFormal(FI inItem, FlowGraph<FI> graph,
+            Formal f, Set<EdgeKey> succEdgeKeys) {
         Map<VarInstance, AssignmentStatus> m =
                 new HashMap<>(inItem.assignmentStatus);
         // a formal argument is always defined.
@@ -635,15 +660,15 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
         // record the fact that we have seen the formal declaration
         curCBI.localDeclarations.add(f.localInstance().orig());
 
-        return DataFlow.<FlowItem> itemToMap(new FlowItem(m), succEdgeKeys);
+        return DataFlow.<FI> itemToMap(reconstructFlowItem(inItem, m),
+                                       succEdgeKeys);
     }
 
     /**
      * Performs the appropriate flow operations for a {@link LocalDecl}.
      */
-    protected Map<EdgeKey, FlowItem> flowLocalDecl(FlowItem inItem,
-            FlowGraph<FlowItem> graph, LocalDecl ld,
-            Set<EdgeKey> succEdgeKeys) {
+    protected Map<EdgeKey, FI> flowLocalDecl(FI inItem, FlowGraph<FI> graph,
+            LocalDecl ld, Set<EdgeKey> succEdgeKeys) {
         Map<VarInstance, AssignmentStatus> m =
                 new HashMap<>(inItem.assignmentStatus);
 
@@ -654,35 +679,35 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
         // record the fact that we have seen a local declaration
         curCBI.localDeclarations.add(ld.localInstance());
 
-        return DataFlow.<FlowItem> itemToMap(new FlowItem(m), succEdgeKeys);
+        return DataFlow.<FI> itemToMap(reconstructFlowItem(inItem, m),
+                                       succEdgeKeys);
     }
 
     /**
      * Performs the appropriate flow operations for a {@link LocalAssign}.
      */
-    protected Map<EdgeKey, FlowItem> flowLocalAssign(FlowItem inItem,
-            FlowGraph<FlowItem> graph, LocalAssign a,
-            Set<EdgeKey> succEdgeKeys) {
+    protected Map<EdgeKey, FI> flowLocalAssign(FI inItem, FlowGraph<FI> graph,
+            LocalAssign a, Set<EdgeKey> succEdgeKeys) {
         Local l = a.left();
         Map<VarInstance, AssignmentStatus> m =
                 new HashMap<>(inItem.assignmentStatus);
         m.put(l.localInstance().orig(), AssignmentStatus.ASSIGNED);
 
-        return DataFlow.<FlowItem> itemToMap(new FlowItem(m), succEdgeKeys);
+        return DataFlow.<FI> itemToMap(reconstructFlowItem(inItem, m),
+                                       succEdgeKeys);
     }
 
     /**
      * Performs the appropriate flow operations for a {@link FieldAssign}.
      */
-    protected Map<EdgeKey, FlowItem> flowFieldAssign(FlowItem inItem,
-            FlowGraph<FlowItem> graph, FieldAssign a,
-            Set<EdgeKey> succEdgeKeys) {
+    protected Map<EdgeKey, FI> flowFieldAssign(FI inItem, FlowGraph<FI> graph,
+            FieldAssign a, Set<EdgeKey> succEdgeKeys) {
         Field f = a.left();
         FieldInstance fi = f.fieldInstance();
 
         // Ignore this assignment if the field's target is not appropriate for
         // what we are interested in.
-        if (!isFieldsTargetAppropriate(f)) return null;
+        if (!isFieldsTargetAppropriate(graph, f)) return null;
 
         Map<VarInstance, AssignmentStatus> m =
                 new HashMap<>(inItem.assignmentStatus);
@@ -693,14 +718,15 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
 
         // The field is now definitely assigned.
         m.put(fi.orig(), AssignmentStatus.ASSIGNED);
-        return DataFlow.<FlowItem> itemToMap(new FlowItem(m), succEdgeKeys);
+        return DataFlow.<FI> itemToMap(reconstructFlowItem(inItem, m),
+                                       succEdgeKeys);
     }
 
     /**
      * Performs the appropriate flow operations for a {@link ConstructorCall}.
      */
-    protected Map<EdgeKey, FlowItem> flowConstructorCall(FlowItem inItem,
-            FlowGraph<FlowItem> graph, ConstructorCall cc,
+    protected Map<EdgeKey, FI> flowConstructorCall(FI inItem,
+            FlowGraph<FI> graph, ConstructorCall cc,
             Set<EdgeKey> succEdgeKeys) {
         if (ConstructorCall.THIS.equals(cc.kind())) {
             // currCodeDecl must be a ConstructorDecl, as that
@@ -715,8 +741,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
     /**
      * Allows subclasses to override if necessary.
      */
-    protected Map<EdgeKey, FlowItem> flowOther(FlowItem inItem,
-            FlowGraph<FlowItem> graph, Node n, Set<EdgeKey> succEdgeKeys) {
+    protected Map<EdgeKey, FI> flowOther(FI inItem, FlowGraph<FI> graph, Node n,
+            Set<EdgeKey> succEdgeKeys) {
         return null;
     }
 
@@ -726,7 +752,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * the field must be the current class; if the field is not static then the
      * target must be "this".
      */
-    protected boolean isFieldsTargetAppropriate(Field f) {
+    protected boolean isFieldsTargetAppropriate(FlowGraph<FI> graph, Field f) {
         ClassType containingClass = curCBI.curClass;
 
         if (f.fieldInstance().flags().isStatic()) {
@@ -753,10 +779,9 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * ClassBodyInfo#curClassFieldAsgtStatuses}.
      */
     @Override
-    protected void check(FlowGraph<FlowItem> graph, Term n, boolean entry,
-            FlowItem inItem, Map<EdgeKey, FlowItem> outItems)
-            throws SemanticException {
-        FlowItem dfIn = inItem;
+    protected void check(FlowGraph<FI> graph, Term n, boolean entry, FI inItem,
+            Map<EdgeKey, FI> outItems) throws SemanticException {
+        FI dfIn = inItem;
         if (dfIn == null) {
             // There is no input data flow item. This can happen if we are
             // checking an unreachable term, and so no Items have flowed
@@ -769,7 +794,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
             dfIn = createInitDFI();
         }
 
-        FlowItem dfOut = null;
+        FI dfOut = null;
         if (!entry && outItems != null && !outItems.isEmpty()) {
             // due to the flow equations, all DataFlowItems in the outItems map
             // are the same, so just take the first one.
@@ -832,34 +857,33 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
     /**
      * Checks that the given {@link Field} is used correctly.
      */
-    protected abstract void checkField(FlowGraph<FlowItem> graph, Field f,
-            FlowItem dfIn) throws SemanticException;
+    protected abstract void checkField(FlowGraph<FI> graph, Field f, FI dfIn)
+            throws SemanticException;
 
     /**
      * Checks that the given {@link Local} is used correctly.
      */
-    protected abstract void checkLocal(FlowGraph<FlowItem> graph, Local l,
-            FlowItem dfIn) throws SemanticException;
+    protected abstract void checkLocal(FlowGraph<FI> graph, Local l, FI dfIn)
+            throws SemanticException;
 
     /**
      * Checks that an assignment to the given {@link LocalInstance} is correct.
      */
-    protected abstract void checkLocalAssign(FlowGraph<FlowItem> graph,
-            LocalInstance li, Position pos, FlowItem dfIn)
-            throws SemanticException;
+    protected abstract void checkLocalAssign(FlowGraph<FI> graph,
+            LocalInstance li, Position pos, FI dfIn) throws SemanticException;
 
     /**
      * Checks that the given {@link FieldAssign} is correct.
      */
-    protected abstract void checkFieldAssign(FlowGraph<FlowItem> graph,
-            FieldAssign a, FlowItem dfIn) throws SemanticException;
+    protected abstract void checkFieldAssign(FlowGraph<FI> graph, FieldAssign a,
+            FI dfIn) throws SemanticException;
 
     /**
      * Checks that the usage of locals in the given {@link ClassBody} (which
      * represents an inner class) is correct.
      */
-    protected void checkClassBody(FlowGraph<FlowItem> graph, ClassBody cb,
-            FlowItem dfIn, FlowItem dfOut) throws SemanticException {
+    protected void checkClassBody(FlowGraph<FI> graph, ClassBody cb, FI dfIn,
+            FI dfOut) throws SemanticException {
         // we need to check that the locals used inside this class body
         // have all been defined at this point.
         Set<LocalInstance> localsUsed = curCBI.localsUsedInClassBodies.get(cb);
@@ -874,17 +898,16 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * locals used in the inner class having the given {@link ClassBody})
      * are initialized before the class declaration.
      */
-    protected abstract void checkLocalsUsedByInnerClass(
-            FlowGraph<FlowItem> graph, ClassBody cb,
-            Set<LocalInstance> localsUsed, FlowItem dfIn, FlowItem dfOut)
+    protected abstract void checkLocalsUsedByInnerClass(FlowGraph<FI> graph,
+            ClassBody cb, Set<LocalInstance> localsUsed, FI dfIn, FI dfOut)
             throws SemanticException;
 
     /**
      * Allow subclasses to override the checking of other nodes, if needed.
      * @throws SemanticException
      */
-    protected void checkOther(FlowGraph<FlowItem> graph, Node n, FlowItem dfIn,
-            FlowItem dfOut) throws SemanticException {
+    protected void checkOther(FlowGraph<FI> graph, Node n, FI dfIn, FI dfOut)
+            throws SemanticException {
     }
 
     /**
@@ -895,8 +918,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * fields into {@link ClassBodyInfo#curClassFieldAsgtStatuses} so that they
      * are correct for the next field declaration, initializer, or constructor.
      */
-    protected void finishFieldDecl(FlowGraph<FlowItem> graph, FieldDecl fd,
-            FlowItem dfIn, FlowItem dfOut) {
+    protected void finishFieldDecl(FlowGraph<FI> graph, FieldDecl fd, FI dfIn,
+            FI dfOut) {
         for (Entry<VarInstance, AssignmentStatus> e : dfOut.assignmentStatus.entrySet()) {
             if (!(e.getKey() instanceof FieldInstance)) continue;
 
@@ -917,8 +940,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * The default implementation updates the state of {@link
      * ClassBodyInfo#fieldsConstructorInitializes}.
      */
-    protected void finishConstructorDecl(FlowGraph<FlowItem> graph,
-            ConstructorDecl cd, FlowItem dfIn, FlowItem dfOut) {
+    protected void finishConstructorDecl(FlowGraph<FI> graph,
+            ConstructorDecl cd, FI dfIn, FI dfOut) {
         ConstructorInstance ci = cd.constructorInstance();
 
         // We need to set currCBI.fieldsConstructorInitializes correctly. It is
@@ -970,8 +993,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * fields into {@link ClassBodyInfo#curClassFieldAsgtStatuses} so that they
      * are correct for the next field declaration, initializer, or constructor.
      */
-    protected void finishInitializer(FlowGraph<FlowItem> graph,
-            Initializer initializer, FlowItem dfIn, FlowItem dfOut) {
+    protected void finishInitializer(FlowGraph<FI> graph,
+            Initializer initializer, FI dfIn, FI dfOut) {
         for (Entry<VarInstance, AssignmentStatus> e : dfOut.assignmentStatus.entrySet()) {
             if (!(e.getKey() instanceof FieldInstance)) continue;
 
