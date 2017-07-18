@@ -342,6 +342,7 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
         BadFinalInit15.jl (Semantic, "Final variable .* might already have been initialized"); 
         BadFinalInit16.jl (Semantic, "Local variable .* may not have been initialized"); 
         BadFinalInit17.jl (Semantic, "Final field .* might not have been initialized");
+        BadFinalInit18.jl (Semantic, "Cannot assign a value to final field");
         BadIncrement1.jl (Semantic, "Operand of .* operator must be a variable");
         BadIncrement2.jl (Semantic, "Operand of .* operator must be a variable");
         BadIncrement3.jl (Semantic, "Operand of .* operator must be a variable");

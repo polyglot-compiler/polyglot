@@ -269,7 +269,8 @@ public class DefiniteAssignmentChecker extends
             if ((curCBI.curCodeDecl instanceof FieldDecl
                     || curCBI.curCodeDecl instanceof ConstructorDecl
                     || curCBI.curCodeDecl instanceof Initializer)
-                    && isFieldsTargetAppropriate(f)) {
+                    && isFieldsTargetAppropriate(f)
+                    && ts.equals(curCBI.curClass, fi.container())) {
                 // we are in a constructor or initializer block and
                 // if the field is static then the target is the class
                 // at hand, and if it is not static then the
