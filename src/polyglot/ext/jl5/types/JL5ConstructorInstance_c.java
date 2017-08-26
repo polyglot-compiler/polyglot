@@ -46,7 +46,7 @@ JL5ConstructorInstance {
     protected List<TypeVariable> typeParams;
     protected Annotations annotations;
 
-    public JL5ConstructorInstance_c(JL5TypeSystem_c ts, Position pos,
+    public JL5ConstructorInstance_c(JL5TypeSystem ts, Position pos,
             ClassType container, Flags flags, List<? extends Type> argTypes,
             List<? extends Type> excTypes,
             List<? extends TypeVariable> typeParams) {
