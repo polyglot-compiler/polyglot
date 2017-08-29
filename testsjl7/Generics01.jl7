@@ -1,0 +1,12 @@
+class A<X> {
+	<Y>A(X x, Y y) { }
+	public static void main(String[] args) {
+		B b = new B();
+		C c = new C();
+		new A<B>(b, c);
+	}
+}
+class B {
+}
+class C {
+}
