@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -66,9 +66,9 @@ import polyglot.util.StringUtil;
  * the local file system. (NOTE: Extensions may extend this implementation and
  * are not forced to use local file system for i/o.)
  */
-public class ExtFileManager extends
-        ForwardingJavaFileManager<StandardJavaFileManager> implements
-        FileManager {
+public class ExtFileManager
+        extends ForwardingJavaFileManager<StandardJavaFileManager>
+        implements FileManager {
     protected static final JavaCompiler javaCompiler = Main.javaCompiler();
 
     protected final ExtensionInfo extInfo;
@@ -195,9 +195,8 @@ public class ExtFileManager extends
     }
 
     protected String fileKey(String packageName, String relativeName) {
-        if (!packageName.isEmpty())
-            packageName =
-                    packageName.replace('.', separatorChar) + separatorChar;
+        if (!packageName.isEmpty()) packageName =
+                packageName.replace('.', separatorChar) + separatorChar;
         StringBuilder sb = new StringBuilder(packageName);
         sb.append(relativeName);
         return sb.toString();
@@ -205,7 +204,8 @@ public class ExtFileManager extends
 
     @Override
     public JavaFileObject getJavaFileForOutput(Location location,
-            String className, Kind kind, FileObject sibling) throws IOException {
+            String className, Kind kind, FileObject sibling)
+            throws IOException {
 
         String pkg = StringUtil.getPackageComponent(className);
         String name = StringUtil.getShortNameComponent(className);
@@ -242,7 +242,8 @@ public class ExtFileManager extends
     // Use this method for obtaining JavaFileObjects representing files on the
     // local file system
     @Override
-    public Iterable<? extends JavaFileObject> getJavaFileObjects(File... files) {
+    public Iterable<? extends JavaFileObject> getJavaFileObjects(
+            File... files) {
         return fileManager.getJavaFileObjects(files);
     }
 
@@ -393,8 +394,9 @@ public class ExtFileManager extends
             Report.report(3, "looking in " + location + " for " + name);
         }
         if (Report.should_report(report_topics, 4)) {
-            Report.report(4, "Location " + location + " has "
-                    + getLocation(location));
+            Report.report(4,
+                          "Location " + location + " has "
+                                  + getLocation(location));
         }
 
         try {
@@ -404,19 +406,20 @@ public class ExtFileManager extends
             }
             catch (IOException e) {
                 throw new InternalCompilerError("Error while checking for class file "
-                                                        + name,
-                                                e);
+                        + name, e);
             }
             if (jfo != null) {
                 if (Report.should_report(report_topics, 4)) {
-                    Report.report(4, "Class " + name + " found in " + location
-                            + " at " + jfo.toUri());
+                    Report.report(4,
+                                  "Class " + name + " found in " + location
+                                          + " at " + jfo.toUri());
                 }
             }
             else {
                 if (Report.should_report(report_topics, 4)) {
-                    Report.report(4, "Class " + name + " not found in "
-                            + location);
+                    Report.report(4,
+                                  "Class " + name + " not found in "
+                                          + location);
                 }
             }
 
@@ -446,8 +449,10 @@ public class ExtFileManager extends
     @Override
     public FileSource fileSource(String fileName, boolean userSpecified)
             throws IOException {
-        return fileSource(fileName, userSpecified
-                ? Source.Kind.USER_SPECIFIED : Source.Kind.DEPENDENCY);
+        return fileSource(fileName,
+                          userSpecified
+                                  ? Source.Kind.USER_SPECIFIED
+                                  : Source.Kind.DEPENDENCY);
     }
 
     @Override
@@ -466,8 +471,11 @@ public class ExtFileManager extends
     @Override
     public FileSource fileSource(Location location, String fileName,
             boolean userSpecified) throws IOException {
-        return fileSource(location, fileName, userSpecified
-                ? Source.Kind.USER_SPECIFIED : Source.Kind.DEPENDENCY);
+        return fileSource(location,
+                          fileName,
+                          userSpecified
+                                  ? Source.Kind.USER_SPECIFIED
+                                  : Source.Kind.DEPENDENCY);
     }
 
     @Override
@@ -496,9 +504,8 @@ public class ExtFileManager extends
             sourceFile = loadedSources.get(key);
             if (sourceFile != null) return sourceFile;
             fo = getFileForInput(location, "", fileName);
-            if (fo == null)
-                throw new FileNotFoundException("File: " + fileName
-                        + " not found.");
+            if (fo == null) throw new FileNotFoundException("File: " + fileName
+                    + " not found.");
         }
         sourceFile = extInfo.createFileSource(fo, kind);
         String[] exts = extInfo.fileExtensions();
@@ -597,7 +604,8 @@ public class ExtFileManager extends
             try {
                 source = extInfo.createFileSource(fo, Source.Kind.DEPENDENCY);
                 if (Report.should_report(Report.loader, 2))
-                    Report.report(2, "Loading " + className + " from " + source);
+                    Report.report(2,
+                                  "Loading " + className + " from " + source);
 
                 loadedSources.put(key, source);
                 return source;
@@ -610,9 +618,8 @@ public class ExtFileManager extends
 
     protected String fileKey(Location location, String packageName,
             String fileName) {
-        if (caseInsensitive())
-            return location + "/" + packageName.toLowerCase() + "/"
-                    + fileName.toLowerCase();
+        if (caseInsensitive()) return location + "/" + packageName.toLowerCase()
+                + "/" + fileName.toLowerCase();
         return location + "/" + packageName + "/" + fileName;
     }
 
