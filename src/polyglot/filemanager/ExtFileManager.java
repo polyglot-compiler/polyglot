@@ -33,6 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -50,6 +52,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.FileSource;
@@ -157,7 +160,39 @@ public class ExtFileManager
         String pkg = StringUtil.getPackageComponent(className);
         String name = StringUtil.getShortNameComponent(className);
         String relativeName = name + kind.extension;
-        return (JavaFileObject) getFileForInput(location, pkg, relativeName);
+        JavaFileObject result =
+                (JavaFileObject) getFileForInput(location, pkg, relativeName);
+
+        if (result == null
+                && location == StandardLocation.PLATFORM_CLASS_PATH) {
+            // In Java 9+, the FileManager is unable to find a class file for
+            // system classes. In this case, we fall back on reflection to get
+            // a resource for the class.
+
+            // Get the class from the system class loader.
+            Class<?> clazz;
+            try {
+                clazz = ClassLoader.getSystemClassLoader().loadClass(className);
+            }
+            catch (ClassNotFoundException e) {
+                clazz = null;
+            }
+
+            if (clazz != null) {
+                // Found the class. Create a JavaFileObject for it.
+                URL url = clazz.getResource(relativeName);
+                try {
+                    result = new ExtFileObject(url.toURI(),
+                                               kindFromExtension(relativeName),
+                                               clazz.getResourceAsStream(relativeName));
+                }
+                catch (URISyntaxException e) {
+                    throw new InternalCompilerError(e);
+                }
+            }
+        }
+
+        return result;
     }
 
     protected Kind kindFromExtension(String name) {
