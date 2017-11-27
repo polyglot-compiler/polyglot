@@ -45,10 +45,28 @@ import javax.tools.SimpleJavaFileObject;
 public class ExtFileObject extends SimpleJavaFileObject {
 
     final protected ByteArrayOutputStream baos;
+    private final static int BUF_SIZE = 4096;
 
     public ExtFileObject(URI u, Kind k) {
         super(u, k);
         baos = new ByteArrayOutputStream();
+    }
+
+    /**
+     * Initializes the contents of the FileObject with the given InputStream.
+     */
+    public ExtFileObject(URI u, Kind k, InputStream in) throws IOException {
+        this(u, k);
+
+        int nRead;
+        byte[] buf = new byte[BUF_SIZE];
+
+        OutputStream out = openOutputStream();
+        while ((nRead = in.read(buf, 0, buf.length)) != -1) {
+            out.write(buf, 0, nRead);
+        }
+
+        out.flush();
     }
 
     @Override
