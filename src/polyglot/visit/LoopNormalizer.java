@@ -70,31 +70,27 @@ public class LoopNormalizer extends NodeVisitor {
     }
 
     @Override
-    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
-        // If this loop is labeled, we pass the label into the loop translation functions
-        // so they can ensure that the label stays attached to the correct node.
+    public Node override(Node parent, Node n) {
+        // If the parent is a label, we pass it into the loop translation
+        // functions so they can ensure that the label is reinserted
+        // appropriately, and we remove the original label.
         Labeled label = null;
-
         if (n instanceof Labeled) {
             label = (Labeled) n;
-            n = ((Labeled) n).statement();
+            n = label.statement();
         }
 
-        if (n instanceof While) {
-            While s = (While) n;
-            return translateWhile(s, label);
-        }
-        else if (n instanceof Do) {
-            Do s = (Do) n;
-            return translateDo(s, label);
-        }
-        else if (n instanceof For) {
-            For s = (For) n;
-            return translateFor(s, label);
-        }
-        else {
-            return label != null ? label : n;
-        }
+        n = n.visitChildren(this);
+
+        if (n instanceof While)
+            return translateWhile((While) n, label);
+        if (n instanceof Do)
+            return translateDo((Do) n, label);
+        if (n instanceof For)
+            return translateFor((For) n, label);
+
+        // Reattach label if its statement was not a loop.
+        return label != null ? label : n;
     }
 
     /** Whenever a new node is created, this method is called and should do
