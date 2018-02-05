@@ -26,34 +26,17 @@
 
 package polyglot.visit;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import polyglot.ast.Assign;
-import polyglot.ast.Block;
-import polyglot.ast.BooleanLit;
-import polyglot.ast.Branch;
-import polyglot.ast.Do;
-import polyglot.ast.Eval;
-import polyglot.ast.Expr;
-import polyglot.ast.For;
-import polyglot.ast.ForUpdate;
-import polyglot.ast.If;
-import polyglot.ast.JLang;
-import polyglot.ast.Local;
-import polyglot.ast.LocalDecl;
-import polyglot.ast.Loop;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.Stmt;
-import polyglot.ast.While;
+import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
 import polyglot.types.TypeSystem;
 import polyglot.util.Position;
 import polyglot.util.UniqueID;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /** 
  * Turns all loops into while(true) loops.
@@ -65,6 +48,10 @@ public class LoopNormalizer extends NodeVisitor {
     protected final NodeFactory nf;
     protected final boolean dumbDo;
 
+    /**
+     * Warning: the [dumbDo] translation is incorrect in the presence of break/continue
+     * statements within do-while blocks.
+     */
     public LoopNormalizer(Job job, TypeSystem ts, NodeFactory nf, boolean dumbDo) {
         super(nf.lang());
         this.job = job;
@@ -84,22 +71,30 @@ public class LoopNormalizer extends NodeVisitor {
 
     @Override
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+        // If this loop is labeled, we pass the label into the loop translation functions
+        // so they can ensure that the label stays attached to the correct node.
+        Labeled label = null;
+
+        if (n instanceof Labeled) {
+            label = (Labeled) n;
+            n = ((Labeled) n).statement();
+        }
+
         if (n instanceof While) {
             While s = (While) n;
-            return translateWhile(s);
+            return translateWhile(s, label);
         }
-
-        if (n instanceof Do) {
+        else if (n instanceof Do) {
             Do s = (Do) n;
-            return translateDo(s);
+            return translateDo(s, label);
         }
-
-        if (n instanceof For) {
+        else if (n instanceof For) {
             For s = (For) n;
-            return translateFor(s);
+            return translateFor(s, label);
         }
-
-        return n;
+        else {
+            return label != null ? label : n;
+        }
     }
 
     /** Whenever a new node is created, this method is called and should do
@@ -222,29 +217,26 @@ public class LoopNormalizer extends NodeVisitor {
      *     break;
      * }
      */
-    protected Stmt translateWhile(While s) {
+    protected Stmt translateWhile(While s, Labeled label) {
+        While w;
         Expr cond = s.cond();
 
-        // avoid unnecessary translations
         if (lang().condIsConstantTrue(s, lang())) {
-            if (cond instanceof BooleanLit) {
-                return s;
-            }
-            else {
-                return s.cond(createBool(true));
-            }
+            // avoid unnecessary translations
+            w = cond instanceof BooleanLit ? s : s.cond(createBool(true));
+        }
+        else {
+            // new loop
+            w = createLoop(s);
+            LocalDecl var = createLoopVar(s, cond);
+            If branch = createLoopIf(var, s.body());
+            List<Stmt> stmts = new ArrayList<>(2);
+            stmts.add(var);
+            stmts.add(branch);
+            w = w.body(((Block) w.body()).statements(stmts));
         }
 
-        // new loop
-        While w = createLoop(s);
-        LocalDecl var = createLoopVar(s, cond);
-        If branch = createLoopIf(var, s.body());
-        List<Stmt> stmts = new ArrayList<>(2);
-        stmts.add(var);
-        stmts.add(branch);
-        w = w.body(((Block) w.body()).statements(stmts));
-
-        return w;
+        return label != null ? label.statement(w) : w;
     }
 
     /* do {...} while (e);
@@ -272,18 +264,16 @@ public class LoopNormalizer extends NodeVisitor {
      * // may cause compiler to emit "may not have been initialized"
      * // error
      */
-    protected Stmt translateDo(Do s) {
+    protected Stmt translateDo(Do s, Labeled label) {
         if (dumbDo) {
             While w = nf.While(s.position(), s.cond(), s.body());
-            return createBlock(Arrays.<Stmt> asList(s.body(),
-                                                    translateWhile(w)));
+            return createBlock(
+                    Arrays.<Stmt> asList(s.body(), translateWhile(w, label)));
         } else { 
-            Expr cond = s.cond();
-    
             // new loop
             While w = createLoop(s);
             LocalDecl var = createLoopVar(s);
-            If init = createInitIf(var, cond);
+            If init = createInitIf(var, s.cond());
             If branch = createLoopIf(var, s.body());
             List<Stmt> stmts = new ArrayList<>(2);
             stmts.add(init);
@@ -291,7 +281,7 @@ public class LoopNormalizer extends NodeVisitor {
             w = w.body(((Block) w.body()).statements(stmts));
             stmts = new ArrayList<>(2);
             stmts.add(var);
-            stmts.add(w);
+            stmts.add(label != null ? label.statement(w) : w);
     
             return createBlock(stmts);
         }
@@ -313,7 +303,7 @@ public class LoopNormalizer extends NodeVisitor {
      *     break;
      * }
      */
-    protected Stmt translateFor(For s) {
+    protected Stmt translateFor(For s, Labeled label) {
         Expr cond = s.cond();
 
         // for loops allow empty conditions, which is the same as true
@@ -335,7 +325,7 @@ public class LoopNormalizer extends NodeVisitor {
         stmts = new ArrayList<>(s.inits().size() + 2);
         addInits(stmts, s);
         stmts.add(var);
-        stmts.add(w);
+        stmts.add(label != null ? label.statement(w) : w);
 
         return createBlock(stmts);
     }
