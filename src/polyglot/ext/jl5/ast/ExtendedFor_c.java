@@ -159,19 +159,13 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         if (expr.type().isArray()) {
             elementType = expr.type().toArray().base();
         }
-        else if (t instanceof RawClass) {
-            // we have a raw class.
-            elementType = ts.Object();
-        }
         else {
             JL5SubstClassType iterableType =
                     ts.findGenericSupertype((JL5ParsedClassType) ts.Iterable(),
                                             t.toReference());
-            if (iterableType == null) {
-                throw new InternalCompilerError("Cannot find generic supertype of Iterable for "
-                        + t.toReference(), position);
-            }
-            elementType = iterableType.actuals().get(0);
+            elementType = iterableType != null
+                    ? iterableType.actuals().get(0)
+                    : ts.Object(); // Raw Iterable.
         }
         if (!elementType.isImplicitCastValid(declType)) {
             throw new SemanticException("Incompatible types: required "
