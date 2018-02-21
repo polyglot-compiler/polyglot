@@ -190,7 +190,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
                 ClassType superContainer = superType.toClass().outer();
                 // ct needs an enclosing instance of superContainer,
                 // or a subclass of superContainer.
-                ClassType e = ct;
+                ClassType e = ct.outer();
 
                 while (e != null) {
                     // use isImplicitCastValid instead of isSubtype in order to allow unchecked conversion.
@@ -206,15 +206,6 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
                                                         + " must have an enclosing instance"
                                                         + " that is a subtype of "
                                                         + superContainer,
-                                                n.position());
-                }
-                if (e == ct) {
-                    throw new SemanticException(ct
-                                                        + " is a subtype of "
-                                                        + superContainer
-                                                        + "; an enclosing instance that is a subtype of "
-                                                        + superContainer
-                                                        + " must be specified in the super constructor call.",
                                                 n.position());
                 }
             }

@@ -290,6 +290,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         InnerClass12.jl5;
         InnerClass13.jl5;
         InnerClass14.jl5;
+        InnerClass16.jl5;
         Instanceof01.jl5 (Semantic, "not reifiable");
         Instanceof02.jl5;
         Interface01.jl5;
@@ -712,6 +713,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         InnerClass12.jl5;
         InnerClass13.jl5;
         InnerClass14.jl5;
+        InnerClass16.jl5;
         Instanceof01.jl5 (Semantic, "not reifiable");
         Instanceof02.jl5;
         Interface01.jl5;
