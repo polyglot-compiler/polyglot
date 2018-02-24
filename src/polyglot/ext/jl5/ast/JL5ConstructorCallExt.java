@@ -186,7 +186,8 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             // must be provided, or ct must have an enclosing instance of the
             // super class's container class, or a subclass thereof.
             if (q == null && superType.isClass()
-                    && superType.toClass().isInnerClass()) {
+                    && superType.toClass().isInnerClass()
+                    && !superType.toClass().inStaticContext()) {
                 ClassType superContainer = superType.toClass().outer();
                 // ct needs an enclosing instance of superContainer,
                 // or a subclass of superContainer.
