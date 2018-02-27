@@ -333,6 +333,16 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
         if (this.body != null) {
             ts.checkClassConformance(type);
+
+            // JLS SE 7, 8.9.2.
+            // "... for each declared enum constant with the name n, the
+            // enum type has an implicitly declared public static final
+            // field named n of type E. ... Each such field is initialized
+            // to the enum constant corresponding to it."
+            // I.e., the anonymous classes defined by this enum constant
+            // is technically declared in a static context. This
+            // is consistent with javac behavior.
+            type.inStaticContext(true);
         }
 
         return n;
