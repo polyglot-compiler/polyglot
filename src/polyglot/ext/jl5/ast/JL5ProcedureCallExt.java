@@ -29,16 +29,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.ProcedureCall;
 import polyglot.ast.ProcedureCallOps;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.types.ProcedureInstance;
 import polyglot.types.ReferenceType;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Copy;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
@@ -99,6 +105,45 @@ public abstract class JL5ProcedureCallExt extends JL5TermExt implements
             actualTypeArgs.add((ReferenceType) tn.type());
         }
         return actualTypeArgs;
+    }
+
+    @Override
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        ProcedureCall n = node();
+        ProcedureInstance pi = n.procedureInstance();
+
+        // Update for vararg calls only.
+        if (!JL5Flags.isVarArgs(pi.flags()))
+            return super.childExpectedType(child, av);
+
+        int lastFormalIdx = pi.formalTypes().size() - 1;
+        Type lastFormalType = pi.formalTypes().get(lastFormalIdx);
+        if (!lastFormalType.isArray())
+            throw new InternalCompilerError(
+                    "Vararg parameter is not an array type");
+
+        for (int i = 0; i < n.arguments().size(); i++) {
+            Expr e = n.arguments().get(i);
+            if (e == child) {
+                if (i < lastFormalIdx) {
+                    // Normal parameter.
+                    return pi.formalTypes().get(i);
+                }
+                int childDims = child.type().isArray()
+                        ? child.type().toArray().dims()
+                        : 0;
+                if (childDims == lastFormalType.toArray().dims()) {
+                    // Vararg passed as array.
+                    return lastFormalType;
+                }
+                else {
+                    // Vararg passed as element.
+                    return lastFormalType.toArray().base();
+                }
+            }
+        }
+
+        return super.childExpectedType(child, av);
     }
 
     @Override
