@@ -35,6 +35,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.ConstantChecker;
 import polyglot.visit.TypeChecker;
 
@@ -80,5 +81,18 @@ public class JL7CaseExt extends JL7Ext implements JL5CaseOps {
 
         return superLang().checkConstants(this.node(), cc);
 
+    }
+
+    @Override
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        Case n = (Case) node();
+        TypeSystem ts = av.typeSystem();
+
+        if (n.expr() != null && child == n.expr()
+                && n.expr().type().isSubtype(ts.String())) {
+            return ts.String();
+        }
+
+        return super.childExpectedType(child, av);
     }
 }

@@ -26,27 +26,17 @@
 
 package polyglot.ast;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.ListUtil;
-import polyglot.util.Position;
-import polyglot.util.SerialVersionUID;
-import polyglot.visit.AscriptionVisitor;
-import polyglot.visit.CFGBuilder;
-import polyglot.visit.ConstantChecker;
-import polyglot.visit.FlowGraph;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeChecker;
+import polyglot.util.*;
+import polyglot.visit.*;
+
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A {@code Switch} is an immutable representation of a Java
@@ -185,8 +175,8 @@ public class Switch_c extends Stmt_c implements Switch {
                     return this;
                 }
                 else if (cc.lang().isConstant(expr, cc.lang())) {
-                    key = new Long(c.value());
-                    str = expr.toString() + " (" + c.value() + ")";
+                    key = cc.lang().constantValue(expr, cc.lang());
+                    str = expr.toString() + " (" + key + ")";
                 }
                 else {
                     continue;

@@ -25,12 +25,15 @@
  ******************************************************************************/
 package polyglot.ext.jl7.ast;
 
+import polyglot.ast.Expr;
 import polyglot.ast.Switch;
 import polyglot.ext.jl5.ast.J5Lang_c;
 import polyglot.ext.jl5.ast.JL5SwitchOps;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AscriptionVisitor;
 
 public class JL7SwitchExt extends JL7Ext implements JL5SwitchOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -49,4 +52,15 @@ public class JL7SwitchExt extends JL7Ext implements JL5SwitchOps {
         return J5Lang_c.lang(pred()).isAcceptableSwitchType(this.node(), type);
     }
 
+    @Override
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        Switch n = node();
+        TypeSystem ts = av.typeSystem();
+
+        if (child == n.expr() && n.expr().type().isSubtype(ts.String()))
+            return ts.String();
+
+        return super.childExpectedType(child, av);
+
+    }
 }
