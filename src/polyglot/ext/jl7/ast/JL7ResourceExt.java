@@ -70,20 +70,18 @@ public class JL7ResourceExt extends JL7Ext {
 
         LocalDecl n = this.node();
         ClassType declType = n.declType().toClass();
-        JL7TypeSystem jl7ts = (JL7TypeSystem) ts;
         try {
             MethodInstance mi =
                     ts.findMethod(declType,
                                   "close",
                                   Collections.<Type> emptyList(),
-                                  jl7ts.AutoCloseable(),
+                                  declType,
                                   true);
             // The resource may throw exceptions declared by close().
             l.addAll(mi.throwTypes());
         }
         catch (SemanticException e) {
-            throw new InternalCompilerError("Unexpected SemanticException: "
-                    + e);
+            throw new InternalCompilerError("Unexpected SemanticException " + e, e);
         }
 
         l.addAll(superLang().throwTypes(n, ts));

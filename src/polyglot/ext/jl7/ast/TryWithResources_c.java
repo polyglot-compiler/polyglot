@@ -34,6 +34,7 @@ import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.Term;
 import polyglot.ast.Try_c;
+import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
@@ -75,6 +76,12 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
     @Override
     public TryWithResources resources(List<LocalDecl> resources) {
         return resources(this, resources);
+    }
+
+    @Override
+    public Context enterScope(Context c) {
+        // Resource declarations are in scope only within the try block.
+        return c.pushBlock();
     }
 
     protected <N extends TryWithResources_c> N resources(N n,
