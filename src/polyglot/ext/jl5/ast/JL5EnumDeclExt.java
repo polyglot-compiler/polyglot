@@ -92,7 +92,7 @@ public class JL5EnumDeclExt extends JL5ClassDeclExt {
         JL5MethodInstance valuesMI =
                 (JL5MethodInstance) ts.methodInstance(n.position(),
                                                       n.type(),
-                                                      flags.set(Flags.NATIVE),
+                                                      flags,
                                                       ts.arrayOf(n.type()),
                                                       "values",
                                                       Collections.<Type> emptyList(),
