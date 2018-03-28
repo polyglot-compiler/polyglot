@@ -358,13 +358,13 @@ OctalEscape = \\ [0-7]
 
 <YYINITIAL> {
     /* 3.7 Comments */
-    "/*"    { yybegin(TRADITIONAL_COMMENT);
-              commentBegin = pos(); }
-    "//"    { yybegin(END_OF_LINE_COMMENT); }
-    "/**"	{ yybegin(JAVADOC_COMMENT);
-		 	  sb.setLength(0);
-		  	  sb.append(yytext());
-		  	  commentBegin = pos(); }
+    "/*"        { yybegin(TRADITIONAL_COMMENT);
+                  commentBegin = pos(); }
+    "//"        { yybegin(END_OF_LINE_COMMENT); }
+    "/**[^/]"   { yybegin(JAVADOC_COMMENT);
+                  sb.setLength(0);
+                  sb.append(yytext());
+                  commentBegin = pos(); }
 
     /* 3.10.4 Character Literals */
     \'      { yybegin(CHARACTER); sb.setLength(0); }
