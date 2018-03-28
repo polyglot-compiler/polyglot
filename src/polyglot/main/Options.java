@@ -1128,6 +1128,8 @@ public class Options {
                         + File.separator + "lib");
             }
             File[] files = java_home_libdir.listFiles();
+            if (files == null)
+                files = new File[0];
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < files.length; i++) {
                 if (files[i].getName().endsWith("jar")) {
