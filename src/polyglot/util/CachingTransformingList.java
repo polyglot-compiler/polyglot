@@ -52,6 +52,9 @@ public class CachingTransformingList<T, U> extends TransformingList<T, U> {
 
     @Override
     public U get(int index) {
+        if (cache.size() != underlying.size())
+            throw new InternalCompilerError(
+                    "Underlying list of CachingTransformingList was modified");
         U o = cache.get(index);
         if (o == null) {
             o = trans.transform(underlying.get(index));
