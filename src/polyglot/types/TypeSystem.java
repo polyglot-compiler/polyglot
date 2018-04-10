@@ -288,24 +288,24 @@ public interface TypeSystem {
 
     /**
      * Checks whether a class member can be accessed from code that is
-     * declared in the class {@code contextClass}.
+     * declared in the tyoe {@code contextType}.
      */
-    boolean isAccessible(MemberInstance mi, ClassType contextClass);
+    boolean isAccessible(MemberInstance mi, ReferenceType contextType);
 
     /**
      * Checks whether a class member can be accessed from code that is
-     * declared in the class {@code contextClass}.
+     * declared in the type {@code contextType}.
      */
-    boolean isAccessible(MemberInstance mi, ClassType contextClass,
+    boolean isAccessible(MemberInstance mi, ReferenceType contextType,
             boolean fromClient);
 
     /**
      * Checks whether a class member mi, which is declared in container or
      * an ancestor of container, can be accessed from code that is declared
-     * in class {@code contextClass}, accessing it via the type container.
+     * in type {@code contextType}, accessing it via the type container.
      */
     boolean isAccessible(MemberInstance mi, ReferenceType container,
-            ClassType contextClass);
+            ReferenceType contextType);
 
     /**
      * Checks whether a member mi, which is declared in container or

@@ -453,23 +453,23 @@ public class TypeSystem_c implements TypeSystem {
     }
 
     @Override
-    public boolean isAccessible(MemberInstance mi, ClassType contextClass) {
-        return isAccessible(mi, contextClass, false);
+    public boolean isAccessible(MemberInstance mi, ReferenceType contextType) {
+        return isAccessible(mi, contextType, false);
     }
 
     @Override
-    public boolean isAccessible(MemberInstance mi, ClassType contextClass,
+    public boolean isAccessible(MemberInstance mi, ReferenceType contextType,
             boolean fromClient) {
         assert_(mi);
 
         ReferenceType target = mi.container();
-        return isAccessible(mi, target, contextClass, fromClient);
+        return isAccessible(mi, target, contextType, fromClient);
     }
 
     @Override
     public boolean isAccessible(MemberInstance mi, ReferenceType container,
-            ClassType contextClass) {
-        return isAccessible(mi, container, contextClass, true);
+            ReferenceType contextType) {
+        return isAccessible(mi, container, contextType, true);
     }
 
     @Override
