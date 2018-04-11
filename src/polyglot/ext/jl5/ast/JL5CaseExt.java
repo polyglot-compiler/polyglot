@@ -112,12 +112,12 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
                                                                    expr.position(),
                                                                    null,
                                                                    amb.id());
-            e = (Expr) e.visit(tc);
+            e = (Expr) e.visit(tc.rethrowMissingDependencies(true));
             n = n.expr(e);
         }
         else {
             // try type checking it
-            n = c.expr((Expr) c.expr().visit(tc));
+            n = c.expr((Expr) c.expr().visit(tc.rethrowMissingDependencies(true)));
         }
 
         if (!tc.lang().constantValueSet(n.expr(), tc.lang())) {
