@@ -123,47 +123,27 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     public Flags flags() {
         return erased().flags();
     }
-
-    private transient List<? extends ConstructorInstance> constructors = null;
-
+    
     @Override
     public List<? extends ConstructorInstance> constructors() {
-        if (constructors == null) {
-            constructors = erased().constructors();
-        }
-        return constructors;
+        return erased().constructors();
     }
-
-    private transient List<? extends ClassType> memberClasses = null;
 
     @Override
     public List<? extends ClassType> memberClasses() {
-        if (memberClasses == null) {
-            memberClasses = erased().memberClasses();
-        }
-        return memberClasses;
+        return erased().memberClasses();
     }
-
-    private transient List<? extends MethodInstance> methods = null;
 
     @Override
     public List<? extends MethodInstance> methods() {
-        if (methods == null) {
-            methods = erased().methods();
-        }
-        return methods;
+        return erased().methods();
     }
-
-    private transient List<? extends FieldInstance> fields = null;
 
     @Override
     public List<? extends FieldInstance> fields() {
-        if (fields == null) {
-            fields = erased().fields();
-            for (FieldInstance fi : fields) {
-                fi.setContainer(this);
-            }
-        }
+        List<? extends FieldInstance> fields = erased().fields();
+        for (FieldInstance fi : fields)
+            fi.setContainer(this);
         return fields;
     }
 
