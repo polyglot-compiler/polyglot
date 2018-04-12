@@ -868,23 +868,27 @@ public class JL5TypeSystem_c
             for (TypeVariable tv : subst.substitutions().keySet()) {
                 Type a = subst.substitutions().get(tv);
                 Type substUpperBound = subst.substType(tv.upperBound());
+
                 if (!isSubtype(a, substUpperBound)) {
-                    return null;
+                    // Consider a function with the following signature:
+                    //     <E extends Enum<E>> void f(Class<E> cls)
+                    // Calling f with a *raw* generic type would result in
+                    // E = Enum<E>, and so E will have an upper bound of
+                    // Enum<Enum<E>> after substitutions. Unfortunately,
+                    // Enum<E> is not a subtype of Enum<Enum<E>>. To get
+                    // around this, we repeat the check from above, this time
+                    // without substituting E within the upper bound of E.
+                    Map<TypeVariable, ReferenceType> m = new HashMap<>(subst.substitutions());
+                    m.remove(tv);
+                    if (!isSubtype(a, subst(m).substType(tv.upperBound()))) {
+                        return null;
+                    }
                 }
             }
-            //mj = (JL5MethodInstance) this.instantiate(mi.position(), mi, actualTypeArgs);
             mj = subst.substMethod(mi);
         }
-//        System.err.println("JL5TS methocall valid to " + mi + " with argtypes "
-//                + argTypes + " and actuals " + actualTypeArgs);
-//        System.err.println("  subst is " + subst);
-//        System.err.println("  Call to mi " + mi + " after inference is " + mj);
-//        System.err.println("  super.methodCallValid ? "
-//                + super.methodCallValid(mj, name, argTypes));
-        if (super.methodCallValid(mj, name, argTypes)) {
-            return mj;
-        }
-        return null;
+
+        return super.methodCallValid(mj, name, argTypes) ? mj : null;
     }
 
     @Override
