@@ -384,8 +384,6 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             // compatible throws clause is explicitly declared by the interface.
             List<? extends MethodInstance> objectMethods =
                     ts.Object().methods();
-            List<MethodInstance> implicitlyDeclaredMethods =
-                    new ArrayList<>(objectMethods.size());
             for (MethodInstance mi : objectMethods) {
                 Flags flags = mi.flags();
                 if (!flags.isPublic()) continue;
@@ -400,13 +398,14 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                     ts.checkOverride(mj, mi);
                     methodNeeded = false;
                 }
-                if (methodNeeded)
-                    implicitlyDeclaredMethods.add(mi.container(type)
-                                                    .flags(flags.Abstract()
-                                                                .clearFinal()));
+                if (methodNeeded) {
+                    MethodInstance implicitMi = mi
+                            .container(type)
+                            .flags(flags.Abstract().clearFinal());
+                    implicitMi.setDeclaration(implicitMi);
+                    type.addMethod(implicitMi);
+                }
             }
-            for (MethodInstance mi : implicitlyDeclaredMethods)
-                type.addMethod(mi);
             implicitMembersAdded = true;
         }
 
