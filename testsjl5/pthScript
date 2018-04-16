@@ -141,6 +141,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         EnumTest16.jl5;
         EnumTest17.jl5;
         EnumTest18.jl5;
+        EnumTest19.jl5;
         error1.jl5 (Semantic, "should be declared abstract");
         error3.jl5 (Semantic, "Name clash");
         error3b.jl5;

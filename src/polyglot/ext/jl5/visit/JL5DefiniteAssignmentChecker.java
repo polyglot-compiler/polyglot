@@ -27,6 +27,7 @@ package polyglot.ext.jl5.visit;
 
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -42,6 +43,23 @@ import polyglot.visit.NodeVisitor;
 public class JL5DefiniteAssignmentChecker extends DefiniteAssignmentChecker {
     public JL5DefiniteAssignmentChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
+    }
+
+    @Override
+    protected void setupClassBody(ClassType ct, ClassBody n)
+            throws SemanticException {
+
+        super.setupClassBody(ct, n);
+
+        // Enum constants are implicitly assigned.
+        for (ClassMember cm : n.members()) {
+            if (!(cm instanceof EnumConstantDecl))
+                continue;
+            EnumConstantDecl ecd = (EnumConstantDecl) cm;
+            curCBI.curClassFieldAsgtStatuses.put(
+                    ecd.enumInstance().orig(),
+                    AssignmentStatus.ASSIGNED);
+        }
     }
 
     @Override

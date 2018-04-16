@@ -1,0 +1,6 @@
+class EnumTestImplicitDefiniteAssignment {
+    enum E {
+        A;
+        static E a = A;
+    }
+}
