@@ -111,6 +111,13 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
         if (base == this.base) return this;
         ArrayType_c n = (ArrayType_c) copy();
         n.base = base;
+
+        // Recompute methods and fields so that their
+        // container points to n.
+        n.methods = null;
+        n.fields = null;
+        init();
+
         return n;
     }
 
