@@ -685,6 +685,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Generics54.jl5 (Semantic, "Cannot extend non-class");
         Generics55.jl5 (Semantic, "inherited with different arguments"),
                        (Semantic, "inherited with different arguments");
+        Generics59.jl5 (Semantic, "Type argument .* is not a subtype of its declared bound .*");
         genmethod1.jl5 (Semantic);
         HexFloatingPoint.jl5;
         ImplicitCast01.jl5;

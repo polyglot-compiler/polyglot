@@ -1,0 +1,7 @@
+interface A {}
+interface B {}
+class C<T extends A & B> {
+    public static void main(String[] args) {
+        C<A> c;
+    }
+}

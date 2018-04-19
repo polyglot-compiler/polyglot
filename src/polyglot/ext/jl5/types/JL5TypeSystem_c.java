@@ -1461,13 +1461,14 @@ public class JL5TypeSystem_c
         }
         if (t2 instanceof IntersectionType) {
             IntersectionType it = (IntersectionType) t2;
-            // t1 is a substype of u1&u2&...&un if there is some ui such
-            // that t1 is a subtype of ui.
+            // t1 is a subtype of u1 & u2 & ... & un if
+            // t1 is a subtype of each ui.
             for (Type t : it.bounds()) {
-                if (isSubtype(t1, t)) {
-                    return true;
+                if (!isSubtype(t1, t)) {
+                    return false;
                 }
             }
+            return true;
         }
         if (t2 instanceof LubType) {
             LubType lub = (LubType) t2;
