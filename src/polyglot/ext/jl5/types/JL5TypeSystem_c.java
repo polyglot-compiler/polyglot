@@ -2170,7 +2170,7 @@ public class JL5TypeSystem_c
                         ReferenceType substUpperBoundOfA =
                                 (ReferenceType) subst.substType(a.upperBound());
                         ReferenceType glb;
-                        if (typeEquals(wub, substUpperBoundOfA))
+                        if (isSubtype(wub, substUpperBoundOfA))
                             glb = wub;
                         else glb = this.glb(wub, substUpperBoundOfA, false);
                         vsi.setUpperBound(glb);

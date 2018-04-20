@@ -28,6 +28,7 @@ package polyglot.ext.jl5.types.inference;
 import java.util.ArrayList;
 import java.util.List;
 
+import polyglot.ext.jl5.types.CaptureConvertedWildCardType;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5PrimitiveType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
@@ -97,39 +98,35 @@ public class SubConversionConstraint extends Constraint {
                                                          .substType(tv);
                         ReferenceType actual_targ =
                                 (ReferenceType) s.subst().substType(tv);
-                        if (!(formal_targ instanceof WildCardType)) {
-                            r.add(new EqualConstraint(actual_targ,
-                                                      formal_targ,
-                                                      solver));
-                        }
-                        else if (formal_targ instanceof WildCardType
+                        if (formal_targ instanceof WildCardType
                                 && ((WildCardType) formal_targ).isExtendsConstraint()) {
-                            WildCardType formal_targ_wc =
-                                    (WildCardType) formal_targ;
-                            if (!(actual_targ instanceof WildCardType)) {
-                                r.add(new SubConversionConstraint(actual_targ,
+                            WildCardType formal_targ_wc = (WildCardType) formal_targ;
+                            if (actual_targ instanceof WildCardType
+                                    && ((WildCardType) actual_targ).isExtendsConstraint()) {
+                                WildCardType actual_targ_wc = (WildCardType) actual_targ;
+                                r.add(new SubConversionConstraint(actual_targ_wc.upperBound(),
                                                                   formal_targ_wc.upperBound(),
                                                                   solver));
                             }
-                            else if (actual_targ instanceof WildCardType
-                                    && ((WildCardType) actual_targ).isExtendsConstraint()) {
-                                WildCardType actual_targ_wc =
-                                        (WildCardType) actual_targ;
-                                r.add(new SubConversionConstraint(actual_targ_wc.upperBound(),
+                            else if (actual_targ instanceof CaptureConvertedWildCardType
+                                    && ((CaptureConvertedWildCardType) actual_targ).isExtendsConstraint()) {
+                                CaptureConvertedWildCardType actual_targ_wc =
+                                        (CaptureConvertedWildCardType) actual_targ;
+                                r.add(new SubConversionConstraint(
+                                        actual_targ_wc.upperBound(),
+                                        formal_targ_wc.upperBound(),
+                                        solver));
+                            }
+                            else {
+                                r.add(new SubConversionConstraint(actual_targ,
                                                                   formal_targ_wc.upperBound(),
                                                                   solver));
                             }
                         }
                         else if (formal_targ instanceof WildCardType
                                 && ((WildCardType) formal_targ).isSuperConstraint()) {
-                            WildCardType formal_targ_wc =
-                                    (WildCardType) formal_targ;
-                            if (!(actual_targ instanceof WildCardType)) {
-                                r.add(new SuperConversionConstraint(actual_targ,
-                                                                    formal_targ_wc.lowerBound(),
-                                                                    solver));
-                            }
-                            else if (actual_targ instanceof WildCardType
+                            WildCardType formal_targ_wc = (WildCardType) formal_targ;
+                            if (actual_targ instanceof WildCardType
                                     && ((WildCardType) actual_targ).isSuperConstraint()) {
                                 WildCardType actual_targ_wc =
                                         (WildCardType) actual_targ;
@@ -137,6 +134,25 @@ public class SubConversionConstraint extends Constraint {
                                                                     formal_targ_wc.lowerBound(),
                                                                     solver));
                             }
+                            else if (actual_targ instanceof CaptureConvertedWildCardType
+                                    && ((CaptureConvertedWildCardType) actual_targ).isSuperConstraint()) {
+                                CaptureConvertedWildCardType actual_targ_wc =
+                                        (CaptureConvertedWildCardType) actual_targ;
+                                r.add(new SuperConversionConstraint(
+                                        actual_targ_wc.lowerBound(),
+                                        formal_targ_wc.lowerBound(),
+                                        solver));
+                            }
+                            else {
+                                r.add(new SuperConversionConstraint(actual_targ,
+                                                                    formal_targ_wc.lowerBound(),
+                                                                    solver));
+                            }
+                        }
+                        else {
+                            r.add(new EqualConstraint(actual_targ,
+                                    formal_targ,
+                                    solver));
                         }
                     }
                 }
