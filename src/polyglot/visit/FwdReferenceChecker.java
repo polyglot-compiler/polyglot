@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import polyglot.ast.Assign;
+import polyglot.ext.jl5.ast.EnumConstantDecl;
 import polyglot.ast.Field;
 import polyglot.ast.FieldAssign;
 import polyglot.ast.FieldDecl;
@@ -66,6 +67,11 @@ public class FwdReferenceChecker extends ContextVisitor {
             frc.inInitialization = true;
             frc.inStaticInit = fd.flags().isStatic();
             return frc;
+        }
+        else if (n instanceof EnumConstantDecl) {
+            EnumConstantDecl ec = (EnumConstantDecl) n;
+            declaredFields.add(ec.enumInstance());
+            return this;
         }
         else if (n instanceof Initializer) {
             FwdReferenceChecker frc = (FwdReferenceChecker) copy();
