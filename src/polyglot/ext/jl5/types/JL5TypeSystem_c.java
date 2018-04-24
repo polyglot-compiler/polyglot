@@ -2048,6 +2048,12 @@ public class JL5TypeSystem_c
             ReferenceType contextType, boolean fromClient) {
         assert_(mi);
 
+        // Accessibility checks do not rely on generics.
+        if (container.isClass())
+            container = (ClassType) container.toClass().declaration();
+        if (contextType.isClass())
+            contextType = (ClassType) contextType.toClass().declaration();
+
         Flags flags = mi.flags();
 
         if (container instanceof TypeVariable) {
