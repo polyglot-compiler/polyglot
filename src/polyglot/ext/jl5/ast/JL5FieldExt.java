@@ -54,6 +54,7 @@ public class JL5FieldExt extends JL5ExprExt {
                                     nf.Id(n.id().position(), n.name()));
             ec = (Field) ec.type(n.type());
             ec = ec.fieldInstance(n.fieldInstance());
+            ec = ec.targetImplicit(n.isTargetImplicit());
             n = ec;
         }
         return n;
