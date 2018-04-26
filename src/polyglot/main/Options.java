@@ -29,7 +29,10 @@ package polyglot.main;
 import static java.io.File.pathSeparator;
 import static java.io.File.pathSeparatorChar;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +43,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileManager.Location;
@@ -140,6 +145,12 @@ public class Options {
     protected boolean output_source_only;
 
     protected Boolean print_args;
+
+    /**
+     * A member filter file is a text file containing a
+     * list of line-separated regular expressions.
+     */
+    public Pattern memberFilter;
 
     /**
      * Constructor
@@ -447,7 +458,18 @@ public class Options {
                              "Check that no options try to handle the same command line flag."));
 
         flags.add(new Switch("-no-output-to-fs",
-                             "keep .java files in memory if possible"));;
+                             "keep .java files in memory if possible"));
+
+        flags.add(new PathFlag<File>("-method-filter", "<file>",
+                "for each method whose signature matches any of the regular expressions " +
+                        "listed in <file>, replace its body with " +
+                        "`throw new Runtime Exception(...)`. Method signatures have the form " +
+                        "QualifiedClassName#methodName(T1, T2, ..., Tn)") {
+            @Override
+            public File handlePathEntry(String entry) {
+                return new File(entry);
+            }
+        });
     }
 
     /**
@@ -733,6 +755,9 @@ public class Options {
         else if (ids.contains("-no-output-to-fs")) {
             noOutputToFS = (Boolean) arg.value();
         }
+        else if (ids.contains("-method-filter")) {
+            setMemberFilter(this.<List<File>, File>sccast(arg.value(), File.class));
+        }
         else throw new UnhandledArgument(arg);
     }
 
@@ -873,6 +898,39 @@ public class Options {
 
     protected void setMergeStrings(boolean value) {
         merge_strings = value;
+    }
+
+    protected void setMemberFilter(List<File> files) throws UsageError {
+        StringBuilder sb = new StringBuilder();
+        String[] autoEscapes = {"(", ")", "[", "]"};
+        for (File file : files) {
+            if (!file.exists())
+                throw new UsageError("File not found: " + file.getPath());
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                for (String line; (line = br.readLine()) != null; ) {
+                    line = line.trim();
+                    if (line.isEmpty() || line.startsWith("//"))
+                        continue;
+                    for (String s : autoEscapes)
+                        line = line.replace(s, "\\" + s);
+                    try {
+                        //noinspection ResultOfMethodCallIgnored
+                        Pattern.compile(line);
+                    } catch (PatternSyntaxException e) {
+                        throw new UsageError(
+                                "Invalid regex for method filter in " +
+                                        file.getPath() + ": " + e.getMessage());
+                    }
+                    if (sb.length() > 0)
+                        sb.append('|');
+                    sb.append(line);
+                }
+            }
+            catch (IOException e) {
+                throw new UsageError(e.getMessage());
+            }
+        }
+        memberFilter = Pattern.compile(sb.toString());
     }
 
     /**

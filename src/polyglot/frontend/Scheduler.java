@@ -808,6 +808,8 @@ public abstract class Scheduler {
 
     public abstract Goal Parsed(Job job);
 
+    public abstract Goal MembersFiltered(Job job);
+
     public abstract Goal TypesInitialized(Job job);
 
     public abstract Goal TypesInitializedForCommandLine();

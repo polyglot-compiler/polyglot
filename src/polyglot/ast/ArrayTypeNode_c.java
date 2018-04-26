@@ -147,4 +147,10 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode {
     public Node copy(NodeFactory nf) {
         return nf.ArrayTypeNode(this.position, this.base);
     }
+
+    @Override
+    public String name() {
+        String baseName = base.name();
+        return baseName != null ? baseName + "[]" : null;
+    }
 }

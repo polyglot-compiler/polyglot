@@ -31,6 +31,7 @@ import polyglot.frontend.goals.CodeGenerated;
 import polyglot.frontend.goals.ConstantsChecked;
 import polyglot.frontend.goals.ConstructorCallsChecked;
 import polyglot.frontend.goals.Disambiguated;
+import polyglot.frontend.goals.EmptyGoal;
 import polyglot.frontend.goals.ExceptionsChecked;
 import polyglot.frontend.goals.ExitPathsChecked;
 import polyglot.frontend.goals.FieldConstantsChecked;
@@ -39,6 +40,7 @@ import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.ImportTableInitialized;
 import polyglot.frontend.goals.InitializationsChecked;
 import polyglot.frontend.goals.MembersAdded;
+import polyglot.frontend.goals.MembersFiltered;
 import polyglot.frontend.goals.Parsed;
 import polyglot.frontend.goals.ReachabilityChecked;
 import polyglot.frontend.goals.Serialized;
@@ -100,6 +102,18 @@ public class JLScheduler extends Scheduler {
     @Override
     public Goal Parsed(Job job) {
         return Parsed.create(this, job);
+    }
+
+    @Override
+    public Goal MembersFiltered(Job job) {
+        if (job.extensionInfo().getOptions().memberFilter != null) {
+            TypeSystem ts = extInfo.typeSystem();
+            NodeFactory nf = extInfo.nodeFactory();
+            return MembersFiltered.create(this, job, ts, nf);
+        }
+        else {
+            return internGoal(new EmptyGoal(job, "MembersFiltered"));
+        }
     }
 
     @Override

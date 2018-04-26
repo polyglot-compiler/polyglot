@@ -53,6 +53,7 @@ public class TypeChecked extends VisitorGoal {
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<>();
         l.add(scheduler.Disambiguated(job));
+        l.add(scheduler.MembersFiltered(job));
         l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
