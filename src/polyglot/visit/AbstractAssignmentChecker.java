@@ -64,6 +64,7 @@ import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.FieldInstance;
 import polyglot.types.LocalInstance;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
@@ -759,7 +760,16 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
             // is the only place constructor calls are allowed
             // record the fact that the current constructor calls the other
             // constructor
-            curCBI.constructorsCallingThis.add((ConstructorDecl) curCBI.curCodeDecl);
+            ConstructorDecl cd = (ConstructorDecl) curCBI.curCodeDecl;
+            curCBI.constructorsCallingThis.add(cd);
+
+            // Set all final non-static fields as assigned.
+            Map<VarInstance, AssignmentStatus> m = new HashMap<>(inItem.assignmentStatus);
+            ReferenceType container = cd.constructorInstance().container();
+            for (FieldInstance fi : container.fields())
+                if (fi.flags().isFinal() && !fi.flags().isStatic())
+                    m.put(fi.orig(), AssignmentStatus.ASSIGNED);
+            return DataFlow.itemToMap(reconstructFlowItem(inItem, m), succEdgeKeys);
         }
         return null;
     }

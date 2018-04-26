@@ -131,8 +131,7 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
                         ic != null && ic.definitelyAssigned;
 
                 for (ConstructorDecl cd : curCBI.allConstructors) {
-                    boolean isInitialized = fieldInitializedBeforeConstructors
-                            || curCBI.constructorsCallingThis.contains(cd);
+                    boolean isInitialized = fieldInitializedBeforeConstructors;
 
                     ConstructorInstance ci = cd.constructorInstance();
                     Set<FieldInstance> s =
