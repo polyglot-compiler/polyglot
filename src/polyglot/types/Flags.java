@@ -27,6 +27,7 @@
 package polyglot.types;
 
 import java.io.Serializable;
+import java.lang.reflect.Modifier;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -588,5 +589,24 @@ public class Flags implements Serializable, Copy<Flags> {
 
     public boolean isEmpty() {
         return flags.isEmpty();
+    }
+
+    public int toModifiers() {
+        int modifiers = 0;
+
+        if (isAbstract()) modifiers |= Modifier.ABSTRACT;
+        if (isFinal()) modifiers |= Modifier.FINAL;
+        if (isInterface()) modifiers |= Modifier.INTERFACE;
+        if (isNative()) modifiers |= Modifier.NATIVE;
+        if (isPrivate()) modifiers |= Modifier.PRIVATE;
+        if (isProtected()) modifiers |= Modifier.PROTECTED;
+        if (isPublic()) modifiers |= Modifier.PUBLIC;
+        if (isStatic()) modifiers |= Modifier.STATIC;
+        if (isStrictFP()) modifiers |= Modifier.STRICT;
+        if (isSynchronized()) modifiers |= Modifier.SYNCHRONIZED;
+        if (isTransient()) modifiers |= Modifier.TRANSIENT;
+        if (isVolatile()) modifiers |= Modifier.VOLATILE;
+        
+        return modifiers;
     }
 }
