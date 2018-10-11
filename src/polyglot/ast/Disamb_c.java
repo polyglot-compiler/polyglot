@@ -303,7 +303,7 @@ public class Disamb_c implements Disamb {
     }
 
     protected boolean exprOK() {
-        return !(amb instanceof QualifierNode) && !(amb instanceof TypeNode)
+        return !(amb instanceof QualifierNode)
                 && (amb instanceof Expr || amb instanceof Receiver
                         || amb instanceof Prefix);
     }
