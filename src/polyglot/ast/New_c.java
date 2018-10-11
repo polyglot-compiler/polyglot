@@ -390,7 +390,9 @@ public class New_c extends Expr_c implements New, NewOps {
             ParsedClassType anonType = nn.anonType();
 
             // Make sure that the inStaticContext flag of the class is correct.
-            anonType.inStaticContext(ar.context().inStaticContext());
+            if (anonType != null) {
+                anonType.inStaticContext(ar.context().inStaticContext());
+            }
 
             if (anonType != null && !anonType.supertypesResolved()) {
                 if (!ct.flags().isInterface()) {
