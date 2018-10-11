@@ -331,7 +331,7 @@ class ConsList<T> {
     @Override
     public int hashCode() {
         int hc = 0;
-        if (next == null) hc = next.hashCode() * 31;
+        if (next != null) hc = next.hashCode() * 31;
         return hc + elem.hashCode();
     }
 }
