@@ -420,7 +420,6 @@ public class InnerClassRemover extends ContextVisitor {
             NodeFactory nf) {
         // Create a list of formals to add to the constructor.
         List<Formal> formals = new ArrayList<>();
-        List<LocalInstance> localInstances = new ArrayList<>();
         List<Local> localVars = new ArrayList<>();
 
         for (FieldInstance fi : newFields) {
@@ -435,7 +434,6 @@ public class InnerClassRemover extends ContextVisitor {
                               nf.Id(pos, li.name()));
             formal = formal.localInstance(li);
             formals.add(formal);
-            localInstances.add(li);
             // create a local variable that access the local.
             Local l = nf.Local(pos, nf.Id(pos, li.name()));
             l = (Local) l.type(li.type());
