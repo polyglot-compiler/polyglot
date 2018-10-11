@@ -61,7 +61,7 @@ public interface JL5ClassType extends ClassType {
     /**
      * Translate the type as it should be if it were the receiver
      * of a field or method call.
-     * @param context
+     * @param resolver
      */
     String translateAsReceiver(Resolver resolver);
 
