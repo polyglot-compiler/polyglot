@@ -141,7 +141,7 @@ public class ExtensionCleaner extends NodeVisitor {
         Type t = n.type();
 
         if (n instanceof CanonicalTypeNode) {
-            if (t.typeSystem() == ts) {
+            if (t != null && t.typeSystem() == ts) {
                 return n;
             }
             else {
