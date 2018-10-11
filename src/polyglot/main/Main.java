@@ -418,11 +418,6 @@ public class Main {
         return null;
     }
 
-    static private Collection<String> timeTopics = new ArrayList<>(1);
-    static {
-        timeTopics.add("time");
-    }
-
     static private void reportTime(String msg, int level) {
         Report.report(level, msg);
     }
