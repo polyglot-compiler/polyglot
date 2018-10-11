@@ -143,6 +143,11 @@ public class PPG {
             System.err.println(HEADER + "Exception: " + e.getMessage());
             System.exit(1);
         }
+        finally {
+            if (out != System.out) {
+                out.close();
+            }
+        }
     }
 
     public static void usage() {
