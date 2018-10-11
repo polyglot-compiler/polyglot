@@ -52,7 +52,7 @@ public class CollectionUtil {
         }
 
         // the case where both are null is handled in the previous if.
-        if (a == null ^ b == null) {
+        if (a == null || b == null) {
             return false;
         }
 
