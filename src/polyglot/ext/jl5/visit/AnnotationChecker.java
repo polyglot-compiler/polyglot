@@ -98,9 +98,8 @@ public class AnnotationChecker extends ContextVisitor {
      * @param decl
      * @throws SemanticException
      */
-    public void checkAnnotationApplicability(AnnotationElem n, Declaration decl)
+    public void checkAnnotationApplicability(AnnotationElem annotation, Declaration decl)
             throws SemanticException {
-        AnnotationElem annotation = n;
         JL5ClassType annotationType =
                 (JL5ClassType) annotation.typeName().type().toClass();
 
@@ -117,7 +116,7 @@ public class AnnotationChecker extends ContextVisitor {
                 if (at.equals(typeSystem().TargetAnnotation())) {
                     // annotationType has a target annotation!
                     checkTargetMetaAnnotation((AnnotationElementValueArray) ra.singleElement(at),
-                                              n,
+                                              annotation,
                                               decl);
                 }
             }
