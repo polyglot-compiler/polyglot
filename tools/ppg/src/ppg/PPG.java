@@ -57,12 +57,12 @@ public class PPG {
                 // assume all switches begin with a dash '-'
                 if (args[i].charAt(0) == '-') {
                     if (args[i].equals("-symbols")) {
-                        if (args.length > i)
+                        if (i+1 < args.length)
                             SYMBOL_CLASS_NAME = args[++i];
                         else throw new Exception("No filename specified after -symbols");
                     }
                     else if (args[i].equals("-o")) {
-                        if (args.length > i)
+                        if (i+1 < args.length)
                             OUTPUT_FILE = args[++i];
                         else throw new Exception("No filename specified after -o");
                     }
