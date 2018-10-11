@@ -188,7 +188,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor {
     /** Return true if we should catch errors thrown when visiting the node. */
     protected boolean catchErrors(Node n) {
         return n instanceof Stmt || n instanceof ClassMember
-                || n instanceof ClassDecl || n instanceof Import
+                || n instanceof Import
                 || n instanceof SourceFile;
     }
 
