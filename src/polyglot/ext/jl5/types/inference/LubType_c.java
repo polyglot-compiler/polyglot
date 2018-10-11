@@ -139,6 +139,11 @@ public class LubType_c extends ClassType_c implements LubType {
                 est.retainAll(est_of_u);
             }
         }
+
+        if (est == null) {
+            est = new LinkedHashSet<>();
+        }
+
         Set<ReferenceType> mec = new LinkedHashSet<>(est);
         for (ReferenceType e1 : est) {
             for (ReferenceType e2 : est) {
