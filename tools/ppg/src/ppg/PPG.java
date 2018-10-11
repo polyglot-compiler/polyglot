@@ -145,12 +145,7 @@ public class PPG {
         }
         finally {
             if (out != System.out) {
-                try {
-                    out.close();
-                }
-                catch (IOException e) {
-                    // ignore
-                }
+                out.close();
             }
         }
     }
