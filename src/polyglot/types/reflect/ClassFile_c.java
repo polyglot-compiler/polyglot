@@ -370,7 +370,9 @@ public class ClassFile_c implements ClassFile {
             case Constant.LONG:
             case Constant.DOUBLE:
                 // Longs and doubles take up 2 constant pool entries.
-                constants[++i] = null;
+                if (i+1 < count) {
+                    constants[++i] = null;
+                }
                 break;
             }
         }
