@@ -182,7 +182,7 @@ public class ExtFileManager
                 // Found the class. Create a JavaFileObject for it.
                 URL url = clazz.getResource(relativeName);
                 try {
-                    result = new ExtFileObject(url.toURI(),
+                    result = new ExtFileObject(new URI(url.getPath()),
                                                kindFromExtension(relativeName),
                                                clazz.getResourceAsStream(relativeName));
                 }
