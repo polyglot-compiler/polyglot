@@ -27,9 +27,11 @@ package polyglot.filemanager;
 
 import static java.io.File.separatorChar;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -131,6 +133,27 @@ public class ExtFileManager
         if (!defaultLocations.equals(default_locations)) {
             default_locations = defaultLocations;
             clearCache();
+        }
+        setupPackageCacheForBuiltinPackages();
+    }
+
+    private static void setupPackageCacheForBuiltinPackages() {
+        File builtinClasspathFile = new File(
+                System.getProperty("java.home") +
+                        separatorChar + "lib" + separatorChar + "classlist");
+        if (builtinClasspathFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(builtinClasspathFile))) {
+                while (true) {
+                    String line = reader.readLine();
+                    if (line == null) break;
+                    int index = line.indexOf('/');
+                    while (index >= 0) {
+                        String packagePath = line.substring(0, index).replace('/', '.');
+                        packageCache.put(packagePath, true);
+                        index = line.indexOf('/', index + 1);
+                    }
+                }
+            } catch (IOException e) { }
         }
     }
 

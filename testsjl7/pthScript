@@ -15,23 +15,23 @@
 #                    |  ( ErrorKind, "RegExp" )
 #                    |  ( "RegExp" )
 #                    |  ( )
-#      ErrorKind    :   one of, or a unique prefix of one of the following 
-#                       strings: "Warning", "Internal Error", "I/O Error", 
+#      ErrorKind    :   one of, or a unique prefix of one of the following
+#                       strings: "Warning", "Internal Error", "I/O Error",
 #                       "Lexical Error", "Syntax Error", "Semantic Error"
 #                       or "Post-compiler Error".
-#      Filename     :   the name of a file. Is interpreted from the 
+#      Filename     :   the name of a file. Is interpreted from the
 #                       directory where pth is run.
 #      LitString    :   a literal string, enclosed in quotes.
-#      RegExp       :   a regular expression, as in java.util.regex; 
+#      RegExp       :   a regular expression, as in java.util.regex;
 #                       is always enclosed in quotes.
-#      CmdLineArgs  :   additional command line args for the Polyglot 
+#      CmdLineArgs  :   additional command line args for the Polyglot
 #                       compiler; is always enclosed in quotes.
 
 # Compile some java classes first
 #javac "-d java-out -cp ." {
 #}
- 
-polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \"-source 1.7 -Xlint\\:-options\" -morepermissiveinference" {
+
+polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
 	Diamond01.jl7;
 	Diamond02.jl7 (Semantic, "type arguments cannot be used");
 	Diamond03.jl7 (Semantic, "anonymous class");
@@ -49,10 +49,10 @@ polyglot.ext.jl7.JL7ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	IntLit02b.jl7 ("Could not find") , ("Could not find"); // 2 errors
 	IntLit02c.jl7 (Syntax);
 	IntLit03.jl7;
-	IntLit04.jl7 ("out of range"),("unexpected .* literal"), 
-	             ("out of range"),("unexpected .* literal"), 
+	IntLit04.jl7 ("out of range"),("unexpected .* literal"),
+	             ("out of range"),("unexpected .* literal"),
 	             ("out of range"),("out of range"),("out of range"),
-	             ("out of range"),("unexpected .* literal"), 
+	             ("out of range"),("unexpected .* literal"),
 	             ("out of range"),("unexpected .* literal"); // 11 errors
 	MultiCatch01.jl7;
 	MultiCatch02.jl7 (Semantic);
