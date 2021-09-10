@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -64,7 +64,12 @@ import polyglot.visit.FlowGraph.Peer;
  */
 public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
     public CopyPropagator(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, ts, nf, true /* forward analysis */, true /* perform dataflow on entry to CodeDecls */);
+        super(
+                job,
+                ts,
+                nf,
+                true /* forward analysis */,
+                true /* perform dataflow on entry to CodeDecls */);
     }
 
     protected static class DataFlowItem extends DataFlow.Item {
@@ -92,15 +97,15 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
         }
 
         protected static class CopyInfo {
-            final public LocalInstance li; // Local instance this node pertains to.
+            public final LocalInstance li; // Local instance this node pertains to.
             public CopyInfo from; // In edge.
             public Set<CopyInfo> to; // Out edges.
             public CopyInfo root; // Root CopyInfo node for this tree.
 
             protected CopyInfo(LocalInstance li) {
                 if (li == null) {
-                    throw new InternalCompilerError("Null local instance "
-                            + "encountered during copy propagation.");
+                    throw new InternalCompilerError(
+                            "Null local instance " + "encountered during copy propagation.");
                 }
 
                 this.li = li;
@@ -136,9 +141,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
             @Override
             public int hashCode() {
                 return li.hashCode()
-                        + 31
-                        * (from == null ? 0 : from.li.hashCode() + 31
-                                * root.li.hashCode());
+                        + 31 * (from == null ? 0 : from.li.hashCode() + 31 * root.li.hashCode());
             }
         }
 
@@ -149,8 +152,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
             if (newTo) {
                 ciTo = new CopyInfo(to);
                 map.put(to, ciTo);
-            }
-            else {
+            } else {
                 ciTo = map.get(to);
             }
 
@@ -158,8 +160,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
             CopyInfo ciFrom;
             if (map.containsKey(from)) {
                 ciFrom = map.get(from);
-            }
-            else {
+            } else {
                 ciFrom = new CopyInfo(from);
                 map.put(from, ciFrom);
                 ciFrom.root = ciFrom;
@@ -167,8 +168,8 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
 
             // Make sure ciTo doesn't already have a 'from' node.
             if (ciTo.from != null) {
-                throw new InternalCompilerError("Error while copying dataflow "
-                        + "item during copy propagation.");
+                throw new InternalCompilerError(
+                        "Error while copying dataflow " + "item during copy propagation.");
             }
 
             // Link up.
@@ -178,8 +179,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
             // Consistency fix-up.
             if (newTo) {
                 ciTo.root = ciFrom.root;
-            }
-            else {
+            } else {
                 ciTo.setRoot(ciFrom.root);
             }
         }
@@ -187,8 +187,8 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
         protected void intersect(DataFlowItem dfi) {
             boolean modified = false;
 
-            for (Iterator<Map.Entry<LocalInstance, CopyInfo>> it =
-                    map.entrySet().iterator(); it.hasNext();) {
+            for (Iterator<Map.Entry<LocalInstance, CopyInfo>> it = map.entrySet().iterator();
+                    it.hasNext(); ) {
                 Map.Entry<LocalInstance, CopyInfo> e = it.next();
                 LocalInstance li = e.getKey();
                 CopyInfo ci = e.getValue();
@@ -229,8 +229,8 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
             if (!modified) return;
 
             // Fix consistency.
-            for (Iterator<Map.Entry<LocalInstance, CopyInfo>> it =
-                    map.entrySet().iterator(); it.hasNext();) {
+            for (Iterator<Map.Entry<LocalInstance, CopyInfo>> it = map.entrySet().iterator();
+                    it.hasNext(); ) {
                 Entry<LocalInstance, CopyInfo> e = it.next();
                 CopyInfo ci = e.getValue();
 
@@ -260,8 +260,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
                 toCI.from = ci.from;
                 if (ci.from == null) {
                     toCI.setRoot(toCI);
-                }
-                else {
+                } else {
                     ci.from.to.add(toCI);
                 }
             }
@@ -273,8 +272,8 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
         }
 
         private static void die() {
-            throw new InternalCompilerError("Copy propagation dataflow item "
-                    + "consistency error.");
+            throw new InternalCompilerError(
+                    "Copy propagation dataflow item " + "consistency error.");
         }
 
         @SuppressWarnings("unused")
@@ -289,8 +288,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
 
                 if (ci.from == null) {
                     if (ci.root != ci) die();
-                }
-                else {
+                } else {
                     if (!map.containsKey(ci.from.li)) die();
                     if (map.get(ci.from.li) != ci.from) die();
                     if (ci.from.root != ci.root) die();
@@ -343,14 +341,13 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
     }
 
     @Override
-    public DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph,
-            Term node, boolean entry) {
+    public DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph, Term node, boolean entry) {
         return new DataFlowItem();
     }
 
     @Override
-    public DataFlowItem confluence(List<DataFlowItem> inItems,
-            Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
+    public DataFlowItem confluence(
+            List<DataFlowItem> inItems, Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
         return confluence(inItems);
     }
 
@@ -360,8 +357,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
         for (DataFlowItem inItem : inItems) {
             if (result == null) {
                 result = new DataFlowItem(inItem);
-            }
-            else {
+            } else {
                 result.intersect(inItem);
             }
         }
@@ -376,8 +372,8 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
     }
 
     @Override
-    protected Map<EdgeKey, DataFlowItem> flow(DataFlowItem in,
-            FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
+    protected Map<EdgeKey, DataFlowItem> flow(
+            DataFlowItem in, FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
         DataFlowItem result = new DataFlowItem(in);
 
         if (peer.isEntry()) {
@@ -401,20 +397,20 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
                     result.add(from, to);
                 }
             }
-        }
-        else if (t instanceof Unary) {
+        } else if (t instanceof Unary) {
             Unary n = (Unary) t;
             Unary.Operator op = n.operator();
             Expr expr = n.expr();
 
             if (expr instanceof Local
-                    && (op == Unary.POST_INC || op == Unary.POST_DEC
-                            || op == Unary.PRE_INC || op == Unary.PRE_DEC)) {
+                    && (op == Unary.POST_INC
+                            || op == Unary.POST_DEC
+                            || op == Unary.PRE_INC
+                            || op == Unary.PRE_DEC)) {
 
                 result.kill(((Local) expr).localInstance().orig());
             }
-        }
-        else if (t instanceof LocalDecl) {
+        } else if (t instanceof LocalDecl) {
             LocalDecl n = (LocalDecl) t;
 
             LocalInstance to = n.localInstance();
@@ -428,15 +424,13 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
                 LocalInstance from = ((Local) n.init()).localInstance().orig();
                 result.add(from, to);
             }
-        }
-        else if (t instanceof Block) {
+        } else if (t instanceof Block) {
             // Kill locals that were declared in the block.
             Block n = (Block) t;
             for (Stmt stmt : n.statements()) {
                 killDecl(result, stmt);
             }
-        }
-        else if (t instanceof Loop) {
+        } else if (t instanceof Loop) {
             if (t instanceof For) {
                 // Kill locals that were declared in the initializers.
                 For n = (For) t;
@@ -447,12 +441,10 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
 
             // Kill locals that were declared in the body.
             killDecl(result, ((Loop) t).body());
-        }
-        else if (t instanceof Catch) {
+        } else if (t instanceof Catch) {
             // Kill catch's formal.
             result.kill(((Catch) t).formal().localInstance());
-        }
-        else if (t instanceof If) {
+        } else if (t instanceof If) {
             // Kill locals declared in consequent and alternative.
             If n = (If) t;
             killDecl(result, n.consequent());
@@ -463,8 +455,7 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
     }
 
     @Override
-    public void post(FlowGraph<DataFlowItem> graph, Term root)
-            throws SemanticException {
+    public void post(FlowGraph<DataFlowItem> graph, Term root) throws SemanticException {
         // No need to do any checking.
         if (Report.should_report(Report.cfg, 2)) {
             dumpFlowGraph(graph, root);
@@ -472,17 +463,19 @@ public class CopyPropagator extends DataFlow<CopyPropagator.DataFlowItem> {
     }
 
     @Override
-    public void check(FlowGraph<DataFlowItem> graph, Term n, boolean entry,
-            DataFlowItem inItem, Map<EdgeKey, DataFlowItem> outItems)
+    public void check(
+            FlowGraph<DataFlowItem> graph,
+            Term n,
+            boolean entry,
+            DataFlowItem inItem,
+            Map<EdgeKey, DataFlowItem> outItems)
             throws SemanticException {
 
-        throw new InternalCompilerError("CopyPropagator.check should never be "
-                + "called.");
+        throw new InternalCompilerError("CopyPropagator.check should never be " + "called.");
     }
 
     @Override
-    public Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
 
         if (n instanceof Local) {
             FlowGraph<DataFlowItem> g = currentFlowGraph();

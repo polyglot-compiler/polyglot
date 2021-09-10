@@ -1,8 +1,8 @@
 package java_cup;
 
-/** This class represents a transition in an LALR viable prefix recognition 
+/** This class represents a transition in an LALR viable prefix recognition
  *  machine.  Transitions can be under terminals for non-terminals.  They are
- *  internally linked together into singly linked lists containing all the 
+ *  internally linked together into singly linked lists containing all the
  *  transitions out of a single state via the _next field.
  *
  * @see     java_cup.lalr_state
@@ -24,10 +24,8 @@ public class lalr_transition {
     public lalr_transition(symbol on_sym, lalr_state to_st, lalr_transition nxt)
             throws internal_error {
         /* sanity checks */
-        if (on_sym == null)
-            throw new internal_error("Attempt to create transition on null symbol");
-        if (to_st == null)
-            throw new internal_error("Attempt to create transition to null state");
+        if (on_sym == null) throw new internal_error("Attempt to create transition on null symbol");
+        if (to_st == null) throw new internal_error("Attempt to create transition to null state");
 
         /* initialize */
         _on_symbol = on_sym;
@@ -37,12 +35,11 @@ public class lalr_transition {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Constructor with null next. 
+    /** Constructor with null next.
      * @param on_sym  symbol we are transitioning on.
      * @param to_st   state we transition to.
      */
-    public lalr_transition(symbol on_sym, lalr_state to_st)
-            throws internal_error {
+    public lalr_transition(symbol on_sym, lalr_state to_st) throws internal_error {
         this(on_sym, to_st, null);
     }
 

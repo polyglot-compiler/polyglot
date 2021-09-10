@@ -51,8 +51,8 @@ public abstract class SourceFileTest extends AbstractTest {
 
     protected long elapsed;
 
-    public SourceFileTest(List<List<String>> compilationUnits,
-            List<ExpectedFailure> expectedFailures) {
+    public SourceFileTest(
+            List<List<String>> compilationUnits, List<ExpectedFailure> expectedFailures) {
         super(testName(compilationUnits));
         this.compilationUnits = compilationUnits;
         this.expectedFailures = expectedFailures;
@@ -61,8 +61,7 @@ public abstract class SourceFileTest extends AbstractTest {
     private static String testName(List<List<String>> compilationUnits) {
         if (compilationUnits.size() == 1) {
             List<String> filenames = compilationUnits.get(0);
-            if (filenames.size() == 1)
-                return new File(filenames.get(0)).getName();
+            if (filenames.size() == 1) return new File(filenames.get(0)).getName();
             return filenames.toString();
         }
         return compilationUnits.toString();
@@ -89,8 +88,8 @@ public abstract class SourceFileTest extends AbstractTest {
             for (String filename : compilationUnit) {
                 File sourceFile = new File(testpath + filename);
                 if (!sourceFile.exists()) {
-                    appendFailureMessage("File " + filename
-                            + " does not exist in directory " + testpath);
+                    appendFailureMessage(
+                            "File " + filename + " does not exist in directory " + testpath);
                     return false;
                 }
             }
@@ -103,16 +102,17 @@ public abstract class SourceFileTest extends AbstractTest {
         List<File> sourceFiles = new LinkedList<>();
 
         try {
-            if (!testDir.getCanonicalPath()
-                        .equals(sourceDir.getCanonicalPath())) {
+            if (!testDir.getCanonicalPath().equals(sourceDir.getCanonicalPath())) {
                 for (List<String> compilationUnit : sourceFileNames)
                     for (String filename : compilationUnit) {
                         File srcFile = new File(testpath + filename);
                         File dstFile = new File(sourcepath + filename);
                         if (dstFile.exists()) {
-                            appendFailureMessage("File " + filename
-                                    + " already exists in directory "
-                                    + sourcepath);
+                            appendFailureMessage(
+                                    "File "
+                                            + filename
+                                            + " already exists in directory "
+                                            + sourcepath);
                             return false;
                         }
                         Files.copy(srcFile.toPath(), dstFile.toPath());
@@ -120,49 +120,49 @@ public abstract class SourceFileTest extends AbstractTest {
                     }
             }
 
-//        // Figure out the output directory.
-//        File destDir;
-//        boolean addDestDirToCmdLine = false;
-//        {
-//            String s = getDestDir();
-//            if (s != null) {
-//                destDir = new File(s);
-//                if (!destDir.exists()) destDir.mkdir();
-//            }
-//            else {
-//                destDir = new File("pthOutput");
-//
-//                for (int i = 1; destDir.exists(); i++)
-//                    destDir = new File("pthOutput." + i);
-//
-//                destDir.mkdir();
-//                addDestDirToCmdLine = true;
-//            }
-//        }
+            //        // Figure out the output directory.
+            //        File destDir;
+            //        boolean addDestDirToCmdLine = false;
+            //        {
+            //            String s = getDestDir();
+            //            if (s != null) {
+            //                destDir = new File(s);
+            //                if (!destDir.exists()) destDir.mkdir();
+            //            }
+            //            else {
+            //                destDir = new File("pthOutput");
+            //
+            //                for (int i = 1; destDir.exists(); i++)
+            //                    destDir = new File("pthOutput." + i);
+            //
+            //                destDir.mkdir();
+            //                addDestDirToCmdLine = true;
+            //            }
+            //        }
             if (!td.preTest(this)) return false;
 
             String compilerDirname = td.getPathFromFlagMap("compilerpath");
             List<String> cmdLineHdr = getCommandLineHeader();
 
             // Next, loop through each compilation unit and compile it.
-//            boolean addClassPath = false;
+            //            boolean addClassPath = false;
             for (List<String> list : sourceFileNames) {
                 List<String> cmdLine = new LinkedList<>(cmdLineHdr);
                 cmdLine.addAll(list);
 
                 // TODO
-//                if (addDestDirToCmdLine) {
-//                    cmdLine.add("-d");
-//                    cmdLine.add(prependTestPath(destDir.getName()));
-//                }
-//
-//                // To get separate compilation, add the output directory to the
-//                // class path only if we are compiling subsequent sets of files.
-//                if (addClassPath) {
-//                    cmdLine.add("-cp");
-//                    cmdLine.add(prependTestPath(destDir.getName()));
-//                }
-//                else addClassPath = true;
+                //                if (addDestDirToCmdLine) {
+                //                    cmdLine.add("-d");
+                //                    cmdLine.add(prependTestPath(destDir.getName()));
+                //                }
+                //
+                //                // To get separate compilation, add the output directory to the
+                //                // class path only if we are compiling subsequent sets of files.
+                //                if (addClassPath) {
+                //                    cmdLine.add("-cp");
+                //                    cmdLine.add(prependTestPath(destDir.getName()));
+                //                }
+                //                else addClassPath = true;
 
                 // Start timer.
                 long start = System.nanoTime();
@@ -172,8 +172,9 @@ public abstract class SourceFileTest extends AbstractTest {
                 long finish = System.nanoTime();
                 elapsed = finish - start;
                 if (ret != 0) {
-                    if (ret > 0) appendFailureMessage("Failed to compile: "
-                            + compilerName() + " exit code " + ret);
+                    if (ret > 0)
+                        appendFailureMessage(
+                                "Failed to compile: " + compilerName() + " exit code " + ret);
                     return false;
                 }
             }
@@ -183,21 +184,21 @@ public abstract class SourceFileTest extends AbstractTest {
             okay = postTest() && okay;
             okay = td.postTest(this) && okay;
             return okay;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return false;
-        }
-        finally {
+        } finally {
             // Remove source files from work/path/source/path,
             // unless test/path and work/path/source/path are the same.
             if (!isSameDirectory(sourceDir, testDir)) {
                 for (File dstFile : sourceFiles) {
                     if (dstFile.exists() && !dstFile.delete()) {
-                        appendFailureMessage("Cannot delete file "
-                                + dstFile.getName() + " in directory "
-                                + sourcepath);
+                        appendFailureMessage(
+                                "Cannot delete file "
+                                        + dstFile.getName()
+                                        + " in directory "
+                                        + sourcepath);
                         return false;
                     }
                 }
@@ -214,14 +215,12 @@ public abstract class SourceFileTest extends AbstractTest {
         super.postRun();
 
         File saveDir;
-        if (Main.options.deleteOutputFiles)
-            saveDir = null;
+        if (Main.options.deleteOutputFiles) saveDir = null;
         else {
             // Figure out the output directory.
             String savepath = getWorkPath() + "pthOutput." + getName();
             saveDir = new File(savepath);
-            for (int i = 1; saveDir.exists(); i++)
-                saveDir = new File(savepath + "." + i);
+            for (int i = 1; saveDir.exists(); i++) saveDir = new File(savepath + "." + i);
             saveDir.mkdir();
         }
         td.cleanup(this, saveDir);
@@ -230,8 +229,7 @@ public abstract class SourceFileTest extends AbstractTest {
     protected boolean isSameDirectory(File dir1, File dir2) {
         try {
             return dir1.getCanonicalPath().equals(dir2.getCanonicalPath());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return true;
@@ -245,17 +243,15 @@ public abstract class SourceFileTest extends AbstractTest {
     public List<List<String>> getSourceFileNames() {
         List<List<String>> result = new ArrayList<>(compilationUnits.size());
         for (List<String> compilationUnit : compilationUnits) {
-            List<String> sourceFileNames =
-                    new ArrayList<>(compilationUnit.size());
-            for (String sourceFile : compilationUnit)
-                sourceFileNames.add(sourceFile);
+            List<String> sourceFileNames = new ArrayList<>(compilationUnit.size());
+            for (String sourceFile : compilationUnit) sourceFileNames.add(sourceFile);
             result.add(sourceFileNames);
         }
         return result;
     }
 
-    public abstract int invokeCompiler(String compilerDirname,
-            List<String> cmdLineHdr, List<String> sourceFileNames);
+    public abstract int invokeCompiler(
+            String compilerDirname, List<String> cmdLineHdr, List<String> sourceFileNames);
 
     public void printTestResult(PDFReporter pr) {
         String notice = getNotice();
@@ -265,8 +261,7 @@ public abstract class SourceFileTest extends AbstractTest {
         }
 
         String result;
-        if (success())
-            result = "OK";
+        if (success()) result = "OK";
         else {
             String msg = getFailureMessage();
             if (msg == null) msg = "Failed (no message)";

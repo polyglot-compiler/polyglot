@@ -17,7 +17,7 @@ public class ScannerBuffer implements Scanner {
     }
 
     /**
-     * Read-Only access to the buffered Symbols 
+     * Read-Only access to the buffered Symbols
      * @return an unmodifiable Version of the buffer
      */
     public List<Symbol> getBuffered() {
@@ -30,5 +30,4 @@ public class ScannerBuffer implements Scanner {
         buffer.add(buffered);
         return buffered;
     }
-
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -34,7 +34,7 @@ import polyglot.util.CodeWriter;
  * compilation unit. A {@code Job} contains all information for a
  * particular compilation unit carried between phases of the compiler.
  * Only one pass should be run over a job at a time.
- * 
+ *
  * TODO: The class should probably be renamed to, say, CompilationUnit.
  */
 public class Job {
@@ -86,12 +86,11 @@ public class Job {
     public void setRunningPass(Pass pass) {
         // The pass is not-null iff the job is running
         if (pass != null) {
-            // We're starting to run the pass. 
+            // We're starting to run the pass.
             // Record the initial error count.
             this.initialErrorCount = compiler().errorQueue().errorCount();
-        }
-        else {
-            // We've stopped running a pass. 
+        } else {
+            // We've stopped running a pass.
             // Check if the error count changed.
             int errorCount = compiler().errorQueue().errorCount();
 
@@ -133,7 +132,7 @@ public class Job {
     }
 
     /**
-     * Return the {@code Source} associated with the 
+     * Return the {@code Source} associated with the
      * {@code SourceJob} returned by {@code sourceJob}.
      */
     public Source source() {

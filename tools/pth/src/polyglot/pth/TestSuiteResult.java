@@ -45,16 +45,14 @@ public final class TestSuiteResult extends TestResult {
      */
     protected static String getResultsFileName(File script) {
         String parent = "";
-        if (script.getParent() != null)
-            parent = script.getParent() + File.separator;
-        return parent + RESULT_FILE_PREFIX + script.getName()
-                + RESULT_FILE_SUFFIX;
+        if (script.getParent() != null) parent = script.getParent() + File.separator;
+        return parent + RESULT_FILE_PREFIX + script.getName() + RESULT_FILE_SUFFIX;
     }
 
     public final Map<String, TestResult> testResults;
 
-    public TestSuiteResult(Test t, Date dateTestRun,
-            Map<String, TestResult> testResults, Date dateLastSuccess) {
+    public TestSuiteResult(
+            Test t, Date dateTestRun, Map<String, TestResult> testResults, Date dateLastSuccess) {
         super(t, dateTestRun, dateLastSuccess);
         this.testResults = testResults;
     }

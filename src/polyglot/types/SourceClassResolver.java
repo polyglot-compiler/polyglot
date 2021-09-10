@@ -122,8 +122,11 @@ public class SourceClassResolver extends LoadedClassResolver {
      * @param ignoreModTimes
      *            TODO
      */
-    public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
-            boolean allowRawClasses, boolean compileCommandLineOnly,
+    public SourceClassResolver(
+            Compiler compiler,
+            ExtensionInfo ext,
+            boolean allowRawClasses,
+            boolean compileCommandLineOnly,
             boolean ignoreModTimes) {
         super(ext, allowRawClasses);
         this.compiler = compiler;
@@ -148,8 +151,7 @@ public class SourceClassResolver extends LoadedClassResolver {
      */
     @Override
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(report_topics, 3))
-            Report.report(3, "SourceCR.find(" + name + ")");
+        if (Report.should_report(report_topics, 3)) Report.report(3, "SourceCR.find(" + name + ")");
 
         ClassFile clazz = null;
         ClassFile encodedClazz = null;
@@ -161,16 +163,14 @@ public class SourceClassResolver extends LoadedClassResolver {
             // Check for encoded type information.
             if (clazz.encodedClassType(version.name()) != null) {
                 if (Report.should_report(report_topics, 4))
-                    Report.report(4,
-                                  "Class " + name + " has encoded type info");
+                    Report.report(4, "Class " + name + " has encoded type info");
                 encodedClazz = clazz;
             }
-            if (encodedClazz != null
-                    && !name.replace(".", "/").equals(encodedClazz.name())) {
+            if (encodedClazz != null && !name.replace(".", "/").equals(encodedClazz.name())) {
                 if (Report.should_report(report_topics, 3))
-                    Report.report(3,
-                                  "Not using " + encodedClazz.name()
-                                          + "(case-insensitive filesystem?)");
+                    Report.report(
+                            3,
+                            "Not using " + encodedClazz.name() + "(case-insensitive filesystem?)");
                 encodedClazz = null;
                 clazz = null;
             }
@@ -184,8 +184,7 @@ public class SourceClassResolver extends LoadedClassResolver {
             int dot1 = className.lastIndexOf('.');
             className = dot1 > 0 ? className.substring(0, dot1) : className;
             int slash1 = className.lastIndexOf(File.separatorChar);
-            className =
-                    slash1 > 0 ? className.substring(slash1 + 1) : className;
+            className = slash1 > 0 ? className.substring(slash1 + 1) : className;
             int dot2 = name.lastIndexOf('.');
             String clazzName = dot2 > 0 ? name.substring(dot2 + 1) : name;
             if (!className.equals(clazzName)) source = null;
@@ -198,10 +197,8 @@ public class SourceClassResolver extends LoadedClassResolver {
         }
 
         if (Report.should_report(report_topics, 4)) {
-            if (source == null)
-                Report.report(4, "Class " + name + " not found in source file");
-            else Report.report(4,
-                               "Class " + name + " found in source " + source);
+            if (source == null) Report.report(4, "Class " + name + " not found in source file");
+            else Report.report(4, "Class " + name + " found in source " + source);
         }
 
         // Don't use the raw class if the source or encoded class is available.
@@ -217,23 +214,16 @@ public class SourceClassResolver extends LoadedClassResolver {
             long classModTime = encodedClazz.sourceLastModified(version.name());
             long sourceModTime = source.getLastModified();
 
-            int comp =
-                    checkCompilerVersion(encodedClazz.compilerVersion(version.name()));
+            int comp = checkCompilerVersion(encodedClazz.compilerVersion(version.name()));
             if (!ignoreModTimes && classModTime < sourceModTime) {
-                if (Report.should_report(report_topics,
-                                         3))
-                    Report.report(3,
-                                  "Source file version is newer than compiled for "
-                                          + name + ".");
+                if (Report.should_report(report_topics, 3))
+                    Report.report(
+                            3, "Source file version is newer than compiled for " + name + ".");
                 encodedClazz = null;
-            }
-            else if (comp != COMPATIBLE) {
+            } else if (comp != COMPATIBLE) {
                 // Incompatible or older version, so go with the source.
-                if (Report.should_report(report_topics,
-                                         3))
-                    Report.report(3,
-                                  "Incompatible source file version for " + name
-                                          + ".");
+                if (Report.should_report(report_topics, 3))
+                    Report.report(3, "Incompatible source file version for " + name + ".");
                 encodedClazz = null;
             }
         }
@@ -246,11 +236,9 @@ public class SourceClassResolver extends LoadedClassResolver {
                 Report.report(4, "Using encoded class type for " + name);
             try {
                 result = getEncodedType(encodedClazz, name);
-            }
-            catch (BadSerializationException e) {
+            } catch (BadSerializationException e) {
                 se = e;
-            }
-            catch (SemanticException e) {
+            } catch (SemanticException e) {
                 if (Report.should_report(report_topics, 4))
                     Report.report(4, "Could not load encoded class " + name);
                 encodedClazz = null;
@@ -279,12 +267,18 @@ public class SourceClassResolver extends LoadedClassResolver {
         if (clazz != null && !allowRawClasses) {
             // We have a raw class only. We do not have the source code,
             // or encoded class information.
-            throw new SemanticException("Class \"" + name + "\" not found."
-                    + " A class file was found at " + clazz.getClassFileURI()
-                    + ", but it did not contain appropriate"
-                    + " information for the Polyglot-based compiler "
-                    + ext.compilerName() + ". Try using " + ext.compilerName()
-                    + " to recompile the source code.");
+            throw new SemanticException(
+                    "Class \""
+                            + name
+                            + "\" not found."
+                            + " A class file was found at "
+                            + clazz.getClassFileURI()
+                            + ", but it did not contain appropriate"
+                            + " information for the Polyglot-based compiler "
+                            + ext.compilerName()
+                            + ". Try using "
+                            + ext.compilerName()
+                            + " to recompile the source code.");
         }
         throw se == null ? new NoClassException(name) : se;
     }
@@ -292,8 +286,7 @@ public class SourceClassResolver extends LoadedClassResolver {
     /**
      * Get a type from a source file.
      */
-    protected Named getTypeFromSource(FileSource source, String name)
-            throws SemanticException {
+    protected Named getTypeFromSource(FileSource source, String name) throws SemanticException {
         Scheduler scheduler = ext.scheduler();
         Job job = scheduler.loadSource(source, !compileCommandLineOnly);
 
@@ -316,8 +309,6 @@ public class SourceClassResolver extends LoadedClassResolver {
 
         // The source has already been compiled, but the type was not created
         // there.
-        throw new NoClassException(name,
-                                   "Could not find \"" + name + "\" in "
-                                           + source + ".");
+        throw new NoClassException(name, "Could not find \"" + name + "\" in " + source + ".");
     }
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -47,8 +47,7 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.ListUtil;
 import polyglot.util.SerialVersionUID;
 
-public class JL5ParsedClassType_c extends ParsedClassType_c implements
-        JL5ParsedClassType {
+public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5ParsedClassType {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected PClass<TypeVariable, ReferenceType> pclass;
@@ -58,8 +57,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     protected boolean annotationsResolved = false;
     protected Annotations annotations;
 
-    public JL5ParsedClassType_c(TypeSystem ts, LazyClassInitializer init,
-            Source fromSource) {
+    public JL5ParsedClassType_c(TypeSystem ts, LazyClassInitializer init, Source fromSource) {
         super(ts, init, fromSource);
         this.annotationElems = new LinkedList<>();
         this.enumConstants = new LinkedList<>();
@@ -131,8 +129,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     @Override
     public List<JL5MethodInstance> methodsNamed(String name) {
         @SuppressWarnings("unchecked")
-        List<JL5MethodInstance> result =
-                (List<JL5MethodInstance>) super.methodsNamed(name);
+        List<JL5MethodInstance> result = (List<JL5MethodInstance>) super.methodsNamed(name);
         return result;
     }
 
@@ -143,8 +140,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
         }
         // try it with the stripped out outer...
         if (outer() != null && super.outer() != this.outer()) {
-            return super.outer().equals(maybe_outer)
-                    || super.outer().isEnclosed(maybe_outer);
+            return super.outer().equals(maybe_outer) || super.outer().isEnclosed(maybe_outer);
         }
         return false;
     }
@@ -170,13 +166,10 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
             chain = new LinkedList<>();
             chain.add(this);
             chain.add(toType);
-        }
-        else if (toType.isPrimitive()) {
+        } else if (toType.isPrimitive()) {
             // see if unboxing will let us cast to the primitive
             if (ts.primitiveTypeOfWrapper(this) != null) {
-                chain =
-                        ts.isImplicitCastValidChain(ts.primitiveTypeOfWrapper(this),
-                                                    toType);
+                chain = ts.isImplicitCastValidChain(ts.primitiveTypeOfWrapper(this), toType);
                 if (chain != null) {
                     chain.addFirst(this);
                 }
@@ -201,8 +194,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     public void setTypeVariables(List<TypeVariable> typeVars) {
         if (typeVars == null) {
             this.typeVars = Collections.emptyList();
-        }
-        else {
+        } else {
             this.typeVars = ListUtil.copy(typeVars, true);
             // Go through and set the declaring class of the type variables.
             for (TypeVariable tv : typeVars) {
@@ -301,8 +293,7 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
                 // For a static nested class whose enclosing class has a type
                 // parameter, the enclosing class is needed as the qualifier.
                 JL5ParsedClassType pct = (JL5ParsedClassType) container;
-                if (!pct.typeVariables().isEmpty())
-                    return container.translate(c) + "." + name();
+                if (!pct.typeVariables().isEmpty()) return container.translate(c) + "." + name();
             }
         }
         // Translate without printing out any parameters.
@@ -374,9 +365,8 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements
     @Override
     public Set<Type> superclasses() {
         if (this.superType() == null) {
-            return Collections.<Type> emptySet();
+            return Collections.<Type>emptySet();
         }
         return Collections.singleton(this.superType());
     }
-
 }

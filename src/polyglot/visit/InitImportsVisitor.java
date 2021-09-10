@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -59,8 +59,7 @@ public class InitImportsVisitor extends ErrorHandlingVisitor {
 
             if (pn != null) {
                 it = ts.importTable(sf.source().name(), pn.package_());
-            }
-            else {
+            } else {
                 it = ts.importTable(sf.source().name(), null);
             }
 
@@ -73,8 +72,7 @@ public class InitImportsVisitor extends ErrorHandlingVisitor {
     }
 
     @Override
-    public Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof SourceFile) {
             SourceFile sf = (SourceFile) n;
             InitImportsVisitor v_ = (InitImportsVisitor) v;
@@ -86,8 +84,7 @@ public class InitImportsVisitor extends ErrorHandlingVisitor {
 
             if (im.kind() == Import.SINGLE_TYPE) {
                 this.importTable.addClassImport(im.name(), im.position());
-            }
-            else if (im.kind() == Import.TYPE_IMPORT_ON_DEMAND) {
+            } else if (im.kind() == Import.TYPE_IMPORT_ON_DEMAND) {
                 this.importTable.addTypeOnDemandImport(im.name(), im.position());
             }
         }

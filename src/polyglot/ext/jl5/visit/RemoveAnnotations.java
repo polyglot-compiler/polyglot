@@ -57,7 +57,10 @@ public class RemoveAnnotations extends ContextVisitor {
         if (n instanceof ClassDecl) {
             ClassDecl cd = (ClassDecl) n;
             cd = cd.flags(JL5Flags.clearAnnotation(cd.flags()));
-            cd = (ClassDecl) ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems(Collections.<AnnotationElem> emptyList());
+            cd =
+                    (ClassDecl)
+                            ((AnnotatedElement) JL5Ext.ext(cd))
+                                    .annotationElems(Collections.<AnnotationElem>emptyList());
             return cd;
         }
         if (n instanceof AnnotationElemDecl) {
@@ -66,7 +69,8 @@ public class RemoveAnnotations extends ContextVisitor {
         JL5Ext ext = JL5Ext.ext(n);
         if (ext instanceof AnnotatedElement) {
             // remove the annotations
-            return ((AnnotatedElement) ext).annotationElems(Collections.<AnnotationElem> emptyList());
+            return ((AnnotatedElement) ext)
+                    .annotationElems(Collections.<AnnotationElem>emptyList());
         }
         return n;
     }
@@ -74,14 +78,16 @@ public class RemoveAnnotations extends ContextVisitor {
     private MethodDecl translateAnnotationElemDecl(AnnotationElemDecl n) {
         Flags f = JL5Flags.clearAnnotation(n.flags());
         MethodDecl md =
-                nodeFactory().MethodDecl(n.position(),
-                                         f,
-                                         n.returnType(),
-                                         n.id(),
-                                         n.formals(),
-                                         n.throwTypes(),
-                                         n.body(),
-                                         n.javadoc());
+                nodeFactory()
+                        .MethodDecl(
+                                n.position(),
+                                f,
+                                n.returnType(),
+                                n.id(),
+                                n.formals(),
+                                n.throwTypes(),
+                                n.body(),
+                                n.javadoc());
         md = md.methodInstance(n.methodInstance());
         return md;
     }

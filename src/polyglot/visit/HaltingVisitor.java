@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -35,7 +35,7 @@ import polyglot.ast.Node;
 
 /**
  * A HaltingVisitor is used to prune the traversal of the AST at a
- * particular node.  Clients can call {@code bypass(Node n)} to 
+ * particular node.  Clients can call {@code bypass(Node n)} to
  * have the visitor skip n and its children when recursing through the AST.
  */
 public abstract class HaltingVisitor extends NodeVisitor {
@@ -71,8 +71,7 @@ public abstract class HaltingVisitor extends NodeVisitor {
         // often used.
         if (this.bypass == null) {
             v.bypass = Collections.singleton(n);
-        }
-        else {
+        } else {
             v.bypass = new ArrayList<>(this.bypass.size() + 1);
             v.bypass.addAll(bypass);
             v.bypass.add(n);
@@ -91,8 +90,7 @@ public abstract class HaltingVisitor extends NodeVisitor {
         // often used.
         if (this.bypass == null) {
             v.bypass = new ArrayList<>(c);
-        }
-        else {
+        } else {
             v.bypass = new ArrayList<>(this.bypass.size() + c.size());
             v.bypass.addAll(bypass);
             v.bypass.addAll(c);

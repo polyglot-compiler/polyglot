@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -46,25 +46,21 @@ public class JL5DefiniteAssignmentChecker extends DefiniteAssignmentChecker {
     }
 
     @Override
-    protected void setupClassBody(ClassType ct, ClassBody n)
-            throws SemanticException {
+    protected void setupClassBody(ClassType ct, ClassBody n) throws SemanticException {
 
         super.setupClassBody(ct, n);
 
         // Enum constants are implicitly assigned.
         for (ClassMember cm : n.members()) {
-            if (!(cm instanceof EnumConstantDecl))
-                continue;
+            if (!(cm instanceof EnumConstantDecl)) continue;
             EnumConstantDecl ecd = (EnumConstantDecl) cm;
             curCBI.curClassFieldAsgtStatuses.put(
-                    ecd.enumInstance().orig(),
-                    AssignmentStatus.ASSIGNED);
+                    ecd.enumInstance().orig(), AssignmentStatus.ASSIGNED);
         }
     }
 
     @Override
-    protected NodeVisitor enterCall(Node parent, Node n)
-            throws SemanticException {
+    protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         if (n instanceof ClassBody) {
             // we are starting to process a class declaration, but have yet
             // to do any of the dataflow analysis.
@@ -74,21 +70,18 @@ public class JL5DefiniteAssignmentChecker extends DefiniteAssignmentChecker {
             ClassType ct = null;
             if (parent instanceof ClassDecl) {
                 ct = ((ClassDecl) parent).type();
-            }
-            else if (parent instanceof New) {
+            } else if (parent instanceof New) {
                 ct = ((New) parent).anonType();
-            }
-            else if (parent instanceof EnumConstantDecl) {
+            } else if (parent instanceof EnumConstantDecl) {
                 ct = ((EnumConstantDecl) parent).type();
             }
             if (ct == null) {
-                throw new InternalCompilerError("ClassBody found but cannot find the class.",
-                                                n.position());
+                throw new InternalCompilerError(
+                        "ClassBody found but cannot find the class.", n.position());
             }
             setupClassBody(ct, (ClassBody) n);
         }
 
         return super.enterCall(n);
     }
-
 }

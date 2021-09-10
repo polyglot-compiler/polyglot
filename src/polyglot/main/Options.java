@@ -85,13 +85,10 @@ public class Options {
     private final List<File> bootclasspath_directories = new ArrayList<>();
 
     public JavaFileManager.Location source_path = StandardLocation.SOURCE_PATH;
-    public JavaFileManager.Location source_output =
-            StandardLocation.SOURCE_OUTPUT;
-    public JavaFileManager.Location class_output =
-            StandardLocation.CLASS_OUTPUT;
+    public JavaFileManager.Location source_output = StandardLocation.SOURCE_OUTPUT;
+    public JavaFileManager.Location class_output = StandardLocation.CLASS_OUTPUT;
     public JavaFileManager.Location classpath = StandardLocation.CLASS_PATH;
-    public JavaFileManager.Location bootclasspath =
-            StandardLocation.PLATFORM_CLASS_PATH;
+    public JavaFileManager.Location bootclasspath = StandardLocation.PLATFORM_CLASS_PATH;
 
     public boolean noOutputToFS = false;
     public boolean assertions = false;
@@ -169,9 +166,11 @@ public class Options {
             for (OptFlag<?> flag : flags) {
                 for (String id : flag.ids()) {
                     if (!ids.add(id)) {
-                        throw new InternalCompilerError("Flag " + flag.ids()
-                                + " conflicts with "
-                                + OptFlag.lookupFlag(id, flags).ids());
+                        throw new InternalCompilerError(
+                                "Flag "
+                                        + flag.ids()
+                                        + " conflicts with "
+                                        + OptFlag.lookupFlag(id, flags).ids());
                     }
                 }
             }
@@ -190,129 +189,137 @@ public class Options {
     public List<OptFlag.Arg<?>> filterArgs(Set<OptFlag<?>> flags) {
         List<Arg<?>> matches = new ArrayList<>();
         for (Arg<?> arg : arguments) {
-            if (arg.flag != null && flags.contains(arg.flag()))
-                matches.add(arg);
+            if (arg.flag != null && flags.contains(arg.flag())) matches.add(arg);
         }
         return matches;
     }
 
     protected void populateFlags(Set<OptFlag<?>> flags) {
-        flags.add(new OptFlag<Void>(Kind.HELP,
-                                    new String[] { "--help", "-h", "-help",
-                                            "-?" },
-                                    null,
-                                    "print this message") {
-            @Override
-            public Arg<Void> handle(String[] args, int index)
-                    throws UsageError {
-                throw new UsageError("", 0);
-            }
-        });
+        flags.add(
+                new OptFlag<Void>(
+                        Kind.HELP,
+                        new String[] {"--help", "-h", "-help", "-?"},
+                        null,
+                        "print this message") {
+                    @Override
+                    public Arg<Void> handle(String[] args, int index) throws UsageError {
+                        throw new UsageError("", 0);
+                    }
+                });
 
-        flags.add(new OptFlag<Void>(Kind.VERSION,
-                                    new String[] { "--version", "-version" },
-                                    null,
-                                    "print version info") {
-            @Override
-            public Arg<Void> handle(String[] args, int index) {
-                StringBuffer sb = new StringBuffer();
-                if (extension != null) {
-                    sb.append(extension.compilerName() + " version "
-                            + extension.version() + "\n");
-                }
-                sb.append("Polyglot compiler toolkit version "
-                        + new polyglot.frontend.JLVersion());
-                throw new Main.TerminationException(sb.toString(), 0);
-            }
-        });
+        flags.add(
+                new OptFlag<Void>(
+                        Kind.VERSION,
+                        new String[] {"--version", "-version"},
+                        null,
+                        "print version info") {
+                    @Override
+                    public Arg<Void> handle(String[] args, int index) {
+                        StringBuffer sb = new StringBuffer();
+                        if (extension != null) {
+                            sb.append(
+                                    extension.compilerName()
+                                            + " version "
+                                            + extension.version()
+                                            + "\n");
+                        }
+                        sb.append(
+                                "Polyglot compiler toolkit version "
+                                        + new polyglot.frontend.JLVersion());
+                        throw new Main.TerminationException(sb.toString(), 0);
+                    }
+                });
 
-        flags.add(new OptFlag<File>("-d",
-                                    "<directory>",
-                                    "output directory",
-                                    "current directory") {
-            @Override
-            public Arg<File> handle(String[] args, int index) {
-                File f = new File(args[index]);
-                if (!f.exists()) f.mkdirs();
-                return createArg(index + 1, f);
-            }
+        flags.add(
+                new OptFlag<File>("-d", "<directory>", "output directory", "current directory") {
+                    @Override
+                    public Arg<File> handle(String[] args, int index) {
+                        File f = new File(args[index]);
+                        if (!f.exists()) f.mkdirs();
+                        return createArg(index + 1, f);
+                    }
 
-            @Override
-            public Arg<File> defaultArg() {
-                return createDefault(new File(System.getProperty("user.dir")));
-            }
-        });
+                    @Override
+                    public Arg<File> defaultArg() {
+                        return createDefault(new File(System.getProperty("user.dir")));
+                    }
+                });
 
-        flags.add(new OptFlag<File>("-D",
-                                    "<directory>",
-                                    "output directory for .java files",
-                                    "same as -d") {
+        flags.add(
+                new OptFlag<File>(
+                        "-D", "<directory>", "output directory for .java files", "same as -d") {
 
-            @Override
-            public Arg<File> handle(String[] args, int index) {
-                File f = new File(args[index]);
-                if (!f.exists()) f.mkdirs();
-                return createArg(index + 1, f);
-            }
+                    @Override
+                    public Arg<File> handle(String[] args, int index) {
+                        File f = new File(args[index]);
+                        if (!f.exists()) f.mkdirs();
+                        return createArg(index + 1, f);
+                    }
 
-            @Override
-            public Arg<File> defaultArg(List<Arg<?>> args) {
-                // There could be more than one arg specified.
-                List<Arg<?>> outdirs = OptFlag.lookupAll("-d", args);
-                if (!outdirs.isEmpty()) {
-                    Arg<?> arg = outdirs.get(outdirs.size() - 1);
-                    return createDefault((File) arg.value());
-                }
-                else return createDefault(new File(System.getProperty("user.dir")));
-            }
+                    @Override
+                    public Arg<File> defaultArg(List<Arg<?>> args) {
+                        // There could be more than one arg specified.
+                        List<Arg<?>> outdirs = OptFlag.lookupAll("-d", args);
+                        if (!outdirs.isEmpty()) {
+                            Arg<?> arg = outdirs.get(outdirs.size() - 1);
+                            return createDefault((File) arg.value());
+                        } else return createDefault(new File(System.getProperty("user.dir")));
+                    }
 
-            @Override
-            public Arg<File> defaultArg() {
-                throw new UnsupportedOperationException("The -D flag requires other arguments to set its default value.");
-            }
-        });
+                    @Override
+                    public Arg<File> defaultArg() {
+                        throw new UnsupportedOperationException(
+                                "The -D flag requires other arguments to set its default value.");
+                    }
+                });
 
-        flags.add(new StdPathFlag(new String[] { "-classpath", "-cp" },
-                                  "<path>",
-                                  "where to find user class files",
-                                  "JVM property: java.class.path") {
-            @Override
-            public Arg<List<File>> defaultArg() {
-                return handle(new String[] {
-                        System.getProperty("java.class.path") }, 0);
-            }
-        });
+        flags.add(
+                new StdPathFlag(
+                        new String[] {"-classpath", "-cp"},
+                        "<path>",
+                        "where to find user class files",
+                        "JVM property: java.class.path") {
+                    @Override
+                    public Arg<List<File>> defaultArg() {
+                        return handle(new String[] {System.getProperty("java.class.path")}, 0);
+                    }
+                });
 
-        flags.add(new StdPathFlag("-bootclasspath",
-                                  "<path>",
-                                  "where to find runtime class files",
-                                  "JVM property: sun.boot.class.path (or all jars in java.home/lib)") {
-            @Override
-            public Arg<List<File>> defaultArg() {
-                return handle(new String[] { jvmbootclasspath() }, 0);
-            }
-        });
+        flags.add(
+                new StdPathFlag(
+                        "-bootclasspath",
+                        "<path>",
+                        "where to find runtime class files",
+                        "JVM property: sun.boot.class.path (or all jars in java.home/lib)") {
+                    @Override
+                    public Arg<List<File>> defaultArg() {
+                        return handle(new String[] {jvmbootclasspath()}, 0);
+                    }
+                });
 
-        flags.add(new StdPathFlag("-addbootcp",
-                                  "<path>",
-                                  "prepend <path> to the bootclasspath"));
+        flags.add(new StdPathFlag("-addbootcp", "<path>", "prepend <path> to the bootclasspath"));
 
-        flags.add(new StdPathFlag("-sourcepath",
-                                  "<path>",
-                                  "where to find source files",
-                                  "current directory") {
-            @Override
-            public Arg<List<File>> defaultArg() {
-                return handle(new String[] { System.getProperty("user.dir") },
-                              0);
-            }
-        });
+        flags.add(
+                new StdPathFlag(
+                        "-sourcepath",
+                        "<path>",
+                        "where to find source files",
+                        "current directory") {
+                    @Override
+                    public Arg<List<File>> defaultArg() {
+                        return handle(new String[] {System.getProperty("user.dir")}, 0);
+                    }
+                });
 
-        flags.add(new Switch("-commandlineonly",
-                             "only compile files named on the command-line (may also require -c)"));
+        flags.add(
+                new Switch(
+                        "-commandlineonly",
+                        "only compile files named on the command-line (may also require -c)"));
 
-        flags.add(new Switch("-preferclassfiles",
-                             "prefer class files to source files even if the source is newer"));
+        flags.add(
+                new Switch(
+                        "-preferclassfiles",
+                        "prefer class files to source files even if the source is newer"));
 
         flags.add(new Switch("-assert", "recognize the assert keyword"));
 
@@ -322,154 +329,153 @@ public class Options {
 
         flags.add(new Switch("-c", "compile only to .java"));
 
-        flags.add(new IntFlag("-errors",
-                              "<num>",
-                              "set the maximum number of errors",
-                              100));
+        flags.add(new IntFlag("-errors", "<num>", "set the maximum number of errors", 100));
 
-        flags.add(new IntFlag("-w",
-                              "<num>",
-                              "set the maximum width of the .java output files",
-                              80));
+        flags.add(
+                new IntFlag("-w", "<num>", "set the maximum width of the .java output files", 80));
 
-        flags.add(new OptFlag<String>("-postcompiler",
-                                      "<compiler>",
-                                      "run javac-like compiler after translation") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
-        });
+        flags.add(
+                new OptFlag<String>(
+                        "-postcompiler",
+                        "<compiler>",
+                        "run javac-like compiler after translation") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
+                });
 
-        flags.add(new OptFlag<String>("-postopts",
-                                      "<options>",
-                                      "options to pass to the compiler after translation") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
-        });
+        flags.add(
+                new OptFlag<String>(
+                        "-postopts",
+                        "<options>",
+                        "options to pass to the compiler after translation") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
+                });
 
         flags.add(new Switch("-stdout", "output to stdout"));
 
-        flags.add(new OptFlag<String>("-sx", "<ext>", "set source extension") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
-        });
+        flags.add(
+                new OptFlag<String>("-sx", "<ext>", "set source extension") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
+                });
 
-        flags.add(new OptFlag<String>("-ox", "<ext>", "set output extension") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
+        flags.add(
+                new OptFlag<String>("-ox", "<ext>", "set output extension") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
 
-            @Override
-            public Arg<String> defaultArg() {
-                return createDefault("java");
-            }
-        });
+                    @Override
+                    public Arg<String> defaultArg() {
+                        return createDefault("java");
+                    }
+                });
 
         flags.add(new Switch("-noserial", "disable class serialization"));
 
-        flags.add(new OptFlag<String>("-dump",
-                                      "<pass>",
-                                      "dump the ast after pass <pass>") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
-        });
+        flags.add(
+                new OptFlag<String>("-dump", "<pass>", "dump the ast after pass <pass>") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
+                });
 
-        flags.add(new OptFlag<String>("-print",
-                                      "<pass>",
-                                      "pretty-print the ast after pass <pass>") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
-        });
+        flags.add(
+                new OptFlag<String>("-print", "<pass>", "pretty-print the ast after pass <pass>") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
+                });
 
-        flags.add(new OptFlag<String>("-disable",
-                                      "<pass>",
-                                      "disable pass <pass>") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
-        });
+        flags.add(
+                new OptFlag<String>("-disable", "<pass>", "disable pass <pass>") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
+                });
 
-        flags.add(new Switch("-nooutput",
-                             "delete output files after compilation"));
+        flags.add(new Switch("-nooutput", "delete output files after compilation"));
 
-        flags.add(new Switch(new String[] { "-v", "-verbose" },
-                             "delete output files after compilation"));
+        flags.add(
+                new Switch(
+                        new String[] {"-v", "-verbose"}, "delete output files after compilation"));
 
         StringBuffer allowedTopics = new StringBuffer("Allowed topics: ");
-        for (Iterator<String> iter =
-                Report.topics.iterator(); iter.hasNext();) {
+        for (Iterator<String> iter = Report.topics.iterator(); iter.hasNext(); ) {
             allowedTopics.append(iter.next());
             if (iter.hasNext()) {
                 allowedTopics.append(", ");
             }
         }
 
-        flags.add(new OptFlag<Pair<String, Integer>>("-report",
-                                                     "<topic>=<level>",
-                                                     "print verbose debugging information about"
-                                                             + " topic at specified verbosity. "
-                                                             + allowedTopics.toString()) {
-            @Override
-            public Arg<Pair<String, Integer>> handle(String[] args, int index)
-                    throws UsageError {
-                StringTokenizer st = new StringTokenizer(args[index], "=");
-                String topic = "";
-                int level = 0;
-                if (st.hasMoreTokens()) topic = st.nextToken();
-                if (st.hasMoreTokens()) {
-                    try {
-                        level = Integer.parseInt(st.nextToken());
+        flags.add(
+                new OptFlag<Pair<String, Integer>>(
+                        "-report",
+                        "<topic>=<level>",
+                        "print verbose debugging information about"
+                                + " topic at specified verbosity. "
+                                + allowedTopics.toString()) {
+                    @Override
+                    public Arg<Pair<String, Integer>> handle(String[] args, int index)
+                            throws UsageError {
+                        StringTokenizer st = new StringTokenizer(args[index], "=");
+                        String topic = "";
+                        int level = 0;
+                        if (st.hasMoreTokens()) topic = st.nextToken();
+                        if (st.hasMoreTokens()) {
+                            try {
+                                level = Integer.parseInt(st.nextToken());
+                            } catch (NumberFormatException e) {
+                            }
+                        }
+                        return createArg(index + 1, new Pair<>(topic, level));
                     }
-                    catch (NumberFormatException e) {
-                    }
-                }
-                return createArg(index + 1, new Pair<>(topic, level));
-            }
-        });
+                });
 
-        flags.add(new Switch("-debugpositions",
-                             "generate position information for compiler-generated code"));
+        flags.add(
+                new Switch(
+                        "-debugpositions",
+                        "generate position information for compiler-generated code"));
 
         flags.add(new Switch("-simpleoutput", "use SimpleCodeWriter"));
 
-        flags.add(new Switch("-mergestrings",
-                             "parse concatenated string literals as one single string literal"));
+        flags.add(
+                new Switch(
+                        "-mergestrings",
+                        "parse concatenated string literals as one single string literal"));
 
-        flags.add(new Switch(Kind.SECRET,
-                             "-print-arguments",
-                             "Check that no options try to handle the same command line flag."));
+        flags.add(
+                new Switch(
+                        Kind.SECRET,
+                        "-print-arguments",
+                        "Check that no options try to handle the same command line flag."));
 
-        flags.add(new Switch("-no-output-to-fs",
-                             "keep .java files in memory if possible"));
+        flags.add(new Switch("-no-output-to-fs", "keep .java files in memory if possible"));
 
-        flags.add(new PathFlag<File>("-method-filter", "<file>",
-                "for each method whose signature matches any of the regular expressions " +
-                        "listed in <file>, replace its body with " +
-                        "`throw new Runtime Exception(...)`. Method signatures have the form " +
-                        "QualifiedClassName#methodName(T1, T2, ..., Tn)") {
-            @Override
-            public File handlePathEntry(String entry) {
-                return new File(entry);
-            }
-        });
+        flags.add(
+                new PathFlag<File>(
+                        "-method-filter",
+                        "<file>",
+                        "for each method whose signature matches any of the regular expressions"
+                                + " listed in <file>, replace its body with `throw new Runtime"
+                                + " Exception(...)`. Method signatures have the form"
+                                + " QualifiedClassName#methodName(T1, T2, ..., Tn)") {
+                    @Override
+                    public File handlePathEntry(String entry) {
+                        return new File(entry);
+                    }
+                });
     }
 
     /**
@@ -478,8 +484,7 @@ public class Options {
      *
      */
     public static class StdPathFlag extends PathFlag<File> {
-        public StdPathFlag(String id, String params, String usage,
-                String defaultValue) {
+        public StdPathFlag(String id, String params, String usage, String defaultValue) {
             super(id, params, usage, defaultValue);
         }
 
@@ -491,16 +496,14 @@ public class Options {
             super(ids, params, usage);
         }
 
-        public StdPathFlag(String[] ids, String params, String usage,
-                String defaultValue) {
+        public StdPathFlag(String[] ids, String params, String usage, String defaultValue) {
             super(ids, params, usage, defaultValue);
         }
 
         @Override
         public File handlePathEntry(String entry) {
             File f = new File(entry);
-            if (f.exists())
-                return f;
+            if (f.exists()) return f;
             else return null;
         }
     }
@@ -509,8 +512,7 @@ public class Options {
      * Set default values for options
      */
     @Deprecated
-    public void setDefaultValues() {
-    }
+    public void setDefaultValues() {}
 
     /**
      * Parse the command line and process arguments.
@@ -518,16 +520,13 @@ public class Options {
      * @throws UsageError
      *             if the usage is incorrect.
      */
-    public final void parseCommandLine(String args[], Set<String> source)
-            throws UsageError {
-        for (int index = 0; index < args.length;) {
+    public final void parseCommandLine(String args[], Set<String> source) throws UsageError {
+        for (int index = 0; index < args.length; ) {
             try {
                 int nextIndex = parseCommand(args, index, source);
-                if (nextIndex == index)
-                    throw new UsageError("Illegal option: " + args[index]);
+                if (nextIndex == index) throw new UsageError("Illegal option: " + args[index]);
                 index = nextIndex;
-            }
-            catch (ArrayIndexOutOfBoundsException e) {
+            } catch (ArrayIndexOutOfBoundsException e) {
                 throw new UsageError("Missing argument");
             }
         }
@@ -543,8 +542,8 @@ public class Options {
      * @throws UsageError
      *             if the usage is incorrect.
      */
-    public final void processArguments(List<Arg<?>> arguments,
-            Set<String> source) throws UsageError {
+    public final void processArguments(List<Arg<?>> arguments, Set<String> source)
+            throws UsageError {
         this.arguments.clear();
         this.arguments.addAll(arguments);
         validateArgs();
@@ -580,7 +579,7 @@ public class Options {
      * @param source
      *          The set of source filenames provided on the command line.
      */
-    final protected void applyArgs(Set<String> source) throws UsageError {
+    protected final void applyArgs(Set<String> source) throws UsageError {
         // Set up defaults first.
         for (OptFlag<?> flag : flags) {
             Arg<?> arg = flag.defaultArg(arguments);
@@ -591,17 +590,18 @@ public class Options {
         for (Arg<?> arg : arguments) {
             if (arg.flag == null) {
                 handleSourceArg(arg, source);
-            }
-            else {
+            } else {
                 try {
                     handleArg(arg);
-                }
-                catch (UsageError e) {
+                } catch (UsageError e) {
                     throw e;
-                }
-                catch (Throwable e) {
-                    throw new InternalCompilerError("Error while handling arg "
-                            + arg + " created by " + arg.flag().getClass(), e);
+                } catch (Throwable e) {
+                    throw new InternalCompilerError(
+                            "Error while handling arg "
+                                    + arg
+                                    + " created by "
+                                    + arg.flag().getClass(),
+                            e);
                 }
             }
         }
@@ -623,8 +623,7 @@ public class Options {
             out.print(" " + arg.toString());
         }
         for (OptFlag<?> flag : flags) {
-            if (seen.contains(flag))
-                continue;
+            if (seen.contains(flag)) continue;
             else {
                 Arg<?> arg = flag.defaultArg(arguments);
                 if (arg != null) out.print(" " + arg.toString());
@@ -638,14 +637,18 @@ public class Options {
      * @param in
      * @return
      */
-    protected <To extends Collection<Param>, Param> To sccast(Object in,
-            Class<Param> clazz) {
+    protected <To extends Collection<Param>, Param> To sccast(Object in, Class<Param> clazz) {
         @SuppressWarnings("unchecked")
         To out = (To) in;
         for (Param p : out) {
             if (!clazz.isInstance(p))
-                throw new ClassCastException("Expected " + clazz.getName()
-                        + " but " + p + " has type " + p.getClass().getName());
+                throw new ClassCastException(
+                        "Expected "
+                                + clazz.getName()
+                                + " but "
+                                + p
+                                + " has type "
+                                + p.getClass().getName());
         }
         return out;
     }
@@ -659,106 +662,71 @@ public class Options {
 
         if (ids.contains("-d")) {
             setClassOutput((File) arg.value());
-        }
-        else if (ids.contains("-D")) {
+        } else if (ids.contains("-D")) {
             setSourceOutput((File) arg.value());
-        }
-        else if (ids.contains("-classpath")) {
-            setClasspath(this.<List<File>, File> sccast(arg.value(),
-                                                        File.class));
-        }
-        else if (ids.contains("-bootclasspath")) {
-            setBootclasspath(this.<List<File>, File> sccast(arg.value(),
-                                                            File.class));
-        }
-        else if (ids.contains("-addbootcp")) {
-            addBootCP(this.<List<File>, File> sccast(arg.value(), File.class));
-        }
-        else if (ids.contains("-sourcepath")) {
-            setSourcepath(this.<List<File>, File> sccast(arg.value(),
-                                                         File.class));
-        }
-        else if (ids.contains("-commandlineonly")) {
+        } else if (ids.contains("-classpath")) {
+            setClasspath(this.<List<File>, File>sccast(arg.value(), File.class));
+        } else if (ids.contains("-bootclasspath")) {
+            setBootclasspath(this.<List<File>, File>sccast(arg.value(), File.class));
+        } else if (ids.contains("-addbootcp")) {
+            addBootCP(this.<List<File>, File>sccast(arg.value(), File.class));
+        } else if (ids.contains("-sourcepath")) {
+            setSourcepath(this.<List<File>, File>sccast(arg.value(), File.class));
+        } else if (ids.contains("-commandlineonly")) {
             setCommandLineOnly((Boolean) arg.value());
-        }
-        else if (ids.contains("-preferclassfiles")) {
+        } else if (ids.contains("-preferclassfiles")) {
             setIgnoreModTimes((Boolean) arg.value());
-        }
-        else if (ids.contains("-assert")) {
+        } else if (ids.contains("-assert")) {
             setAssertions((Boolean) arg.value());
-        }
-        else if (ids.contains("-fqcn")) {
+        } else if (ids.contains("-fqcn")) {
             setFullyQualifiedNames((Boolean) arg.value());
-        }
-        else if (ids.contains("-g")) {
+        } else if (ids.contains("-g")) {
             setGenerateDebugInfo((Boolean) arg.value());
-        }
-        else if (ids.contains("-c")) {
+        } else if (ids.contains("-c")) {
             setOutputOnly((Boolean) arg.value());
-        }
-        else if (ids.contains("-errors")) {
+        } else if (ids.contains("-errors")) {
             setErrorCount((Integer) arg.value());
-        }
-        else if (ids.contains("-w")) {
+        } else if (ids.contains("-w")) {
             setOutputWidth((Integer) arg.value());
-        }
-        else if (ids.contains("-postcompiler")) {
+        } else if (ids.contains("-postcompiler")) {
             setPostCompiler((String) arg.value());
-        }
-        else if (ids.contains("-postopts")) {
+        } else if (ids.contains("-postopts")) {
             setPostCompilerOpts((String) arg.value());
-        }
-        else if (ids.contains("-stdout")) {
+        } else if (ids.contains("-stdout")) {
             setOutputStdOut((Boolean) arg.value());
-        }
-        else if (ids.contains("-sx")) {
+        } else if (ids.contains("-sx")) {
             addSourceExtension((String) arg.value());
-        }
-        else if (ids.contains("-ox")) {
+        } else if (ids.contains("-ox")) {
             setOutputExtension((String) arg.value());
-        }
-        else if (ids.contains("-noserial")) {
+        } else if (ids.contains("-noserial")) {
             setNoSerializedTypes((Boolean) arg.value());
-        }
-        else if (ids.contains("-dump")) {
+        } else if (ids.contains("-dump")) {
             addDumpAST((String) arg.value());
-        }
-        else if (ids.contains("-print")) {
+        } else if (ids.contains("-print")) {
             addPrintAST((String) arg.value());
-        }
-        else if (ids.contains("-disable")) {
+        } else if (ids.contains("-disable")) {
             addDisablePass((String) arg.value());
-        }
-        else if (ids.contains("-nooutput")) {
+        } else if (ids.contains("-nooutput")) {
             setNoOutput((Boolean) arg.value());
-        }
-        else if (ids.contains("-verbose")) {
+        } else if (ids.contains("-verbose")) {
             setVerbose((Boolean) arg.value());
-        }
-        else if (ids.contains("-report")) {
+        } else if (ids.contains("-report")) {
             @SuppressWarnings("unchecked")
             Pair<String, Integer> pair = (Pair<String, Integer>) arg.value();
             addReportTopic(pair.part1(), pair.part2());
-        }
-        else if (ids.contains("-debugpositions")) {
+        } else if (ids.contains("-debugpositions")) {
             setDebugPositions((Boolean) arg.value());
-        }
-        else if (ids.contains("-simpleoutput")) {
+        } else if (ids.contains("-simpleoutput")) {
             setSimpleOutput((Boolean) arg.value());
-        }
-        else if (ids.contains("-mergestrings")) {
+        } else if (ids.contains("-mergestrings")) {
             setMergeStrings((Boolean) arg.value());
-        }
-        else if (ids.contains("-print-arguments")) {
+        } else if (ids.contains("-print-arguments")) {
             print_args = (Boolean) arg.value();
-        }
-        else if (ids.contains("-no-output-to-fs")) {
+        } else if (ids.contains("-no-output-to-fs")) {
             noOutputToFS = (Boolean) arg.value();
-        }
-        else if (ids.contains("-method-filter")) {
+        } else if (ids.contains("-method-filter")) {
             setMemberFilter(this.<List<File>, File>sccast(arg.value(), File.class));
-        }
-        else throw new UnhandledArgument(arg);
+        } else throw new UnhandledArgument(arg);
     }
 
     /**
@@ -841,9 +809,8 @@ public class Options {
 
     protected void addSourceExtension(String value) {
         if (source_ext == null) {
-            source_ext = new String[] { value };
-        }
-        else {
+            source_ext = new String[] {value};
+        } else {
             String[] s = new String[source_ext.length + 1];
             System.arraycopy(source_ext, 0, s, 0, source_ext.length);
             s[s.length - 1] = value;
@@ -904,29 +871,26 @@ public class Options {
         StringBuilder sb = new StringBuilder();
         String[] autoEscapes = {"(", ")", "[", "]"};
         for (File file : files) {
-            if (!file.exists())
-                throw new UsageError("File not found: " + file.getPath());
+            if (!file.exists()) throw new UsageError("File not found: " + file.getPath());
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 for (String line; (line = br.readLine()) != null; ) {
                     line = line.trim();
-                    if (line.isEmpty() || line.startsWith("//"))
-                        continue;
-                    for (String s : autoEscapes)
-                        line = line.replace(s, "\\" + s);
+                    if (line.isEmpty() || line.startsWith("//")) continue;
+                    for (String s : autoEscapes) line = line.replace(s, "\\" + s);
                     try {
                         //noinspection ResultOfMethodCallIgnored
                         Pattern.compile(line);
                     } catch (PatternSyntaxException e) {
                         throw new UsageError(
-                                "Invalid regex for method filter in " +
-                                        file.getPath() + ": " + e.getMessage());
+                                "Invalid regex for method filter in "
+                                        + file.getPath()
+                                        + ": "
+                                        + e.getMessage());
                     }
-                    if (sb.length() > 0)
-                        sb.append('|');
+                    if (sb.length() > 0) sb.append('|');
                     sb.append(line);
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new UsageError(e.getMessage());
             }
         }
@@ -977,10 +941,15 @@ public class Options {
     }
 
     public void usageHeader(PrintStream out) {
-        out.println("usage: " + extension.compilerName() + " [options] "
-                + "<source-file>." + extension.fileExtensions()[0] + " ...");
+        out.println(
+                "usage: "
+                        + extension.compilerName()
+                        + " [options] "
+                        + "<source-file>."
+                        + extension.fileExtensions()[0]
+                        + " ...");
         out.println("where [options] includes:");
-//      usageForFlag(out, "@<file>", "read options from <file>");
+        //      usageForFlag(out, "@<file>", "read options from <file>");
     }
 
     public void usage(PrintStream out, boolean showSecretMenu) {
@@ -1040,8 +1009,7 @@ public class Options {
      * @param description
      *            description of the flag.
      */
-    protected void usageForFlag(PrintStream out, String flag,
-            String description) {
+    protected void usageForFlag(PrintStream out, String flag, String description) {
         out.print("  ");
         out.print(flag);
         // cur is where the cursor is on the screen.
@@ -1050,8 +1018,7 @@ public class Options {
         // print space to get up to indentation level
         if (cur < USAGE_FLAG_WIDTH) {
             printSpaces(out, USAGE_FLAG_WIDTH - cur);
-        }
-        else {
+        } else {
             // the flag is long. Get a new line before printing the
             // description.
             out.println();
@@ -1075,8 +1042,7 @@ public class Options {
                     out.println();
                     printSpaces(out, USAGE_FLAG_WIDTH);
                     cur = USAGE_FLAG_WIDTH;
-                }
-                else {
+                } else {
                     out.print(" ");
                     cur++;
                 }
@@ -1118,8 +1084,7 @@ public class Options {
                     out.println();
                     printSpaces(out, USAGE_SUBSECTION_INDENT);
                     cur = USAGE_SUBSECTION_INDENT;
-                }
-                else {
+                } else {
                     out.print(' ');
                     cur++;
                 }
@@ -1178,16 +1143,19 @@ public class Options {
             File java_home_libdir;
             if (System.getProperty("os.name").indexOf("Mac") != -1) {
                 // XXX: gross!
-                java_home_libdir = new File(System.getProperty("java.home")
-                        + File.separator + ".." + File.separator + "Classes");
-            }
-            else {
-                java_home_libdir = new File(System.getProperty("java.home")
-                        + File.separator + "lib");
+                java_home_libdir =
+                        new File(
+                                System.getProperty("java.home")
+                                        + File.separator
+                                        + ".."
+                                        + File.separator
+                                        + "Classes");
+            } else {
+                java_home_libdir =
+                        new File(System.getProperty("java.home") + File.separator + "lib");
             }
             File[] files = java_home_libdir.listFiles();
-            if (files == null)
-                files = new File[0];
+            if (files == null) files = new File[0];
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < files.length; i++) {
                 if (files[i].getName().endsWith("jar")) {
@@ -1202,8 +1170,7 @@ public class Options {
 
     public List<File> defaultPlatformClasspath() {
         List<File> path = new ArrayList<>();
-        StringTokenizer st =
-                new StringTokenizer(jvmbootclasspath(), pathSeparator);
+        StringTokenizer st = new StringTokenizer(jvmbootclasspath(), pathSeparator);
         while (st.hasMoreTokens()) {
             File next = new File(st.nextToken());
             path.add(next);
@@ -1222,6 +1189,5 @@ public class Options {
     public File sourceOutputDirectory() {
         return source_output_directory;
     }
-
 }
 // vim: ts=4

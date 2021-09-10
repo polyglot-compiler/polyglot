@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -59,8 +59,7 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
     protected TypeNode base;
     protected List<TypeNode> typeArguments;
 
-    public AmbTypeInstantiation(Position pos, TypeNode base,
-            List<TypeNode> typeArguments) {
+    public AmbTypeInstantiation(Position pos, TypeNode base, List<TypeNode> typeArguments) {
         super(pos);
         assert typeArguments != null;
         this.base = base;
@@ -87,16 +86,14 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
         return typeArguments;
     }
 
-    protected <N extends AmbTypeInstantiation> N typeArguments(N n,
-            List<TypeNode> typeArguments) {
+    protected <N extends AmbTypeInstantiation> N typeArguments(N n, List<TypeNode> typeArguments) {
         if (CollectionUtil.equals(n.typeArguments, typeArguments)) return n;
         if (n == this) n = Copy.Util.copy(n);
         n.typeArguments = typeArguments;
         return n;
     }
 
-    protected AmbTypeInstantiation reconstruct(TypeNode base,
-            List<TypeNode> typeArguments) {
+    protected AmbTypeInstantiation reconstruct(TypeNode base, List<TypeNode> typeArguments) {
         AmbTypeInstantiation n = this;
         n = base(n, base);
         n = typeArguments(n, typeArguments);
@@ -120,21 +117,25 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
         JL5ParsedClassType pct = handleBase(typeMap);
 
         Type baseType = base.type();
-//        System.err.println("Base type is " + base);
-//        System.err.println("typeArguments is " + typeArguments);
-//        if (baseType instanceof JL5SubstClassType) {
-//            System.err.println("  " + this.position);
-//            System.err.println("    base type of " + this + " is " + base.type()+ " " + base.type().getClass());
-//            System.err.println("   base type base is " + ((JL5SubstClassType)baseType).base());
-//            System.err.println("   base type instantiation is " + ((JL5SubstClassType)baseType).subst() + "  " + ((JL5SubstClassType)baseType).subst().getClass());
-//            System.err.println("   type args are is " + this.typeArguments);
-//        }
+        //        System.err.println("Base type is " + base);
+        //        System.err.println("typeArguments is " + typeArguments);
+        //        if (baseType instanceof JL5SubstClassType) {
+        //            System.err.println("  " + this.position);
+        //            System.err.println("    base type of " + this + " is " + base.type()+ " " +
+        // base.type().getClass());
+        //            System.err.println("   base type base is " +
+        // ((JL5SubstClassType)baseType).base());
+        //            System.err.println("   base type instantiation is " +
+        // ((JL5SubstClassType)baseType).subst() + "  " +
+        // ((JL5SubstClassType)baseType).subst().getClass());
+        //            System.err.println("   type args are is " + this.typeArguments);
+        //        }
 
         if (pct.pclass() == null || pct.pclass().formals().isEmpty()) {
             // The base class has no formals.
             // Then this node should not be created in the first place.
-            throw new SemanticException("Cannot instantiate " + baseType
-                    + " because it has no formals", position);
+            throw new SemanticException(
+                    "Cannot instantiate " + baseType + " because it has no formals", position);
         }
 
         checkParamSize(pct);
@@ -142,19 +143,20 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
         // if subst is not null, check that subst does not already define the formal type variables
         if (!typeMap.isEmpty()) {
             if (typeMap.keySet().containsAll(pct.typeVariables())) {
-                throw new SemanticException("Cannot instantiate " + baseType
-                        + " with arguments " + typeArguments, this.position());
+                throw new SemanticException(
+                        "Cannot instantiate " + baseType + " with arguments " + typeArguments,
+                        this.position());
             }
         }
 
-        // add the new mappings 
+        // add the new mappings
         List<TypeVariable> formals = pct.typeVariables();
         for (int i = 0; i < typeArguments.size(); i++) {
             ReferenceType t = (ReferenceType) typeArguments.get(i).type();
             typeMap.put(formals.get(i), t);
         }
 
-//        System.err.println("Instantiating " + pct + " with " + typeMap);
+        //        System.err.println("Instantiating " + pct + " with " + typeMap);
         JL5TypeSystem ts = (JL5TypeSystem) sc.typeSystem();
         Type instantiated = ts.subst(pct, typeMap);
         return sc.nodeFactory().CanonicalTypeNode(position, instantiated);
@@ -189,40 +191,37 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
                         // trying to instantiate a member class of
                         // a raw class.
                         // See JLS 3rd ed. 4.8
-                        throw new SemanticException("\"Rare\" types are not allowed: cannot provide "
-                                                            + "type arguments to member class "
-                                                            + ct.name()
-                                                            + " of raw class "
-                                                            + ct.outer() + ".",
-                                                    position);
+                        throw new SemanticException(
+                                "\"Rare\" types are not allowed: cannot provide "
+                                        + "type arguments to member class "
+                                        + ct.name()
+                                        + " of raw class "
+                                        + ct.outer()
+                                        + ".",
+                                position);
                     }
                 }
             }
         }
     }
 
-    protected JL5ParsedClassType handleBase(
-            Map<TypeVariable, ReferenceType> typeMap) {
+    protected JL5ParsedClassType handleBase(Map<TypeVariable, ReferenceType> typeMap) {
         Type baseType = base.type();
-        if (baseType instanceof JL5ParsedClassType)
-            return (JL5ParsedClassType) baseType;
+        if (baseType instanceof JL5ParsedClassType) return (JL5ParsedClassType) baseType;
         if (baseType instanceof RawClass) return ((RawClass) baseType).base();
         if (baseType instanceof JL5SubstClassType) {
             JL5SubstClassType sct = (JL5SubstClassType) baseType;
             typeMap.putAll(sct.subst().substitutions());
             return sct.base();
         }
-        throw new InternalCompilerError("Don't know how to handle " + baseType,
-                                        position);
+        throw new InternalCompilerError("Don't know how to handle " + baseType, position);
     }
 
-    protected void checkParamSize(JL5ParsedClassType pct)
-            throws SemanticException {
+    protected void checkParamSize(JL5ParsedClassType pct) throws SemanticException {
         int pctFormalSize = pct.pclass().formals().size();
         if (pctFormalSize != typeArguments.size()) {
-            throw new SemanticException("Wrong number of type parameters for class "
-                                                + pct,
-                                        position);
+            throw new SemanticException(
+                    "Wrong number of type parameters for class " + pct, position);
         }
     }
 

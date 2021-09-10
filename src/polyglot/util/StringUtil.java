@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -102,8 +102,7 @@ public class StringUtil {
             if (sb != null) {
                 if (t != null) {
                     sb.append(t);
-                }
-                else {
+                } else {
                     sb.append(c);
                 }
             }
@@ -122,40 +121,41 @@ public class StringUtil {
             if (unicode) {
                 StringBuffer sb = new StringBuffer(8);
                 sb.append(Integer.toHexString(c));
-                while (sb.length() < 4)
-                    sb.insert(0, '0');
+                while (sb.length() < 4) sb.insert(0, '0');
                 sb.insert(0, "\\u");
                 return sb.toString();
-            }
-            else {
+            } else {
                 return null;
             }
         }
 
         switch (c) {
-        case '\b':
-            return ("\\b");
-        case '\t':
-            return ("\\t");
-        case '\n':
-            return ("\\n");
-        case '\f':
-            return ("\\f");
-        case '\r':
-            return ("\\r");
-        case '\"':
-            return ("\\\""); // "\\\"";
-        case '\'':
-            return ("\\\'"); // "\\\'";
-        case '\\':
-            return ("\\\\"); // "\\\\";
+            case '\b':
+                return ("\\b");
+            case '\t':
+                return ("\\t");
+            case '\n':
+                return ("\\n");
+            case '\f':
+                return ("\\f");
+            case '\r':
+                return ("\\r");
+            case '\"':
+                return ("\\\""); // "\\\"";
+            case '\'':
+                return ("\\\'"); // "\\\'";
+            case '\\':
+                return ("\\\\"); // "\\\\";
         }
 
         if (c >= 0x20 && c < 0x7f) {
             return null;
         }
 
-        return ("\\" + (char) ('0' + c / 64) + (char) ('0' + (c & 63) / 8) + (char) ('0' + (c & 7)));
+        return ("\\"
+                + (char) ('0' + c / 64)
+                + (char) ('0' + (c & 63) / 8)
+                + (char) ('0' + (c & 7)));
     }
 
     public static String nth(int n) {
@@ -170,18 +170,17 @@ public class StringUtil {
 
         char last = s.charAt(s.length() - 1);
         switch (last) {
-        case '1':
-            s.append("st");
-            break;
-        case '2':
-            s.append("nd");
-            break;
-        case '3':
-            s.append("rd");
-            break;
-        default:
-            s.append("th");
-
+            case '1':
+                s.append("st");
+                break;
+            case '2':
+                s.append("nd");
+                break;
+            case '3':
+                s.append("rd");
+                break;
+            default:
+                s.append("th");
         }
         return s.toString();
     }

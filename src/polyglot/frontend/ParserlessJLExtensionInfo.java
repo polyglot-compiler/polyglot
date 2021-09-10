@@ -60,11 +60,12 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
      * @see polyglot.frontend.ParserlessJLExtensionInfo#initTypeSystem()
      */
     protected LoadedClassResolver makeLoadedClassResolver() {
-        return new SourceClassResolver(compiler,
-                                       this,
-                                       true,
-                                       getOptions().compile_command_line_only,
-                                       getOptions().ignore_mod_times);
+        return new SourceClassResolver(
+                compiler,
+                this,
+                true,
+                getOptions().compile_command_line_only,
+                getOptions().ignore_mod_times);
     }
 
     @Override
@@ -81,11 +82,9 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
             }
 
             ts.initialize(r, this);
-        }
-        catch (SemanticException e) {
-            throw new InternalCompilerError("Unable to initialize type system: "
-                                                    + e.getMessage(),
-                                            e);
+        } catch (SemanticException e) {
+            throw new InternalCompilerError(
+                    "Unable to initialize type system: " + e.getMessage(), e);
         }
     }
 
@@ -152,5 +151,4 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
         @SuppressWarnings("unused")
         Topics t = new Topics();
     }
-
 }

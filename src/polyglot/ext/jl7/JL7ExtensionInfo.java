@@ -64,8 +64,7 @@ public class JL7ExtensionInfo extends JL5ExtensionInfo {
 
     @Override
     protected NodeFactory createNodeFactory() {
-        return new JL7NodeFactory_c(J7Lang_c.instance,
-                                    new JL7ExtFactory_c(new JL5ExtFactory_c()));
+        return new JL7NodeFactory_c(J7Lang_c.instance, new JL7ExtFactory_c(new JL5ExtFactory_c()));
         /*
         JL5Options opt = (JL5Options) getOptions();
         if (!opt.removeJava5isms) {
@@ -105,12 +104,11 @@ public class JL7ExtensionInfo extends JL5ExtensionInfo {
 
     @Override
     public Set<String> keywords() {
-	return new Lexer_c(null).keywords();
+        return new Lexer_c(null).keywords();
     }
 
     @Override
     public Version version() {
         return new JL7Version();
     }
-
 }

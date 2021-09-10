@@ -71,8 +71,7 @@ public class ExtensionRewriter extends ContextVisitor {
     /** The language dispatcher for the AST */
     private Lang lang;
 
-    public ExtensionRewriter(Job job, ExtensionInfo from_ext,
-            ExtensionInfo to_ext) {
+    public ExtensionRewriter(Job job, ExtensionInfo from_ext, ExtensionInfo to_ext) {
         super(job, from_ext.typeSystem(), to_ext.nodeFactory());
         this.job = job;
         this.from_ext = from_ext;
@@ -98,8 +97,7 @@ public class ExtensionRewriter extends ContextVisitor {
             Report.report(2, "<< " + this + "::override " + n + " -> " + m);
         if (m == null) {
             return super.override(parent, n);
-        }
-        else {
+        } else {
             return m;
         }
     }
@@ -108,38 +106,31 @@ public class ExtensionRewriter extends ContextVisitor {
     public NodeVisitor enterCall(Node n) throws SemanticException {
         try {
             return lang().extRewriteEnter(n, this);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             Position position = e.position();
 
             if (position == null) {
                 position = n.position();
             }
 
-            errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                 e.getMessage(),
-                                 position);
+            errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
 
             return this;
         }
     }
 
     @Override
-    public Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         try {
             return lang().extRewrite(n, this);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             Position position = e.position();
 
             if (position == null) {
                 position = n.position();
             }
 
-            errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                 e.getMessage(),
-                                 position);
+            errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
 
             return n;
         }
@@ -159,8 +150,7 @@ public class ExtensionRewriter extends ContextVisitor {
             for (SourceFile sf : c.sources()) {
                 to_ext.scheduler().addJob(sf.source(), sf);
             }
-        }
-        else {
+        } else {
             to_ext.scheduler().addJob(job.source(), ast);
         }
         lang = to_ext.nodeFactory().lang();
@@ -228,5 +218,4 @@ public class ExtensionRewriter extends ContextVisitor {
     public QQ qq() {
         return qq;
     }
-
 }

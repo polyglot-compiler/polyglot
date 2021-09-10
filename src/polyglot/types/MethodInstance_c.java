@@ -40,20 +40,24 @@ import polyglot.util.SerialVersionUID;
  * A {@code MethodInstance} represents the type information for a Java
  * method.
  */
-public class MethodInstance_c extends ProcedureInstance_c implements
-        MethodInstance {
+public class MethodInstance_c extends ProcedureInstance_c implements MethodInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected String name;
     protected Type returnType;
 
     /** Used for deserializing types. */
-    protected MethodInstance_c() {
-    }
+    protected MethodInstance_c() {}
 
-    public MethodInstance_c(TypeSystem ts, Position pos,
-            ReferenceType container, Flags flags, Type returnType, String name,
-            List<? extends Type> formalTypes, List<? extends Type> excTypes) {
+    public MethodInstance_c(
+            TypeSystem ts,
+            Position pos,
+            ReferenceType container,
+            Flags flags,
+            Type returnType,
+            String name,
+            List<? extends Type> formalTypes,
+            List<? extends Type> excTypes) {
         super(ts, pos, container, flags, formalTypes, excTypes);
         this.returnType = returnType;
         this.name = name;
@@ -100,8 +104,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
     @Override
     public MethodInstance name(String name) {
-        if (name != null && !name.equals(this.name) || name == null
-                && name != this.name) {
+        if (name != null && !name.equals(this.name) || name == null && name != this.name) {
             MethodInstance_c n = (MethodInstance_c) copy();
             n.setName(name);
             return n;
@@ -161,7 +164,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
     @Override
     public int hashCode() {
-        //return container.hashCode() + flags.hashCode() +
+        // return container.hashCode() + flags.hashCode() +
         //       returnType.hashCode() + name.hashCode();
         return flags.hashCode() + name.hashCode();
     }
@@ -182,8 +185,14 @@ public class MethodInstance_c extends ProcedureInstance_c implements
     @Override
     public String toString() {
         String s =
-                designator() + " " + flags.translate() + returnType + " "
-                        + container() + "." + signature();
+                designator()
+                        + " "
+                        + flags.translate()
+                        + returnType
+                        + " "
+                        + container()
+                        + "."
+                        + signature();
 
         if (!throwTypes.isEmpty()) {
             s += " throws " + TypeSystem_c.listToString(throwTypes);
@@ -214,19 +223,19 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
     @Override
     public boolean isCanonical() {
-        return container.isCanonical() && returnType.isCanonical()
-                && listIsCanonical(formalTypes) && listIsCanonical(throwTypes);
+        return container.isCanonical()
+                && returnType.isCanonical()
+                && listIsCanonical(formalTypes)
+                && listIsCanonical(throwTypes);
     }
 
     @Override
-    public final boolean methodCallValid(String name,
-            List<? extends Type> argTypes) {
+    public final boolean methodCallValid(String name, List<? extends Type> argTypes) {
         return ts.methodCallValid(this, name, argTypes);
     }
 
     @Override
-    public boolean methodCallValidImpl(String name,
-            List<? extends Type> argTypes) {
+    public boolean methodCallValidImpl(String name, List<? extends Type> argTypes) {
         return name().equals(name) && ts.callValid(this, argTypes);
     }
 
@@ -251,7 +260,8 @@ public class MethodInstance_c extends ProcedureInstance_c implements
             }
 
             rt = sup;
-        };
+        }
+        ;
 
         return l;
     }
@@ -276,105 +286,140 @@ public class MethodInstance_c extends ProcedureInstance_c implements
     }
 
     @Override
-    public boolean canOverrideImpl(MethodInstance mj, boolean quiet)
-            throws SemanticException {
+    public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
         MethodInstance mi = this;
         String overridOrHid = mi.flags().isStatic() ? "hid" : "overrid";
 
         if (!(mi.name().equals(mj.name()) && mi.hasFormals(mj.formalTypes()))) {
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot " + overridOrHid + "e "
-                    + mj.signature() + " in " + mj.container()
-                    + "; incompatible parameter types", mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; incompatible parameter types",
+                    mi.position());
         }
 
         if (!ts.typeEquals(mi.returnType(), mj.returnType())) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3,
-                              "return type " + mi.returnType() + " != "
-                                      + mj.returnType());
+                Report.report(3, "return type " + mi.returnType() + " != " + mj.returnType());
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot " + overridOrHid + "e "
-                    + mj.signature() + " in " + mj.container()
-                    + "; attempting to use incompatible return type\n"
-                    + "found: " + mi.returnType() + "\n" + "required: "
-                    + mj.returnType(), mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; attempting to use incompatible return type\n"
+                            + "found: "
+                            + mi.returnType()
+                            + "\n"
+                            + "required: "
+                            + mj.returnType(),
+                    mi.position());
         }
 
         if (!ts.throwsSubset(mi, mj)) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3,
-                              mi.throwTypes() + " not subset of "
-                                      + mj.throwTypes());
+                Report.report(3, mi.throwTypes() + " not subset of " + mj.throwTypes());
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in "
-                                                + mi.container() + " cannot "
-                                                + overridOrHid + "e "
-                                                + mj.signature() + " in "
-                                                + mj.container()
-                                                + "; the throw set "
-                                                + mi.throwTypes()
-                                                + " is not a subset of the "
-                                                + overridOrHid
-                                                + "den method's throw set "
-                                                + mj.throwTypes() + ".",
-                                        mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; the throw set "
+                            + mi.throwTypes()
+                            + " is not a subset of the "
+                            + overridOrHid
+                            + "den method's throw set "
+                            + mj.throwTypes()
+                            + ".",
+                    mi.position());
         }
 
         if (mi.flags().moreRestrictiveThan(mj.flags())) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3,
-                              mi.flags() + " more restrictive than "
-                                      + mj.flags());
+                Report.report(3, mi.flags() + " more restrictive than " + mj.flags());
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot "
-                                                + overridOrHid
-                                                + "e "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; attempting to assign weaker access privileges",
-                                        mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; attempting to assign weaker access privileges",
+                    mi.position());
         }
 
         if (mi.flags().isStatic() != mj.flags().isStatic()) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, mi.signature() + " is "
-                        + (mi.flags().isStatic() ? "" : "not") + " static but "
-                        + mj.signature() + " is "
-                        + (mj.flags().isStatic() ? "" : "not") + " static");
+                Report.report(
+                        3,
+                        mi.signature()
+                                + " is "
+                                + (mi.flags().isStatic() ? "" : "not")
+                                + " static but "
+                                + mj.signature()
+                                + " is "
+                                + (mj.flags().isStatic() ? "" : "not")
+                                + " static");
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot "
-                                                + overridOrHid
-                                                + "e "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; "
-                                                + overridOrHid
-                                                + "den method is "
-                                                + (mj.flags().isStatic()
-                                                        ? "" : "not ")
-                                                + "static", mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; "
+                            + overridOrHid
+                            + "den method is "
+                            + (mj.flags().isStatic() ? "" : "not ")
+                            + "static",
+                    mi.position());
         }
 
         if (mi != mj && !mi.equals(mj) && mj.flags().isFinal()) {
             // mi can "override" a final method mj if mi and mj are the same method instance.
-            if (Report.should_report(Report.types, 3))
-                Report.report(3, mj.flags() + " final");
+            if (Report.should_report(Report.types, 3)) Report.report(3, mj.flags() + " final");
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot " + overridOrHid + "e "
-                    + mj.signature() + " in " + mj.container() + "; "
-                    + overridOrHid + "den method is final", mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; "
+                            + overridOrHid
+                            + "den method is final",
+                    mi.position());
         }
 
         return true;
@@ -393,8 +438,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
         // instances from rt's supertypes.  See JLS 2nd Ed. | 8.4.6.
         List<MethodInstance> l = new LinkedList<>();
         for (MethodInstance mi : implementedImplAux(rt)) {
-            if (!mi.flags().isPrivate()
-                    && ts.isAccessible(mi, mi.container(), rt, false))
+            if (!mi.flags().isPrivate() && ts.isAccessible(mi, mi.container(), rt, false))
                 l.add(mi);
         }
         return l;
@@ -402,7 +446,7 @@ public class MethodInstance_c extends ProcedureInstance_c implements
 
     protected List<MethodInstance> implementedImplAux(ReferenceType rt) {
         if (rt == null) {
-            return Collections.<MethodInstance> emptyList();
+            return Collections.<MethodInstance>emptyList();
         }
 
         List<MethodInstance> l = new LinkedList<>();

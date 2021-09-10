@@ -97,8 +97,7 @@ public interface Lang {
      * @param tb The visitor which adds new type objects to the
      * {@code TypeSystem}.
      */
-    NodeVisitor buildTypesEnter(Node n, TypeBuilder tb)
-            throws SemanticException;
+    NodeVisitor buildTypesEnter(Node n, TypeBuilder tb) throws SemanticException;
 
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
@@ -148,8 +147,7 @@ public interface Lang {
      *
      * @param tc The type checking visitor.
      */
-    Node typeCheckOverride(Node n, Node parent, TypeChecker tc)
-            throws SemanticException;
+    Node typeCheckOverride(Node n, Node parent, TypeChecker tc) throws SemanticException;
 
     /**
      * Type check the AST.
@@ -178,8 +176,7 @@ public interface Lang {
      *
      * @param rw The visitor.
      */
-    NodeVisitor extRewriteEnter(Node n, ExtensionRewriter rw)
-            throws SemanticException;
+    NodeVisitor extRewriteEnter(Node n, ExtensionRewriter rw) throws SemanticException;
 
     /**
      * Rewrite the AST for the compilation in this language.
@@ -254,5 +251,4 @@ public interface Lang {
      *  Requires that {@code isConstant()} is true.
      */
     Object constantValue(Expr n, Lang lang);
-
 }

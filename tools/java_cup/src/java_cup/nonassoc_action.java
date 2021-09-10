@@ -1,8 +1,8 @@
 package java_cup;
 
-/** This class represents a shift/reduce nonassociative error within the 
+/** This class represents a shift/reduce nonassociative error within the
  *  parse table.  If action_table element is assign to type
- *  nonassoc_action, it cannot be changed, and signifies that there 
+ *  nonassoc_action, it cannot be changed, and signifies that there
  *  is a conflict between shifting and reducing a production and a
  *  terminal that shouldn't be next to each other.
  *
@@ -15,7 +15,7 @@ public class nonassoc_action extends parse_action {
     /*--- Constructor(s) ----------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Simple constructor. 
+    /** Simple constructor.
      */
     public nonassoc_action() {
         /* don't need to set anything, since it signifies error */
@@ -44,8 +44,7 @@ public class nonassoc_action extends parse_action {
     /** Generic equality test. */
     @Override
     public boolean equals(Object other) {
-        if (other instanceof parse_action)
-            return equals((parse_action) other);
+        if (other instanceof parse_action) return equals((parse_action) other);
         else return false;
     }
 

@@ -16,20 +16,20 @@ import polyglot.main.Main.TerminationException;
 /**
  * An ANT {@code Task} to facilitate the building of
  * of code written in language extensions within the ANT framework. This task
- * can be used similarly way to the {@code JavaC} task. 
- * 
+ * can be used similarly way to the {@code JavaC} task.
+ *
  * <p> This class can
- * optionally be subclassed by extensions (to provide compilation for 
+ * optionally be subclassed by extensions (to provide compilation for
  * a particular language). In that case, subclasses should override the
- * init method to set the source file extension 
+ * init method to set the source file extension
  * ({@link PolyglotAntTask#srcExt srcExt}) and extension name
- * or class ({@link PolyglotAntTask#extensionName extensionName} or 
- * {@link PolyglotAntTask#extensionClass extensionClass}) appropriately, and 
+ * or class ({@link PolyglotAntTask#extensionName extensionName} or
+ * {@link PolyglotAntTask#extensionClass extensionClass}) appropriately, and
  * override the setter methods for these fields to prevent the user from modifying
  * these fields.
- * 
+ *
  * <b>This class has not been fully tested.</b>
- * 
+ *
  * @see org.apache.tools.ant.Task
  */
 public class PolyglotAntTask extends MatchingTask {
@@ -38,7 +38,7 @@ public class PolyglotAntTask extends MatchingTask {
      */
     protected String extensionName;
     /**
-     * Class of the extension, like the {@code -extclass} command line 
+     * Class of the extension, like the {@code -extclass} command line
      * option.
      */
     protected Class extensionClass;
@@ -50,7 +50,7 @@ public class PolyglotAntTask extends MatchingTask {
      * The path for source compilation.
      */
     protected Path src;
-    
+
     /**
      * Bootclasspath, like the {@code -bootclasspath} command line option.
      */
@@ -70,7 +70,7 @@ public class PolyglotAntTask extends MatchingTask {
      * the {@code <file>} command line option.
      */
     protected File optionsFile;
-    
+
     /**
      * The post compiler to invoke, like the {@code -post}
      * command line option.
@@ -94,19 +94,19 @@ public class PolyglotAntTask extends MatchingTask {
      */
     protected boolean fqcn;
     /**
-     * Indiciates if the Polyglot compiler should use only compile to the 
+     * Indiciates if the Polyglot compiler should use only compile to the
      * output files, like the {@code -c}
      * command line option.
      */
     protected boolean onlyToJava;
-    
+
     /**
-     * A {@code List} of {@link org.apache.tools.ant.types.Commandline.Arguments 
-     * Commandline.Arguments}, to allow the user to specify command line 
+     * A {@code List} of {@link org.apache.tools.ant.types.Commandline.Arguments
+     * Commandline.Arguments}, to allow the user to specify command line
      * options that we do not deal with explicitly.
      */
-    protected List additionalArgs; 
-    
+    protected List additionalArgs;
+
     /**
      * The classpath to be used for compilation, like the {@code -classpath}
      * command line option.
@@ -118,9 +118,9 @@ public class PolyglotAntTask extends MatchingTask {
      */
     protected Path compileSourcepath;
 
-    public PolyglotAntTask() { }
-    
-    public void init() { 
+    public PolyglotAntTask() {}
+
+    public void init() {
         super.init();
         extensionName = null;
         extensionClass = null;
@@ -139,42 +139,41 @@ public class PolyglotAntTask extends MatchingTask {
         compileClasspath = null;
         compileSourcepath = null;
     }
-    
+
     public void execute() throws BuildException {
         dumpDetails();
         checkParameters();
         // scan source directories and dest directory to build up
         File[] compileFiles = getCompileFiles();
-        
+
         if (compileFiles.length == 0) {
             // nothing to do. no files to compile
-            log("No files to compile", 
-                Project.MSG_INFO);
+            log("No files to compile", Project.MSG_INFO);
             return;
         }
-        
+
         // build up the argument list
         String[] args = constructArgList(compileFiles);
-        
-        log("Invoking polyglot with the following arguments: " + 
-            "(enclosing single quotes are not part of the arguments):", 
-            Project.MSG_VERBOSE);
+
+        log(
+                "Invoking polyglot with the following arguments: "
+                        + "(enclosing single quotes are not part of the arguments):",
+                Project.MSG_VERBOSE);
         for (int i = 0; i < args.length; i++) {
-            log("  '" + args[i] + "'", Project.MSG_VERBOSE);                
+            log("  '" + args[i] + "'", Project.MSG_VERBOSE);
         }
         // invoke the polyglot compiler.
         compile(args);
     }
-    
+
     protected File[] getCompileFiles() {
         File[] compileFiles = new File[0];
         String[] srcList = src.list();
         for (int i = 0; i < srcList.length; i++) {
             File srcDir = getProject().resolveFile(srcList[i]);
             if (!srcDir.exists()) {
-                throw new BuildException("srcdir \""
-                                         + srcDir.getPath()
-                                         + "\" does not exist!", getLocation());
+                throw new BuildException(
+                        "srcdir \"" + srcDir.getPath() + "\" does not exist!", getLocation());
             }
 
             DirectoryScanner ds = this.getDirectoryScanner(srcDir);
@@ -184,7 +183,7 @@ public class PolyglotAntTask extends MatchingTask {
         }
         return compileFiles;
     }
-    
+
     /**
      * Scans the directory looking for source files to be compiled.
      * The results are returned in the class variable compileList
@@ -197,12 +196,9 @@ public class PolyglotAntTask extends MatchingTask {
         File[] newFiles = sfs.restrictAsFiles(files, srcDir, destDir, m);
 
         if (newFiles.length > 0) {
-            File[] newCompileList = new File[compileFiles.length + 
-                newFiles.length];
-            System.arraycopy(compileFiles, 0, newCompileList, 0,
-                compileFiles.length);
-            System.arraycopy(newFiles, 0, newCompileList,
-                compileFiles.length, newFiles.length);
+            File[] newCompileList = new File[compileFiles.length + newFiles.length];
+            System.arraycopy(compileFiles, 0, newCompileList, 0, compileFiles.length);
+            System.arraycopy(newFiles, 0, newCompileList, compileFiles.length, newFiles.length);
             compileFiles = newCompileList;
         }
         return compileFiles;
@@ -215,33 +211,33 @@ public class PolyglotAntTask extends MatchingTask {
     protected String destFileExt() {
         return onlyToJava ? outputExt : "class";
     }
-    
+
     /**
-     * Check to make sure the paramters are consistent with invoking the 
-     * Polyglot compiler. 
+     * Check to make sure the paramters are consistent with invoking the
+     * Polyglot compiler.
      * @throws BuildException if the parameters are inconsistent.
      */
     protected void checkParameters() throws BuildException {
         // at most one of extenstionClass and extensionName is set.
         if (extensionClass != null && extensionName != null) {
-            throw new BuildException("At most one of extclass and " + 
-                                     "extname can be set.", getLocation());
+            throw new BuildException(
+                    "At most one of extclass and " + "extname can be set.", getLocation());
         }
-        
+
         if (src == null) {
-            throw new BuildException("srcdir attribute must be set!",
-                                     getLocation());
+            throw new BuildException("srcdir attribute must be set!", getLocation());
         }
         if (src.size() == 0) {
-            throw new BuildException("srcdir attribute must be set!",
-                                     getLocation());
+            throw new BuildException("srcdir attribute must be set!", getLocation());
         }
 
         if (destDir != null && !destDir.isDirectory()) {
-            throw new BuildException("destination directory \"" 
-                                     + destDir 
-                                     + "\" does not exist "
-                                     + "or is not a directory", getLocation());
+            throw new BuildException(
+                    "destination directory \""
+                            + destDir
+                            + "\" does not exist "
+                            + "or is not a directory",
+                    getLocation());
         }
     }
 
@@ -252,7 +248,7 @@ public class PolyglotAntTask extends MatchingTask {
      */
     protected String[] constructArgList(File[] files) {
         List argList = new ArrayList();
-        
+
         // set up command line args
         if (optionsFile != null) {
             argList.add("@" + optionsFile.getPath());
@@ -296,8 +292,7 @@ public class PolyglotAntTask extends MatchingTask {
         if (compileSourcepath != null) {
             argList.add("-sourcepath");
             argList.add(compileSourcepath.toString());
-        }
-        else if (src != null) {
+        } else if (src != null) {
             argList.add("-sourcepath");
             argList.add(src.toString());
         }
@@ -311,41 +306,40 @@ public class PolyglotAntTask extends MatchingTask {
         }
         if (additionalArgs != null) {
             for (Iterator i = additionalArgs.iterator(); i.hasNext(); ) {
-                Commandline.Argument arg = (Commandline.Argument)i.next();
+                Commandline.Argument arg = (Commandline.Argument) i.next();
                 String[] parts = arg.getParts();
                 for (int j = 0; j < parts.length; j++) {
                     argList.add(parts[j]);
                 }
             }
         }
-        
+
         // add the files to compile.
         int argListSize = argList.size();
         String[] args = new String[argListSize + files.length];
         argList.toArray(args);
-        
+
         for (int i = 0; i < files.length; ++i) {
             args[argListSize + i] = files[i].getPath();
         }
-        
+
         return args;
     }
-    
+
     /**
      * Invoke the Polyglot compiler, with the given command line arguments.
      */
     protected void compile(String[] args) {
         try {
             new polyglot.main.Main().start(args);
-        }
-        catch (TerminationException e) {
+        } catch (TerminationException e) {
             throw new BuildException(e.getMessage(), e);
         }
     }
-     
+
     /**
      * Dump the settings of the parameters, for debugging purposes.
-     */  
+     */
     protected void dumpDetails() {
         log("extensionName = " + extensionName, Project.MSG_DEBUG);
         log("extensionClass = " + extensionClass, Project.MSG_DEBUG);
@@ -364,7 +358,7 @@ public class PolyglotAntTask extends MatchingTask {
         if (additionalArgs != null) {
             for (Iterator i = additionalArgs.iterator(); i.hasNext(); ) {
                 StringBuffer sb = new StringBuffer();
-                Commandline.Argument arg = (Commandline.Argument)i.next();
+                Commandline.Argument arg = (Commandline.Argument) i.next();
                 String[] parts = arg.getParts();
                 sb.append("   '");
                 for (int j = 0; j < parts.length; j++) {
@@ -372,12 +366,11 @@ public class PolyglotAntTask extends MatchingTask {
                 }
                 sb.append("'");
                 log(sb.toString(), Project.MSG_DEBUG);
-            }            
+            }
         }
         log("compileClasspath = " + compileClasspath, Project.MSG_DEBUG);
         log("compileSourcepath = " + compileSourcepath, Project.MSG_DEBUG);
         log("fileset = " + Arrays.asList(this.getCompileFiles()), Project.MSG_DEBUG);
-
     }
     /**
      * Adds a command-line argument.
@@ -409,6 +402,7 @@ public class PolyglotAntTask extends MatchingTask {
         }
         return src.createPath();
     }
+
     public void setSrcdir(Path srcDir) {
         if (src == null) {
             src = srcDir;
@@ -424,14 +418,14 @@ public class PolyglotAntTask extends MatchingTask {
             this.bootclasspath.append(bootclasspath);
         }
     }
-    
+
     public Path createBootclasspath() {
         if (bootclasspath == null) {
             bootclasspath = new Path(getProject());
         }
         return bootclasspath.createPath();
     }
-    
+
     /**
      * Adds a reference to a classpath defined elsewhere.
      */
@@ -446,6 +440,7 @@ public class PolyglotAntTask extends MatchingTask {
     public void setOx(String outExt) {
         this.outputExt = outExt;
     }
+
     public void setOptions(File optionsFile) {
         this.optionsFile = optionsFile;
     }
@@ -469,12 +464,12 @@ public class PolyglotAntTask extends MatchingTask {
     public void setOnlytojava(boolean onlyToJava) {
         this.onlyToJava = onlyToJava;
     }
-    
+
     public void setClasspath(Path classpath) {
         if (compileClasspath == null) {
             compileClasspath = classpath;
         } else {
-            compileClasspath.append(classpath) ; 
+            compileClasspath.append(classpath);
         }
     }
 
@@ -527,5 +522,4 @@ public class PolyglotAntTask extends MatchingTask {
     public void setSourcepathRef(Reference r) {
         createSourcepath().setRefid(r);
     }
-
 }

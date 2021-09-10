@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -70,8 +70,7 @@ public interface JLang extends Lang {
      *
      * @param ar The visitor which disambiguates.
      */
-    Node disambiguateOverride(Node n, Node parent, AmbiguityRemover ar)
-            throws SemanticException;
+    Node disambiguateOverride(Node n, Node parent, AmbiguityRemover ar) throws SemanticException;
 
     /**
      * Remove any remaining ambiguities from the AST.
@@ -85,8 +84,7 @@ public interface JLang extends Lang {
      *
      * @param ar The visitor which disambiguates.
      */
-    NodeVisitor disambiguateEnter(Node n, AmbiguityRemover ar)
-            throws SemanticException;
+    NodeVisitor disambiguateEnter(Node n, AmbiguityRemover ar) throws SemanticException;
 
     /**
      * Remove any remaining ambiguities from the AST.
@@ -145,8 +143,7 @@ public interface JLang extends Lang {
      *
      * @param ec The visitor.
      */
-    NodeVisitor exceptionCheckEnter(Node n, ExceptionChecker ec)
-            throws SemanticException;
+    NodeVisitor exceptionCheckEnter(Node n, ExceptionChecker ec) throws SemanticException;
 
     /**
      * Check that exceptions are properly propagated throughout the AST.
@@ -161,9 +158,9 @@ public interface JLang extends Lang {
      */
     Node exceptionCheck(Node n, ExceptionChecker ec) throws SemanticException;
 
-    /** 
+    /**
      * List of Types of exceptions that might get thrown.  The result is
-     * not necessarily correct until after type checking. 
+     * not necessarily correct until after type checking.
      */
     List<Type> throwTypes(Node n, TypeSystem ts);
 
@@ -171,22 +168,21 @@ public interface JLang extends Lang {
 
     /**
      * Used to find the missing static target of a static method call.
-     * Should return the container of the method instance. 
-     * 
+     * Should return the container of the method instance.
+     *
      */
     Type findContainer(Call n, TypeSystem ts, MethodInstance mi);
 
     ReferenceType findTargetType(Call n) throws SemanticException;
 
     /**
-    * Typecheck the Call when the target is null. This method finds
-    * an appropriate target, and then type checks accordingly.
-    * 
-    * @param argTypes list of {@code Type}s of the arguments
-     * @throws SemanticException 
-    */
-    Node typeCheckNullTarget(Call n, TypeChecker tc, List<Type> argTypes)
-            throws SemanticException;
+     * Typecheck the Call when the target is null. This method finds
+     * an appropriate target, and then type checks accordingly.
+     *
+     * @param argTypes list of {@code Type}s of the arguments
+     * @throws SemanticException
+     */
+    Node typeCheckNullTarget(Call n, TypeChecker tc, List<Type> argTypes) throws SemanticException;
 
     // ClassDeclOps
 
@@ -194,7 +190,10 @@ public interface JLang extends Lang {
 
     void prettyPrintFooter(ClassDecl n, CodeWriter w, PrettyPrinter tr);
 
-    Node addDefaultConstructor(ClassDecl n, TypeSystem ts, NodeFactory nf,
+    Node addDefaultConstructor(
+            ClassDecl n,
+            TypeSystem ts,
+            NodeFactory nf,
             ConstructorInstance defaultConstructorInstance)
             throws SemanticException;
 
@@ -214,11 +213,10 @@ public interface JLang extends Lang {
 
     // NewOps
 
-    TypeNode findQualifiedTypeNode(New n, AmbiguityRemover ar, ClassType outer,
-            TypeNode objectType) throws SemanticException;
-
-    Expr findQualifier(New n, AmbiguityRemover ar, ClassType ct)
+    TypeNode findQualifiedTypeNode(New n, AmbiguityRemover ar, ClassType outer, TypeNode objectType)
             throws SemanticException;
+
+    Expr findQualifier(New n, AmbiguityRemover ar, ClassType ct) throws SemanticException;
 
     void typeCheckFlags(New n, TypeChecker tc) throws SemanticException;
 
@@ -238,15 +236,14 @@ public interface JLang extends Lang {
 
     // ProcedureDeclOps
 
-    void prettyPrintHeader(ProcedureDecl n, Flags flags, CodeWriter w,
-            PrettyPrinter tr);
+    void prettyPrintHeader(ProcedureDecl n, Flags flags, CodeWriter w, PrettyPrinter tr);
 
     // TermOps
 
     /**
      * Return the first direct subterm performed when evaluating this term. If
      * this term has no subterms, this should return null.
-     * 
+     *
      * This method is similar to the deprecated entry(), but it should *not*
      * recursively drill down to the innermost subterm. The direct child visited
      * first in this term's dataflow should be returned.
@@ -262,13 +259,12 @@ public interface JLang extends Lang {
     // TryOps
 
     /**
-     * Construct an ExceptionChecker that is suitable for checking the try block of 
-     * a try-catch-finally AST node. 
+     * Construct an ExceptionChecker that is suitable for checking the try block of
+     * a try-catch-finally AST node.
      * @param ec The exception checker immediately prior to the try block.
      * @return
      */
-    ExceptionChecker constructTryBlockExceptionChecker(Try n,
-            ExceptionChecker ec);
+    ExceptionChecker constructTryBlockExceptionChecker(Try n, ExceptionChecker ec);
 
     /**
      * Perform exception checking of the try block of a try-catch-finally
@@ -277,28 +273,25 @@ public interface JLang extends Lang {
      * @return
      * @throws SemanticException
      */
-    Block exceptionCheckTryBlock(Try n, ExceptionChecker ec)
-            throws SemanticException;
+    Block exceptionCheckTryBlock(Try n, ExceptionChecker ec) throws SemanticException;
 
     /**
      * Perform exception checking of the catch blocks of a try-catch-finally
      * AST node, using the supplied exception checker.
-     * 
+     *
      * @param ec
      * @return
      * @throws SemanticException
      */
-    List<Catch> exceptionCheckCatchBlocks(Try n, ExceptionChecker ec)
-            throws SemanticException;
+    List<Catch> exceptionCheckCatchBlocks(Try n, ExceptionChecker ec) throws SemanticException;
 
     /**
      * Perform exception checking of the finally block of a try-catch-finally
      * AST node (if there is one), using the supplied exception checker.
-     * 
+     *
      * @param ec
      * @return
      * @throws SemanticException
      */
-    Block exceptionCheckFinallyBlock(Try n, ExceptionChecker ec)
-            throws SemanticException;
+    Block exceptionCheckFinallyBlock(Try n, ExceptionChecker ec) throws SemanticException;
 }

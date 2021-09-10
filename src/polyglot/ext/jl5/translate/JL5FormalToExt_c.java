@@ -21,8 +21,7 @@ public class JL5FormalToExt_c extends FormalToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor toExtEnter(ExtensionRewriter rw) throws SemanticException {
         // Skip annotations
         return rw.bypass(((AnnotatedElement) JL5Ext.ext(node())).annotationElems());
     }
@@ -33,18 +32,15 @@ public class JL5FormalToExt_c extends FormalToExt_c {
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
 
         Formal to =
-                to_nf.Formal(f.position(),
-                             f.flags(),
-                             ((AnnotatedElement) JL5Ext.ext(f)).annotationElems(),
-                             f.type(),
-                             f.id(),
-                             ((JL5FormalExt) JL5Ext.ext(f)).isVarArg());
+                to_nf.Formal(
+                        f.position(),
+                        f.flags(),
+                        ((AnnotatedElement) JL5Ext.ext(f)).annotationElems(),
+                        f.type(),
+                        f.id(),
+                        ((JL5FormalExt) JL5Ext.ext(f)).isVarArg());
         Type type = rw.to_ts().unknownType(f.position());
-        LocalInstance li =
-                rw.to_ts().localInstance(f.position(),
-                                         f.flags(),
-                                         type,
-                                         f.name());
+        LocalInstance li = rw.to_ts().localInstance(f.position(), f.flags(), type, f.name());
         return to.localInstance(li);
     }
 }

@@ -16,7 +16,6 @@ package java_cup;
  * @version last updated: 12/22/97 [CSA]
  * @author  Frank Flannery
  */
-
 public class version {
     /** The major version number. */
     public static final int major = 0;

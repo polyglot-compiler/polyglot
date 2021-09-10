@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# To be run in repo root
+
+java -jar lib/google-java-format.jar \
+  --aosp --skip-sorting-imports --skip-javadoc-formatting \
+  --dry-run \
+  $(git ls-tree -r HEAD --name-only src | grep -E '.*\.java') \
+  $(git ls-tree -r HEAD --name-only tools | grep -E '.*\.java') 2> /dev/null

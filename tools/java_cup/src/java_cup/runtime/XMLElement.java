@@ -14,16 +14,16 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
 public abstract class XMLElement {
     public abstract List<XMLElement> selectById(String s);
 
-    public static void dump(XMLStreamWriter writer, XMLElement elem,
-            String... blacklist) throws XMLStreamException {
+    public static void dump(XMLStreamWriter writer, XMLElement elem, String... blacklist)
+            throws XMLStreamException {
         dump(null, writer, elem, blacklist);
     }
 
-    public static void dump(ScannerBuffer buffer, XMLStreamWriter writer,
-            XMLElement elem, String... blacklist) throws XMLStreamException {
+    public static void dump(
+            ScannerBuffer buffer, XMLStreamWriter writer, XMLElement elem, String... blacklist)
+            throws XMLStreamException {
         writer.writeStartDocument("utf-8", "1.0");
-        writer.writeProcessingInstruction("xml-stylesheet",
-                                          "href=\"tree.xsl\" type=\"text/xsl\"");
+        writer.writeProcessingInstruction("xml-stylesheet", "href=\"tree.xsl\" type=\"text/xsl\"");
         writer.writeStartElement("document");
 
         if (blacklist.length > 0) {
@@ -52,16 +52,14 @@ public abstract class XMLElement {
                         writer.writeCharacters(cs.value + "");
                         cs.getRight().toXML(writer, "right");
                         writer.writeEndElement();
-                    }
-                    else {
+                    } else {
                         writer.writeStartElement("keyword");
                         writer.writeAttribute("left", cs.getLeft() + "");
                         writer.writeAttribute("right", cs.getRight() + "");
                         writer.writeCharacters(cs.getName() + "");
                         writer.writeEndElement();
                     }
-                }
-                else {
+                } else {
                     writer.writeStartElement("token");
                     writer.writeCharacters(s.toString());
                     writer.writeEndElement();
@@ -85,16 +83,17 @@ public abstract class XMLElement {
 
     public abstract Location left();
 
-    protected abstract void dump(XMLStreamWriter writer)
-            throws XMLStreamException;
+    protected abstract void dump(XMLStreamWriter writer) throws XMLStreamException;
 
     public List<XMLElement> getChildren() {
         return new LinkedList<>();
-    };
+    }
+    ;
 
     public boolean hasChildren() {
         return false;
-    };
+    }
+    ;
 
     public static class NonTerminal extends XMLElement {
         @Override
@@ -143,8 +142,7 @@ public abstract class XMLElement {
 
         @Override
         public Location right() {
-            for (Iterator<XMLElement> it =
-                    list.descendingIterator(); it.hasNext();) {
+            for (Iterator<XMLElement> it = list.descendingIterator(); it.hasNext(); ) {
                 Location loc = it.next().right();
                 if (loc != null) return loc;
             }
@@ -154,14 +152,19 @@ public abstract class XMLElement {
         @Override
         public String toString() {
             if (list.isEmpty()) {
-                return "<nonterminal id=\"" + tagname + "\" variant=\""
-                        + variant + "\" />";
+                return "<nonterminal id=\"" + tagname + "\" variant=\"" + variant + "\" />";
             }
-            String ret = "<nonterminal id=\"" + tagname + "\" left=\"" + left()
-                    + "\" right=\"" + right() + "\" variant=\"" + variant
-                    + "\">";
-            for (XMLElement e : list)
-                ret += e.toString();
+            String ret =
+                    "<nonterminal id=\""
+                            + tagname
+                            + "\" left=\""
+                            + left()
+                            + "\" right=\""
+                            + right()
+                            + "\" variant=\""
+                            + variant
+                            + "\">";
+            for (XMLElement e : list) ret += e.toString();
             return ret + "</nonterminal>";
         }
 
@@ -170,12 +173,11 @@ public abstract class XMLElement {
             writer.writeStartElement("nonterminal");
             writer.writeAttribute("id", tagname);
             writer.writeAttribute("variant", variant + "");
-//                      if (!list.isEmpty()){
+            //                      if (!list.isEmpty()){
             Location loc = left();
             if (loc != null) loc.toXML(writer, "left");
-//                      }
-            for (XMLElement e : list)
-                e.dump(writer);
+            //                      }
+            for (XMLElement e : list) e.dump(writer);
             loc = right();
             if (loc != null) loc.toXML(writer, "right");
             writer.writeEndElement();
@@ -237,7 +239,8 @@ public abstract class XMLElement {
                 ret.add(this);
             }
             return ret;
-        };
+        }
+        ;
 
         Location l, r;
         Object value;
@@ -271,8 +274,15 @@ public abstract class XMLElement {
         public String toString() {
             return value == null
                     ? "<terminal id=\"" + tagname + "\"/>"
-                    : "<terminal id=\"" + tagname + "\" left=\"" + l
-                            + "\" right=\"" + r + "\">" + value + "</terminal>";
+                    : "<terminal id=\""
+                            + tagname
+                            + "\" left=\""
+                            + l
+                            + "\" right=\""
+                            + r
+                            + "\">"
+                            + value
+                            + "</terminal>";
         }
 
         @Override

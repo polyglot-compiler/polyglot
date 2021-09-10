@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -71,8 +71,8 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     protected AnnotationTypeElemInstance ai;
     protected Javadoc javadoc;
 
-    public AnnotationElemDecl_c(Position pos, Flags flags, TypeNode type,
-            Id name, Term defaultVal, Javadoc javadoc) {
+    public AnnotationElemDecl_c(
+            Position pos, Flags flags, TypeNode type, Id name, Term defaultVal, Javadoc javadoc) {
         super(pos);
         this.type = type;
         this.flags = flags;
@@ -85,8 +85,8 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public AnnotationElemDecl_c(Position pos, Flags flags, TypeNode type,
-            Id name, Term defaultVal) {
+    public AnnotationElemDecl_c(
+            Position pos, Flags flags, TypeNode type, Id name, Term defaultVal) {
         this(pos, flags, type, name, defaultVal, null);
     }
 
@@ -174,13 +174,12 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
-    public AnnotationElemDecl annotationElemInstance(
-            AnnotationTypeElemInstance ai) {
+    public AnnotationElemDecl annotationElemInstance(AnnotationTypeElemInstance ai) {
         return annotationElemInstance(this, ai);
     }
 
-    protected <N extends AnnotationElemDecl_c> N annotationElemInstance(N n,
-            AnnotationTypeElemInstance ai) {
+    protected <N extends AnnotationElemDecl_c> N annotationElemInstance(
+            N n, AnnotationTypeElemInstance ai) {
         if (n.ai == ai) return n;
         if (n == this) n = Copy.Util.copy(n);
         n.ai = ai;
@@ -204,8 +203,8 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         // this may not be necessary - I think this is for scopes for
-        // symbol checking? - in fields and methods there many anon inner 
-        // classes and thus a scope is needed - but in annots there 
+        // symbol checking? - in fields and methods there many anon inner
+        // classes and thus a scope is needed - but in annots there
         // cannot be ???
         return tb.pushCode();
     }
@@ -224,12 +223,13 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
         f = f.Public().Abstract();
 
         AnnotationTypeElemInstance ai =
-                ts.annotationElemInstance(position(),
-                                          ct,
-                                          f,
-                                          ts.unknownType(position()),
-                                          this.name(),
-                                          defaultVal != null);
+                ts.annotationElemInstance(
+                        position(),
+                        ct,
+                        f,
+                        ts.unknownType(position()),
+                        this.name(),
+                        defaultVal != null);
         ct.addAnnotationElem(ai);
 
         return annotationElemInstance(ai);
@@ -256,23 +256,25 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
-        // check type - must be one of primitive, String, Class, 
+        // check type - must be one of primitive, String, Class,
         // enum, annotation or array or one of these
         if (!ts.isValidAnnotationValueType(type().type())) {
-            throw new SemanticException("The type: "
-                                                + this.type()
-                                                + " for the annotation element declaration "
-                                                + this.name()
-                                                + " must be a primitive, String, Class, enum type, annotation type or an array of one of these.",
-                                        type().position());
+            throw new SemanticException(
+                    "The type: "
+                            + this.type()
+                            + " for the annotation element declaration "
+                            + this.name()
+                            + " must be a primitive, String, Class, enum type, annotation type or"
+                            + " an array of one of these.",
+                    type().position());
         }
 
-        // an annotation element cannot have the same type as the 
+        // an annotation element cannot have the same type as the
         // type it is declared in - direct
         // also need to check indirect cycles
         if (type().type().equals(tc.context().currentClass())) {
-            throw new SemanticException("Cyclic annotation element type: "
-                    + type(), type().position());
+            throw new SemanticException(
+                    "Cyclic annotation element type: " + type(), type().position());
         }
 
         // check default value matches type
@@ -280,54 +282,49 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
             Type defaultValType;
             if (defaultVal instanceof Expr) {
                 defaultValType = ((Expr) defaultVal).type();
-            }
-            else if (defaultVal instanceof ElementValueArrayInit) {
+            } else if (defaultVal instanceof ElementValueArrayInit) {
                 ElementValueArrayInit evai = (ElementValueArrayInit) defaultVal;
                 defaultValType = evai.type();
-            }
-            else if (defaultVal instanceof AnnotationElem) {
-                defaultValType =
-                        ((AnnotationElem) defaultVal).typeName().type();
-            }
-            else {
-                throw new InternalCompilerError("Don't know how to deal with default value ("
-                                                        + defaultVal
-                                                        + ") of kind "
-                                                        + defaultVal.getClass(),
-                                                defaultVal.position());
+            } else if (defaultVal instanceof AnnotationElem) {
+                defaultValType = ((AnnotationElem) defaultVal).typeName().type();
+            } else {
+                throw new InternalCompilerError(
+                        "Don't know how to deal with default value ("
+                                + defaultVal
+                                + ") of kind "
+                                + defaultVal.getClass(),
+                        defaultVal.position());
             }
             if (defaultVal instanceof ElementValueArrayInit) {
-                ((ElementValueArrayInit) defaultVal).typeCheckElements(tc,
-                                                                       type.type());
-            }
-            else {
+                ((ElementValueArrayInit) defaultVal).typeCheckElements(tc, type.type());
+            } else {
                 if (!ts.isImplicitCastValid(defaultValType, type.type())
                         && !ts.equals(defaultValType, type.type())
-                        && !(defaultVal instanceof Expr && ts.numericConversionValid(type.type(),
-                                                                                     tc.lang()
-                                                                                       .constantValue((Expr) defaultVal,
-                                                                                                      tc.lang())))
+                        && !(defaultVal instanceof Expr
+                                && ts.numericConversionValid(
+                                        type.type(),
+                                        tc.lang().constantValue((Expr) defaultVal, tc.lang())))
                         && !ts.isBaseCastValid(defaultValType, type.type())
-                        && !(defaultVal instanceof Expr && ts.numericConversionBaseValid(type.type(),
-                                                                                         tc.lang()
-                                                                                           .constantValue((Expr) defaultVal,
-                                                                                                          tc.lang())))) {
-                    throw new SemanticException("The type of the default value: "
-                                                        + defaultVal
-                                                        + " does not match the annotation element type: "
-                                                        + type.type() + " .",
-                                                defaultVal.position());
+                        && !(defaultVal instanceof Expr
+                                && ts.numericConversionBaseValid(
+                                        type.type(),
+                                        tc.lang().constantValue((Expr) defaultVal, tc.lang())))) {
+                    throw new SemanticException(
+                            "The type of the default value: "
+                                    + defaultVal
+                                    + " does not match the annotation element type: "
+                                    + type.type()
+                                    + " .",
+                            defaultVal.position());
                 }
             }
         }
 
         if (flags.contains(Flags.NATIVE)) {
-            throw new SemanticException("Modifier native is not allowed here",
-                                        position());
+            throw new SemanticException("Modifier native is not allowed here", position());
         }
         if (flags.contains(Flags.PRIVATE)) {
-            throw new SemanticException("Modifier private is not allowed here",
-                                        position());
+            throw new SemanticException("Modifier private is not allowed here", position());
         }
 
         if (defaultVal != null) ts.checkAnnotationValueConstant(defaultVal);

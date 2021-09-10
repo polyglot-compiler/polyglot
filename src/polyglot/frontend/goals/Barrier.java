@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -35,7 +35,7 @@ import polyglot.frontend.Pass;
 import polyglot.frontend.Scheduler;
 
 /**
- * A {@code Barrier} goal synchronizes all the jobs to reach the same goal. 
+ * A {@code Barrier} goal synchronizes all the jobs to reach the same goal.
  *
  * @author nystrom
  */
@@ -100,8 +100,7 @@ public abstract class Barrier extends AbstractGoal {
     public int hashCode() {
         if (name == null) {
             return System.identityHashCode(this);
-        }
-        else {
+        } else {
             return name.hashCode();
         }
     }
@@ -110,8 +109,7 @@ public abstract class Barrier extends AbstractGoal {
     public boolean equals(Object o) {
         if (name == null) {
             return this == o;
-        }
-        else if (o instanceof Barrier) {
+        } else if (o instanceof Barrier) {
             Barrier b = (Barrier) o;
             return name.equals(b.name);
         }

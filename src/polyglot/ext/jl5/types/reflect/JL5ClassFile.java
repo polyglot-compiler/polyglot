@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -41,8 +41,8 @@ public class JL5ClassFile extends ClassFile_c {
     private Annotations runtimeVisibleAnnotations;
     private Annotations runtimeInvisibleAnnotations;
 
-    public JL5ClassFile(FileObject classFileSource, byte[] code,
-            ExtensionInfo ext) throws IOException {
+    public JL5ClassFile(FileObject classFileSource, byte[] code, ExtensionInfo ext)
+            throws IOException {
         super(classFileSource, code, ext);
     }
 
@@ -61,20 +61,18 @@ public class JL5ClassFile extends ClassFile_c {
     }
 
     @Override
-    public Attribute createAttribute(DataInputStream in, String name,
-            int nameIndex, int length) throws IOException {
+    public Attribute createAttribute(DataInputStream in, String name, int nameIndex, int length)
+            throws IOException {
         if (name.equals("Signature")) {
             signature = new JL5Signature(this, in, nameIndex, length);
             return signature;
         }
         if (name.equals("RuntimeVisibleAnnotations")) {
-            runtimeVisibleAnnotations =
-                    new Annotations(this, in, nameIndex, length);
+            runtimeVisibleAnnotations = new Annotations(this, in, nameIndex, length);
             return runtimeVisibleAnnotations;
         }
         if (name.equals("RuntimeInvisibleAnnotations")) {
-            runtimeInvisibleAnnotations =
-                    new Annotations(this, in, nameIndex, length);
+            runtimeInvisibleAnnotations = new Annotations(this, in, nameIndex, length);
             return runtimeInvisibleAnnotations;
         }
         return super.createAttribute(in, name, nameIndex, length);
@@ -91,5 +89,4 @@ public class JL5ClassFile extends ClassFile_c {
     public Annotations getRuntimeInvisibleAnnotations() {
         return this.runtimeInvisibleAnnotations;
     }
-
 }

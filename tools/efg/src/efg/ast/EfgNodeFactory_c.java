@@ -5,8 +5,7 @@ import polyglot.ext.jl7.ast.JL7NodeFactory_c;
 /**
  * NodeFactory for Efg extension.
  */
-public class EfgNodeFactory_c extends JL7NodeFactory_c
-        implements EfgNodeFactory {
+public class EfgNodeFactory_c extends JL7NodeFactory_c implements EfgNodeFactory {
     public EfgNodeFactory_c() {
         this(EfgLang_c.INSTANCE);
     }

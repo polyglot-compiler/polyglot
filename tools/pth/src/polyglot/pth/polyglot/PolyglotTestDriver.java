@@ -43,22 +43,19 @@ public class PolyglotTestDriver extends AbstractTestDriver {
         return destDir;
     }
 
-    public int invokeCompiler(PolyglotSourceFileTest sft,
-            List<String> cmdLine) {
+    public int invokeCompiler(PolyglotSourceFileTest sft, List<String> cmdLine) {
         ErrorQueue eq = sft.errorQueue();
         try {
             polyglot.main.Main polyglotMain = new polyglot.main.Main();
             polyglotMain.start(cmdLine.toArray(new String[cmdLine.size()]), eq);
-        }
-        catch (polyglot.main.Main.TerminationException e) {
+        } catch (polyglot.main.Main.TerminationException e) {
             if (e.getMessage() != null) {
                 sft.appendFailureMessage(e.getMessage());
                 return 1;
-            }
-            else {
+            } else {
                 if (!eq.hasErrors()) {
-                    sft.appendFailureMessage("Failed to compile for unknown reasons: "
-                            + e.toString());
+                    sft.appendFailureMessage(
+                            "Failed to compile for unknown reasons: " + e.toString());
                     return 1;
                 }
             }
@@ -79,32 +76,32 @@ public class PolyglotTestDriver extends AbstractTestDriver {
     @Override
     public boolean postTest(SourceFileTest t) {
         boolean okay = true;
-//        File destDir = getDestDir();
-//        for (PolyglotTester tester : testers) {
-//            // Normalize generated files.
-//            if (!tester.normalizeGeneratedFiles(t, destDir))
-//                okay = false;
-//            else {
-//                // Compare generated files with solution and report results.
-//                okay = okay && tester.checkResult(t, destDir);
-//            }
-//        }
+        //        File destDir = getDestDir();
+        //        for (PolyglotTester tester : testers) {
+        //            // Normalize generated files.
+        //            if (!tester.normalizeGeneratedFiles(t, destDir))
+        //                okay = false;
+        //            else {
+        //                // Compare generated files with solution and report results.
+        //                okay = okay && tester.checkResult(t, destDir);
+        //            }
+        //        }
         return okay;
     }
 
     @Override
     public boolean cleanup(SourceFileTest t, File saveDir) {
         boolean okay = true;
-//        File destDir = getDestDir();
-//        for (PolyglotTester tester : testers) {
-//            if (shouldCleanupReferenceFiles()) {
-//                // Clean up reference files.
-//                okay = tester.cleanupReferenceFiles(t, destDir, saveDir)
-//                        && okay;
-//            }
-//            // Clean up generated files.
-//            okay = tester.cleanupGeneratedFiles(t, destDir, saveDir) && okay;
-//        }
+        //        File destDir = getDestDir();
+        //        for (PolyglotTester tester : testers) {
+        //            if (shouldCleanupReferenceFiles()) {
+        //                // Clean up reference files.
+        //                okay = tester.cleanupReferenceFiles(t, destDir, saveDir)
+        //                        && okay;
+        //            }
+        //            // Clean up generated files.
+        //            okay = tester.cleanupGeneratedFiles(t, destDir, saveDir) && okay;
+        //        }
         return okay;
     }
 
@@ -117,14 +114,14 @@ public class PolyglotTestDriver extends AbstractTestDriver {
 
     @Override
     public void printTestResult(SourceFileTest t, PDFReporter pr) {
-//        File destDir = getDestDir();
-//        for (PolyglotTester tester : testers)
-//            tester.printTestResult(t, destDir, pr);
+        //        File destDir = getDestDir();
+        //        for (PolyglotTester tester : testers)
+        //            tester.printTestResult(t, destDir, pr);
     }
 
-//    @Override
-//    public void getSummary(StringBuffer sb) {
-//        for (PolyglotTester tester : testers)
-//            tester.getSummary(sb);
-//    }
+    //    @Override
+    //    public void getSummary(StringBuffer sb) {
+    //        for (PolyglotTester tester : testers)
+    //            tester.getSummary(sb);
+    //    }
 }

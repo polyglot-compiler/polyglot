@@ -16,8 +16,7 @@ public class JL5LocalDeclToJL_c extends LocalDeclToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor toExtEnter(ExtensionRewriter rw) throws SemanticException {
         // Skip annotations
         LocalDecl n = (LocalDecl) node();
         JL5LocalDeclExt ext = (JL5LocalDeclExt) JL5Ext.ext(n);

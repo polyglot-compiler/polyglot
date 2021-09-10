@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -56,8 +56,7 @@ import polyglot.visit.TypeChecker;
  * the elements of these array may be expressions of any type (e.g.,
  * {@code Call}).
  */
-public class ElementValueArrayInit_c extends Term_c implements
-        ElementValueArrayInit {
+public class ElementValueArrayInit_c extends Term_c implements ElementValueArrayInit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<Term> elements;
@@ -80,8 +79,7 @@ public class ElementValueArrayInit_c extends Term_c implements
         return elements(this, elements);
     }
 
-    protected <N extends ElementValueArrayInit_c> N elements(N n,
-            List<Term> elements) {
+    protected <N extends ElementValueArrayInit_c> N elements(N n, List<Term> elements) {
         ElementValueArrayInit_c ext = n;
         if (CollectionUtil.equals(ext.elements, elements)) return n;
         if (n == this) {
@@ -114,8 +112,7 @@ public class ElementValueArrayInit_c extends Term_c implements
     }
 
     /** Reconstruct the initializer. */
-    protected <N extends ElementValueArrayInit_c> N reconstruct(N n,
-            List<Term> elements) {
+    protected <N extends ElementValueArrayInit_c> N reconstruct(N n, List<Term> elements) {
         n = elements(n, elements);
         return n;
     }
@@ -135,16 +132,14 @@ public class ElementValueArrayInit_c extends Term_c implements
         for (Term e : elements) {
             if (type == null) {
                 type = typeOf(e);
-            }
-            else {
+            } else {
                 type = ts.leastCommonAncestor(type, typeOf(e));
             }
         }
 
         if (type == null) {
             return type(ts.Null());
-        }
-        else {
+        } else {
             return type(arrayOf(ts, type));
         }
     }
@@ -174,8 +169,8 @@ public class ElementValueArrayInit_c extends Term_c implements
             t = this.type();
         }
         if (!t.isArray()) {
-            throw new InternalCompilerError("Type of array initializer must "
-                    + "be an array.", position());
+            throw new InternalCompilerError(
+                    "Type of array initializer must " + "be an array.", position());
         }
 
         t = t.toArray().base();
@@ -192,13 +187,12 @@ public class ElementValueArrayInit_c extends Term_c implements
     }
 
     @Override
-    public void typeCheckElements(TypeChecker tc, Type lhsType)
-            throws SemanticException {
+    public void typeCheckElements(TypeChecker tc, Type lhsType) throws SemanticException {
         TypeSystem ts = lhsType.typeSystem();
 
         if (!lhsType.isArray()) {
-            throw new SemanticException("Cannot initialize " + lhsType
-                    + " with " + type() + ".", position());
+            throw new SemanticException(
+                    "Cannot initialize " + lhsType + " with " + type() + ".", position());
         }
 
         // Check if we can assign each individual element.
@@ -214,12 +208,9 @@ public class ElementValueArrayInit_c extends Term_c implements
 
             if (!ts.isImplicitCastValid(s, t)
                     && !ts.typeEquals(s, t)
-                    && !ts.numericConversionValid(t,
-                                                  tc.lang()
-                                                    .constantValue((Expr) e,
-                                                                   tc.lang()))) {
-                throw new SemanticException("Cannot assign " + s + " to " + t
-                        + ".", e.position());
+                    && !ts.numericConversionValid(
+                            t, tc.lang().constantValue((Expr) e, tc.lang()))) {
+                throw new SemanticException("Cannot assign " + s + " to " + t + ".", e.position());
             }
         }
     }
@@ -233,7 +224,7 @@ public class ElementValueArrayInit_c extends Term_c implements
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("{ ");
 
-        for (Iterator<Term> i = elements.iterator(); i.hasNext();) {
+        for (Iterator<Term> i = elements.iterator(); i.hasNext(); ) {
             Term e = i.next();
             print(e, w, tr);
 
@@ -259,7 +250,6 @@ public class ElementValueArrayInit_c extends Term_c implements
 
     @Override
     public Node copy(NodeFactory nf) {
-        return ((JL5NodeFactory) nf).ElementValueArrayInit(position(),
-                                                           this.elements);
+        return ((JL5NodeFactory) nf).ElementValueArrayInit(position(), this.elements);
     }
 }

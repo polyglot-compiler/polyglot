@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -55,7 +55,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
 
     protected List<Expr> elements;
 
-//    @Deprecated
+    //    @Deprecated
     public ArrayInit_c(Position pos, List<Expr> elements) {
         this(pos, elements, null);
     }
@@ -104,16 +104,14 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
         for (Expr e : elements) {
             if (type == null) {
                 type = e.type();
-            }
-            else {
+            } else {
                 type = ts.leastCommonAncestor(type, e.type());
             }
         }
 
         if (type == null) {
             return type(ts.Null());
-        }
-        else {
+        } else {
             return type(arrayOf(ts, type));
         }
     }
@@ -131,8 +129,8 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
         Type t = av.toType();
 
         if (!t.isArray()) {
-            throw new InternalCompilerError("Type of array initializer must "
-                    + "be an array.", position());
+            throw new InternalCompilerError(
+                    "Type of array initializer must " + "be an array.", position());
         }
 
         t = t.toArray().base();
@@ -149,13 +147,12 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
     }
 
     @Override
-    public void typeCheckElements(TypeChecker tc, Type lhsType)
-            throws SemanticException {
+    public void typeCheckElements(TypeChecker tc, Type lhsType) throws SemanticException {
         TypeSystem ts = lhsType.typeSystem();
 
         if (!lhsType.isArray()) {
-            throw new SemanticException("Cannot initialize " + lhsType
-                    + " with " + type + ".", position());
+            throw new SemanticException(
+                    "Cannot initialize " + lhsType + " with " + type + ".", position());
         }
 
         // Check if we can assign each individual element.
@@ -171,11 +168,8 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
 
             if (!ts.isImplicitCastValid(s, t)
                     && !ts.typeEquals(s, t)
-                    && !ts.numericConversionValid(t,
-                                                  tc.lang()
-                                                    .constantValue(e, tc.lang()))) {
-                throw new SemanticException("Cannot assign " + s + " to " + t
-                        + ".", e.position());
+                    && !ts.numericConversionValid(t, tc.lang().constantValue(e, tc.lang()))) {
+                throw new SemanticException("Cannot assign " + s + " to " + t + ".", e.position());
             }
         }
     }
@@ -189,7 +183,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit {
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("{ ");
 
-        for (Iterator<Expr> i = elements.iterator(); i.hasNext();) {
+        for (Iterator<Expr> i = elements.iterator(); i.hasNext(); ) {
             Expr e = i.next();
             print(e, w, tr);
 

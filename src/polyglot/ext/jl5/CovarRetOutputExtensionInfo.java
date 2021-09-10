@@ -26,61 +26,58 @@ public class CovarRetOutputExtensionInfo extends JLOutputExtensionInfo {
         return new CovarRetTypeSystem_c();
     }
 
-    static protected class CovarRetTypeSystem_c extends TypeSystem_c {
+    protected static class CovarRetTypeSystem_c extends TypeSystem_c {
         @Override
-        public MethodInstance methodInstance(Position pos,
-                ReferenceType container, Flags flags, Type returnType,
-                String name, List<? extends Type> formals,
+        public MethodInstance methodInstance(
+                Position pos,
+                ReferenceType container,
+                Flags flags,
+                Type returnType,
+                String name,
+                List<? extends Type> formals,
                 List<? extends Type> throwTypes) {
-            return new CovarRetMethodInstance_c(this,
-                                                pos,
-                                                container,
-                                                flags,
-                                                returnType,
-                                                name,
-                                                formals,
-                                                throwTypes);
+            return new CovarRetMethodInstance_c(
+                    this, pos, container, flags, returnType, name, formals, throwTypes);
         }
     }
 
-    static protected class CovarRetMethodInstance_c extends MethodInstance_c {
+    protected static class CovarRetMethodInstance_c extends MethodInstance_c {
 
-        private static final long serialVersionUID =
-                SerialVersionUID.generate();
+        private static final long serialVersionUID = SerialVersionUID.generate();
 
-        public CovarRetMethodInstance_c(TypeSystem ts, Position pos,
-                ReferenceType container, Flags flags, Type returnType,
-                java.lang.String name, List<? extends Type> formals,
+        public CovarRetMethodInstance_c(
+                TypeSystem ts,
+                Position pos,
+                ReferenceType container,
+                Flags flags,
+                Type returnType,
+                java.lang.String name,
+                List<? extends Type> formals,
                 List<? extends Type> throwTypes) {
-            super(ts,
-                  pos,
-                  container,
-                  flags,
-                  returnType,
-                  name,
-                  formals,
-                  throwTypes);
+            super(ts, pos, container, flags, returnType, name, formals, throwTypes);
         }
 
         @Override
-        public boolean canOverrideImpl(MethodInstance mj, boolean quiet)
-                throws SemanticException {
+        public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
             MethodInstance mi = this;
 
             // This is the only rule that has changed.
             if (!canOverrideReturnType(mi.returnType(), mj.returnType())) {
                 if (quiet) return false;
-                throw new SemanticException(mi.signature() + " in "
-                                                    + mi.container()
-                                                    + " cannot override "
-                                                    + mj.signature() + " in "
-                                                    + mj.container()
-                                                    + "; incompatible "
-                                                    + "return types: "
-                                                    + mi.returnType()
-                                                    + " is not a subtype of "
-                                                    + mj.returnType(),
-                                            mi.position());
+                throw new SemanticException(
+                        mi.signature()
+                                + " in "
+                                + mi.container()
+                                + " cannot override "
+                                + mj.signature()
+                                + " in "
+                                + mj.container()
+                                + "; incompatible "
+                                + "return types: "
+                                + mi.returnType()
+                                + " is not a subtype of "
+                                + mj.returnType(),
+                        mi.position());
             }
 
             // Force the return types to be the same and then let the super
@@ -93,15 +90,12 @@ public class CovarRetOutputExtensionInfo extends JLOutputExtensionInfo {
         protected boolean canOverrideReturnType(Type ri, Type rj) {
             if (ri.isPrimitive()) {
                 return ri.equals(rj);
-            }
-            else if (ri.isReference()) {
+            } else if (ri.isReference()) {
                 return ri.isSubtype(rj) || ri.isImplicitCastValid(rj);
-            }
-            else if (ri.isVoid()) {
+            } else if (ri.isVoid()) {
                 return rj.isVoid();
             }
             return ri.equals(rj);
         }
     }
-
 }

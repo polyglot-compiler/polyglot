@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -39,7 +39,7 @@ import polyglot.visit.CFGBuilder;
 /**
  * A {@code ArrayAccessAssign_c} represents a Java assignment expression
  * to an array element.  For instance, {@code A[3] = e}.
- * 
+ *
  * The class of the {@code Expr} returned by
  * {@code ArrayAccessAssign_c.left()}is guaranteed to be an
  * {@code ArrayAccess}.
@@ -47,14 +47,12 @@ import polyglot.visit.CFGBuilder;
 public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
-    public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
-            Expr right) {
+    //    @Deprecated
+    public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op, Expr right) {
         this(pos, left, op, right, null);
     }
 
-    public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op,
-            Expr right, Ext ext) {
+    public ArrayAccessAssign_c(Position pos, ArrayAccess left, Operator op, Expr right, Ext ext) {
         super(pos, left, op, right, ext);
     }
 
@@ -71,7 +69,8 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
 
     private void assertLeftType(Expr left) {
         if (!(left instanceof ArrayAccess)) {
-            throw new InternalCompilerError("left expression of an ArrayAccessAssign must be an array access");
+            throw new InternalCompilerError(
+                    "left expression of an ArrayAccessAssign must be an array access");
         }
     }
 
@@ -79,8 +78,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     public Term firstChild() {
         if (operator() == ASSIGN) {
             return left().array();
-        }
-        else {
+        } else {
             return left();
         }
     }
@@ -99,7 +97,7 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
     protected void acceptCFGOpAssign(CFGBuilder<?> v) {
         /*
         ArrayAccess a = (ArrayAccess)left();
-        
+
         // a[i] OP= e: visit a -> i -> a[i] -> e -> (a[i] OP= e)
         v.visitCFG(a.array(), a.index().entry());
         v.visitCFG(a.index(), a);
@@ -125,5 +123,4 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign {
 
         return l;
     }
-
 }

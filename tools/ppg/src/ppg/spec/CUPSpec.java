@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -45,9 +45,14 @@ public class CUPSpec extends Spec {
     private String start;
     private final int NT_NOT_FOUND = -1;
 
-    public CUPSpec(String pkg, Vector<String> imp, Vector<Code> codeParts,
-            Vector<SymbolList> syms, Vector<Precedence> precedence,
-            String startSym, Vector<Production> prods) {
+    public CUPSpec(
+            String pkg,
+            Vector<String> imp,
+            Vector<Code> codeParts,
+            Vector<SymbolList> syms,
+            Vector<Precedence> precedence,
+            String startSym,
+            Vector<Production> prods) {
         super();
         packageName = pkg;
         imports = imp;
@@ -95,8 +100,7 @@ public class CUPSpec extends Spec {
         Vector<Vector<GrammarPart>> sourceRHSList = sourceProd.getRHS();
 
         Vector<Vector<GrammarPart>> rhs = p.getRHS();
-        Production result =
-                new Production(nt, new Vector<Vector<GrammarPart>>());
+        Production result = new Production(nt, new Vector<Vector<GrammarPart>>());
 
         for (int i = 0; i < rhs.size(); i++) {
             Vector<GrammarPart> toMatch = rhs.elementAt(i);
@@ -105,10 +109,9 @@ public class CUPSpec extends Spec {
                 if (Production.isSameProduction(toMatch, source)) {
                     Vector<GrammarPart> clone = new Vector<>();
                     for (int k = 0; k < source.size(); k++) {
-                        clone.addElement((GrammarPart) source.elementAt(k)
-                                                             .clone());
+                        clone.addElement((GrammarPart) source.elementAt(k).clone());
                     }
-                    //result.addToRHS((Vector) source.clone());
+                    // result.addToRHS((Vector) source.clone());
                     result.addToRHS(clone);
                     break;
                 }
@@ -131,8 +134,7 @@ public class CUPSpec extends Spec {
 
     @Override
     public Object clone() {
-        String newPkgName =
-                (packageName == null) ? null : packageName.toString();
+        String newPkgName = (packageName == null) ? null : packageName.toString();
         /*******************/
         Vector<String> newImports = new Vector<>();
         for (int i = 0; i < imports.size(); i++) {
@@ -162,17 +164,11 @@ public class CUPSpec extends Spec {
         /*******************/
         Vector<Production> newProductions = new Vector<>();
         for (int i = 0; i < productions.size(); i++) {
-            newProductions.addElement((Production) productions.elementAt(i)
-                                                              .clone());
+            newProductions.addElement((Production) productions.elementAt(i).clone());
         }
 
-        return new CUPSpec(newPkgName,
-                           newImports,
-                           newCode,
-                           newSymbols,
-                           newPrec,
-                           newStart,
-                           newProductions);
+        return new CUPSpec(
+                newPkgName, newImports, newCode, newSymbols, newPrec, newStart, newProductions);
 
         /*
         return new CUPSpec(newPkgName,
@@ -199,7 +195,7 @@ public class CUPSpec extends Spec {
             SymbolList list = symbols.elementAt(i);
             dropped = dropped || list.dropSymbol(gs);
         }
-        //TODO: error if symbol being dropped was not found
+        // TODO: error if symbol being dropped was not found
         /*
         if (!dropped)
         	throw new PPGError("file", -1, "symbol "+gs+" not found.");
@@ -239,12 +235,11 @@ public class CUPSpec extends Spec {
             ntProds.put(nt.getName(), new Integer(productions.size()));
             // just append to our list
             productions.addElement(p);
-        }
-        else {
+        } else {
             // attach to specific nonterminal in our list of productions
             Production prod = productions.elementAt(pos);
             prod.add(p);
-            //productions.setElementAt(prod, pos);
+            // productions.setElementAt(prod, pos);
         }
     }
 
@@ -258,8 +253,7 @@ public class CUPSpec extends Spec {
 
     private int findNonterminal(String nt) {
         Integer pos = ntProds.get(nt);
-        if (pos == null)
-            return NT_NOT_FOUND;
+        if (pos == null) return NT_NOT_FOUND;
         else return pos.intValue();
     }
 
@@ -323,7 +317,7 @@ public class CUPSpec extends Spec {
         cw.newline();
         cw.end();
 
-        //Write out to stdout in a naive manner
+        // Write out to stdout in a naive manner
         /*
         try {
         	export(System.out);
@@ -359,13 +353,11 @@ public class CUPSpec extends Spec {
         out.println();
 
         // symbols
-        for (int i = 0; i < symbols.size(); i++)
-            out.println(symbols.elementAt(i).toString());
+        for (int i = 0; i < symbols.size(); i++) out.println(symbols.elementAt(i).toString());
         out.println();
 
         // precedence
-        for (int i = 0; i < prec.size(); i++)
-            out.println(prec.elementAt(i).toString());
+        for (int i = 0; i < prec.size(); i++) out.println(prec.elementAt(i).toString());
         out.println();
 
         // start

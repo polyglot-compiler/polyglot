@@ -17,8 +17,7 @@ public class symbol_set implements Iterable<symbol> {
     /*-----------------------------------------------------------*/
 
     /** Constructor for an empty set. */
-    public symbol_set() {
-    }
+    public symbol_set() {}
 
     /** Constructor for cloning from another set.
      * @param other the set we are cloning from.
@@ -57,8 +56,7 @@ public class symbol_set implements Iterable<symbol> {
      * @param obj the object we are testing.
      */
     protected void not_null(Object obj) throws internal_error {
-        if (obj == null)
-            throw new internal_error("Null object used in set operation");
+        if (obj == null) throw new internal_error("Null object used in set operation");
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -79,8 +77,7 @@ public class symbol_set implements Iterable<symbol> {
         not_null(other);
 
         /* walk down our set and make sure every element is in the other */
-        for (symbol s : this)
-            if (!other.contains(s)) return false;
+        for (symbol s : this) if (!other.contains(s)) return false;
 
         /* they were all there */
         return true;
@@ -136,8 +133,7 @@ public class symbol_set implements Iterable<symbol> {
         not_null(other);
 
         /* walk down the other set and do the adds individually */
-        for (symbol s : other)
-            result = add(s) || result;
+        for (symbol s : other) result = add(s) || result;
 
         return result;
     }
@@ -151,8 +147,7 @@ public class symbol_set implements Iterable<symbol> {
         not_null(other);
 
         /* walk down the other set and do the removes individually */
-        for (symbol s : other)
-            remove(s);
+        for (symbol s : other) remove(s);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -164,8 +159,7 @@ public class symbol_set implements Iterable<symbol> {
         /* once we know they are the same size, then improper subset does test */
         try {
             return is_subset_of(other);
-        }
-        catch (internal_error e) {
+        } catch (internal_error e) {
             /* can't throw the error (because super class doesn't), so we crash */
             e.crash();
             return false;
@@ -177,8 +171,7 @@ public class symbol_set implements Iterable<symbol> {
     /** Generic equality comparison. */
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof symbol_set))
-            return false;
+        if (!(other instanceof symbol_set)) return false;
         else return equals((symbol_set) other);
     }
 
@@ -189,8 +182,7 @@ public class symbol_set implements Iterable<symbol> {
     public int hashCode() {
         int result = 0;
 
-        for (symbol s : this)
-            result ^= s.hashCode();
+        for (symbol s : this) result ^= s.hashCode();
 
         return result;
     }
@@ -206,8 +198,7 @@ public class symbol_set implements Iterable<symbol> {
         result = "{";
         comma_flag = false;
         for (symbol s : this) {
-            if (comma_flag)
-                result += ", ";
+            if (comma_flag) result += ", ";
             else comma_flag = true;
 
             result += s.name();

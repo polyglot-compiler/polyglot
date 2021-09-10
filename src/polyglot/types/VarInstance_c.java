@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -45,11 +45,9 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance 
     protected boolean constantValueSet;
 
     /** Used for deserializing types. */
-    protected VarInstance_c() {
-    }
+    protected VarInstance_c() {}
 
-    public VarInstance_c(TypeSystem ts, Position pos, Flags flags, Type type,
-            String name) {
+    public VarInstance_c(TypeSystem ts, Position pos, Flags flags, Type type, String name) {
         super(ts, pos);
         this.flags = flags;
         this.type = type;
@@ -89,8 +87,9 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance 
                 setNotConstant();
                 return isConstant;
             }
-//            Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-//            scheduler.addConcurrentDependency(scheduler.currentGoal(), new ConstantsChecked(this));
+            //            Scheduler scheduler = typeSystem().extensionInfo().scheduler();
+            //            scheduler.addConcurrentDependency(scheduler.currentGoal(), new
+            // ConstantsChecked(this));
         }
         return isConstant;
     }
@@ -131,8 +130,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance 
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof VarInstance) {
             VarInstance i = (VarInstance) o;
-            return flags.equals(i.flags()) && ts.equals(type, i.type())
-                    && name.equals(i.name());
+            return flags.equals(i.flags()) && ts.equals(type, i.type()) && name.equals(i.name());
         }
 
         return false;
@@ -155,12 +153,14 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance 
 
     @Override
     public void setConstantValue(Object constantValue) {
-        if (!(constantValue == null) && !(constantValue instanceof Boolean)
+        if (!(constantValue == null)
+                && !(constantValue instanceof Boolean)
                 && !(constantValue instanceof Number)
                 && !(constantValue instanceof Character)
                 && !(constantValue instanceof String)) {
 
-            throw new InternalCompilerError("Can only set constant value to a primitive or String.");
+            throw new InternalCompilerError(
+                    "Can only set constant value to a primitive or String.");
         }
 
         this.constantValue = constantValue;

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -99,7 +99,7 @@ import polyglot.util.UniqueID;
  * <li>Increment and decrement (++, --) operators, as well as compound
  *     assignments (+= etc.), will be broken into simple assignments (=).
  * </ul>
- * 
+ *
  * To summarize, each statement will make at most one write, and contain at
  * most one dereference. The only write operation is the simple assignment (=).
  */
@@ -113,8 +113,8 @@ public class ExpressionFlattener extends NodeVisitor {
     protected final Stack<List<Stmt>> blockStack = new Stack<>();
 
     /** Set of expressions not to flatten. Only applies to the expressions
-      * themselves, and not their subexpressions (unless they are also in
-      * the set explicitly). */
+     * themselves, and not their subexpressions (unless they are also in
+     * the set explicitly). */
     protected final Set<Expr> dontFlatten = new HashSet<>();
 
     /** Used to copy a whole AST subtree. */
@@ -127,8 +127,7 @@ public class ExpressionFlattener extends NodeVisitor {
         this(job, ts, nf, false);
     }
 
-    public ExpressionFlattener(Job job, TypeSystem ts, NodeFactory nf,
-            boolean flatten_all_decls) {
+    public ExpressionFlattener(Job job, TypeSystem ts, NodeFactory nf, boolean flatten_all_decls) {
         super(nf.lang());
         this.job = job;
         this.ts = ts;
@@ -164,8 +163,7 @@ public class ExpressionFlattener extends NodeVisitor {
                 // we are not a labeled loop
                 // add lp to the stmt list.
                 addStmt(lp);
-            }
-            else {
+            } else {
                 // we are a labeled loop. Let the parent
                 // (i.e., the Labeled AST node) take
                 // care of adding us to stmt list.
@@ -337,8 +335,7 @@ public class ExpressionFlattener extends NodeVisitor {
                 if (flatten) {
                     addStmt(a);
                 }
-            }
-            else {
+            } else {
                 if (flatten) {
                     addStmt(a);
                 }
@@ -349,10 +346,8 @@ public class ExpressionFlattener extends NodeVisitor {
 
             if (flatten) {
                 return l;
-            }
-            else {
-                return nf.Local(n.position().startOf(),
-                                nf.Id(n.position().startOf(), "dummy"));
+            } else {
+                return nf.Local(n.position().startOf(), nf.Id(n.position().startOf(), "dummy"));
             }
         }
 
@@ -384,8 +379,7 @@ public class ExpressionFlattener extends NodeVisitor {
             // create a local temp for the expression
             if (!flatten_all_decls) {
                 return createDeclWithInit(t, e.position(), val);
-            }
-            else {
+            } else {
                 LocalDecl d = createDecl(t, val.position(), null);
                 addStmt(d);
                 Local l = createLocal(d);
@@ -417,12 +411,10 @@ public class ExpressionFlattener extends NodeVisitor {
 
                 if (!lit.value()) {
                     return lit; // constant false
-                }
-                else {
+                } else {
                     return visitEdge(b, b.right()); // only rhs matters
                 }
-            }
-            else {
+            } else {
                 LocalDecl d = createDecl(ts.Boolean(), b.position(), null);
                 addStmt(d);
 
@@ -433,8 +425,7 @@ public class ExpressionFlattener extends NodeVisitor {
 
                 return r;
             }
-        }
-        else if (b.operator() == Binary.COND_OR) {
+        } else if (b.operator() == Binary.COND_OR) {
             Expr left = visitEdge(b, b.left());
 
             if (left instanceof BooleanLit) {
@@ -442,12 +433,10 @@ public class ExpressionFlattener extends NodeVisitor {
 
                 if (lit.value()) {
                     return lit; // constant true
-                }
-                else {
+                } else {
                     return visitEdge(b, b.right()); // only rhs matters
                 }
-            }
-            else {
+            } else {
                 LocalDecl d = createDecl(ts.Boolean(), b.position(), null);
                 addStmt(d);
 
@@ -469,39 +458,27 @@ public class ExpressionFlattener extends NodeVisitor {
         if (e != null) {
             if (d.flags().isFinal()) {
                 d = d.init(null);
-            }
-            else {
+            } else {
                 d = d.init(defaultValue(d.declType(), d.position()));
             }
             addStmt(d);
-            // create new array expression 
+            // create new array expression
             // if initializer is an arrayinit
             if (e instanceof ArrayInit) {
                 if (e.type() instanceof ArrayType) {
                     ArrayType at = (ArrayType) e.type();
-                    e =
-                            createNewArray((ArrayInit) e,
-                                           at.ultimateBase(),
-                                           at.dims());
-                }
-                else if (e.type() instanceof NullType) {
+                    e = createNewArray((ArrayInit) e, at.ultimateBase(), at.dims());
+                } else if (e.type() instanceof NullType) {
                     ArrayType at = (ArrayType) d.type().type();
-                    e =
-                            createNewArray((ArrayInit) e,
-                                           at.ultimateBase(),
-                                           at.dims());
-                }
-                else {
-                    throw new InternalCompilerError("Unexpected type for array init: "
-                            + e.type());
+                    e = createNewArray((ArrayInit) e, at.ultimateBase(), at.dims());
+                } else {
+                    throw new InternalCompilerError("Unexpected type for array init: " + e.type());
                 }
             }
             Local l = createLocal(d);
             n = createAssign(l, e);
-        }
-        else {
-            if (!d.flags().isFinal())
-                n = d.init(defaultValue(d.declType(), d.position()));
+        } else {
+            if (!d.flags().isFinal()) n = d.init(defaultValue(d.declType(), d.position()));
         }
         return n;
     }
@@ -521,7 +498,7 @@ public class ExpressionFlattener extends NodeVisitor {
      * Create a local declaration that can take a value of the
      * type t, and initialize it to the expression val.
      * Return the new local that was declared.
-     * @throws SemanticException 
+     * @throws SemanticException
      */
     protected Local createDeclWithInit(Type t, Position pos, Expr val) {
         LocalDecl d = createDecl(t, pos, val);
@@ -532,8 +509,8 @@ public class ExpressionFlattener extends NodeVisitor {
     }
 
     /** Returns true if e should never be flattened or if e has been added to
-      * the don't flatten list. Note that is then removed from the don't flatten
-      * list. */
+     * the don't flatten list. Note that is then removed from the don't flatten
+     * list. */
     protected boolean dontFlatten(Expr e) {
         boolean ret = dontFlatten.contains(e);
         dontFlatten.remove(e);
@@ -541,13 +518,13 @@ public class ExpressionFlattener extends NodeVisitor {
     }
 
     /** Add e to the list of expressions not to flatten. Note that this only
-      * applies to e itself, and not to any of its subexpressions. */
+     * applies to e itself, and not to any of its subexpressions. */
     protected void addDontFlatten(Expr e) {
         dontFlatten.add(e);
     }
 
     /** Returns true if the expression e is of a type that should never be
-      * flattened. */
+     * flattened. */
     protected boolean neverFlatten(Expr e) {
         return e instanceof Lit || e instanceof Special || e instanceof Local;
     }
@@ -573,7 +550,7 @@ public class ExpressionFlattener extends NodeVisitor {
     }
 
     /** Whenever a new node is created, this method is called and should do
-      * additional processing of the node as needed. */
+     * additional processing of the node as needed. */
     protected <N extends Node> N postCreate(N n) {
         return n;
     }
@@ -602,8 +579,7 @@ public class ExpressionFlattener extends NodeVisitor {
         if (e instanceof Assign) {
             Assign a = (Assign) e;
             return a.operator() == Assign.ASSIGN;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -637,19 +613,17 @@ public class ExpressionFlattener extends NodeVisitor {
     private Expr defaultValue(Type t, Position pos) {
         // XXX is this factored out somewhere in the code base?
         if (t.isPrimitive()) {
-            if (t.isBoolean())
-                return nf.BooleanLit(pos, false).type(ts.Boolean());
+            if (t.isBoolean()) return nf.BooleanLit(pos, false).type(ts.Boolean());
             if (t.isNumeric()) return nf.IntLit(pos, IntLit.INT, 0).type(t);
             throw new InternalCompilerError("Unexpected primitive type: " + t);
-        }
-        else {
+        } else {
             return nf.NullLit(pos).type(ts.Null());
         }
     }
 
     /**
      * Create a declaration for a local variable with the type t at
-     * position pos, with initializing expression init. 
+     * position pos, with initializing expression init.
      * Return the LocalDecl produced. Do NOT add the local decl
      * to the statements
      */
@@ -660,11 +634,12 @@ public class ExpressionFlattener extends NodeVisitor {
             init = defaultValue(t, pos);
         }
         LocalDecl d =
-                nf.LocalDecl(pos,
-                             Flags.NONE,
-                             postCreate(nf.CanonicalTypeNode(pos, t)),
-                             postCreate(nf.Id(pos, name)),
-                             init);
+                nf.LocalDecl(
+                        pos,
+                        Flags.NONE,
+                        postCreate(nf.CanonicalTypeNode(pos, t)),
+                        postCreate(nf.Id(pos, name)),
+                        init);
         d = d.localInstance(li);
         d = postCreate(d);
         return d;
@@ -676,9 +651,7 @@ public class ExpressionFlattener extends NodeVisitor {
     protected Local createLocal(LocalDecl d) {
         Position pos = d.position();
         LocalInstance li = d.localInstance();
-        Local l =
-                (Local) nf.Local(pos, postCreate(nf.Id(pos, d.name())))
-                          .type(typeOf(li));
+        Local l = (Local) nf.Local(pos, postCreate(nf.Id(pos, d.name()))).type(typeOf(li));
         l = l.localInstance(li);
         l = postCreate(l);
         return l;
@@ -693,9 +666,7 @@ public class ExpressionFlattener extends NodeVisitor {
     protected Eval createAssign(Expr l, Expr r) {
         Position pos = l.position();
         l = (Expr) deepCopy(l);
-        Eval a =
-                nf.Eval(pos,
-                        postCreate(nf.Assign(pos, l, Assign.ASSIGN, r)).type(typeOf(l)));
+        Eval a = nf.Eval(pos, postCreate(nf.Assign(pos, l, Assign.ASSIGN, r)).type(typeOf(l)));
         a = postCreate(a);
         return a;
     }
@@ -707,22 +678,14 @@ public class ExpressionFlattener extends NodeVisitor {
         Position pos = a.position();
         Operator op = a.operator().binaryOperator();
 
-        Binary b =
-                postCreate(nf.Binary(pos,
-                                     (Expr) deepCopy(a.left()),
-                                     op,
-                                     a.right()));
+        Binary b = postCreate(nf.Binary(pos, (Expr) deepCopy(a.left()), op, a.right()));
         if (typeOf(a.left()).isNumeric() && typeOf(a.right()).isNumeric()) {
             try {
-                b =
-                        (Binary) b.type(ts.promote(typeOf(a.left()),
-                                                   typeOf(a.right())));
-            }
-            catch (SemanticException e) {
+                b = (Binary) b.type(ts.promote(typeOf(a.left()), typeOf(a.right())));
+            } catch (SemanticException e) {
                 throw new InternalCompilerError(e);
             }
-        }
-        else {
+        } else {
             b = (Binary) b.type(a.left().type());
         }
         TypeNode tn = postCreate(nf.CanonicalTypeNode(pos, a.left().type()));
@@ -737,7 +700,7 @@ public class ExpressionFlattener extends NodeVisitor {
     /**
      * Convert an increment or decrement to an assignment,
      * e.g. "i++" to "i = i + 1"
-     * @throws SemanticException 
+     * @throws SemanticException
      */
     protected Eval createIncDec(Unary u) {
         Position pos = u.position();
@@ -745,31 +708,23 @@ public class ExpressionFlattener extends NodeVisitor {
 
         if (u.operator() == Unary.PRE_INC || u.operator() == Unary.POST_INC) {
             op = Binary.ADD;
-        }
-        else {
+        } else {
             op = Binary.SUB;
         }
 
         Expr e = u.expr();
         Expr e2 = (Expr) deepCopy(e);
-        //XXX: ugh.  Special case for char. javac allows char++ but not char + 1;
+        // XXX: ugh.  Special case for char. javac allows char++ but not char + 1;
         if (e.type().isChar())
-            e2 =
-                    nf.Cast(pos, nf.CanonicalTypeNode(pos, ts.Int()), e2)
-                      .type(ts.Int());
+            e2 = nf.Cast(pos, nf.CanonicalTypeNode(pos, ts.Int()), e2).type(ts.Int());
 
         Expr plus;
         try {
-            plus =
-                    nf.Binary(pos, e2, op, createInt(1))
-                      .type(ts.promote(typeOf(e2)));
-        }
-        catch (SemanticException se) {
+            plus = nf.Binary(pos, e2, op, createInt(1)).type(ts.promote(typeOf(e2)));
+        } catch (SemanticException se) {
             throw new InternalCompilerError(se);
         }
-        plus =
-                nf.Cast(pos, nf.CanonicalTypeNode(pos, e.type()), plus)
-                  .type(e.type());
+        plus = nf.Cast(pos, nf.CanonicalTypeNode(pos, e.type()), plus).type(e.type());
 
         Eval a = createAssign(e, postCreate(plus).type(typeOf(e)));
         return a;
@@ -783,11 +738,7 @@ public class ExpressionFlattener extends NodeVisitor {
     protected If createAndIf(Expr cond, Local l, Expr e, Binary original) {
         Position pos = l.position();
         cond = (Expr) deepCopy(cond);
-        If s =
-                nf.If(pos,
-                      cond,
-                      createAssign(l, e),
-                      createAssign(l, createBool(false)));
+        If s = nf.If(pos, cond, createAssign(l, e), createAssign(l, createBool(false)));
         s = postCreate(s);
         return s;
     }
@@ -800,11 +751,7 @@ public class ExpressionFlattener extends NodeVisitor {
     protected If createOrIf(Expr cond, Local l, Expr e, Binary original) {
         Position pos = l.position();
         cond = (Expr) deepCopy(cond);
-        If s =
-                nf.If(pos,
-                      cond,
-                      createAssign(l, createBool(true)),
-                      createAssign(l, e));
+        If s = nf.If(pos, cond, createAssign(l, createBool(true)), createAssign(l, e));
         s = postCreate(s);
         return s;
     }
@@ -814,8 +761,7 @@ public class ExpressionFlattener extends NodeVisitor {
      * of "cond ? e1 : e2"
      * i.e., "if (cond) l = e1; else l = e2"
      */
-    protected If createCondIf(Expr cond, Local l, Expr e1, Expr e2,
-            Conditional original) {
+    protected If createCondIf(Expr cond, Local l, Expr e1, Expr e2, Conditional original) {
         Position pos = l.position();
         If s = nf.If(pos, cond, createAssign(l, e1), createAssign(l, e2));
         s = postCreate(s);
@@ -826,17 +772,16 @@ public class ExpressionFlattener extends NodeVisitor {
      * Create a boolean literal
      */
     protected BooleanLit createBool(boolean val) {
-        return (BooleanLit) postCreate(nf.BooleanLit(Position.compilerGenerated(),
-                                                     val)).type(ts.Boolean());
+        return (BooleanLit)
+                postCreate(nf.BooleanLit(Position.compilerGenerated(), val)).type(ts.Boolean());
     }
 
     /**
      * Create an int literal
      */
     protected IntLit createInt(int val) {
-        return (IntLit) postCreate(nf.IntLit(Position.compilerGenerated(),
-                                             IntLit.INT,
-                                             val)).type(ts.Int());
+        return (IntLit)
+                postCreate(nf.IntLit(Position.compilerGenerated(), IntLit.INT, val)).type(ts.Int());
     }
 
     protected Type typeOf(Expr e) {

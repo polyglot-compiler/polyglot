@@ -63,11 +63,9 @@ public class ExpectedFailure {
     public boolean equals(Object o) {
         if (o instanceof ExpectedFailure) {
             ExpectedFailure that = (ExpectedFailure) o;
-            return (that.kind == kind
-                    || that.kind != null && that.kind.equals(kind))
+            return (that.kind == kind || that.kind != null && that.kind.equals(kind))
                     && (that.errMsgRegExp == errMsgRegExp
-                            || that.errMsgRegExp != null
-                                    && that.errMsgRegExp.equals(errMsgRegExp));
+                            || that.errMsgRegExp != null && that.errMsgRegExp.equals(errMsgRegExp));
         }
         return false;
     }
@@ -81,8 +79,7 @@ public class ExpectedFailure {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        if (kind != null)
-            sb.append(ErrorInfo.getErrorString(kind.intValue()));
+        if (kind != null) sb.append(ErrorInfo.getErrorString(kind.intValue()));
         else sb.append("error");
         if (errMsgRegExp != null) {
             sb.append(" matching the regular expression '");

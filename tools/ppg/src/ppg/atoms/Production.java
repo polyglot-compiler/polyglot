@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -55,12 +55,11 @@ public class Production implements Unparse {
     @SuppressWarnings("unchecked")
     @Override
     public Object clone() {
-        return new Production((Nonterminal) lhs.clone(),
-                              (Vector<Vector<GrammarPart>>) rhs.clone());
+        return new Production((Nonterminal) lhs.clone(), (Vector<Vector<GrammarPart>>) rhs.clone());
     }
 
     public void drop(Production prod) {
-        //assertSameLHS(prod, "drop");
+        // assertSameLHS(prod, "drop");
         Vector<Vector<GrammarPart>> toDrop = prod.getRHS();
         // this is O(n^2)
         for (int i = 0; i < toDrop.size(); i++) {
@@ -73,8 +72,7 @@ public class Production implements Unparse {
                 }
                 // production match not found
                 if (j == rhs.size() - 1) {
-                    System.err.println(HEADER
-                            + "no match found for production:");
+                    System.err.println(HEADER + "no match found for production:");
                     System.err.print(prod.getLHS() + " ::= ");
                     for (int k = 0; k < target.size(); k++) {
                         System.err.print(target.elementAt(k) + " ");
@@ -85,8 +83,7 @@ public class Production implements Unparse {
         }
     }
 
-    public static boolean isSameProduction(Vector<GrammarPart> u,
-            Vector<GrammarPart> v) {
+    public static boolean isSameProduction(Vector<GrammarPart> u, Vector<GrammarPart> v) {
         int uIdx = 0, vIdx = 0;
         GrammarPart ug = null, vg = null;
 
@@ -103,8 +100,7 @@ public class Production implements Unparse {
                 continue;
             }
 
-            if (!ug.equals(vg))
-                return false;
+            if (!ug.equals(vg)) return false;
             else {
                 uIdx++;
                 vIdx++;
@@ -114,9 +110,8 @@ public class Production implements Unparse {
         if (uIdx == u.size() && vIdx == v.size()) {
             // got through all the way, they are the same
             return true;
-        }
-        else {
-            // one of the lists was not seen all the way, 
+        } else {
+            // one of the lists was not seen all the way,
             // must check that only semantic actions are left
             if (uIdx < u.size()) {
                 for (; uIdx < u.size(); uIdx++) {
@@ -124,8 +119,7 @@ public class Production implements Unparse {
                     if (!(ug instanceof SemanticAction)) return false;
                 }
                 return true;
-            }
-            else { // vIdx < v.size()
+            } else { // vIdx < v.size()
                 for (; vIdx < v.size(); vIdx++) {
                     vg = v.elementAt(vIdx);
                     if (!(vg instanceof SemanticAction)) return false;
@@ -152,7 +146,7 @@ public class Production implements Unparse {
     }
 
     public void add(Production prod) {
-        //assertSameLHS(prod, "add");
+        // assertSameLHS(prod, "add");
         Vector<Vector<GrammarPart>> additional = prod.getRHS();
         for (int i = 0; i < additional.size(); i++) {
             rhs.addElement(additional.elementAt(i));

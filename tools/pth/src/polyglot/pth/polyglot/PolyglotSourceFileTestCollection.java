@@ -12,8 +12,12 @@ public class PolyglotSourceFileTestCollection extends SourceFileTestCollection {
 
     private static final String JAVAC = "javac";
 
-    public PolyglotSourceFileTestCollection(String testCommand, String name,
-            String testDir, String args, List<SourceFileTest> tests) {
+    public PolyglotSourceFileTestCollection(
+            String testCommand,
+            String name,
+            String testDir,
+            String args,
+            List<SourceFileTest> tests) {
         super(testCommand, name, testDir, args, tests);
     }
 
@@ -51,11 +55,8 @@ public class PolyglotSourceFileTestCollection extends SourceFileTestCollection {
                     File workpathFile = new File(workpath);
                     Path workPath = workpathFile.toPath().normalize();
                     if (workPath.isAbsolute()) {
-                        arg = workpathFile.toURI()
-                                          .relativize(testpathFile.toURI())
-                                          .getPath();
-                    }
-                    else arg = workPath.relativize(testPath).toString();
+                        arg = workpathFile.toURI().relativize(testpathFile.toURI()).getPath();
+                    } else arg = workPath.relativize(testPath).toString();
                 }
             }
             newArgs.add(arg);
@@ -76,13 +77,12 @@ public class PolyglotSourceFileTestCollection extends SourceFileTestCollection {
     protected PolyglotTestDriver createTestDriver() {
         PolyglotTestDriver ptd;
         switch (testCommand) {
-        case "javac":
-            ptd = new JavaTestDriver(this);
-            break;
-        default:
-            ptd = new PolyglotTestDriver(this);
+            case "javac":
+                ptd = new JavaTestDriver(this);
+                break;
+            default:
+                ptd = new PolyglotTestDriver(this);
         }
         return ptd;
     }
-
 }

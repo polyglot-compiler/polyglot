@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -89,24 +89,19 @@ public class ConstantFolder extends NodeVisitor {
             return nf.StringLit(pos, (String) v).type(ts.String());
         }
         if (v instanceof Boolean) {
-            return nf.BooleanLit(pos, ((Boolean) v).booleanValue())
-                     .type(ts.Boolean());
+            return nf.BooleanLit(pos, ((Boolean) v).booleanValue()).type(ts.Boolean());
         }
         if (v instanceof Double) {
-            return nf.FloatLit(pos, FloatLit.DOUBLE, ((Double) v).doubleValue())
-                     .type(ts.Double());
+            return nf.FloatLit(pos, FloatLit.DOUBLE, ((Double) v).doubleValue()).type(ts.Double());
         }
         if (v instanceof Float) {
-            return nf.FloatLit(pos, FloatLit.FLOAT, ((Float) v).floatValue())
-                     .type(ts.Float());
+            return nf.FloatLit(pos, FloatLit.FLOAT, ((Float) v).floatValue()).type(ts.Float());
         }
         if (v instanceof Long) {
-            return nf.IntLit(pos, IntLit.LONG, ((Long) v).longValue())
-                     .type(ts.Long());
+            return nf.IntLit(pos, IntLit.LONG, ((Long) v).longValue()).type(ts.Long());
         }
         if (v instanceof Integer) {
-            return nf.IntLit(pos, IntLit.INT, ((Integer) v).intValue())
-                     .type(ts.Int());
+            return nf.IntLit(pos, IntLit.INT, ((Integer) v).intValue()).type(ts.Int());
         }
         if (v instanceof Character) {
             return nf.CharLit(pos, ((Character) v).charValue()).type(ts.Char());

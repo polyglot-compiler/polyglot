@@ -36,7 +36,9 @@ import polyglot.util.InternalCompilerError;
  */
 public class EfgInfo {
     protected static enum ValidationState {
-        SUCCEEDED, FAILED, UNKNOWN
+        SUCCEEDED,
+        FAILED,
+        UNKNOWN
     }
 
     protected ValidationState validation;
@@ -49,25 +51,27 @@ public class EfgInfo {
 
     public EfgInfo() {
         validation = UNKNOWN;
-        factoryMappings = new TreeMap<>(new Comparator<ClassType>() {
-            @Override
-            public int compare(ClassType o1, ClassType o2) {
-                if (o1 == o2) return 0;
+        factoryMappings =
+                new TreeMap<>(
+                        new Comparator<ClassType>() {
+                            @Override
+                            public int compare(ClassType o1, ClassType o2) {
+                                if (o1 == o2) return 0;
 
-                // Null comes last.
-                if (o1 == null) return 1;
-                if (o2 == null) return -1;
+                                // Null comes last.
+                                if (o1 == null) return 1;
+                                if (o2 == null) return -1;
 
-                // Compare according to simple names.
-                String sn1 = o1.name();
-                String sn2 = o2.name();
-                int comp = sn1.compareTo(sn2);
-                if (comp != 0) return comp;
+                                // Compare according to simple names.
+                                String sn1 = o1.name();
+                                String sn2 = o2.name();
+                                int comp = sn1.compareTo(sn2);
+                                if (comp != 0) return comp;
 
-                // Compare according to fully qualified names.
-                return o1.fullName().compareTo(o2.fullName());
-            }
-        });
+                                // Compare according to fully qualified names.
+                                return o1.fullName().compareTo(o2.fullName());
+                            }
+                        });
     }
 
     /**
@@ -121,10 +125,7 @@ public class EfgInfo {
                 ClassType ct = fm.classType;
                 EfgClassInfo efmi = get(ct);
                 if (efmi == null) {
-                    efmi = new EfgClassInfo(extInfo,
-                                            EfgClassInfo.State.CONFIG,
-                                            fm.pos,
-                                            ct);
+                    efmi = new EfgClassInfo(extInfo, EfgClassInfo.State.CONFIG, fm.pos, ct);
                     factoryMappings.put(ct, efmi);
                 }
 
@@ -136,8 +137,7 @@ public class EfgInfo {
     /**
      * Reads the configuration file.
      */
-    protected Config readConfig(ExtensionInfo extInfo)
-            throws SemanticException {
+    protected Config readConfig(ExtensionInfo extInfo) throws SemanticException {
         Options options = (Options) polyglot.main.Options.global;
         File file = options.confFile();
         ErrorQueue eq = extInfo.compiler().errorQueue();
@@ -149,15 +149,12 @@ public class EfgInfo {
             Symbol sym;
             try {
                 sym = grm.parse();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
                 return Config.dummy();
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 throw e;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 eq.enqueue(ErrorInfo.SYNTAX_ERROR, e.getMessage());
                 return Config.dummy();
             }
@@ -171,8 +168,7 @@ public class EfgInfo {
 
             // Ensure the existence of the interface and class being extended.
             return result.validate(extInfo.typeSystem());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new InternalCompilerError(e);
         }
     }
@@ -184,10 +180,7 @@ public class EfgInfo {
         ClassType ct = cd.type();
         EfgClassInfo efmi = get(ct);
         if (efmi == null) {
-            efmi = new EfgClassInfo(extInfo,
-                                    EfgClassInfo.State.AUTO,
-                                    cd.position(),
-                                    ct);
+            efmi = new EfgClassInfo(extInfo, EfgClassInfo.State.AUTO, cd.position(), ct);
             factoryMappings.put(ct, efmi);
         }
 
@@ -215,44 +208,37 @@ public class EfgInfo {
             for (EfgClassInfo classInfo : factoryMappings.values()) {
                 for (Name basename : classInfo.basenames.keySet()) {
                     // Check for duplicates in parent extension factory.
-                    ClassType dup = ts.hasFactory(config.superInterfaceCT,
-                                                  basename.name);
+                    ClassType dup = ts.hasFactory(config.superInterfaceCT, basename.name);
                     if (dup != null) {
-                        eq.enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                   "Duplicate factory method: already declared in "
-                                           + dup,
-                                   basename.pos);
+                        eq.enqueue(
+                                ErrorInfo.SEMANTIC_ERROR,
+                                "Duplicate factory method: already declared in " + dup,
+                                basename.pos);
                     }
                     // Check for duplicates in extension factory being generated.
                     else if (allBasenames.containsKey(basename.name)) {
-                        eq.enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                   "Duplicate factory method: already declared "
-                                           + "by "
-                                           + allBasenames.get(basename.name),
-                                   basename.pos);
-                    }
-                    else {
-                        allBasenames.put(basename.name,
-                                         classInfo.classType.fullName());
+                        eq.enqueue(
+                                ErrorInfo.SEMANTIC_ERROR,
+                                "Duplicate factory method: already declared "
+                                        + "by "
+                                        + allBasenames.get(basename.name),
+                                basename.pos);
+                    } else {
+                        allBasenames.put(basename.name, classInfo.classType.fullName());
                     }
                 }
             }
 
             // Ensure delegates exist.
             for (EfgClassInfo classInfo : factoryMappings.values()) {
-                classInfo.checkDelegates(eq,
-                                         config.superInterfaceCT,
-                                         allBasenames.keySet());
+                classInfo.checkDelegates(eq, config.superInterfaceCT, allBasenames.keySet());
             }
 
             // Fill in defaults where needed.
             for (EfgClassInfo classInfo : factoryMappings.values()) {
-                classInfo.fillInDefaults(eq,
-                                         config.superInterfaceCT,
-                                         allBasenames.keySet());
+                classInfo.fillInDefaults(eq, config.superInterfaceCT, allBasenames.keySet());
             }
-        }
-        finally {
+        } finally {
             validation = eq.errorCount() == errorsBefore ? SUCCEEDED : FAILED;
         }
     }

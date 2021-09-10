@@ -7,10 +7,9 @@ package java_cup;
 
 public class assoc {
 
-  /* various associativities, no_prec being the default value */
-  public final static int left = 0;
-  public final static int right = 1;
-  public final static int nonassoc = 2;
-  public final static int no_prec = -1;
-
+    /* various associativities, no_prec being the default value */
+    public static final int left = 0;
+    public static final int right = 1;
+    public static final int nonassoc = 2;
+    public static final int no_prec = -1;
 }

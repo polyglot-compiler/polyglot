@@ -64,14 +64,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     protected Expr init;
     protected LocalInstance li;
 
-//    @Deprecated
-    public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
-            Expr init) {
+    //    @Deprecated
+    public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name, Expr init) {
         this(pos, flags, type, name, init, null);
     }
 
-    public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name,
-            Expr init, Ext ext) {
+    public LocalDecl_c(Position pos, Flags flags, TypeNode type, Id name, Expr init, Ext ext) {
         super(pos, ext);
         assert flags != null && type != null && name != null; // init may be null
         this.flags = flags;
@@ -191,8 +189,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /** Reconstruct the declaration. */
-    protected <N extends LocalDecl_c> N reconstruct(N n, TypeNode type, Id name,
-            Expr init) {
+    protected <N extends LocalDecl_c> N reconstruct(N n, TypeNode type, Id name, Expr init) {
         n = type(n, type);
         n = id(n, name);
         n = init(n, init);
@@ -233,10 +230,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         TypeSystem ts = tb.typeSystem();
 
         LocalInstance li =
-                ts.localInstance(position(),
-                                 flags(),
-                                 ts.unknownType(position()),
-                                 name());
+                ts.localInstance(position(), flags(), ts.unknownType(position()), name());
         n = localInstance(n, li);
         return n;
     }
@@ -267,9 +261,14 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         LocalInstance outerLocal = c.findLocalSilent(li.name());
 
         if (outerLocal != null && c.isLocal(li.name())) {
-            throw new SemanticException("Local variable \"" + name
-                    + "\" multiply defined.  " + "Previous definition at "
-                    + outerLocal.position() + ".", position());
+            throw new SemanticException(
+                    "Local variable \""
+                            + name
+                            + "\" multiply defined.  "
+                            + "Previous definition at "
+                            + outerLocal.position()
+                            + ".",
+                    position());
         }
 
         return super.typeCheckEnter(tc);
@@ -283,27 +282,27 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
         try {
             ts.checkLocalFlags(flags);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), position());
         }
 
         if (init != null) {
             if (init instanceof ArrayInit) {
                 ((ArrayInit) init).typeCheckElements(tc, type.type());
-            }
-            else {
+            } else {
                 if (!ts.isImplicitCastValid(init.type(), type.type())
                         && !ts.typeEquals(init.type(), type.type())
-                        && !ts.numericConversionValid(type.type(),
-                                                      tc.lang()
-                                                        .constantValue(init,
-                                                                       tc.lang()))) {
-                    throw new SemanticException("The type of the variable "
-                            + "initializer \"" + init.type()
-                            + "\" does not match that of "
-                            + "the declaration \"" + type.type() + "\".",
-                                                init.position());
+                        && !ts.numericConversionValid(
+                                type.type(), tc.lang().constantValue(init, tc.lang()))) {
+                    throw new SemanticException(
+                            "The type of the variable "
+                                    + "initializer \""
+                                    + init.type()
+                                    + "\" does not match that of "
+                                    + "the declaration \""
+                                    + type.type()
+                                    + "\".",
+                            init.position());
                 }
             }
         }
@@ -315,8 +314,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         protected ConstantChecker cc;
         protected LocalInstance li;
 
-        AddDependenciesVisitor(JLang lang, ConstantChecker cc,
-                LocalInstance li) {
+        AddDependenciesVisitor(JLang lang, ConstantChecker cc, LocalInstance li) {
             super(lang);
             this.cc = cc;
             this.li = li;
@@ -328,8 +326,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                 Field f = (Field) n;
                 if (!f.fieldInstance().orig().constantValueSet()) {
                     Scheduler scheduler = cc.job().extensionInfo().scheduler();
-                    Goal g = scheduler.FieldConstantsChecked(f.fieldInstance()
-                                                              .orig());
+                    Goal g = scheduler.FieldConstantsChecked(f.fieldInstance().orig());
                     throw new MissingDependencyException(g);
                 }
             }
@@ -346,17 +343,15 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-//        if (init != null && ! init.constantValueSet()) {
-//            // HACK to add dependencies for computing the constant value.
-//            init.visit(new AddDependenciesVisitor(cc, li));
-//            return this;
-//        }
+        //        if (init != null && ! init.constantValueSet()) {
+        //            // HACK to add dependencies for computing the constant value.
+        //            init.visit(new AddDependenciesVisitor(cc, li));
+        //            return this;
+        //        }
 
-        if (init == null || !cc.lang().isConstant(init, cc.lang())
-                || !li.flags().isFinal()) {
+        if (init == null || !cc.lang().isConstant(init, cc.lang()) || !li.flags().isFinal()) {
             li.setNotConstant();
-        }
-        else {
+        } else {
             li.setConstantValue(cc.lang().constantValue(init, cc.lang()));
         }
 
@@ -388,8 +383,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     @Override
     public String toString() {
-        return flags.translate() + type + " " + name
-                + (init != null ? " = " + init : "") + ";";
+        return flags.translate() + type + " " + name + (init != null ? " = " + init : "") + ";";
     }
 
     @Override
@@ -440,8 +434,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         if (init() != null) {
             v.visitCFG(type(), init(), ENTRY);
             v.visitCFG(init(), this, EXIT);
-        }
-        else {
+        } else {
             v.visitCFG(type(), this, EXIT);
         }
 
@@ -452,5 +445,4 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     public Node copy(NodeFactory nf) {
         return nf.LocalDecl(position, flags, type, name, init);
     }
-
 }

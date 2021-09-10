@@ -62,8 +62,7 @@ import polyglot.visit.TypeChecker;
 public class JLang_c implements JLang {
     public static final JLang instance = new JLang_c();
 
-    protected JLang_c() {
-    }
+    protected JLang_c() {}
 
     protected NodeOps NodeOps(Node n) {
         return n;
@@ -128,20 +127,18 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final NodeVisitor buildTypesEnter(Node n, TypeBuilder tb)
-            throws SemanticException {
+    public final NodeVisitor buildTypesEnter(Node n, TypeBuilder tb) throws SemanticException {
         return NodeOps(n).buildTypesEnter(tb);
     }
 
     @Override
-    public final Node buildTypes(Node n, TypeBuilder tb)
-            throws SemanticException {
+    public final Node buildTypes(Node n, TypeBuilder tb) throws SemanticException {
         return NodeOps(n).buildTypes(tb);
     }
 
     @Override
-    public final Node disambiguateOverride(Node n, Node parent,
-            AmbiguityRemover ar) throws SemanticException {
+    public final Node disambiguateOverride(Node n, Node parent, AmbiguityRemover ar)
+            throws SemanticException {
         return NodeOps(n).disambiguateOverride(parent, ar);
     }
 
@@ -152,14 +149,12 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final Node disambiguate(Node n, AmbiguityRemover ar)
-            throws SemanticException {
+    public final Node disambiguate(Node n, AmbiguityRemover ar) throws SemanticException {
         return NodeOps(n).disambiguate(ar);
     }
 
     @Override
-    public final NodeVisitor typeCheckEnter(Node n, TypeChecker tc)
-            throws SemanticException {
+    public final NodeVisitor typeCheckEnter(Node n, TypeChecker tc) throws SemanticException {
         return NodeOps(n).typeCheckEnter(tc);
     }
 
@@ -170,8 +165,7 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final Node typeCheck(Node n, TypeChecker tc)
-            throws SemanticException {
+    public final Node typeCheck(Node n, TypeChecker tc) throws SemanticException {
         return NodeOps(n).typeCheck(tc);
     }
 
@@ -181,8 +175,7 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final Node checkConstants(Node n, ConstantChecker cc)
-            throws SemanticException {
+    public final Node checkConstants(Node n, ConstantChecker cc) throws SemanticException {
         return NodeOps(n).checkConstants(cc);
     }
 
@@ -193,8 +186,7 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final Node exceptionCheck(Node n, ExceptionChecker ec)
-            throws SemanticException {
+    public final Node exceptionCheck(Node n, ExceptionChecker ec) throws SemanticException {
         return NodeOps(n).exceptionCheck(ec);
     }
 
@@ -210,8 +202,7 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final Node extRewrite(Node n, ExtensionRewriter rw)
-            throws SemanticException {
+    public final Node extRewrite(Node n, ExtensionRewriter rw) throws SemanticException {
         return NodeOps(n).extRewrite(rw);
     }
 
@@ -256,8 +247,7 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final Node copy(Node n, ExtensionInfo extInfo)
-            throws SemanticException {
+    public final Node copy(Node n, ExtensionInfo extInfo) throws SemanticException {
         return NodeOps(n).copy(extInfo);
     }
 
@@ -274,32 +264,31 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final Node typeCheckNullTarget(Call n, TypeChecker tc,
-            List<Type> argTypes) throws SemanticException {
+    public final Node typeCheckNullTarget(Call n, TypeChecker tc, List<Type> argTypes)
+            throws SemanticException {
         return CallOps(n).typeCheckNullTarget(tc, argTypes);
     }
 
     // ClassDeclOps
 
     @Override
-    public final void prettyPrintHeader(ClassDecl n, CodeWriter w,
-            PrettyPrinter tr) {
+    public final void prettyPrintHeader(ClassDecl n, CodeWriter w, PrettyPrinter tr) {
         ClassDeclOps(n).prettyPrintHeader(w, tr);
     }
 
     @Override
-    public final void prettyPrintFooter(ClassDecl n, CodeWriter w,
-            PrettyPrinter tr) {
+    public final void prettyPrintFooter(ClassDecl n, CodeWriter w, PrettyPrinter tr) {
         ClassDeclOps(n).prettyPrintFooter(w, tr);
     }
 
     @Override
-    public final Node addDefaultConstructor(ClassDecl n, TypeSystem ts,
-            NodeFactory nf, ConstructorInstance defaultConstructorInstance)
+    public final Node addDefaultConstructor(
+            ClassDecl n,
+            TypeSystem ts,
+            NodeFactory nf,
+            ConstructorInstance defaultConstructorInstance)
             throws SemanticException {
-        return ClassDeclOps(n).addDefaultConstructor(ts,
-                                                     nf,
-                                                     defaultConstructorInstance);
+        return ClassDeclOps(n).addDefaultConstructor(ts, nf, defaultConstructorInstance);
     }
 
     // ExprOps
@@ -344,8 +333,9 @@ public class JLang_c implements JLang {
     // NewOps
 
     @Override
-    public final TypeNode findQualifiedTypeNode(New n, AmbiguityRemover ar,
-            ClassType outer, TypeNode objectType) throws SemanticException {
+    public final TypeNode findQualifiedTypeNode(
+            New n, AmbiguityRemover ar, ClassType outer, TypeNode objectType)
+            throws SemanticException {
         return NewOps(n).findQualifiedTypeNode(ar, outer, objectType);
     }
 
@@ -356,14 +346,12 @@ public class JLang_c implements JLang {
     }
 
     @Override
-    public final void typeCheckFlags(New n, TypeChecker tc)
-            throws SemanticException {
+    public final void typeCheckFlags(New n, TypeChecker tc) throws SemanticException {
         NewOps(n).typeCheckFlags(tc);
     }
 
     @Override
-    public final void typeCheckNested(New n, TypeChecker tc)
-            throws SemanticException {
+    public final void typeCheckNested(New n, TypeChecker tc) throws SemanticException {
         NewOps(n).typeCheckNested(tc);
     }
 
@@ -397,8 +385,8 @@ public class JLang_c implements JLang {
     // ProcedureDeclOps
 
     @Override
-    public final void prettyPrintHeader(ProcedureDecl n, Flags flags,
-            CodeWriter w, PrettyPrinter tr) {
+    public final void prettyPrintHeader(
+            ProcedureDecl n, Flags flags, CodeWriter w, PrettyPrinter tr) {
         ProcedureDeclOps(n).prettyPrintHeader(flags, w, tr);
     }
 
@@ -417,20 +405,18 @@ public class JLang_c implements JLang {
     // TryOps
 
     @Override
-    public final ExceptionChecker constructTryBlockExceptionChecker(Try n,
-            ExceptionChecker ec) {
+    public final ExceptionChecker constructTryBlockExceptionChecker(Try n, ExceptionChecker ec) {
         return TryOps(n).constructTryBlockExceptionChecker(ec);
     }
 
     @Override
-    public final Block exceptionCheckTryBlock(Try n, ExceptionChecker ec)
-            throws SemanticException {
+    public final Block exceptionCheckTryBlock(Try n, ExceptionChecker ec) throws SemanticException {
         return TryOps(n).exceptionCheckTryBlock(ec);
     }
 
     @Override
-    public final List<Catch> exceptionCheckCatchBlocks(Try n,
-            ExceptionChecker ec) throws SemanticException {
+    public final List<Catch> exceptionCheckCatchBlocks(Try n, ExceptionChecker ec)
+            throws SemanticException {
         return TryOps(n).exceptionCheckCatchBlocks(ec);
     }
 

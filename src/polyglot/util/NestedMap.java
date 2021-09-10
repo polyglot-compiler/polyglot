@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -52,8 +52,7 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
      * is null, it defaults to a NilMap.
      **/
     public NestedMap(Map<K, V> containing) {
-        this.superMap =
-                containing == null ? NilMap.<K, V> emptyMap() : containing;
+        this.superMap = containing == null ? NilMap.<K, V>emptyMap() : containing;
         this.myMap = new HashMap<>();
         setView = new EntrySet();
         nShadowed = 0;
@@ -105,8 +104,7 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
 
     @Override
     public V get(Object key) {
-        if (myMap.containsKey(key))
-            return myMap.get(key);
+        if (myMap.containsKey(key)) return myMap.get(key);
         else return superMap.get(key);
     }
 
@@ -114,8 +112,7 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
     public V put(K key, V value) {
         if (myMap.containsKey(key)) {
             return myMap.put(key, value);
-        }
-        else {
+        } else {
             V oldV = superMap.get(key);
             myMap.put(key, value);
             nShadowed++;
@@ -136,9 +133,9 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
     public final class KeySet extends AbstractSet<K> {
         @Override
         public Iterator<K> iterator() {
-            return new ConcatenatedIterator<>(myMap.keySet().iterator(),
-                                              new FilteringIterator<>(superMap.keySet(),
-                                                                      keyNotInMyMap));
+            return new ConcatenatedIterator<>(
+                    myMap.keySet().iterator(),
+                    new FilteringIterator<>(superMap.keySet(), keyNotInMyMap));
         }
 
         @Override
@@ -161,9 +158,9 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
     private final class EntrySet extends AbstractSet<Entry<K, V>> {
         @Override
         public Iterator<Entry<K, V>> iterator() {
-            return new ConcatenatedIterator<>(myMap.entrySet().iterator(),
-                                              new FilteringIterator<>(superMap.entrySet(),
-                                                                      entryKeyNotInMyMap));
+            return new ConcatenatedIterator<>(
+                    myMap.entrySet().iterator(),
+                    new FilteringIterator<>(superMap.entrySet(), entryKeyNotInMyMap));
         }
 
         @Override
@@ -182,10 +179,8 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
             if (entVal != null) {
                 V val = NestedMap.this.get(entKey);
                 return (val != null) && val.equals(entVal);
-            }
-            else {
-                return NestedMap.this.containsKey(entKey)
-                        && (NestedMap.this.get(entKey) == null);
+            } else {
+                return NestedMap.this.containsKey(entKey) && (NestedMap.this.get(entKey) == null);
             }
         }
 
@@ -206,11 +201,11 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
                     return !myMap.containsKey(ent.getKey());
                 }
             };
-    private Predicate<K> keyNotInMyMap = new Predicate<K>() {
-        @Override
-        public boolean isTrue(K o) {
-            return !myMap.containsKey(o);
-        }
-    };
-
+    private Predicate<K> keyNotInMyMap =
+            new Predicate<K>() {
+                @Override
+                public boolean isTrue(K o) {
+                    return !myMap.containsKey(o);
+                }
+            };
 }

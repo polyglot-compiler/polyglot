@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -53,34 +53,26 @@ import polyglot.visit.TypeChecker;
  */
 public class ResolveAnnotationsVisitor extends ContextVisitor {
     public ResolveAnnotationsVisitor(Job job) {
-        super(job, job.extensionInfo().typeSystem(), job.extensionInfo()
-                                                        .nodeFactory());
+        super(job, job.extensionInfo().typeSystem(), job.extensionInfo().nodeFactory());
     }
 
     @Override
-    protected Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         JL5Ext ext = JL5Ext.ext(n);
         if (ext instanceof AnnotatedElement) {
             AnnotatedElement aext = (AnnotatedElement) ext;
-            List<AnnotationElem> newElems =
-                    new ArrayList<>(aext.annotationElems().size());
+            List<AnnotationElem> newElems = new ArrayList<>(aext.annotationElems().size());
             for (AnnotationElem elem : aext.annotationElems()) {
                 // type check elem
-                TypeChecker tc =
-                        new TypeChecker(this.job(),
-                                        this.typeSystem(),
-                                        this.nodeFactory());
+                TypeChecker tc = new TypeChecker(this.job(), this.typeSystem(), this.nodeFactory());
 
                 tc = (TypeChecker) tc.context(this.context());
                 elem = (AnnotationElem) elem.visit(tc);
                 AnnotationElem ae = elem;
                 if (!ae.typeName().type().isCanonical()) {
-                    throw new InternalCompilerError("Couldn't type check "
-                                                            + elem
-                                                            + " during annotation resolution",
-                                                    elem.position());
-
+                    throw new InternalCompilerError(
+                            "Couldn't type check " + elem + " during annotation resolution",
+                            elem.position());
                 }
                 newElems.add(elem);
             }
@@ -95,12 +87,11 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
      * Given a list of annotation elements, create an Annotations
      * for the annotations that should survive in the binary (i.e., in the
      * type information)
-     * @throws SemanticException 
+     * @throws SemanticException
      */
-    public Annotations createAnnotations(List<AnnotationElem> annotationElems,
-            Position pos) throws SemanticException {
-        Map<Type, Map<String, AnnotationElementValue>> m =
-                new LinkedHashMap<>();
+    public Annotations createAnnotations(List<AnnotationElem> annotationElems, Position pos)
+            throws SemanticException {
+        Map<Type, Map<String, AnnotationElementValue>> m = new LinkedHashMap<>();
 
         JL5TypeSystem ts = (JL5TypeSystem) this.typeSystem();
         for (AnnotationElem ae : annotationElems) {
@@ -109,5 +100,4 @@ public class ResolveAnnotationsVisitor extends ContextVisitor {
         }
         return ts.createAnnotations(m, pos);
     }
-
 }

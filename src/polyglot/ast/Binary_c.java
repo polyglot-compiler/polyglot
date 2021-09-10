@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -54,7 +54,7 @@ public class Binary_c extends Expr_c implements Binary {
     protected Expr right;
     protected Precedence precedence;
 
-//    @Deprecated
+    //    @Deprecated
     public Binary_c(Position pos, Expr left, Operator op, Expr right) {
         this(pos, left, op, right, null);
     }
@@ -66,8 +66,7 @@ public class Binary_c extends Expr_c implements Binary {
         this.op = op;
         this.right = right;
         this.precedence = op.precedence();
-        if (op == ADD
-                && (left instanceof StringLit || right instanceof StringLit)) {
+        if (op == ADD && (left instanceof StringLit || right instanceof StringLit)) {
             this.precedence = Precedence.STRING_ADD;
         }
     }
@@ -156,8 +155,7 @@ public class Binary_c extends Expr_c implements Binary {
 
     @Override
     public boolean constantValueSet(Lang lang) {
-        return lang.constantValueSet(left, lang)
-                && lang.constantValueSet(right, lang);
+        return lang.constantValueSet(left, lang) && lang.constantValueSet(right, lang);
     }
 
     @Override
@@ -285,8 +283,7 @@ public class Binary_c extends Expr_c implements Binary {
                 if (op == USHR) return new Integer(l >>> r);
                 return null;
             }
-        }
-        catch (ArithmeticException e) {
+        } catch (ArithmeticException e) {
             // ignore div by 0
             return null;
         }
@@ -316,15 +313,15 @@ public class Binary_c extends Expr_c implements Binary {
 
         if (op == GT || op == LT || op == GE || op == LE) {
             if (!l.isNumeric()) {
-                throw new SemanticException("The " + op
-                        + " operator must have numeric operands, not type " + l
-                        + ".", left.position());
+                throw new SemanticException(
+                        "The " + op + " operator must have numeric operands, not type " + l + ".",
+                        left.position());
             }
 
             if (!r.isNumeric()) {
-                throw new SemanticException("The " + op
-                        + " operator must have numeric operands, not type " + r
-                        + ".", right.position());
+                throw new SemanticException(
+                        "The " + op + " operator must have numeric operands, not type " + r + ".",
+                        right.position());
             }
 
             return type(ts.Boolean());
@@ -332,10 +329,8 @@ public class Binary_c extends Expr_c implements Binary {
 
         if (op == EQ || op == NE) {
             if (!ts.isCastValid(l, r) && !ts.isCastValid(r, l)) {
-                throw new SemanticException("The "
-                                                    + op
-                                                    + " operator must have operands of similar type.",
-                                            position());
+                throw new SemanticException(
+                        "The " + op + " operator must have operands of similar type.", position());
             }
 
             return type(ts.Boolean());
@@ -343,15 +338,15 @@ public class Binary_c extends Expr_c implements Binary {
 
         if (op == COND_OR || op == COND_AND) {
             if (!l.isBoolean()) {
-                throw new SemanticException("The " + op
-                        + " operator must have boolean operands, not type " + l
-                        + ".", left.position());
+                throw new SemanticException(
+                        "The " + op + " operator must have boolean operands, not type " + l + ".",
+                        left.position());
             }
 
             if (!r.isBoolean()) {
-                throw new SemanticException("The " + op
-                        + " operator must have boolean operands, not type " + r
-                        + ".", right.position());
+                throw new SemanticException(
+                        "The " + op + " operator must have boolean operands, not type " + r + ".",
+                        right.position());
             }
 
             return type(ts.Boolean());
@@ -362,14 +357,14 @@ public class Binary_c extends Expr_c implements Binary {
             // operation is string concatenation.  See JLS 2nd Ed. | 15.18.
             if (ts.typeEquals(l, ts.String()) || ts.typeEquals(r, ts.String())) {
                 if (!ts.canCoerceToString(r, tc.context())) {
-                    throw new SemanticException("Cannot coerce an expression "
-                                                        + "of type " + r
-                                                        + " to a String.",
-                                                right.position());
+                    throw new SemanticException(
+                            "Cannot coerce an expression " + "of type " + r + " to a String.",
+                            right.position());
                 }
                 if (!ts.canCoerceToString(l, tc.context())) {
-                    throw new SemanticException("Cannot coerce an expression "
-                            + "of type " + l + " to a String.", left.position());
+                    throw new SemanticException(
+                            "Cannot coerce an expression " + "of type " + l + " to a String.",
+                            left.position());
                 }
 
                 Binary_c n = this;
@@ -387,65 +382,73 @@ public class Binary_c extends Expr_c implements Binary {
 
         if (op == ADD) {
             if (!l.isNumeric()) {
-                throw new SemanticException("The "
-                                                    + op
-                                                    + " operator must have numeric or String operands, not type "
-                                                    + l + ".",
-                                            left.position());
+                throw new SemanticException(
+                        "The "
+                                + op
+                                + " operator must have numeric or String operands, not type "
+                                + l
+                                + ".",
+                        left.position());
             }
 
             if (!r.isNumeric()) {
-                throw new SemanticException("The "
-                                                    + op
-                                                    + " operator must have numeric or String operands, not type "
-                                                    + r + ".",
-                                            right.position());
+                throw new SemanticException(
+                        "The "
+                                + op
+                                + " operator must have numeric or String operands, not type "
+                                + r
+                                + ".",
+                        right.position());
             }
         }
 
         if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
             if (!ts.isImplicitCastValid(l, ts.Long())) {
-                throw new SemanticException("The "
-                                                    + op
-                                                    + " operator must have numeric or boolean operands, not type "
-                                                    + l + ".",
-                                            left.position());
+                throw new SemanticException(
+                        "The "
+                                + op
+                                + " operator must have numeric or boolean operands, not type "
+                                + l
+                                + ".",
+                        left.position());
             }
 
             if (!ts.isImplicitCastValid(r, ts.Long())) {
-                throw new SemanticException("The "
-                                                    + op
-                                                    + " operator must have numeric or boolean operands, not type "
-                                                    + r + ".",
-                                            right.position());
+                throw new SemanticException(
+                        "The "
+                                + op
+                                + " operator must have numeric or boolean operands, not type "
+                                + r
+                                + ".",
+                        right.position());
             }
         }
 
         if (op == SUB || op == MUL || op == DIV || op == MOD) {
             if (!l.isNumeric()) {
-                throw new SemanticException("The " + op
-                        + " operator must have numeric operands, not type " + l
-                        + ".", left.position());
+                throw new SemanticException(
+                        "The " + op + " operator must have numeric operands, not type " + l + ".",
+                        left.position());
             }
 
             if (!r.isNumeric()) {
-                throw new SemanticException("The " + op
-                        + " operator must have numeric operands, not type " + r
-                        + ".", right.position());
+                throw new SemanticException(
+                        "The " + op + " operator must have numeric operands, not type " + r + ".",
+                        right.position());
             }
         }
 
         if (op == SHL || op == SHR || op == USHR) {
             if (!ts.isImplicitCastValid(l, ts.Long())) {
-                throw new SemanticException("The " + op
-                        + " operator must have numeric operands, not type " + l
-                        + ".", left.position());
+                throw new SemanticException(
+                        "The " + op + " operator must have numeric operands, not type " + l + ".",
+                        left.position());
             }
 
             if (!ts.isImplicitCastValid(r, ts.Long())) {
-                throw new SemanticException("The " + op
-                        + " operator must have numeric operands, not type " + r
-                        + ".", right.position());
+                throw new SemanticException(
+                        "The " + op + " operator must have numeric operands, not type " + r + ".",
+                        right.position());
             }
         }
 
@@ -463,11 +466,9 @@ public class Binary_c extends Expr_c implements Binary {
 
         if (child == left) {
             other = right;
-        }
-        else if (child == right) {
+        } else if (child == right) {
             other = left;
-        }
-        else {
+        } else {
             return child.type();
         }
 
@@ -497,7 +498,7 @@ public class Binary_c extends Expr_c implements Binary {
             }
 
             if (op == ADD && ts.typeEquals(type, ts.String())) {
-                // Implicit coercion to String. 
+                // Implicit coercion to String.
                 return ts.String();
             }
 
@@ -542,8 +543,7 @@ public class Binary_c extends Expr_c implements Binary {
             }
 
             return child.type();
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
         }
 
         return child.type();
@@ -599,50 +599,52 @@ public class Binary_c extends Expr_c implements Binary {
             if (op == COND_AND) {
                 // AND operator
                 // short circuit means that left is false
-                v.visitCFG(left,
-                           FlowGraph.EDGE_KEY_TRUE,
-                           right,
-                           ENTRY,
-                           FlowGraph.EDGE_KEY_FALSE,
-                           this,
-                           EXIT);
-            }
-            else {
+                v.visitCFG(
+                        left,
+                        FlowGraph.EDGE_KEY_TRUE,
+                        right,
+                        ENTRY,
+                        FlowGraph.EDGE_KEY_FALSE,
+                        this,
+                        EXIT);
+            } else {
                 // OR operator
                 // short circuit means that left is true
-                v.visitCFG(left,
-                           FlowGraph.EDGE_KEY_FALSE,
-                           right,
-                           ENTRY,
-                           FlowGraph.EDGE_KEY_TRUE,
-                           this,
-                           EXIT);
+                v.visitCFG(
+                        left,
+                        FlowGraph.EDGE_KEY_FALSE,
+                        right,
+                        ENTRY,
+                        FlowGraph.EDGE_KEY_TRUE,
+                        this,
+                        EXIT);
             }
-            v.visitCFG(right,
-                       FlowGraph.EDGE_KEY_TRUE,
-                       this,
-                       EXIT,
-                       FlowGraph.EDGE_KEY_FALSE,
-                       this,
-                       EXIT);
-        }
-        else if (left.type().isBoolean() && right.type().isBoolean()) {
-            v.visitCFG(left,
-                       FlowGraph.EDGE_KEY_TRUE,
-                       right,
-                       ENTRY,
-                       FlowGraph.EDGE_KEY_FALSE,
-                       right,
-                       ENTRY);
-            v.visitCFG(right,
-                       FlowGraph.EDGE_KEY_TRUE,
-                       this,
-                       EXIT,
-                       FlowGraph.EDGE_KEY_FALSE,
-                       this,
-                       EXIT);
-        }
-        else {
+            v.visitCFG(
+                    right,
+                    FlowGraph.EDGE_KEY_TRUE,
+                    this,
+                    EXIT,
+                    FlowGraph.EDGE_KEY_FALSE,
+                    this,
+                    EXIT);
+        } else if (left.type().isBoolean() && right.type().isBoolean()) {
+            v.visitCFG(
+                    left,
+                    FlowGraph.EDGE_KEY_TRUE,
+                    right,
+                    ENTRY,
+                    FlowGraph.EDGE_KEY_FALSE,
+                    right,
+                    ENTRY);
+            v.visitCFG(
+                    right,
+                    FlowGraph.EDGE_KEY_TRUE,
+                    this,
+                    EXIT,
+                    FlowGraph.EDGE_KEY_FALSE,
+                    this,
+                    EXIT);
+        } else {
             v.visitCFG(left, right, ENTRY);
             v.visitCFG(right, this, EXIT);
         }
@@ -656,12 +658,11 @@ public class Binary_c extends Expr_c implements Binary {
             return Collections.singletonList((Type) ts.ArithmeticException());
         }
 
-        return Collections.<Type> emptyList();
+        return Collections.<Type>emptyList();
     }
 
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Binary(this.position, this.left, this.op, this.right);
     }
-
 }

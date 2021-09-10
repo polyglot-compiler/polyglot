@@ -40,9 +40,8 @@ public class JL5ClassDeclToJL_c extends ClassDeclToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw)
-            throws SemanticException {
-        //Skip annotations and parameter nodes
+    public NodeVisitor toExtEnter(ExtensionRewriter rw) throws SemanticException {
+        // Skip annotations and parameter nodes
         ClassDecl cd = (ClassDecl) node();
         JL5ClassDeclExt ext = (JL5ClassDeclExt) JL5Ext.ext(cd);
         rw = (ExtensionRewriter) rw.bypass(ext.annotationElems());
@@ -53,13 +52,14 @@ public class JL5ClassDeclToJL_c extends ClassDeclToExt_c {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         ClassDecl cd = (ClassDecl) node();
-        return rw.to_nf().ClassDecl(cd.position(),
-                                    JL5Flags.clearAnnotation(JL5Flags.clearEnum(cd.flags())),
-                                    cd.id(),
-                                    cd.superClass(),
-                                    cd.interfaces(),
-                                    cd.body(),
-                                    cd.javadoc());
+        return rw.to_nf()
+                .ClassDecl(
+                        cd.position(),
+                        JL5Flags.clearAnnotation(JL5Flags.clearEnum(cd.flags())),
+                        cd.id(),
+                        cd.superClass(),
+                        cd.interfaces(),
+                        cd.body(),
+                        cd.javadoc());
     }
-
 }

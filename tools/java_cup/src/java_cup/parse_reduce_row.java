@@ -1,7 +1,7 @@
 package java_cup;
 
-/** This class represents one row (corresponding to one machine state) of the 
- *  reduce-goto parse table. 
+/** This class represents one row (corresponding to one machine state) of the
+ *  reduce-goto parse table.
  */
 public class parse_reduce_row {
     /*-----------------------------------------------------------*/
@@ -31,7 +31,7 @@ public class parse_reduce_row {
         return _size;
     }
 
-    //Hm Added clear  to clear all static fields
+    // Hm Added clear  to clear all static fields
     public static void clear() {
         _size = 0;
     }

@@ -22,8 +22,7 @@ public class EFGInfoCollector extends ErrorHandlingVisitor {
     protected final ExtensionInfo extInfo;
     protected final EfgTypeSystem ts;
 
-    public EFGInfoCollector(Job job, ExtensionInfo extInfo, EfgTypeSystem ts,
-            EfgNodeFactory nf) {
+    public EFGInfoCollector(Job job, ExtensionInfo extInfo, EfgTypeSystem ts, EfgNodeFactory nf) {
         super(job, ts, nf);
         this.extInfo = extInfo;
         this.ts = ts;
@@ -35,8 +34,7 @@ public class EFGInfoCollector extends ErrorHandlingVisitor {
     }
 
     @Override
-    public Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         EFG_INFO.ensureConfig(extInfo);
 
         EfgExt ext = EfgExt.ext(n);

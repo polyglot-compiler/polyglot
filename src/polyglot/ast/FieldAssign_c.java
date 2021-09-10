@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -42,20 +42,19 @@ import polyglot.visit.NodeVisitor;
 /**
  * A {@code FieldAssign} represents a Java assignment expression to
  * a field.  For instance, {@code this.x = e}.
- * 
+ *
  * The class of the {@code Expr} returned by
  * {@code FieldAssign_c.left()}is guaranteed to be a {@code Field}.
  */
 public class FieldAssign_c extends Assign_c implements FieldAssign {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
+    //    @Deprecated
     public FieldAssign_c(Position pos, Field left, Operator op, Expr right) {
         this(pos, left, op, right, null);
     }
 
-    public FieldAssign_c(Position pos, Field left, Operator op, Expr right,
-            Ext ext) {
+    public FieldAssign_c(Position pos, Field left, Operator op, Expr right, Ext ext) {
         super(pos, left, op, right, ext);
     }
 
@@ -81,12 +80,10 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
         Field f = left();
         if (f.target() instanceof Expr) {
             return (Expr) f.target();
-        }
-        else {
+        } else {
             if (operator() != Assign.ASSIGN) {
                 return f;
-            }
-            else {
+            } else {
                 return right();
             }
         }
@@ -101,12 +98,10 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
             //     o.f = e: visit o -> e -> (o.f = e)
             v.visitCFG(o, right(), ENTRY);
             v.visitCFG(right(), this, EXIT);
-        }
-        else {
+        } else {
             //       T.f = e: visit e -> (T.f OP= e)
             v.visitCFG(right(), this, EXIT);
         }
-
     }
 
     @Override
@@ -147,8 +142,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign {
     }
 
     @Override
-    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw) throws SemanticException {
         return rw.bypass(left());
     }
 

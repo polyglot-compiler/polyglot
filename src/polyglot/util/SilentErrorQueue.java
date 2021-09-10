@@ -33,8 +33,7 @@ import java.util.List;
 /**
  * A {@code SilentErrorQueue} records but does not output error messages.
  */
-public class SilentErrorQueue extends AbstractErrorQueue implements
-Iterable<ErrorInfo> {
+public class SilentErrorQueue extends AbstractErrorQueue implements Iterable<ErrorInfo> {
     private List<ErrorInfo> errors;
 
     public SilentErrorQueue(int limit, String name) {

@@ -63,14 +63,18 @@ public class SourceFile_c extends Node_c implements SourceFile {
     protected ImportTable importTable;
     protected Source source;
 
-//    @Deprecated
-    public SourceFile_c(Position pos, PackageNode package_,
-            List<Import> imports, List<TopLevelDecl> decls) {
+    //    @Deprecated
+    public SourceFile_c(
+            Position pos, PackageNode package_, List<Import> imports, List<TopLevelDecl> decls) {
         this(pos, package_, imports, decls, null);
     }
 
-    public SourceFile_c(Position pos, PackageNode package_,
-            List<Import> imports, List<TopLevelDecl> decls, Ext ext) {
+    public SourceFile_c(
+            Position pos,
+            PackageNode package_,
+            List<Import> imports,
+            List<TopLevelDecl> decls,
+            Ext ext) {
         super(pos, ext);
         assert imports != null && decls != null; // package_ may be null, imports and decls empty
         this.package_ = package_;
@@ -161,8 +165,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
         return importTable(this, importTable);
     }
 
-    protected <N extends SourceFile_c> N importTable(N n,
-            ImportTable importTable) {
+    protected <N extends SourceFile_c> N importTable(N n, ImportTable importTable) {
         if (n.importTable == importTable) return n;
         n = copyIfNeeded(n);
         n.importTable = importTable;
@@ -170,8 +173,8 @@ public class SourceFile_c extends Node_c implements SourceFile {
     }
 
     /** Reconstruct the source file. */
-    protected <N extends SourceFile_c> N reconstruct(N n, PackageNode package_,
-            List<Import> imports, List<TopLevelDecl> decls) {
+    protected <N extends SourceFile_c> N reconstruct(
+            N n, PackageNode package_, List<Import> imports, List<TopLevelDecl> decls) {
         n = package_(n, package_);
         n = imports(n, imports);
         n = decls(n, decls);
@@ -191,8 +194,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
      * field before we recurse into the declarations.
      */
     @Override
-    public NodeVisitor buildTypesEnter(TypeBuilder tb)
-            throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
         Package pkg = null;
         if (package_ != null) {
@@ -224,16 +226,15 @@ public class SourceFile_c extends Node_c implements SourceFile {
             String s = d.name();
 
             if (declaredTypes.containsKey(s)) {
-                throw new SemanticException("Duplicate declaration: \"" + s
-                        + "\".", d.position());
+                throw new SemanticException("Duplicate declaration: \"" + s + "\".", d.position());
             }
 
             declaredTypes.put(s, ((ClassDecl) d).type());
 
             if (d.flags().isPublic()) {
                 if (hasPublic) {
-                    throw new SemanticException("The source contains more than one public declaration.",
-                                                d.position());
+                    throw new SemanticException(
+                            "The source contains more than one public declaration.", d.position());
                 }
 
                 hasPublic = true;
@@ -259,12 +260,14 @@ public class SourceFile_c extends Node_c implements SourceFile {
             if (importedTypes.containsKey(name)) {
                 Named importedType = importedTypes.get(name);
                 if (!ts.equals(named, importedType)) {
-                    throw new SemanticException(name
-                            + " is already defined in a single-type import as type "
-                            + importedType + ".", i.position());
+                    throw new SemanticException(
+                            name
+                                    + " is already defined in a single-type import as type "
+                                    + importedType
+                                    + ".",
+                            i.position());
                 }
-            }
-            else importedTypes.put(name, named);
+            } else importedTypes.put(name, named);
 
             // If another top level type with the same simple name is otherwise
             // declared in the current compilation unit except by a
@@ -273,12 +276,15 @@ public class SourceFile_c extends Node_c implements SourceFile {
             if (declaredTypes.containsKey(name)) {
                 Named declaredType = declaredTypes.get(name);
                 if (!ts.equals(named, declaredType)) {
-                    throw new SemanticException("The import " + s
-                            + " conflicts with type " + declaredType
-                            + " defined in the same file.", i.position());
+                    throw new SemanticException(
+                            "The import "
+                                    + s
+                                    + " conflicts with type "
+                                    + declaredType
+                                    + " defined in the same file.",
+                            i.position());
                 }
             }
-
         }
 
         return this;
@@ -323,8 +329,7 @@ public class SourceFile_c extends Node_c implements SourceFile {
     }
 
     @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         /*
         SourceFile n = this;
 
@@ -332,13 +337,13 @@ public class SourceFile_c extends Node_c implements SourceFile {
         OuterScopeDisambiguator osd = new OuterScopeDisambiguator(ar);
         n = (SourceFile) osd.visitEdgeNoOverride(parent, n);
         if (osd.hasErrors()) throw new SemanticException();
-        
+
         // Ensure supertyperts and signatures are disambiguated for all
         // classes visible from the outer scope.
         SupertypeDisambiguator sud = new SupertypeDisambiguator(ar);
         n = (SourceFile) sud.visitEdgeNoOverride(parent, n);
         if (sud.hasErrors()) throw new SemanticException();
-        
+
         SignatureDisambiguator sid = new SignatureDisambiguator(ar);
         n = (SourceFile) sid.visitEdgeNoOverride(parent, n);
         if (sid.hasErrors()) throw new SemanticException();
@@ -365,5 +370,4 @@ public class SourceFile_c extends Node_c implements SourceFile {
     public Node copy(NodeFactory nf) {
         return nf.SourceFile(position, package_, imports, decls).source(source);
     }
-
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -75,7 +75,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
 
     /**
      * Translates a local class type into a field instance.
-     * 
+     *
      * @param ct
      *          the class type that will contain the field.
      * @param outer
@@ -83,21 +83,23 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
      */
     FieldInstance localToField(ParsedClassType ct, ClassType outer) {
         FieldInstance fi =
-                ts.fieldInstance(Position.compilerGenerated(),
-                                 ct,
-                                 Flags.FINAL.Protected(),
-                                 outer,
-                                 mangleClassName(outer));
+                ts.fieldInstance(
+                        Position.compilerGenerated(),
+                        ct,
+                        Flags.FINAL.Protected(),
+                        outer,
+                        mangleClassName(outer));
         return fi;
     }
 
     FieldDecl createFieldDecl(FieldInstance fi) {
         Id id = nf.Id(Position.compilerGenerated(), fi.name());
         FieldDecl fd =
-                nf.FieldDecl(fi.position(),
-                             fi.flags(),
-                             nf.CanonicalTypeNode(fi.position(), fi.type()),
-                             id);
+                nf.FieldDecl(
+                        fi.position(),
+                        fi.flags(),
+                        nf.CanonicalTypeNode(fi.position(), fi.type()),
+                        id);
         fd = fd.fieldInstance(fi);
         return fd;
     }
@@ -107,8 +109,11 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         Map<ClassType, FieldInstance> fieldMap;
         Context outerContext;
 
-        ClassBodyTranslator(Lang lang, ParsedClassType ct,
-                Map<ClassType, FieldInstance> fieldMap, Context context) {
+        ClassBodyTranslator(
+                Lang lang,
+                ParsedClassType ct,
+                Map<ClassType, FieldInstance> fieldMap,
+                Context context) {
             super(lang);
             this.ct = ct;
             this.fieldMap = fieldMap;
@@ -134,8 +139,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
             }
             if (n instanceof ConstructorDecl) {
                 ConstructorDecl ctd = (ConstructorDecl) n;
-                ClassType ct2 =
-                        (ClassType) ctd.constructorInstance().container();
+                ClassType ct2 = (ClassType) ctd.constructorInstance().container();
                 if (ct2.equals(ct)) {
                     ctd = translateConstructorDecl(ct, ctd, fieldMap);
                 }
@@ -151,8 +155,8 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         ci.setFormalTypes(formals);
     }
 
-    ConstructorDecl translateConstructorDecl(ParsedClassType ct,
-            ConstructorDecl cd, Map<ClassType, FieldInstance> m) {
+    ConstructorDecl translateConstructorDecl(
+            ParsedClassType ct, ConstructorDecl cd, Map<ClassType, FieldInstance> m) {
         List<ClassType> env = env(ct, true);
 
         addEnvToCI(cd.constructorInstance(), env);
@@ -202,13 +206,11 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
                     continue;
                 }
 
-                Special this_ =
-                        nf.Special(Position.compilerGenerated(), Special.THIS);
+                Special this_ = nf.Special(Position.compilerGenerated(), Special.THIS);
                 this_ = (Special) this_.type(ct);
 
                 Id targetId = nf.Id(Position.compilerGenerated(), fi.name());
-                Field target =
-                        nf.Field(Position.compilerGenerated(), this_, targetId);
+                Field target = nf.Field(Position.compilerGenerated(), this_, targetId);
                 target = target.fieldInstance(fi);
                 target = (Field) target.type(fi.type());
 
@@ -218,10 +220,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
                 source = (Local) source.type(li.type());
 
                 FieldAssign assign =
-                        nf.FieldAssign(Position.compilerGenerated(),
-                                       target,
-                                       Assign.ASSIGN,
-                                       source);
+                        nf.FieldAssign(Position.compilerGenerated(), target, Assign.ASSIGN, source);
                 assign = (FieldAssign) assign.type(target.type());
 
                 newStmts.add(nf.Eval(Position.compilerGenerated(), assign));
@@ -232,8 +231,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
             for (int i = 1; i < oldStmts.size(); i++) {
                 newStmts.add(oldStmts.get(i));
             }
-        }
-        else {
+        } else {
             newStmts.addAll(oldStmts);
         }
 
@@ -243,8 +241,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
     }
 
     @Override
-    protected Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof ClassDecl) {
             ClassDecl cd = (ClassDecl) n;
 
@@ -255,8 +252,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
             if (!env.isEmpty()) {
                 // Translate the class body if any supertype (including ct itself)
                 // is an inner class.
-                Context innerContext =
-                        lang().enterChildScope(cd, cd.body(), context);
+                Context innerContext = lang().enterChildScope(cd, cd.body(), context);
                 cd = cd.body(translateClassBody(ct, cd.body(), innerContext));
             }
 
@@ -267,8 +263,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         return n;
     }
 
-    protected ClassBody translateClassBody(ParsedClassType ct, ClassBody body,
-            Context context) {
+    protected ClassBody translateClassBody(ParsedClassType ct, ClassBody body, Context context) {
         List<ClassMember> members = new ArrayList<>();
 
         List<ClassType> env = env(ct, false);
@@ -290,8 +285,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         for (ClassMember cm : body.members()) {
             if (cm instanceof ConstructorDecl) {
                 ctors.add((ConstructorDecl) cm);
-            }
-            else {
+            } else {
                 others.add(cm);
             }
         }
@@ -302,8 +296,7 @@ public class InnerClassRewriter extends InnerClassAbstractRemover {
         body = body.members(members);
 
         // Rewrite the class body.
-        ClassBodyTranslator v =
-                new ClassBodyTranslator(lang(), ct, fieldMap, context);
+        ClassBodyTranslator v = new ClassBodyTranslator(lang(), ct, fieldMap, context);
         v = (ClassBodyTranslator) v.begin();
         body = (ClassBody) body.visit(v);
 

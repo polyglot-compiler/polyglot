@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -91,9 +91,10 @@ public class CodeCleaner extends NodeVisitor {
 
             // Alpha-rename local decls in the block that we're flattening.
             b = (Block) b.visit(alphaRen);
-            return nf.Labeled(l.position(),
-                              nf.Id(Position.compilerGenerated(), l.label()),
-                              b.statements().get(0));
+            return nf.Labeled(
+                    l.position(),
+                    nf.Id(Position.compilerGenerated(), l.label()),
+                    b.statements().get(0));
         }
 
         // Flatten any blocks that may be contained in this one, and clean up dead
@@ -118,8 +119,7 @@ public class CodeCleaner extends NodeVisitor {
                 // Alpha-rename local decls in the block that we're flattening.
                 stmt = (Stmt) stmt.visit(alphaRen);
                 stmtList.addAll(((Block) stmt).statements());
-            }
-            else {
+            } else {
                 stmtList.add(stmt);
             }
         }
@@ -135,8 +135,7 @@ public class CodeCleaner extends NodeVisitor {
         for (Stmt stmt : l) {
             stmtList.add(stmt);
 
-            if (stmt instanceof Branch || stmt instanceof Return
-                    || stmt instanceof Throw) {
+            if (stmt instanceof Branch || stmt instanceof Return || stmt instanceof Throw) {
                 return stmtList;
             }
         }
@@ -149,16 +148,17 @@ public class CodeCleaner extends NodeVisitor {
      **/
     protected Set<String> labelRefs(Block b) {
         final Set<String> result = new HashSet<>();
-        b.visit(new NodeVisitor(lang()) {
-            @Override
-            public Node leave(Node old, Node n, NodeVisitor v) {
-                if (n instanceof Branch) {
-                    result.add(((Branch) n).label());
-                }
+        b.visit(
+                new NodeVisitor(lang()) {
+                    @Override
+                    public Node leave(Node old, Node n, NodeVisitor v) {
+                        if (n instanceof Branch) {
+                            result.add(((Branch) n).label());
+                        }
 
-                return n;
-            }
-        });
+                        return n;
+                    }
+                });
 
         return result;
     }

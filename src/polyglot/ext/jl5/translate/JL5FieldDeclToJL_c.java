@@ -16,8 +16,7 @@ public class JL5FieldDeclToJL_c extends FieldDeclToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor toExtEnter(ExtensionRewriter rw) throws SemanticException {
         // Skip annotations
         FieldDecl n = (FieldDecl) this.node();
         JL5FieldDeclExt ext = (JL5FieldDeclExt) JL5Ext.ext(n);

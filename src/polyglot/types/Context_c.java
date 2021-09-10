@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -55,8 +55,7 @@ public class Context_c implements Context {
     protected TypeSystem ts;
 
     public static class Kind extends Enum {
-        private static final long serialVersionUID =
-                SerialVersionUID.generate();
+        private static final long serialVersionUID = SerialVersionUID.generate();
 
         public Kind(String name) {
             super(name);
@@ -116,8 +115,7 @@ public class Context_c implements Context {
     public Context copy() {
         try {
             return (Context) super.clone();
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");
         }
     }
@@ -135,6 +133,7 @@ public class Context_c implements Context {
      * The import table for the file
      */
     protected ImportTable it;
+
     protected Kind kind;
     protected ClassType type;
     protected ParsedClassType scope;
@@ -223,20 +222,13 @@ public class Context_c implements Context {
         // If found, stop the search since it shadows any enclosing
         // classes method of the same name.
         if (this.currentClass() != null
-                && ts.hasAccessibleMethodNamed(this.currentClass(),
-                                               name,
-                                               this.currentClass())) {
+                && ts.hasAccessibleMethodNamed(this.currentClass(), name, this.currentClass())) {
             if (Report.should_report(TOPICS, 3))
-                Report.report(3, "find-method " + name + argTypes + " -> "
-                        + this.currentClass());
+                Report.report(3, "find-method " + name + argTypes + " -> " + this.currentClass());
 
             // Found a class which has a method of the right name.
             // Now need to check if the method is of the correct type.
-            return ts.findMethod(this.currentClass(),
-                                 name,
-                                 argTypes,
-                                 this.currentClass(),
-                                 false);
+            return ts.findMethod(this.currentClass(), name, argTypes, this.currentClass(), false);
         }
 
         if (outer != null) {
@@ -248,25 +240,24 @@ public class Context_c implements Context {
 
     /**
      * Gets a local of a particular name.
-     * 
+     *
      * @return
      * 		     the local instance
      * @throws SemanticException
-     *           if there is no such local 
+     *           if there is no such local
      */
     @Override
     public LocalInstance findLocal(String name) throws SemanticException {
         LocalInstance vi = findLocalSilent(name);
 
-        if (vi == null)
-            throw new SemanticException("Local " + name + " not found.");
+        if (vi == null) throw new SemanticException("Local " + name + " not found.");
 
         return vi;
     }
 
     /**
      * Gets a local of a particular name.
-     * 
+     *
      * @return the local instance, or null if none exists
      */
     @Override
@@ -311,13 +302,9 @@ public class Context_c implements Context {
             Report.report(3, "find-method-scope " + name + " in " + this);
 
         if (this.currentClass() != null
-                && ts.hasAccessibleMethodNamed(this.currentClass(),
-                                               name,
-                                               this.currentClass())) {
+                && ts.hasAccessibleMethodNamed(this.currentClass(), name, this.currentClass())) {
             if (Report.should_report(TOPICS, 3))
-                Report.report(3,
-                              "find-method-scope " + name + " -> "
-                                      + this.currentClass());
+                Report.report(3, "find-method-scope " + name + " -> " + this.currentClass());
             return this.currentClass();
         }
 
@@ -339,8 +326,7 @@ public class Context_c implements Context {
             FieldInstance fi = (FieldInstance) vi;
 
             if (!ts.isAccessible(fi, this)) {
-                throw new SemanticException("Field " + name
-                        + " not accessible.");
+                throw new SemanticException("Field " + name + " not accessible.");
             }
 
             if (Report.should_report(TOPICS, 3))
@@ -348,8 +334,7 @@ public class Context_c implements Context {
             return fi;
         }
 
-        throw new NoMemberException(NoMemberException.FIELD, "Field " + name
-                + " not found.");
+        throw new NoMemberException(NoMemberException.FIELD, "Field " + name + " not found.");
     }
 
     /**
@@ -360,8 +345,7 @@ public class Context_c implements Context {
         VarInstance vi = findVariableSilent(name);
 
         if (vi != null) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "find-var " + name + " -> " + vi);
+            if (Report.should_report(TOPICS, 3)) Report.report(3, "find-var " + name + " -> " + vi);
             return vi;
         }
 
@@ -373,14 +357,12 @@ public class Context_c implements Context {
      */
     @Override
     public VarInstance findVariableSilent(String name) {
-        if (Report.should_report(TOPICS, 3))
-            Report.report(3, "find-var " + name + " in " + this);
+        if (Report.should_report(TOPICS, 3)) Report.report(3, "find-var " + name + " in " + this);
 
         VarInstance vi = findVariableInThisScope(name);
 
         if (vi != null) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "find-var " + name + " -> " + vi);
+            if (Report.should_report(TOPICS, 3)) Report.report(3, "find-var " + name + " -> " + vi);
             return vi;
         }
 
@@ -430,8 +412,7 @@ public class Context_c implements Context {
      */
     @Override
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(TOPICS, 3))
-            Report.report(3, "find-type " + name + " in " + this);
+        if (Report.should_report(TOPICS, 3)) Report.report(3, "find-type " + name + " in " + this);
 
         if (isOuter()) return ts.systemResolver().find(name);
         if (isSource()) return it.find(name);
@@ -439,8 +420,7 @@ public class Context_c implements Context {
         Named type = findInThisScope(name);
 
         if (type != null) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "find " + name + " -> " + type);
+            if (Report.should_report(TOPICS, 3)) Report.report(3, "find " + name + " -> " + type);
             return type;
         }
 
@@ -480,9 +460,7 @@ public class Context_c implements Context {
     @Override
     public Context pushClass(ParsedClassType classScope, ClassType type) {
         if (Report.should_report(TOPICS, 4))
-            Report.report(4,
-                          "push class " + classScope + " "
-                                  + classScope.position());
+            Report.report(4, "push class " + classScope + " " + classScope.position());
         Context_c v = push();
         v.kind = CLASS;
         v.scope = classScope;
@@ -559,13 +537,13 @@ public class Context_c implements Context {
         return inCode;
     }
 
-    /** 
+    /**
      * Returns whether the current context is a static context.
      * A statement of expression occurs in a static context if and only if the
      * inner-most method, constructor, instance initializer, static initializer,
-     * field initializer, or explicit constructor statement enclosing the 
-     * statement or expressions is a static method, static initializer, the 
-     * variable initializer of a static variable, or an explicity constructor 
+     * field initializer, or explicit constructor statement enclosing the
+     * statement or expressions is a static method, static initializer, the
+     * variable initializer of a static variable, or an explicity constructor
      * invocation statment. (Java Language Spec, 2nd Edition, 8.1.2)
      */
     @Override
@@ -594,8 +572,7 @@ public class Context_c implements Context {
      */
     @Override
     public void addVariable(VarInstance vi) {
-        if (Report.should_report(TOPICS, 3))
-            Report.report(3, "Adding " + vi + " to context.");
+        if (Report.should_report(TOPICS, 3)) Report.report(3, "Adding " + vi + " to context.");
         addVariableToThisScope(vi);
     }
 
@@ -607,8 +584,7 @@ public class Context_c implements Context {
     @Deprecated
     @Override
     public void addMethod(MethodInstance mi) {
-        if (Report.should_report(TOPICS, 3))
-            Report.report(3, "Adding " + mi + " to context.");
+        if (Report.should_report(TOPICS, 3)) Report.report(3, "Adding " + mi + " to context.");
     }
 
     /**
@@ -616,8 +592,7 @@ public class Context_c implements Context {
      */
     @Override
     public void addNamed(Named t) {
-        if (Report.should_report(TOPICS, 3))
-            Report.report(3, "Adding type " + t + " to context.");
+        if (Report.should_report(TOPICS, 3)) Report.report(3, "Adding type " + t + " to context.");
         addNamedToThisScope(t);
     }
 
@@ -629,8 +604,7 @@ public class Context_c implements Context {
         if (t == null && isClass()) {
             try {
                 return ts.findMemberClass(type, name, type);
-            }
-            catch (SemanticException e) {
+            } catch (SemanticException e) {
             }
             if (!type.isAnonymous() && type.name().equals(name)) return type;
         }
@@ -657,8 +631,7 @@ public class Context_c implements Context {
         if (vi == null && isClass()) {
             try {
                 return ts.findField(this.type, name, this.type, true);
-            }
-            catch (SemanticException e) {
+            } catch (SemanticException e) {
                 return null;
             }
         }
@@ -672,5 +645,4 @@ public class Context_c implements Context {
 
     private static final Collection<String> TOPICS =
             CollectionUtil.list(Report.types, Report.context);
-
 }

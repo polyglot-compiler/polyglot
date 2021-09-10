@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -57,14 +57,18 @@ public class For_c extends Loop_c implements For {
     protected List<ForInit> inits;
     protected List<ForUpdate> iters;
 
-//    @Deprecated
-    public For_c(Position pos, List<ForInit> inits, Expr cond,
-            List<ForUpdate> iters, Stmt body) {
+    //    @Deprecated
+    public For_c(Position pos, List<ForInit> inits, Expr cond, List<ForUpdate> iters, Stmt body) {
         this(pos, inits, cond, iters, body, null);
     }
 
-    public For_c(Position pos, List<ForInit> inits, Expr cond,
-            List<ForUpdate> iters, Stmt body, Ext ext) {
+    public For_c(
+            Position pos,
+            List<ForInit> inits,
+            Expr cond,
+            List<ForUpdate> iters,
+            Stmt body,
+            Ext ext) {
         super(pos, cond, body, ext);
         assert (inits != null && iters != null); // cond may be null, inits and iters may be empty
         this.inits = ListUtil.copy(inits, true);
@@ -116,8 +120,8 @@ public class For_c extends Loop_c implements For {
     }
 
     /** Reconstruct the statement. */
-    protected <N extends For_c> N reconstruct(N n, List<ForInit> inits,
-            Expr cond, List<ForUpdate> iters, Stmt body) {
+    protected <N extends For_c> N reconstruct(
+            N n, List<ForInit> inits, Expr cond, List<ForUpdate> iters, Stmt body) {
         n = super.reconstruct(n, cond, body);
         n = inits(n, inits);
         n = iters(n, iters);
@@ -153,21 +157,23 @@ public class For_c extends Loop_c implements For {
                 Type dt = d.type().type();
                 if (t == null) {
                     t = dt;
-                }
-                else if (!t.typeEquals(dt)) {
-                    throw new InternalCompilerError("Local variable "
-                                                            + "declarations in a for loop initializer must all "
-                                                            + "be the same type, in this case "
-                                                            + t + ", not " + dt
-                                                            + ".",
-                                                    d.position());
+                } else if (!t.typeEquals(dt)) {
+                    throw new InternalCompilerError(
+                            "Local variable "
+                                    + "declarations in a for loop initializer must all "
+                                    + "be the same type, in this case "
+                                    + t
+                                    + ", not "
+                                    + dt
+                                    + ".",
+                            d.position());
                 }
             }
         }
 
         if (cond != null && !ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
-            throw new SemanticException("The condition of a for statement must have boolean type.",
-                                        cond.position());
+            throw new SemanticException(
+                    "The condition of a for statement must have boolean type.", cond.position());
         }
 
         return this;
@@ -191,7 +197,7 @@ public class For_c extends Loop_c implements For {
 
         if (inits != null) {
             boolean first = true;
-            for (Iterator<ForInit> i = inits.iterator(); i.hasNext();) {
+            for (Iterator<ForInit> i = inits.iterator(); i.hasNext(); ) {
                 ForInit s = i.next();
                 printForInit(s, w, tr, first);
                 first = false;
@@ -214,7 +220,7 @@ public class For_c extends Loop_c implements For {
         w.allowBreak(0);
 
         if (iters != null) {
-            for (Iterator<ForUpdate> i = iters.iterator(); i.hasNext();) {
+            for (Iterator<ForUpdate> i = iters.iterator(); i.hasNext(); ) {
                 ForUpdate s = i.next();
                 printForUpdate(s, w, tr);
 
@@ -236,8 +242,7 @@ public class For_c extends Loop_c implements For {
         return "for (...) ...";
     }
 
-    private void printForInit(ForInit s, CodeWriter w, PrettyPrinter tr,
-            boolean printType) {
+    private void printForInit(ForInit s, CodeWriter w, PrettyPrinter tr, boolean printType) {
         boolean oldSemiColon = tr.appendSemicolon(false);
         boolean oldPrintType = tr.printType(printType);
         printBlock(s, w, tr);
@@ -263,20 +268,18 @@ public class For_c extends Loop_c implements For {
         if (cond != null) {
             if (v.lang().condIsConstantTrue(this, v.lang())) {
                 v.visitCFG(cond, body, ENTRY);
-            }
-            else if (v.lang().condIsConstantFalse(this, v.lang())
-                    && v.skipDeadLoopBodies()) {
+            } else if (v.lang().condIsConstantFalse(this, v.lang()) && v.skipDeadLoopBodies()) {
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, this, EXIT);
                 return succs;
-            }
-            else {
-                v.visitCFG(cond,
-                           FlowGraph.EDGE_KEY_TRUE,
-                           body,
-                           ENTRY,
-                           FlowGraph.EDGE_KEY_FALSE,
-                           this,
-                           EXIT);
+            } else {
+                v.visitCFG(
+                        cond,
+                        FlowGraph.EDGE_KEY_TRUE,
+                        body,
+                        ENTRY,
+                        FlowGraph.EDGE_KEY_FALSE,
+                        this,
+                        EXIT);
             }
         }
 
@@ -293,11 +296,6 @@ public class For_c extends Loop_c implements For {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.For(this.position,
-                      this.inits,
-                      this.cond,
-                      this.iters,
-                      this.body);
+        return nf.For(this.position, this.inits, this.cond, this.iters, this.body);
     }
-
 }

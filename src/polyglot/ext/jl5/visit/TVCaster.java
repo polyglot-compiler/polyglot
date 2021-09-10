@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -69,7 +69,7 @@ import polyglot.visit.NodeVisitor;
  * Add casts so that we can erase generic classes and the code will still compile under Java 1.4.
  * We need to insert casts aggressively, although there is definitely opportunity to modify this
  * code to avoid redundant casts.
- * 
+ *
  */
 public class TVCaster extends AscriptionVisitor {
     public TVCaster(Job job, TypeSystem ts, NodeFactory nf) {
@@ -84,15 +84,13 @@ public class TVCaster extends AscriptionVisitor {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         Type fromType = ts.erasureType(e.type());
         toType = ts.erasureType(toType);
-        if (!fromType.isReference() || !toType.isReference()
-                || ts.Object().equals(toType)) {
+        if (!fromType.isReference() || !toType.isReference() || ts.Object().equals(toType)) {
             return e;
         }
         if (e instanceof Special || e instanceof ArrayInit || e instanceof Lit) {
             return e;
         }
-        if (e instanceof New
-                && ts.isImplicitCastValid(((New) e).objectType().type(), toType)) {
+        if (e instanceof New && ts.isImplicitCastValid(((New) e).objectType().type(), toType)) {
             return e;
         }
         if (isStringLiterals(e)) {
@@ -114,10 +112,9 @@ public class TVCaster extends AscriptionVisitor {
 
         if (ts.isCastValid(fromType, toType)) {
             Type castType = toType;
-            if (toType.isClass()
-                    && !ts.classAccessible(toType.toClass(), this.context())) {
+            if (toType.isClass() && !ts.classAccessible(toType.toClass(), this.context())) {
                 // the toType is not accessible.
-                //return e;
+                // return e;
                 // Let's try using the fromType instead.
                 castType = fromType;
             }
@@ -139,20 +136,17 @@ public class TVCaster extends AscriptionVisitor {
         JL5ParsedClassType pct;
         if (container.isArray()) {
             Type base = container.toArray().base();
-            while (base.isArray())
-                base = base.toArray().base();
+            while (base.isArray()) base = base.toArray().base();
             if (base instanceof TypeVariable) return true;
             if (base.isReference()) {
                 pct = getBase(base.toReference());
-            }
-            else return false;
-        }
-        else pct = getBase(container);
+            } else return false;
+        } else pct = getBase(container);
 
         FieldInstance bfi = pct.fieldNamed(fi.name());
         if (bfi == null) {
-            throw new InternalCompilerError("Couldn't find field named "
-                    + fi.name() + " in " + pct);
+            throw new InternalCompilerError(
+                    "Couldn't find field named " + fi.name() + " in " + pct);
         }
 
         return hasTypeVariable(bfi.type());
@@ -178,15 +172,12 @@ public class TVCaster extends AscriptionVisitor {
         JL5ParsedClassType pct;
         if (container.isArray()) {
             Type base = container.toArray().base();
-            while (base.isArray())
-                base = base.toArray().base();
+            while (base.isArray()) base = base.toArray().base();
             if (base instanceof TypeVariable) return true;
             if (base.isReference()) {
                 pct = getBase(base.toReference());
-            }
-            else return false;
-        }
-        else pct = getBase(container);
+            } else return false;
+        } else pct = getBase(container);
 
         List<? extends MethodInstance> meths = pct.methodsNamed(mi.name());
 
@@ -225,32 +216,30 @@ public class TVCaster extends AscriptionVisitor {
         if (t instanceof ArrayType) {
             return hasTypeVariable(((ArrayType) t).base());
         }
-//        if (t instanceof JL5SubstClassType) {
-//            JL5SubstClassType sct = (JL5SubstClassType)t;
-//            if (hasTypeVariable(sct.base())) {
-//                return true;
-//            }
-//            for (Type s : (List<Type>)sct.actuals()) {
-//                if (hasTypeVariable(s)) {
-//                    return true;
-//                }
-//            }
-//        }
+        //        if (t instanceof JL5SubstClassType) {
+        //            JL5SubstClassType sct = (JL5SubstClassType)t;
+        //            if (hasTypeVariable(sct.base())) {
+        //                return true;
+        //            }
+        //            for (Type s : (List<Type>)sct.actuals()) {
+        //                if (hasTypeVariable(s)) {
+        //                    return true;
+        //                }
+        //            }
+        //        }
         return false;
     }
 
     private static JL5ParsedClassType getBase(ReferenceType container) {
         if (container instanceof JL5SubstClassType) {
             return ((JL5SubstClassType) container).base();
-        }
-        else if (container instanceof RawClass) {
+        } else if (container instanceof RawClass) {
             return ((RawClass) container).base();
-        }
-        else if (container instanceof JL5ParsedClassType) {
+        } else if (container instanceof JL5ParsedClassType) {
             return (JL5ParsedClassType) container;
         }
-        throw new InternalCompilerError("Don't know how to deal with container of type "
-                + container.getClass());
+        throw new InternalCompilerError(
+                "Don't know how to deal with container of type " + container.getClass());
     }
 
     /**
@@ -262,15 +251,15 @@ public class TVCaster extends AscriptionVisitor {
         }
         if (e instanceof Binary) {
             Binary b = (Binary) e;
-            return b.operator() == Binary.ADD && isStringLiterals(b.left())
+            return b.operator() == Binary.ADD
+                    && isStringLiterals(b.left())
                     && isStringLiterals(b.right());
         }
         return false;
     }
 
     private Expr insertCast(Expr e, Type toType) {
-        if (toType.isClass()
-                && toType.toClass().fullName().equals("java.lang.Enum")) {
+        if (toType.isClass() && toType.toClass().fullName().equals("java.lang.Enum")) {
             // it's the enum type.
             // see if we want to replace it
             JL5Options opts = (JL5Options) job.extensionInfo().getOptions();
@@ -279,7 +268,7 @@ public class TVCaster extends AscriptionVisitor {
                 if (!"java.lang.Enum".equals(enumImpl)) {
                     // we now have a difficult choice.
                     // Do we leave it as java.lang.Enum, or cast it to enumImpl?
-                    // Let's cast it to the type of the expression instead... 
+                    // Let's cast it to the type of the expression instead...
                     Type eType = e.type();
                     JL5TypeSystem ts = (JL5TypeSystem) this.ts;
                     if (eType.isNull()) {
@@ -295,8 +284,7 @@ public class TVCaster extends AscriptionVisitor {
                 }
             }
         }
-        TypeNode tn =
-                nf.CanonicalTypeNode(Position.compilerGenerated(), toType);
+        TypeNode tn = nf.CanonicalTypeNode(Position.compilerGenerated(), toType);
         Expr newE = nf.Cast(Position.compilerGenerated(), tn, e);
         return newE.type(toType);
     }
@@ -310,8 +298,7 @@ public class TVCaster extends AscriptionVisitor {
             Cast c = (Cast) ret;
             return c.expr();
         }
-        if (parent instanceof Assign && ret instanceof Cast
-                && ((Assign) parent).left() == old) {
+        if (parent instanceof Assign && ret instanceof Cast && ((Assign) parent).left() == old) {
             // inserted one cast too many...
             Cast c = (Cast) ret;
             return c.expr();
@@ -327,10 +314,10 @@ public class TVCaster extends AscriptionVisitor {
             Conditional c = (Conditional) parent;
             if (c.consequent() == old || c.alternative() == old) {
                 // n is the consequent or alternative
-                if (c.type().isReference()
-                        && !((Expr) n).type().equals(c.type())) {
+                if (c.type().isReference() && !((Expr) n).type().equals(c.type())) {
                     // c is a reference type that's different from the type of the conditional.
-                    // add a cast, since the Java 1.5 typing rules for conditionals are more permissive.
+                    // add a cast, since the Java 1.5 typing rules for conditionals are more
+                    // permissive.
                     return insertCast((Expr) n, c.type());
                 }
             }
@@ -350,22 +337,21 @@ public class TVCaster extends AscriptionVisitor {
 
         // SNC: we were always casting the receiver of a call to the appropriate type
         // This does not seem to be required.
-//        if (parent instanceof Call && old == ((Call) parent).target()) {
-//            Call c = (Call) parent;
-//            if (c.target() instanceof Expr
-//                    && !(c.target() instanceof Special || c.target() instanceof Lit)) {
-//                Expr e = (Expr) n;
-//                if (e instanceof Cast) {
-//                    e = ((Cast) e).expr();
-//                }
-//                // cast e to the type of the container
-//                JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-//                Type t = c.methodInstance().container();
-//                Type et = ts.erasureType(t);
-//                return insertCast(e, et);
-//            }
-//        }
+        //        if (parent instanceof Call && old == ((Call) parent).target()) {
+        //            Call c = (Call) parent;
+        //            if (c.target() instanceof Expr
+        //                    && !(c.target() instanceof Special || c.target() instanceof Lit)) {
+        //                Expr e = (Expr) n;
+        //                if (e instanceof Cast) {
+        //                    e = ((Cast) e).expr();
+        //                }
+        //                // cast e to the type of the container
+        //                JL5TypeSystem ts = (JL5TypeSystem) this.ts;
+        //                Type t = c.methodInstance().container();
+        //                Type et = ts.erasureType(t);
+        //                return insertCast(e, et);
+        //            }
+        //        }
         return ret;
     }
-
 }

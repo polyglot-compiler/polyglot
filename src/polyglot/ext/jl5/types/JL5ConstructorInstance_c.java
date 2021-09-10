@@ -39,15 +39,19 @@ import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class JL5ConstructorInstance_c extends ConstructorInstance_c implements
-JL5ConstructorInstance {
+public class JL5ConstructorInstance_c extends ConstructorInstance_c
+        implements JL5ConstructorInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<TypeVariable> typeParams;
     protected Annotations annotations;
 
-    public JL5ConstructorInstance_c(JL5TypeSystem ts, Position pos,
-            ClassType container, Flags flags, List<? extends Type> argTypes,
+    public JL5ConstructorInstance_c(
+            JL5TypeSystem ts,
+            Position pos,
+            ClassType container,
+            Flags flags,
+            List<? extends Type> argTypes,
             List<? extends Type> excTypes,
             List<? extends TypeVariable> typeParams) {
         super(ts, pos, container, flags, argTypes, excTypes);
@@ -90,8 +94,7 @@ JL5ConstructorInstance {
             }
             if (!formalTypes.hasNext() && isVariableArity()) {
                 // variable arity method, and this is the last arg.
-                ArrayType arr =
-                        (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
+                ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 formal = arr.base();
             }
             if (ts.isImplicitCastValid(actual, formal)) {
@@ -100,7 +103,8 @@ JL5ConstructorInstance {
             }
             // the actual can't be cast to the formal.
             // HOWEVER: there is still hope.
-            if (isVariableArity() && myFormalTypes.size() == argTypes.size()
+            if (isVariableArity()
+                    && myFormalTypes.size() == argTypes.size()
                     && !formalTypes.hasNext()) {
                 // This is a variable arity method (e.g., m(int x,
                 // String[])) and there
@@ -108,15 +112,13 @@ JL5ConstructorInstance {
                 // arguments.
                 // The last actual can be either the base type of the array,
                 // or the array type.
-                ArrayType arr =
-                        (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
+                ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 if (!ts.isImplicitCastValid(actual, arr)) {
                     // System.err.println("     3: failed " + actual +
                     // " to " +formal + " and " + actual + " to " + arr);
                     return false;
                 }
-            }
-            else {
+            } else {
                 // System.err.println("     4: failed " + actual + " to "
                 // +formal);
                 return false;
@@ -145,7 +147,6 @@ JL5ConstructorInstance {
         for (TypeVariable tv : typeParams) {
             tv.setDeclaringProcedure((JL5ProcedureInstance) declaration());
         }
-
     }
 
     @Override
@@ -180,7 +181,7 @@ JL5ConstructorInstance {
 
         if (!throwTypes.isEmpty()) {
             sb.append(" throws ");
-            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext();) {
+            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext(); ) {
                 Object o = i.next();
                 sb.append(o.toString());
 
@@ -202,5 +203,4 @@ JL5ConstructorInstance {
     public void setAnnotations(Annotations annotations) {
         this.annotations = annotations;
     }
-
 }

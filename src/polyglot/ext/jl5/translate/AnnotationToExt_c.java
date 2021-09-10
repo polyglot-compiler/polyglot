@@ -17,9 +17,6 @@ public class AnnotationToExt_c extends ToExt_c {
         Term n = (Term) node();
         AnnotationElem ae = (AnnotationElem) n;
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
-        return to_nf.NormalAnnotationElem(n.position(),
-                                          ae.typeName(),
-                                          ae.elements());
+        return to_nf.NormalAnnotationElem(n.position(), ae.typeName(), ae.elements());
     }
-
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -70,12 +70,12 @@ import polyglot.util.Position;
 import polyglot.util.UniqueID;
 
 // TODO:
-//Convert closures to anon
-//Add frame classes around anon and local
-//now all classes access only final locals
-//Convert local and anon to member
-//Dup inner member to static
-//Remove inner member
+// Convert closures to anon
+// Add frame classes around anon and local
+// now all classes access only final locals
+// Convert local and anon to member
+// Dup inner member to static
+// Remove inner member
 
 public class LocalClassRemover extends ContextVisitor {
 
@@ -83,8 +83,7 @@ public class LocalClassRemover extends ContextVisitor {
         super(job, ts, nf);
     }
 
-    Map<Pair<LocalInstance, ClassType>, FieldInstance> fieldForLocal =
-            new HashMap<>();
+    Map<Pair<LocalInstance, ClassType>, FieldInstance> fieldForLocal = new HashMap<>();
     Map<ParsedClassType, List<ClassDecl>> orphans = new HashMap<>();
     Map<ParsedClassType, List<FieldInstance>> newFields = new HashMap<>();
 
@@ -109,32 +108,37 @@ public class LocalClassRemover extends ContextVisitor {
 
                     LocalClassDecl lcd = (LocalClassDecl) s;
                     ClassDecl cd = lcd.decl();
-                    Flags flags =
-                            context.inStaticContext()
-                                    ? Flags.PUBLIC.Static() : Flags.PUBLIC;
+                    Flags flags = context.inStaticContext() ? Flags.PUBLIC.Static() : Flags.PUBLIC;
                     cd = cd.flags(flags);
                     cd.type().flags(flags);
                     cd.type().kind(ClassType.MEMBER);
 
                     cd =
-                            rewriteLocalClass(cd,
-                                              hashGet(newFields,
-                                                      cd.type(),
-                                                      Collections.<FieldInstance> emptyList()));
+                            rewriteLocalClass(
+                                    cd,
+                                    hashGet(
+                                            newFields,
+                                            cd.type(),
+                                            Collections.<FieldInstance>emptyList()));
 
                     if (cd != lcd.decl()) {
                         ss.set(i, lcd.decl(cd));
 
-                        // Rewrite the constructor calls in the remaining statements, including the class declaration statement
+                        // Rewrite the constructor calls in the remaining statements, including the
+                        // class declaration statement
                         // itself.
                         for (int j = i; j < ss.size(); j++) {
                             Stmt sj = ss.get(j);
                             sj =
-                                    (Stmt) rewriteConstructorCalls(sj,
-                                                                   cd.type(),
-                                                                   hashGet(newFields,
-                                                                           cd.type(),
-                                                                           Collections.<FieldInstance> emptyList()));
+                                    (Stmt)
+                                            rewriteConstructorCalls(
+                                                    sj,
+                                                    cd.type(),
+                                                    hashGet(
+                                                            newFields,
+                                                            cd.type(),
+                                                            Collections
+                                                                    .<FieldInstance>emptyList()));
                             ss.set(j, sj);
                         }
 
@@ -147,8 +151,7 @@ public class LocalClassRemover extends ContextVisitor {
 
                     ss.remove(i);
                     i--;
-                }
-                else {
+                } else {
                     s = n.visitChild(s, this);
                     ss.set(i, s);
                 }
@@ -163,8 +166,7 @@ public class LocalClassRemover extends ContextVisitor {
     boolean inConstructorCall;
 
     @Override
-    protected NodeVisitor enterCall(Node parent, Node n)
-            throws SemanticException {
+    protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         LocalClassRemover v = (LocalClassRemover) super.enterCall(parent, n);
         if (n instanceof ConstructorCall) {
             if (!inConstructorCall) {
@@ -188,8 +190,7 @@ public class LocalClassRemover extends ContextVisitor {
     }
 
     @Override
-    protected Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
 
         Position pos = n.position();
 
@@ -221,12 +222,7 @@ public class LocalClassRemover extends ContextVisitor {
 
             String name = UniqueID.newID("Anonymous");
             ClassDecl cd =
-                    nf.ClassDecl(pos,
-                                 Flags.PUBLIC,
-                                 nf.Id(pos, name),
-                                 superClass,
-                                 interfaces,
-                                 body);
+                    nf.ClassDecl(pos, Flags.PUBLIC, nf.Id(pos, name), superClass, interfaces, body);
 
             ParsedClassType type = neu.anonType();
             type.kind(ClassType.MEMBER);
@@ -234,9 +230,7 @@ public class LocalClassRemover extends ContextVisitor {
             type.setContainer(context.currentClass());
             type.package_(context.package_());
 
-            Flags flags =
-                    context.inStaticContext()
-                            ? Flags.PUBLIC.Static() : Flags.PUBLIC;
+            Flags flags = context.inStaticContext() ? Flags.PUBLIC.Static() : Flags.PUBLIC;
             type.flags(flags);
 
             cd = cd.type(type);
@@ -269,20 +263,22 @@ public class LocalClassRemover extends ContextVisitor {
             cd = addOrphans(cd);
 
             cd =
-                    rewriteLocalClass(cd,
-                                      hashGet(newFields,
-                                              cd.type(),
-                                              Collections.<FieldInstance> emptyList()));
+                    rewriteLocalClass(
+                            cd,
+                            hashGet(newFields, cd.type(), Collections.<FieldInstance>emptyList()));
 
             hashAdd(orphans, context.currentClassScope(), cd);
 
             neu = neu.objectType(nf.CanonicalTypeNode(pos, type)).body(null);
             neu =
-                    (New) rewriteConstructorCalls(neu,
-                                                  cd.type(),
-                                                  hashGet(newFields,
-                                                          cd.type(),
-                                                          Collections.<FieldInstance> emptyList()));
+                    (New)
+                            rewriteConstructorCalls(
+                                    neu,
+                                    cd.type(),
+                                    hashGet(
+                                            newFields,
+                                            cd.type(),
+                                            Collections.<FieldInstance>emptyList()));
             return neu;
         }
 
@@ -300,10 +296,7 @@ public class LocalClassRemover extends ContextVisitor {
             if (!isLocal(context, l.name())) {
                 FieldInstance fi = boxLocal(l.localInstance());
                 if (fi != null) {
-                    Field f =
-                            nf.Field(pos,
-                                     makeMissingFieldTarget(fi, pos),
-                                     nf.Id(pos, fi.name()));
+                    Field f = nf.Field(pos, makeMissingFieldTarget(fi, pos), nf.Id(pos, fi.name()));
                     f = f.fieldInstance(fi);
                     f = (Field) f.type(fi.type());
                     return f;
@@ -340,15 +333,13 @@ public class LocalClassRemover extends ContextVisitor {
         return InnerClassRemover.addFieldsToClass(cd, newFields, ts, nf, false);
     }
 
-    Node rewriteConstructorCalls(Node s, final ClassType ct,
-            final List<FieldInstance> fields) {
+    Node rewriteConstructorCalls(Node s, final ClassType ct, final List<FieldInstance> fields) {
         Node r = s.visit(new ConstructorCallRewriter(lang(), fields, ct));
         return r;
     }
 
     // Create a new constructor for an anonymous class.
-    ConstructorDecl addConstructor(ClassDecl cd, New neu)
-            throws SemanticException {
+    ConstructorDecl addConstructor(ClassDecl cd, New neu) throws SemanticException {
         // Build the list of formal parameters and list of arguments for the super call.
         List<Formal> formals = new ArrayList<>();
         List<Expr> args = new ArrayList<>();
@@ -361,10 +352,7 @@ public class LocalClassRemover extends ContextVisitor {
         }
 
         ConstructorInstance superCi =
-                typeSystem().findConstructor(superType,
-                                             argTypes,
-                                             cd.type(),
-                                             false);
+                typeSystem().findConstructor(superType, argTypes, cd.type(), false);
         Position argpos = Position.compilerGenerated();
         for (int i = 0; i < superCi.formalTypes().size(); i++) {
             Type at = superCi.formalTypes().get(i);
@@ -375,14 +363,14 @@ public class LocalClassRemover extends ContextVisitor {
             }
             String name = "a" + (i + 1);
             Formal f =
-                    nf.Formal(argpos,
-                              Flags.FINAL,
-                              nf.CanonicalTypeNode(argpos, at),
-                              nf.Id(argpos, name));
+                    nf.Formal(
+                            argpos,
+                            Flags.FINAL,
+                            nf.CanonicalTypeNode(argpos, at),
+                            nf.Id(argpos, name));
             Local l = nf.Local(argpos, nf.Id(argpos, name));
 
-            LocalInstance li =
-                    ts.localInstance(argpos, f.flags(), f.declType(), name);
+            LocalInstance li = ts.localInstance(argpos, f.flags(), f.declType(), name);
             li.setNotConstant();
             f = f.localInstance(li);
             l = l.localInstance(li);
@@ -412,18 +400,15 @@ public class LocalClassRemover extends ContextVisitor {
 
         // Create the constructor declaration node and the CI.
         ConstructorDecl td =
-                nf.ConstructorDecl(pos,
-                                   Flags.PRIVATE,
-                                   nf.Id(cd.position(), cd.name()),
-                                   formals,
-                                   throwTypeNodes,
-                                   nf.Block(pos, statements));
+                nf.ConstructorDecl(
+                        pos,
+                        Flags.PRIVATE,
+                        nf.Id(cd.position(), cd.name()),
+                        formals,
+                        throwTypeNodes,
+                        nf.Block(pos, statements));
         ConstructorInstance ci =
-                ts.constructorInstance(pos,
-                                       cd.type(),
-                                       Flags.PRIVATE,
-                                       argTypes,
-                                       throwTypes);
+                ts.constructorInstance(pos, cd.type(), Flags.PRIVATE, argTypes, throwTypes);
         td = td.constructorInstance(ci);
 
         return td;
@@ -460,19 +445,13 @@ public class LocalClassRemover extends ContextVisitor {
 
         Position pos = li.position();
 
-        fi =
-                ts.fieldInstance(pos,
-                                 curr,
-                                 li.flags().Private(),
-                                 li.type(),
-                                 li.name());
+        fi = ts.fieldInstance(pos, curr, li.flags().Private(), li.type(), li.name());
         fi.setNotConstant();
 
         ParsedClassType ct = (ParsedClassType) curr.declaration();
         ct.addField(fi);
 
-        List<FieldInstance> l =
-                hashGet(newFields, ct, new ArrayList<FieldInstance>());
+        List<FieldInstance> l = hashGet(newFields, ct, new ArrayList<FieldInstance>());
         l.add(fi);
 
         localOfField.put(fi, li);
@@ -498,8 +477,7 @@ public class LocalClassRemover extends ContextVisitor {
 
         if (fi.flags().isStatic()) {
             r = nf.CanonicalTypeNode(pos, fi.container());
-        }
-        else {
+        } else {
             // The field is non-static, so we must prepend with
             // "this", but we need to determine if the "this"
             // should be qualified.  Get the enclosing class which
@@ -509,11 +487,8 @@ public class LocalClassRemover extends ContextVisitor {
             ClassType scope = (ClassType) fi.container();
 
             if (!ts.equals(scope, c.currentClass())) {
-                r =
-                        nf.This(pos.startOf(), nf.CanonicalTypeNode(pos, scope))
-                          .type(scope);
-            }
-            else {
+                r = nf.This(pos.startOf(), nf.CanonicalTypeNode(pos, scope)).type(scope);
+            } else {
                 r = nf.This(pos.startOf()).type(scope);
             }
         }
@@ -542,8 +517,7 @@ public class LocalClassRemover extends ContextVisitor {
         private final ClassType theLocalClass;
         ParsedClassType curr;
 
-        protected ConstructorCallRewriter(Lang lang,
-                List<FieldInstance> fields, ClassType ct) {
+        protected ConstructorCallRewriter(Lang lang, List<FieldInstance> fields, ClassType ct) {
             super(lang);
             this.newFields = fields;
             this.theLocalClass = ct;
@@ -564,26 +538,20 @@ public class LocalClassRemover extends ContextVisitor {
             if (n instanceof New) {
                 New neu = (New) n;
                 ConstructorInstance ci = neu.constructorInstance();
-                ConstructorInstance nci =
-                        (ConstructorInstance) ci.declaration();
+                ConstructorInstance nci = (ConstructorInstance) ci.declaration();
                 if (nci.container().toClass().declaration() == theLocalClass.declaration()) {
-                    neu =
-                            neu.arguments(addArgs(neu,
-                                                  nci,
-                                                  newFields,
-                                                  curr,
-                                                  theLocalClass));
+                    neu = neu.arguments(addArgs(neu, nci, newFields, curr, theLocalClass));
                     if (!theLocalClass.flags().isStatic()) {
                         Expr q;
                         if (theLocalClass.outer() == context.currentClass())
+                            q = nf.This(neu.position()).type(theLocalClass.outer());
+                        else
                             q =
-                                    nf.This(neu.position())
-                                      .type(theLocalClass.outer());
-                        else q =
-                                nf.This(neu.position(),
-                                        nf.CanonicalTypeNode(neu.position(),
-                                                             theLocalClass.outer()))
-                                  .type(theLocalClass.outer());
+                                    nf.This(
+                                                    neu.position(),
+                                                    nf.CanonicalTypeNode(
+                                                            neu.position(), theLocalClass.outer()))
+                                            .type(theLocalClass.outer());
                         neu = neu.qualifier(q);
                         neu = neu.qualifierImplicit(false);
                     }
@@ -593,28 +561,25 @@ public class LocalClassRemover extends ContextVisitor {
             if (n instanceof ConstructorCall) {
                 ConstructorCall neu = (ConstructorCall) n;
                 ConstructorInstance ci = neu.constructorInstance();
-                ConstructorInstance nci =
-                        (ConstructorInstance) ci.declaration();
+                ConstructorInstance nci = (ConstructorInstance) ci.declaration();
                 if (nci.container().toClass().declaration() == theLocalClass.declaration()) {
                     neu =
-                            (ConstructorCall) neu.arguments(addArgs(neu,
-                                                                    nci,
-                                                                    newFields,
-                                                                    curr,
-                                                                    theLocalClass));
+                            (ConstructorCall)
+                                    neu.arguments(
+                                            addArgs(neu, nci, newFields, curr, theLocalClass));
                     // This is wrong: we cannot refer to this in a super() call qualifier.
                     // For now, let this pass and assume InnerClassRemover will fix it.
                     if (!theLocalClass.flags().isStatic()) {
                         Expr q;
                         if (theLocalClass.outer() == context.currentClass())
+                            q = nf.This(neu.position()).type(theLocalClass.outer());
+                        else
                             q =
-                                    nf.This(neu.position())
-                                      .type(theLocalClass.outer());
-                        else q =
-                                nf.This(neu.position(),
-                                        nf.CanonicalTypeNode(neu.position(),
-                                                             theLocalClass.outer()))
-                                  .type(theLocalClass.outer());
+                                    nf.This(
+                                                    neu.position(),
+                                                    nf.CanonicalTypeNode(
+                                                            neu.position(), theLocalClass.outer()))
+                                            .type(theLocalClass.outer());
                         neu = neu.qualifier(q);
                     }
                 }
@@ -625,43 +590,43 @@ public class LocalClassRemover extends ContextVisitor {
         }
 
         // Add local variables to the argument list until it matches the declaration.
-        List<Expr> addArgs(ProcedureCall n, ConstructorInstance nci,
-                List<FieldInstance> fields, ClassType curr,
+        List<Expr> addArgs(
+                ProcedureCall n,
+                ConstructorInstance nci,
+                List<FieldInstance> fields,
+                ClassType curr,
                 ClassType theLocalClass) {
-            if (nci == null || fields == null || fields.isEmpty()
-                    || n.arguments().size() == nci.formalTypes().size())
-                return n.arguments();
+            if (nci == null
+                    || fields == null
+                    || fields.isEmpty()
+                    || n.arguments().size() == nci.formalTypes().size()) return n.arguments();
             List<Expr> args = new ArrayList<>();
             for (FieldInstance fi : fields) {
                 if (curr != null
                         && theLocalClass != null
-                        && ts.isEnclosed((ClassType) curr.declaration(),
-                                         (ClassType) theLocalClass.declaration())) {
-                    // If in the local class being rewritten, use the boxed local (i.e., field) instead of the local.
-                    // This could generate a bad constructor call since the field will refer to 'this' before the superclass
+                        && ts.isEnclosed(
+                                (ClassType) curr.declaration(),
+                                (ClassType) theLocalClass.declaration())) {
+                    // If in the local class being rewritten, use the boxed local (i.e., field)
+                    // instead of the local.
+                    // This could generate a bad constructor call since the field will refer to
+                    // 'this' before the superclass
                     // is initialized, but we'll patch this up later.
                     Position pos = fi.position();
-                    Field f =
-                            nf.Field(pos,
-                                     makeMissingFieldTarget(fi, pos),
-                                     nf.Id(pos, fi.name()));
+                    Field f = nf.Field(pos, makeMissingFieldTarget(fi, pos), nf.Id(pos, fi.name()));
                     f = f.fieldInstance(fi);
                     f = (Field) f.type(fi.type());
                     args.add(f);
-                }
-                else {
+                } else {
                     LocalInstance li = localOfField.get(fi);
                     if (li != null) {
-                        Local l =
-                                nf.Local(li.position(),
-                                         nf.Id(li.position(), li.name()));
+                        Local l = nf.Local(li.position(), nf.Id(li.position(), li.name()));
                         l = l.localInstance(li);
                         l = (Local) l.type(li.type());
                         args.add(processLocal(l, l.position()));
-                    }
-                    else {
-                        throw new InternalCompilerError("field " + fi
-                                + " created with rev map to null", n.position());
+                    } else {
+                        throw new InternalCompilerError(
+                                "field " + fi + " created with rev map to null", n.position());
                     }
                 }
             }
@@ -670,7 +635,5 @@ public class LocalClassRemover extends ContextVisitor {
             assert args.size() == nci.formalTypes().size();
             return args;
         }
-
     }
-
 }

@@ -167,8 +167,7 @@ public interface NodeOps {
      *
      * @param ar The visitor which disambiguates.
      */
-    Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException;
+    Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException;
 
     /**
      * Remove any remaining ambiguities from the AST.
@@ -219,8 +218,7 @@ public interface NodeOps {
      *
      * @param tc The type checking visitor.
      */
-    Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException;
+    Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException;
 
     /**
      * Type check the AST.
@@ -289,8 +287,7 @@ public interface NodeOps {
      *
      * @param ec The visitor.
      */
-    NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException;
+    NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
 
     /**
      * Check that exceptions are properly propagated throughout the AST.

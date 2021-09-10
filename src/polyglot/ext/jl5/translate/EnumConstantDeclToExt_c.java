@@ -47,12 +47,14 @@ public class EnumConstantDeclToExt_c extends ToExt_c {
         List<AnnotationElem> annotationElems =
                 ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems();
         rw = (ExtensionRewriter) rw.bypass(annotationElems);
-        return ((JL5NodeFactory) rw.to_nf()).EnumConstantDecl(cd.position(),
-                                                              cd.flags(),
-                                                              annotationElems,
-                                                              cd.name(),
-                                                              cd.args(),
-                                                              cd.body(),
-                                                              cd.javadoc());
+        return ((JL5NodeFactory) rw.to_nf())
+                .EnumConstantDecl(
+                        cd.position(),
+                        cd.flags(),
+                        annotationElems,
+                        cd.name(),
+                        cd.args(),
+                        cd.body(),
+                        cd.javadoc());
     }
 }

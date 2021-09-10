@@ -88,10 +88,12 @@ public class Compiler {
      * @param extensionInfo the {@code ExtensionInfo} this compiler is for.
      */
     public Compiler(ExtensionInfo extensionInfo) {
-        this(extensionInfo,
-             new StdErrorQueue(System.err,
-                               extensionInfo.getOptions().error_count,
-                               extensionInfo.compilerName()));
+        this(
+                extensionInfo,
+                new StdErrorQueue(
+                        System.err,
+                        extensionInfo.getOptions().error_count,
+                        extensionInfo.compilerName()));
     }
 
     /**
@@ -132,46 +134,35 @@ public class Compiler {
                 for (String sourceName : filenames) {
                     // mark this source as being explicitly specified
                     // by the user.
-                    FileSource source =
-                            source_loader.fileSource(sourceName,
-                                                     Kind.USER_SPECIFIED);
+                    FileSource source = source_loader.fileSource(sourceName, Kind.USER_SPECIFIED);
 
                     sources.add(source);
                 }
-            }
-            catch (FileNotFoundException e) {
-                eq.enqueue(ErrorInfo.IO_ERROR,
-                           "Cannot find source file \"" + e.getMessage()
-                                   + "\".");
+            } catch (FileNotFoundException e) {
+                eq.enqueue(
+                        ErrorInfo.IO_ERROR, "Cannot find source file \"" + e.getMessage() + "\".");
                 eq.flush();
                 return false;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
                 eq.flush();
                 return false;
-            }
-            catch (InternalCompilerError e) {
+            } catch (InternalCompilerError e) {
                 // Report it like other errors, but rethrow to get the stack
                 // trace.
                 try {
-                    eq.enqueue(ErrorInfo.INTERNAL_ERROR,
-                               e.message(),
-                               e.position());
-                }
-                catch (ErrorLimitError e2) {
+                    eq.enqueue(ErrorInfo.INTERNAL_ERROR, e.message(), e.position());
+                } catch (ErrorLimitError e2) {
                 }
 
                 eq.flush();
                 throw e;
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 // Flush the error queue, then rethrow to get the stack trace.
                 eq.flush();
                 throw e;
             }
-        }
-        catch (ErrorLimitError e) {
+        } catch (ErrorLimitError e) {
             eq.flush();
             return false;
         }
@@ -186,12 +177,14 @@ public class Compiler {
      * point for the compiler, called from main().
      */
     public boolean compile(Collection<FileSource> sources) {
-        return runToGoal(sources, new GoalFactory() {
-            @Override
-            public Goal getGoal(Job job) {
-                return sourceExtension().getCompileGoal(job);
-            }
-        });
+        return runToGoal(
+                sources,
+                new GoalFactory() {
+                    @Override
+                    public Goal getGoal(Job job) {
+                        return sourceExtension().getCompileGoal(job);
+                    }
+                });
     }
 
     /**
@@ -200,20 +193,21 @@ public class Compiler {
      * success.
      */
     public boolean validate(Collection<Source> sources) {
-        return runToGoal(sources, new GoalFactory() {
-            @Override
-            public Goal getGoal(Job job) {
-                return sourceExtension().getValidationGoal(job);
-            }
-        });
+        return runToGoal(
+                sources,
+                new GoalFactory() {
+                    @Override
+                    public Goal getGoal(Job job) {
+                        return sourceExtension().getValidationGoal(job);
+                    }
+                });
     }
 
     private static interface GoalFactory {
         Goal getGoal(Job job);
     }
 
-    private boolean runToGoal(Collection<? extends Source> sources,
-            GoalFactory goalFactory) {
+    private boolean runToGoal(Collection<? extends Source> sources, GoalFactory goalFactory) {
         boolean okay = false;
 
         try {
@@ -235,32 +229,25 @@ public class Compiler {
 
                 // Then, compile the files to completion.
                 okay = scheduler.runToCompletion();
-            }
-            catch (InternalCompilerError e) {
+            } catch (InternalCompilerError e) {
                 // Report it like other errors, but rethrow to get the stack trace.
                 try {
-                    eq.enqueue(ErrorInfo.INTERNAL_ERROR,
-                               e.message(),
-                               e.position());
-                }
-                catch (ErrorLimitError e2) {
+                    eq.enqueue(ErrorInfo.INTERNAL_ERROR, e.message(), e.position());
+                } catch (ErrorLimitError e2) {
                 }
                 eq.flush();
                 throw e;
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 // Flush the error queue, then rethrow to get the stack trace.
                 eq.flush();
                 throw e;
             }
-        }
-        catch (ErrorLimitError e) {
+        } catch (ErrorLimitError e) {
         }
 
         eq.flush();
 
-        for (ExtensionInfo ext : allExtensions)
-            ext.getStats().report();
+        for (ExtensionInfo ext : allExtensions) ext.getStats().report();
 
         return okay;
     }
@@ -323,8 +310,7 @@ public class Compiler {
             // loader.loadClass("polyglot.util.CodeWriter");
             // loader.loadClass("polyglot.util.ErrorInfo");
             loader.loadClass("polyglot.util.StdErrorQueue");
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             throw new InternalCompilerError(e.getMessage());
         }
     }
@@ -334,8 +320,7 @@ public class Compiler {
     }
 
     public static CodeWriter createCodeWriter(OutputStream w, int width) {
-        if (Options.global.use_simple_code_writer)
-            return new SimpleCodeWriter(w, width);
+        if (Options.global.use_simple_code_writer) return new SimpleCodeWriter(w, width);
         else return new OptimalCodeWriter(w, width);
     }
 
@@ -344,8 +329,7 @@ public class Compiler {
     }
 
     public static CodeWriter createCodeWriter(Writer w, int width) {
-        if (Options.global.use_simple_code_writer)
-            return new SimpleCodeWriter(w, width);
+        if (Options.global.use_simple_code_writer) return new SimpleCodeWriter(w, width);
         else return new OptimalCodeWriter(w, width);
     }
 }

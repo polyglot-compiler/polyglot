@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -46,8 +46,7 @@ public abstract class TypeObject_c implements TypeObject {
     protected Position position;
 
     /** Used for deserializing types. */
-    protected TypeObject_c() {
-    }
+    protected TypeObject_c() {}
 
     /** Creates a new type in the given a TypeSystem. */
     public TypeObject_c(TypeSystem ts) {
@@ -63,8 +62,7 @@ public abstract class TypeObject_c implements TypeObject {
     public TypeObject_c copy() {
         try {
             return (TypeObject_c) super.clone();
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");
         }
     }
@@ -92,8 +90,7 @@ public abstract class TypeObject_c implements TypeObject {
     @SuppressWarnings("unused")
     private static final long readObjectVersionUID = 1L;
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         // If you update this method in an incompatible way, increment
         // readObjectVersionUID.
 
@@ -130,12 +127,9 @@ public abstract class TypeObject_c implements TypeObject {
      * Overload equalsImpl to find inadvertent overriding errors.
      * Make package-scope and void to break callers.
      */
-    final void equalsImpl(Object o) {
-    }
+    final void equalsImpl(Object o) {}
 
-    final void typeEqualsImpl(Object o) {
-    }
+    final void typeEqualsImpl(Object o) {}
 
-    final void typeEqualsImpl(TypeObject o) {
-    }
+    final void typeEqualsImpl(TypeObject o) {}
 }

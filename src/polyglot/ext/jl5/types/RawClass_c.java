@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -73,10 +73,11 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
             JL5TypeSystem ts = (JL5TypeSystem) this.ts;
             JL5Subst es = ts.erasureSubst(base);
             if (es == null) {
-                throw new InternalCompilerError("Can't have a raw class for "
-                                                        + base
-                                                        + " unless it, or a container, has a type variable!",
-                                                position());
+                throw new InternalCompilerError(
+                        "Can't have a raw class for "
+                                + base
+                                + " unless it, or a container, has a type variable!",
+                        position());
             }
             erased = new JL5SubstClassType_c(ts, base.position(), base, es);
         }
@@ -123,7 +124,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     public Flags flags() {
         return erased().flags();
     }
-    
+
     @Override
     public List<? extends ConstructorInstance> constructors() {
         return erased().constructors();
@@ -142,8 +143,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     @Override
     public List<? extends FieldInstance> fields() {
         List<? extends FieldInstance> fields = erased().fields();
-        for (FieldInstance fi : fields)
-            fi.setContainer(this);
+        for (FieldInstance fi : fields) fi.setContainer(this);
         return fields;
     }
 
@@ -222,15 +222,16 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     @Override
     public boolean descendsFromImpl(Type ancestor) {
-//        System.err.println("   Raw class " + this + " descends from " + ancestor + " ?  interfaces is " + this.interfaces() + "  ::: " + super.descendsFromImpl(ancestor));
-//        System.err.println("    base interfaces are "  + this.base.interfaces());
+        //        System.err.println("   Raw class " + this + " descends from " + ancestor + " ?
+        // interfaces is " + this.interfaces() + "  ::: " + super.descendsFromImpl(ancestor));
+        //        System.err.println("    base interfaces are "  + this.base.interfaces());
         if (super.descendsFromImpl(ancestor)) {
             return true;
         }
-//        Type ra = ((JL5TypeSystem)ts).toRawType(ancestor);
-//        if (!ra.equals(ancestor)) {
-//            return ts.isSubtype(this, ra);
-//        }
+        //        Type ra = ((JL5TypeSystem)ts).toRawType(ancestor);
+        //        if (!ra.equals(ancestor)) {
+        //            return ts.isSubtype(this, ra);
+        //        }
         return false;
     }
 
@@ -263,5 +264,4 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
     public Annotations annotations() {
         return ((JL5TypeSystem) typeSystem()).NoAnnotations();
     }
-
 }

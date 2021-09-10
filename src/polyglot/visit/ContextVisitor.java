@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -38,7 +38,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 
 /**
- * A visitor which maintains a context throughout the visitor's pass.  This is 
+ * A visitor which maintains a context throughout the visitor's pass.  This is
  * the base class of the disambiguation and type checking visitors.
  *
  * TODO: update this documentation.
@@ -103,7 +103,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
      *  except with an updated context.
      *
      *  @param c The new context that is to be used.
-     *  @return Returns a copy of this visitor with the new context 
+     *  @return Returns a copy of this visitor with the new context
      *  {@code c}.
      */
     public ContextVisitor context(Context c) {
@@ -113,10 +113,10 @@ public class ContextVisitor extends ErrorHandlingVisitor {
     }
 
     /**
-     * Returns a new context based on the current context, the Node current 
-     * being visited ({@code parent}), and the Node that is being 
+     * Returns a new context based on the current context, the Node current
+     * being visited ({@code parent}), and the Node that is being
      * entered ({@code n}).  This new context is to be used
-     * for visiting {@code n}. 
+     * for visiting {@code n}.
      *
      * @return The new context after entering Node {@code n}.
      */
@@ -147,13 +147,14 @@ public class ContextVisitor extends ErrorHandlingVisitor {
 
     @Override
     public final NodeVisitor enter(Node n) {
-        throw new InternalCompilerError("Cannot call enter(Node n) on a ContextVisitor; use enter(Node parent, Node n) instead");
+        throw new InternalCompilerError(
+                "Cannot call enter(Node n) on a ContextVisitor; use enter(Node parent, Node n)"
+                        + " instead");
     }
 
     @Override
     public final NodeVisitor enter(Node parent, Node n) {
-        if (Report.should_report(Report.visit, 5))
-            Report.report(5, "enter(" + n + ")");
+        if (Report.should_report(Report.visit, 5)) Report.report(5, "enter(" + n + ")");
 
         if (prune) {
             return new PruningVisitor(lang());
@@ -172,8 +173,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
             }
 
             return v.superEnter(parent, n);
-        }
-        catch (MissingDependencyException e) {
+        } catch (MissingDependencyException e) {
             if (Report.should_report(Report.frontend, 3)) e.printStackTrace();
             Scheduler scheduler = job.extensionInfo().scheduler();
             Goal g = scheduler.currentGoal();
@@ -211,8 +211,7 @@ public class ContextVisitor extends ErrorHandlingVisitor {
             Node m = super.leave(parent, old, n, v);
             this.addDecls(old, m);
             return m;
-        }
-        catch (MissingDependencyException e) {
+        } catch (MissingDependencyException e) {
             if (Report.should_report(Report.frontend, 3)) e.printStackTrace();
             Scheduler scheduler = job.extensionInfo().scheduler();
             Goal g = scheduler.currentGoal();

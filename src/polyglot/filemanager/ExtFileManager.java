@@ -71,8 +71,7 @@ import polyglot.util.StringUtil;
  * the local file system. (NOTE: Extensions may extend this implementation and
  * are not forced to use local file system for i/o.)
  */
-public class ExtFileManager
-        extends ForwardingJavaFileManager<StandardJavaFileManager>
+public class ExtFileManager extends ForwardingJavaFileManager<StandardJavaFileManager>
         implements FileManager {
     protected static final JavaCompiler javaCompiler = Main.javaCompiler();
 
@@ -94,6 +93,7 @@ public class ExtFileManager
             CollectionUtil.list(Report.types, Report.resolver, Report.loader);
 
     protected static final Set<Kind> ALL_KINDS = new HashSet<>();
+
     static {
         ALL_KINDS.add(Kind.CLASS);
         ALL_KINDS.add(Kind.SOURCE);
@@ -164,8 +164,8 @@ public class ExtFileManager
     }
 
     @Override
-    public FileObject getFileForInput(Location location, String packageName,
-            String relativeName) throws IOException {
+    public FileObject getFileForInput(Location location, String packageName, String relativeName)
+            throws IOException {
         if (inMemory) {
             Map<String, JavaFileObject> locMap = objectMap.get(location);
             if (locMap != null) {
@@ -178,16 +178,14 @@ public class ExtFileManager
     }
 
     @Override
-    public JavaFileObject getJavaFileForInput(Location location,
-            String className, Kind kind) throws IOException {
+    public JavaFileObject getJavaFileForInput(Location location, String className, Kind kind)
+            throws IOException {
         String pkg = StringUtil.getPackageComponent(className);
         String name = StringUtil.getShortNameComponent(className);
         String relativeName = name + kind.extension;
-        JavaFileObject result =
-                (JavaFileObject) getFileForInput(location, pkg, relativeName);
+        JavaFileObject result = (JavaFileObject) getFileForInput(location, pkg, relativeName);
 
-        if (result == null
-                && location == StandardLocation.PLATFORM_CLASS_PATH) {
+        if (result == null && location == StandardLocation.PLATFORM_CLASS_PATH) {
             // In Java 9+, the FileManager is unable to find a class file for
             // system classes. In this case, we fall back on reflection to get
             // a resource for the class.
@@ -196,8 +194,7 @@ public class ExtFileManager
             Class<?> clazz;
             try {
                 clazz = ClassLoader.getSystemClassLoader().loadClass(className);
-            }
-            catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 clazz = null;
             }
 
@@ -205,11 +202,12 @@ public class ExtFileManager
                 // Found the class. Create a JavaFileObject for it.
                 URL url = clazz.getResource(relativeName);
                 try {
-                    result = new ExtFileObject(new URI(url.getPath()),
-                                               kindFromExtension(relativeName),
-                                               clazz.getResourceAsStream(relativeName));
-                }
-                catch (URISyntaxException e) {
+                    result =
+                            new ExtFileObject(
+                                    new URI(url.getPath()),
+                                    kindFromExtension(relativeName),
+                                    clazz.getResourceAsStream(relativeName));
+                } catch (URISyntaxException e) {
                     throw new InternalCompilerError(e);
                 }
             }
@@ -220,24 +218,21 @@ public class ExtFileManager
 
     protected Kind kindFromExtension(String name) {
         Kind k;
-        if (name.endsWith(".java"))
-            k = Kind.SOURCE;
-        else if (name.endsWith(".class"))
-            k = Kind.CLASS;
-        else if (name.endsWith(".html") || name.endsWith(".htm"))
-            k = Kind.HTML;
+        if (name.endsWith(".java")) k = Kind.SOURCE;
+        else if (name.endsWith(".class")) k = Kind.CLASS;
+        else if (name.endsWith(".html") || name.endsWith(".htm")) k = Kind.HTML;
         else k = Kind.OTHER;
         return k;
     }
 
     @Override
-    public FileObject getFileForOutput(Location location, String packageName,
-            String relativeName, FileObject sibling) throws IOException {
+    public FileObject getFileForOutput(
+            Location location, String packageName, String relativeName, FileObject sibling)
+            throws IOException {
         if (inMemory) {
             String key = fileKey(packageName, relativeName);
             URI src = URI.create("file:///" + key);
-            JavaFileObject jfo =
-                    new ExtFileObject(src, kindFromExtension(relativeName));
+            JavaFileObject jfo = new ExtFileObject(src, kindFromExtension(relativeName));
             Map<String, JavaFileObject> locMap = objectMap.get(location);
             if (locMap == null) {
                 locMap = new HashMap<>();
@@ -246,32 +241,25 @@ public class ExtFileManager
             locMap.put(key, jfo);
             return jfo;
         }
-        return super.getFileForOutput(location,
-                                      packageName,
-                                      relativeName,
-                                      sibling);
+        return super.getFileForOutput(location, packageName, relativeName, sibling);
     }
 
     protected String fileKey(String packageName, String relativeName) {
-        if (!packageName.isEmpty()) packageName =
-                packageName.replace('.', separatorChar) + separatorChar;
+        if (!packageName.isEmpty())
+            packageName = packageName.replace('.', separatorChar) + separatorChar;
         StringBuilder sb = new StringBuilder(packageName);
         sb.append(relativeName);
         return sb.toString();
     }
 
     @Override
-    public JavaFileObject getJavaFileForOutput(Location location,
-            String className, Kind kind, FileObject sibling)
-            throws IOException {
+    public JavaFileObject getJavaFileForOutput(
+            Location location, String className, Kind kind, FileObject sibling) throws IOException {
 
         String pkg = StringUtil.getPackageComponent(className);
         String name = StringUtil.getShortNameComponent(className);
         String relativeName = name + kind.extension;
-        return (JavaFileObject) getFileForOutput(location,
-                                                 pkg,
-                                                 relativeName,
-                                                 sibling);
+        return (JavaFileObject) getFileForOutput(location, pkg, relativeName, sibling);
     }
 
     @Override
@@ -289,27 +277,25 @@ public class ExtFileManager
     }
 
     @Override
-    public Iterable<JavaFileObject> list(Location location, String packageName,
-            Set<Kind> kinds, boolean recurse) throws IOException {
+    public Iterable<JavaFileObject> list(
+            Location location, String packageName, Set<Kind> kinds, boolean recurse)
+            throws IOException {
         Map<String, JavaFileObject> locMap = objectMap.get(location);
-        if (locMap != null)
-            return locMap.values();
+        if (locMap != null) return locMap.values();
         else return super.list(location, packageName, kinds, recurse);
     }
 
     // Use this method for obtaining JavaFileObjects representing files on the
     // local file system
     @Override
-    public Iterable<? extends JavaFileObject> getJavaFileObjects(
-            File... files) {
+    public Iterable<? extends JavaFileObject> getJavaFileObjects(File... files) {
         return fileManager.getJavaFileObjects(files);
     }
 
     // Use this method for obtaining JavaFileObjects representing files on the
     // local file system
     @Override
-    public Iterable<? extends JavaFileObject> getJavaFileObjects(
-            String... names) {
+    public Iterable<? extends JavaFileObject> getJavaFileObjects(String... names) {
         return fileManager.getJavaFileObjects(names);
     }
 
@@ -340,8 +326,7 @@ public class ExtFileManager
     }
 
     @Override
-    public void setLocation(Location location, Iterable<? extends File> path)
-            throws IOException {
+    public void setLocation(Location location, Iterable<? extends File> path) throws IOException {
         fileManager.setLocation(location, path);
     }
 
@@ -351,8 +336,7 @@ public class ExtFileManager
         boolean exists = false;
         for (int i = default_locations.size() - 1; !exists && i >= 0; i--)
             exists = packageExists(default_locations.get(i), name);
-        if (!exists)
-            exists = packageExists(extInfo.getOptions().source_path, name);
+        if (!exists) exists = packageExists(extInfo.getOptions().source_path, name);
         packageCache.put(name, exists);
         return exists;
     }
@@ -363,22 +347,18 @@ public class ExtFileManager
             ZipFile zip = (ZipFile) o;
             if (zip != null) {
                 return zip;
-            }
-            else {
+            } else {
                 // the zip is not in the cache.
                 // try to get it.
                 if (!dir.exists()) {
                     // record that the file does not exist,
                     zipCache.put(dir, not_found);
-                }
-                else {
+                } else {
                     // get the zip and put it in the cache.
-                    if (Report.should_report(verbose, 2))
-                        Report.report(2, "Opening zip " + dir);
+                    if (Report.should_report(verbose, 2)) Report.report(2, "Opening zip " + dir);
                     if (dir.getName().endsWith(".jar")) {
                         zip = new JarFile(dir);
-                    }
-                    else {
+                    } else {
                         zip = new ZipFile(dir);
                     }
                     zipCache.put(dir, zip);
@@ -411,22 +391,19 @@ public class ExtFileManager
                 String entryName = name.replace('.', '/');
                 try {
                     loadZip(f);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     throw new InternalCompilerError(e);
                 }
                 Boolean contains = packageCache.get(entryName);
                 if (contains != null && contains) return true;
-            }
-            else {
+            } else {
                 String filePath = name.replace('.', File.separatorChar);
                 File newFile = new File(f, filePath);
                 try {
-                    if (newFile.exists() && newFile.isDirectory()
-                            && newFile.getCanonicalPath().endsWith(filePath))
-                        return true;
-                }
-                catch (IOException e) {
+                    if (newFile.exists()
+                            && newFile.isDirectory()
+                            && newFile.getCanonicalPath().endsWith(filePath)) return true;
+                } catch (IOException e) {
                     return false;
                 }
             }
@@ -452,44 +429,34 @@ public class ExtFileManager
             Report.report(3, "looking in " + location + " for " + name);
         }
         if (Report.should_report(report_topics, 4)) {
-            Report.report(4,
-                          "Location " + location + " has "
-                                  + getLocation(location));
+            Report.report(4, "Location " + location + " has " + getLocation(location));
         }
 
         try {
             JavaFileObject jfo = null;
             try {
                 jfo = getJavaFileForInput(location, name, Kind.CLASS);
-            }
-            catch (IOException e) {
-                throw new InternalCompilerError("Error while checking for class file "
-                        + name, e);
+            } catch (IOException e) {
+                throw new InternalCompilerError("Error while checking for class file " + name, e);
             }
             if (jfo != null) {
                 if (Report.should_report(report_topics, 4)) {
-                    Report.report(4,
-                                  "Class " + name + " found in " + location
-                                          + " at " + jfo.toUri());
+                    Report.report(
+                            4, "Class " + name + " found in " + location + " at " + jfo.toUri());
                 }
-            }
-            else {
+            } else {
                 if (Report.should_report(report_topics, 4)) {
-                    Report.report(4,
-                                  "Class " + name + " not found in "
-                                          + location);
+                    Report.report(4, "Class " + name + " not found in " + location);
                 }
             }
 
             if (jfo != null) {
                 return extInfo.createClassFile(jfo, getBytes(jfo));
             }
-        }
-        catch (ClassFormatError e) {
+        } catch (ClassFormatError e) {
             if (Report.should_report(report_topics, 4))
                 Report.report(4, "Class " + name + " format error");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             if (Report.should_report(report_topics, 4))
                 Report.report(4, "Error loading class " + name);
         }
@@ -498,47 +465,41 @@ public class ExtFileManager
 
     @Override
     public FileSource fileSource(String fileName) throws IOException {
-        return fileSource(extInfo.getOptions().source_path,
-                          fileName,
-                          Source.Kind.DEPENDENCY);
+        return fileSource(extInfo.getOptions().source_path, fileName, Source.Kind.DEPENDENCY);
     }
 
     @Deprecated
     @Override
-    public FileSource fileSource(String fileName, boolean userSpecified)
-            throws IOException {
-        return fileSource(fileName,
-                          userSpecified
-                                  ? Source.Kind.USER_SPECIFIED
-                                  : Source.Kind.DEPENDENCY);
+    public FileSource fileSource(String fileName, boolean userSpecified) throws IOException {
+        return fileSource(
+                fileName, userSpecified ? Source.Kind.USER_SPECIFIED : Source.Kind.DEPENDENCY);
     }
 
     @Override
-    public FileSource fileSource(String fileName,
-            polyglot.frontend.Source.Kind kind) throws IOException {
+    public FileSource fileSource(String fileName, polyglot.frontend.Source.Kind kind)
+            throws IOException {
         return fileSource(extInfo.getOptions().source_path, fileName, kind);
     }
 
     @Override
-    public FileSource fileSource(Location location, String fileName)
-            throws IOException {
+    public FileSource fileSource(Location location, String fileName) throws IOException {
         return fileSource(location, fileName, Source.Kind.DEPENDENCY);
     }
 
     @Deprecated
     @Override
-    public FileSource fileSource(Location location, String fileName,
-            boolean userSpecified) throws IOException {
-        return fileSource(location,
-                          fileName,
-                          userSpecified
-                                  ? Source.Kind.USER_SPECIFIED
-                                  : Source.Kind.DEPENDENCY);
+    public FileSource fileSource(Location location, String fileName, boolean userSpecified)
+            throws IOException {
+        return fileSource(
+                location,
+                fileName,
+                userSpecified ? Source.Kind.USER_SPECIFIED : Source.Kind.DEPENDENCY);
     }
 
     @Override
-    public FileSource fileSource(Location location, String fileName,
-            polyglot.frontend.Source.Kind kind) throws IOException {
+    public FileSource fileSource(
+            Location location, String fileName, polyglot.frontend.Source.Kind kind)
+            throws IOException {
         File f = new File(fileName);
         FileSource sourceFile;
         FileObject fo = null;
@@ -549,21 +510,17 @@ public class ExtFileManager
             sourceFile = loadedSources.get(key);
             if (sourceFile != null) return sourceFile;
             for (FileObject jfo : fileManager.getJavaFileObjects(f)) {
-                if (fo != null)
-                    throw new InternalCompilerError("Two files exist of the same name");
+                if (fo != null) throw new InternalCompilerError("Two files exist of the same name");
                 fo = jfo;
             }
-        }
-        else {
-            if (f.isAbsolute())
-                throw new InternalCompilerError("Expected relative filename");
+        } else {
+            if (f.isAbsolute()) throw new InternalCompilerError("Expected relative filename");
 
             key = fileKey(location, "", fileName);
             sourceFile = loadedSources.get(key);
             if (sourceFile != null) return sourceFile;
             fo = getFileForInput(location, "", fileName);
-            if (fo == null) throw new FileNotFoundException("File: " + fileName
-                    + " not found.");
+            if (fo == null) throw new FileNotFoundException("File: " + fileName + " not found.");
         }
         sourceFile = extInfo.createFileSource(fo, kind);
         String[] exts = extInfo.fileExtensions();
@@ -582,24 +539,28 @@ public class ExtFileManager
             for (int i = 0; i < exts.length; i++) {
                 if (exts.length == 2 && i == exts.length - 1) {
                     extString += " or ";
-                }
-                else if (exts.length != 1 && i == exts.length - 1) {
+                } else if (exts.length != 1 && i == exts.length - 1) {
                     extString += ", or ";
-                }
-                else if (i != 0) {
+                } else if (i != 0) {
                     extString += ", ";
                 }
                 extString = extString + "\"." + exts[i] + "\"";
             }
 
             if (exts.length == 1) {
-                throw new IOException("Source \"" + fileName
-                        + "\" does not have the extension " + extString + ".");
-            }
-            else {
-                throw new IOException("Source \"" + fileName
-                        + "\" does not have any of the extensions " + extString
-                        + ".");
+                throw new IOException(
+                        "Source \""
+                                + fileName
+                                + "\" does not have the extension "
+                                + extString
+                                + ".");
+            } else {
+                throw new IOException(
+                        "Source \""
+                                + fileName
+                                + "\" does not have any of the extensions "
+                                + extString
+                                + ".");
             }
         }
 
@@ -627,8 +588,7 @@ public class ExtFileManager
             FileSource source = checkForSource(location, name);
             if (source != null) return source;
             int dot = name.lastIndexOf('.');
-            if (dot == -1)
-                done = true;
+            if (dot == -1) done = true;
             else name = name.substring(0, dot);
         }
         return null;
@@ -653,8 +613,7 @@ public class ExtFileManager
             FileObject fo;
             try {
                 fo = getFileForInput(location, pkgName, fileName);
-            }
-            catch (IOException e1) {
+            } catch (IOException e1) {
                 return null;
             }
             if (fo == null) continue;
@@ -662,22 +621,19 @@ public class ExtFileManager
             try {
                 source = extInfo.createFileSource(fo, Source.Kind.DEPENDENCY);
                 if (Report.should_report(Report.loader, 2))
-                    Report.report(2,
-                                  "Loading " + className + " from " + source);
+                    Report.report(2, "Loading " + className + " from " + source);
 
                 loadedSources.put(key, source);
                 return source;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
             }
         }
         return null;
     }
 
-    protected String fileKey(Location location, String packageName,
-            String fileName) {
-        if (caseInsensitive()) return location + "/" + packageName.toLowerCase()
-                + "/" + fileName.toLowerCase();
+    protected String fileKey(Location location, String packageName, String fileName) {
+        if (caseInsensitive())
+            return location + "/" + packageName.toLowerCase() + "/" + fileName.toLowerCase();
         return location + "/" + packageName + "/" + fileName;
     }
 
@@ -685,8 +641,7 @@ public class ExtFileManager
     public boolean caseInsensitive() {
         if (!caseInsensitivityComputed) {
             setCaseInsensitive(System.getProperty("user.dir"));
-            if (caseInsensitive == 0)
-                throw new InternalCompilerError("unknown case sensitivity");
+            if (caseInsensitive == 0) throw new InternalCompilerError("unknown case sensitivity");
             caseInsensitivityComputed = true;
         }
         return caseInsensitive == 1;
@@ -706,8 +661,7 @@ public class ExtFileManager
 
         if (f1.equals(f2)) {
             caseInsensitive = 1;
-        }
-        else if (f1.exists() && f2.exists()) {
+        } else if (f1.exists() && f2.exists()) {
             boolean f1Exists = false;
             boolean f2Exists = false;
 
@@ -715,8 +669,7 @@ public class ExtFileManager
 
             if (f1.getParent() != null) {
                 dir = new File(f1.getParent());
-            }
-            else {
+            } else {
                 dir = new File(fileName);
             }
 
@@ -730,20 +683,17 @@ public class ExtFileManager
                         f2Exists = true;
                     }
                 }
-            }
-            else {
+            } else {
                 // dir not found
             }
 
             if (!f1Exists || !f2Exists) {
                 caseInsensitive = 1;
-            }
-            else {
+            } else {
                 // There are two files.
                 caseInsensitive = -1;
             }
-        }
-        else {
+        } else {
             caseInsensitive = -1;
         }
     }

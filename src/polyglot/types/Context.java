@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -136,13 +136,13 @@ public interface Context extends Resolver, Copy<Context> {
     /** Return the code instance that defines the local symbol with the given name, or null. */
     CodeInstance definingCodeDef(String name);
 
-    /** 
+    /**
      * Returns whether the current context is a static context.
      * A statement of expression occurs in a static context if and only if the
      * inner-most method, constructor, instance initializer, static initializer,
-     * field initializer, or explicit constructor statement enclosing the 
-     * statement or expressions is a static method, static initializer, the 
-     * variable initializer of a static variable, or an explicity constructor 
+     * field initializer, or explicit constructor statement enclosing the
+     * statement or expressions is a static method, static initializer, the
+     * variable initializer of a static variable, or an explicity constructor
      * invocation statment. (Java Language Spec, 2nd Edition, 8.1.2)
      */
     boolean inStaticContext();

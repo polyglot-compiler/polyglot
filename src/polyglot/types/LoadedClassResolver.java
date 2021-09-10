@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -48,9 +48,9 @@ import polyglot.util.TypeEncoder;
  * from within class files. It does not load from source files.
  */
 public class LoadedClassResolver implements TopLevelResolver {
-    protected final static int NOT_COMPATIBLE = -1;
-    protected final static int MINOR_NOT_COMPATIBLE = 1;
-    protected final static int COMPATIBLE = 0;
+    protected static final int NOT_COMPATIBLE = -1;
+    protected static final int MINOR_NOT_COMPATIBLE = 1;
+    protected static final int COMPATIBLE = 0;
 
     protected TypeSystem ts;
     protected TypeEncoder te;
@@ -60,7 +60,7 @@ public class LoadedClassResolver implements TopLevelResolver {
     protected boolean allowRawClasses;
     protected ExtensionInfo extInfo;
 
-    protected final static Collection<String> report_topics =
+    protected static final Collection<String> report_topics =
             CollectionUtil.list(Report.types, Report.resolver, Report.loader);
     protected ClassFileLoader loader;
 
@@ -95,8 +95,7 @@ public class LoadedClassResolver implements TopLevelResolver {
      */
     @Override
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(report_topics, 3))
-            Report.report(3, "LoadedCR.find(" + name + ")");
+        if (Report.should_report(report_topics, 3)) Report.report(3, "LoadedCR.find(" + name + ")");
 
         Named result = null;
 
@@ -133,13 +132,13 @@ public class LoadedClassResolver implements TopLevelResolver {
 
         // We have a raw class, but are not allowed to use it, and
         // cannot find appropriate encoded info.
-        throw new SemanticException("Unable to find a suitable definition of \""
-                + name
-                + "\". A class file was found,"
-                + " but it did not contain appropriate information for this"
-                + " language extension. If the source for this file is written"
-                + " in the language extension, try recompiling the source code.");
-
+        throw new SemanticException(
+                "Unable to find a suitable definition of \""
+                        + name
+                        + "\". A class file was found,"
+                        + " but it did not contain appropriate information for this"
+                        + " language extension. If the source for this file is written"
+                        + " in the language extension, try recompiling the source code.");
     }
 
     protected boolean recursive = false;
@@ -147,8 +146,7 @@ public class LoadedClassResolver implements TopLevelResolver {
     /**
      * Extract an encoded type from a class file.
      */
-    protected ClassType getEncodedType(ClassFile clazz, String name)
-            throws SemanticException {
+    protected ClassType getEncodedType(ClassFile clazz, String name) throws SemanticException {
         // At this point we've decided to go with the Class. So if something
         // goes wrong here, we have only one choice, to throw an exception.
 
@@ -157,18 +155,18 @@ public class LoadedClassResolver implements TopLevelResolver {
         int comp = checkCompilerVersion(clazz.compilerVersion(version.name()));
 
         if (comp == NOT_COMPATIBLE) {
-            throw new SemanticException("Unable to find a suitable definition of "
-                    + clazz.name()
-                    + ". Try recompiling or obtaining "
-                    + " a newer version of the class file.");
+            throw new SemanticException(
+                    "Unable to find a suitable definition of "
+                            + clazz.name()
+                            + ". Try recompiling or obtaining "
+                            + " a newer version of the class file.");
         }
 
         // Alright, go with it!
         TypeObject dt;
         SystemResolver oldResolver = null;
 
-        if (Report.should_report(Report.serialize, 1))
-            Report.report(1, "Saving system resolver");
+        if (Report.should_report(Report.serialize, 1)) Report.report(1, "Saving system resolver");
         oldResolver = ts.saveSystemResolver();
 
         boolean okay = false;
@@ -196,8 +194,7 @@ public class LoadedClassResolver implements TopLevelResolver {
                 // be resolved. Abort this pass. Dependencies have already
                 // been set up so that this goal will be reattempted after
                 // the types are resolved.
-                throw new UnavailableTypeException(null, "Could not decode "
-                        + name);
+                throw new UnavailableTypeException(null, "Could not decode " + name);
             }
 
             if (dt instanceof ClassType) {
@@ -225,69 +222,56 @@ public class LoadedClassResolver implements TopLevelResolver {
                     if (ct instanceof ParsedClassType) {
                         ParsedClassType pct = (ParsedClassType) ct;
                         init = pct.initializer();
-                        pct.setInitializer(new LazyClassInitializer() {
-                            @Override
-                            public boolean fromClassFile() {
-                                return false;
-                            }
+                        pct.setInitializer(
+                                new LazyClassInitializer() {
+                                    @Override
+                                    public boolean fromClassFile() {
+                                        return false;
+                                    }
 
-                            @Override
-                            public void setClass(ParsedClassType ct) {
-                            }
+                                    @Override
+                                    public void setClass(ParsedClassType ct) {}
 
-                            @Override
-                            public void initTypeObject() {
-                            }
+                                    @Override
+                                    public void initTypeObject() {}
 
-                            @Override
-                            public boolean isTypeObjectInitialized() {
-                                return true;
-                            }
+                                    @Override
+                                    public boolean isTypeObjectInitialized() {
+                                        return true;
+                                    }
 
-                            @Override
-                            public void initSuperclass() {
-                            }
+                                    @Override
+                                    public void initSuperclass() {}
 
-                            @Override
-                            public void initInterfaces() {
-                            }
+                                    @Override
+                                    public void initInterfaces() {}
 
-                            @Override
-                            public void initMemberClasses() {
-                            }
+                                    @Override
+                                    public void initMemberClasses() {}
 
-                            @Override
-                            public void initConstructors() {
-                            }
+                                    @Override
+                                    public void initConstructors() {}
 
-                            @Override
-                            public void initMethods() {
-                            }
+                                    @Override
+                                    public void initMethods() {}
 
-                            @Override
-                            public void initFields() {
-                            }
+                                    @Override
+                                    public void initFields() {}
 
-                            @Override
-                            public void canonicalConstructors() {
-                            }
+                                    @Override
+                                    public void canonicalConstructors() {}
 
-                            @Override
-                            public void canonicalMethods() {
-                            }
+                                    @Override
+                                    public void canonicalMethods() {}
 
-                            @Override
-                            public void canonicalFields() {
-                            }
-                        });
+                                    @Override
+                                    public void canonicalFields() {}
+                                });
                     }
 
-                    for (MethodInstance mi : ct.methods())
-                        Report.report(2, "* " + mi);
-                    for (FieldInstance fi : ct.fields())
-                        Report.report(2, "* " + fi);
-                    for (ConstructorInstance ci : ct.constructors())
-                        Report.report(2, "* " + ci);
+                    for (MethodInstance mi : ct.methods()) Report.report(2, "* " + mi);
+                    for (FieldInstance fi : ct.fields()) Report.report(2, "* " + fi);
+                    for (ConstructorInstance ci : ct.constructors()) Report.report(2, "* " + ci);
 
                     if (ct instanceof ParsedClassType) {
                         ParsedClassType pct = (ParsedClassType) ct;
@@ -296,61 +280,64 @@ public class LoadedClassResolver implements TopLevelResolver {
                 }
 
                 if (Report.should_report(report_topics, 2))
-                    Report.report(2, "Returning serialized ClassType for "
-                            + clazz.name() + ".");
+                    Report.report(2, "Returning serialized ClassType for " + clazz.name() + ".");
 
                 okay = true;
                 return ct;
-            }
-            else {
+            } else {
                 if (Report.should_report(Report.serialize, 2))
-                    Report.report(2, "Failing to deserialize: Class " + name
-                            + " not found in " + clazz.name() + ".");
-                throw new SemanticException("Class " + name + " not found in "
-                        + clazz.name() + ".");
+                    Report.report(
+                            2,
+                            "Failing to deserialize: Class "
+                                    + name
+                                    + " not found in "
+                                    + clazz.name()
+                                    + ".");
+                throw new SemanticException(
+                        "Class " + name + " not found in " + clazz.name() + ".");
             }
-        }
-        catch (InvalidClassException e) {
+        } catch (InvalidClassException e) {
             if (Report.should_report(Report.serialize, 2))
-                Report.report(2, "Failing to deserialize: Bad serialization: "
-                        + clazz.name() + "@" + clazz.getClassFileURI());
+                Report.report(
+                        2,
+                        "Failing to deserialize: Bad serialization: "
+                                + clazz.name()
+                                + "@"
+                                + clazz.getClassFileURI());
 
-            throw new BadSerializationException(clazz.name() + "@"
-                    + clazz.getClassFileURI());
-        }
-        catch (UnavailableTypeException e) {
+            throw new BadSerializationException(clazz.name() + "@" + clazz.getClassFileURI());
+        } catch (UnavailableTypeException e) {
             throw e;
-        }
-        catch (InternalCompilerError e) {
+        } catch (InternalCompilerError e) {
             if (Report.should_report(Report.serialize, 2)) {
-                Report.report(2,
-                              "Failing to deserialize: Internal compiler error: "
-                                      + e.getMessage());
+                Report.report(
+                        2, "Failing to deserialize: Internal compiler error: " + e.getMessage());
             }
 
             throw e;
-        }
-        catch (RuntimeException | SemanticException e) {
+        } catch (RuntimeException | SemanticException e) {
             e.printStackTrace();
             throw e;
-        }
-        finally {
+        } finally {
             recursive = oldRecursive;
 
             if (okay) {
                 if (Report.should_report(Report.serialize, 1))
-                    Report.report(1, "Deserialization successful.  Installing "
-                            + ts.systemResolver().justAdded()
-                            + " into restored system resolver.");
+                    Report.report(
+                            1,
+                            "Deserialization successful.  Installing "
+                                    + ts.systemResolver().justAdded()
+                                    + " into restored system resolver.");
 
                 oldResolver.putAll(ts.systemResolver());
-            }
-            else {
+            } else {
                 if (Report.should_report(Report.serialize, 1)) {
-                    Report.report(1, "Deserialization failed for " + name
-                            + ".  Restoring previous system resolver.");
-                    Report.report(1, "Discarding "
-                            + ts.systemResolver().justAdded());
+                    Report.report(
+                            1,
+                            "Deserialization failed for "
+                                    + name
+                                    + ".  Restoring previous system resolver.");
+                    Report.report(1, "Discarding " + ts.systemResolver().justAdded());
                 }
             }
 
@@ -384,8 +371,7 @@ public class LoadedClassResolver implements TopLevelResolver {
                 // Not the best option, but will work if its the only one.
                 return MINOR_NOT_COMPATIBLE;
             }
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return NOT_COMPATIBLE;
         }
 

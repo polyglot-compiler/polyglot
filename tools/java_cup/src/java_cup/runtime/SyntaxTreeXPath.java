@@ -7,14 +7,10 @@ import java.util.List;
 public class SyntaxTreeXPath {
     public static List<XMLElement> query(String query, XMLElement element) {
         if (query.startsWith("/")) query = query.substring(1);
-        return query0(new LinkedList<>(Arrays.asList(query.split("/"))),
-                      0,
-                      element,
-                      0);
+        return query0(new LinkedList<>(Arrays.asList(query.split("/"))), 0, element, 0);
     }
 
-    private static List<XMLElement> query0(List<String> q, int idx,
-            XMLElement element, int seq) {
+    private static List<XMLElement> query0(List<String> q, int idx, XMLElement element, int seq) {
 
         if (q.get(idx).isEmpty()) { // match deeper descendant q[1]
             return matchDeeperDescendant(q, idx + 1, element, seq);
@@ -31,8 +27,8 @@ public class SyntaxTreeXPath {
         return l;
     }
 
-    private static List<XMLElement> matchDeeperDescendant(List<String> query,
-            int idx, XMLElement element, int seq) {
+    private static List<XMLElement> matchDeeperDescendant(
+            List<String> query, int idx, XMLElement element, int seq) {
         if (query.size() <= idx) return singleton(element);
         boolean matches = match(query.get(idx), element, seq);
         List<XMLElement> l = new LinkedList<>();
@@ -46,20 +42,16 @@ public class SyntaxTreeXPath {
     }
 
     private static boolean match(String m, XMLElement elem, int seq) {
-//		System.out.println("Matching "+elem.tagname+" with "+m);
+        //		System.out.println("Matching "+elem.tagname+" with "+m);
         boolean result = true;
         String[] name = m.split("\\[");
         String[] tag = name[0].split("\\*");
         if (tag[0].isEmpty()) { // start is wildcard
-            if (tag.length > 2)
-                result &= elem.tagname.contains(tag[1]);
-            else if (tag.length == 2)
-                result &= elem.tagname.endsWith(tag[1]);
+            if (tag.length > 2) result &= elem.tagname.contains(tag[1]);
+            else if (tag.length == 2) result &= elem.tagname.endsWith(tag[1]);
             else result &= false;
-        }
-        else { // match with start
-            if (tag.length == 2)
-                result &= elem.tagname.startsWith(tag[1]);
+        } else { // match with start
+            if (tag.length == 2) result &= elem.tagname.startsWith(tag[1]);
             else result = elem.tagname.equals(tag[0]);
         }
         for (int i = 1; i < name.length; i++) {
@@ -70,15 +62,13 @@ public class SyntaxTreeXPath {
             if (predicate.startsWith("@")) {
                 if (predicate.substring(1).startsWith("variant"))
                     if (elem instanceof XMLElement.NonTerminal
-                            && Integer.parseInt(predicate.substring(9)) == ((XMLElement.NonTerminal) elem).getVariant())
-                        result &= true;
+                            && Integer.parseInt(predicate.substring(9))
+                                    == ((XMLElement.NonTerminal) elem).getVariant()) result &= true;
                     else return false;
                 else return false;
-            }
-            else if (predicate.matches("\\d+")) {
+            } else if (predicate.matches("\\d+")) {
                 result &= Integer.parseInt(predicate) == seq;
-            }
-            else return false; // submatch
+            } else return false; // submatch
         }
         return result;
     }

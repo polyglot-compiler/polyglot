@@ -53,13 +53,12 @@ public class If_c extends Stmt_c implements If {
     protected Stmt consequent;
     protected Stmt alternative;
 
-//    @Deprecated
+    //    @Deprecated
     public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative) {
         this(pos, cond, consequent, alternative, null);
     }
 
-    public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative,
-            Ext ext) {
+    public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative, Ext ext) {
         super(pos, ext);
         assert cond != null && consequent != null; // alternative may be null;
         this.cond = cond;
@@ -119,8 +118,7 @@ public class If_c extends Stmt_c implements If {
     }
 
     /** Reconstruct the statement. */
-    protected <N extends If_c> N reconstruct(N n, Expr cond, Stmt consequent,
-            Stmt alternative) {
+    protected <N extends If_c> N reconstruct(N n, Expr cond, Stmt consequent, Stmt alternative) {
         n = cond(n, cond);
         n = consequent(n, consequent);
         n = alternative(n, alternative);
@@ -140,8 +138,8 @@ public class If_c extends Stmt_c implements If {
         TypeSystem ts = tc.typeSystem();
 
         if (!ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
-            throw new SemanticException("Condition of if statement must have boolean type.",
-                                        cond.position());
+            throw new SemanticException(
+                    "Condition of if statement must have boolean type.", cond.position());
         }
 
         return this;
@@ -160,7 +158,10 @@ public class If_c extends Stmt_c implements If {
 
     @Override
     public String toString() {
-        return "if (" + cond + ") " + consequent
+        return "if ("
+                + cond
+                + ") "
+                + consequent
                 + (alternative != null ? " else " + alternative : "");
     }
 
@@ -176,8 +177,7 @@ public class If_c extends Stmt_c implements If {
             if (consequent instanceof Block) {
                 // allow the "} else {" formatting except in emergencies
                 w.allowBreak(0, 2, " ", 1);
-            }
-            else {
+            } else {
                 w.allowBreak(0, " ");
             }
 
@@ -185,8 +185,7 @@ public class If_c extends Stmt_c implements If {
             if (alternative instanceof If) {
                 w.write(" ");
                 print(alternative, w, tr);
-            }
-            else printSubStmt(alternative, w, tr);
+            } else printSubStmt(alternative, w, tr);
         }
     }
 
@@ -201,52 +200,46 @@ public class If_c extends Stmt_c implements If {
             // the condition is a constant expression.
             // That means that one branch is dead code
             boolean condConstantValue =
-                    ((Boolean) v.lang().constantValue(cond,
-                                                      v.lang())).booleanValue();
+                    ((Boolean) v.lang().constantValue(cond, v.lang())).booleanValue();
             if (condConstantValue) {
                 // the condition is constantly true.
                 // the alternative won't be executed.
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY);
                 v.visitCFG(consequent, this, EXIT);
-            }
-            else {
+            } else {
                 // the condition is constantly false.
                 // the consequent won't be executed.
                 if (alternative == null) {
                     // there is no alternative
                     v.visitCFG(cond, this, EXIT);
-                }
-                else {
-                    v.visitCFG(cond,
-                               FlowGraph.EDGE_KEY_FALSE,
-                               alternative,
-                               ENTRY);
+                } else {
+                    v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, alternative, ENTRY);
                     v.visitCFG(alternative, this, EXIT);
                 }
             }
-        }
-        else if (alternative == null) {
+        } else if (alternative == null) {
             // the alternative is null (but the condition is not constant, or we can't
             // skip dead statements.)
-            v.visitCFG(cond,
-                       FlowGraph.EDGE_KEY_TRUE,
-                       consequent,
-                       ENTRY,
-                       FlowGraph.EDGE_KEY_FALSE,
-                       this,
-                       EXIT);
+            v.visitCFG(
+                    cond,
+                    FlowGraph.EDGE_KEY_TRUE,
+                    consequent,
+                    ENTRY,
+                    FlowGraph.EDGE_KEY_FALSE,
+                    this,
+                    EXIT);
             v.visitCFG(consequent, this, EXIT);
-        }
-        else {
+        } else {
             // both consequent and alternative are present, and either the condition
             // is not constant or we can't skip dead statements.
-            v.visitCFG(cond,
-                       FlowGraph.EDGE_KEY_TRUE,
-                       consequent,
-                       ENTRY,
-                       FlowGraph.EDGE_KEY_FALSE,
-                       alternative,
-                       ENTRY);
+            v.visitCFG(
+                    cond,
+                    FlowGraph.EDGE_KEY_TRUE,
+                    consequent,
+                    ENTRY,
+                    FlowGraph.EDGE_KEY_FALSE,
+                    alternative,
+                    ENTRY);
             v.visitCFG(consequent, this, EXIT);
             v.visitCFG(alternative, this, EXIT);
         }
@@ -258,5 +251,4 @@ public class If_c extends Stmt_c implements If {
     public Node copy(NodeFactory nf) {
         return nf.If(position, cond, consequent, alternative);
     }
-
 }

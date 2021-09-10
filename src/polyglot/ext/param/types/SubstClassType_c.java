@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -52,8 +52,8 @@ import polyglot.util.SerialVersionUID;
  * map.  Subclasses must define how the substitutions are performed and
  * how to cache substituted types.
  */
-public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
-        extends ClassType_c implements SubstType<Formal, Actual> {
+public class SubstClassType_c<Formal extends Param, Actual extends TypeObject> extends ClassType_c
+        implements SubstType<Formal, Actual> {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected transient List<? extends ReferenceType> interfaces;
@@ -74,8 +74,11 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
     /** Map from formal parameters (of type Param) to actuals. */
     protected Subst<Formal, Actual> subst;
 
-    public SubstClassType_c(ParamTypeSystem<Formal, Actual> ts, Position pos,
-            ClassType base, Subst<Formal, Actual> subst) {
+    public SubstClassType_c(
+            ParamTypeSystem<Formal, Actual> ts,
+            Position pos,
+            ClassType base,
+            Subst<Formal, Actual> subst) {
         super(ts, pos);
         this.base = base;
         this.subst = subst;
@@ -167,8 +170,7 @@ public class SubstClassType_c<Formal extends Param, Actual extends TypeObject>
 
     protected <T extends TypeObject> List<T> deepCopy(List<T> src) {
         List<T> dst = new ArrayList<>(src.size());
-        for (T t : src)
-            dst.add(Copy.Util.copy(t));
+        for (T t : src) dst.add(Copy.Util.copy(t));
         return dst;
     }
 

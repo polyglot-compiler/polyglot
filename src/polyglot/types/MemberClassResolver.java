@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -44,19 +44,15 @@ public class MemberClassResolver implements TopLevelResolver {
     protected boolean allowRawClasses;
     protected Set<String> nocache;
 
-    protected final static Collection<String> report_topics =
-            CollectionUtil.list(Report.types,
-                                Report.resolver,
-                                Report.loader,
-                                "mcr");
+    protected static final Collection<String> report_topics =
+            CollectionUtil.list(Report.types, Report.resolver, Report.loader, "mcr");
 
     /**
      * Create a member class resolver.
      * @param ts The type system
      * @param inner The resolver for top-level classes
      */
-    public MemberClassResolver(TypeSystem ts, TopLevelResolver inner,
-            boolean allowRawClasses) {
+    public MemberClassResolver(TypeSystem ts, TopLevelResolver inner, boolean allowRawClasses) {
         this.ts = ts;
         this.inner = inner;
         this.allowRawClasses = allowRawClasses;
@@ -73,8 +69,7 @@ public class MemberClassResolver implements TopLevelResolver {
      */
     @Override
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(report_topics, 3))
-            Report.report(3, "MemberCR.find(" + name + ")");
+        if (Report.should_report(report_topics, 3)) Report.report(3, "MemberCR.find(" + name + ")");
 
         if (nocache.contains(name)) {
             throw new NoClassException(name);
@@ -93,10 +88,8 @@ public class MemberClassResolver implements TopLevelResolver {
             if (Report.should_report(report_topics, 2))
                 Report.report(2, "MCR: loading " + name + " from " + inner);
             return inner.find(name);
-        }
-        catch (SemanticException e) {
-            if (Report.should_report(report_topics, 2))
-                Report.report(2, "MCR: " + e.getMessage());
+        } catch (SemanticException e) {
+            if (Report.should_report(report_topics, 2)) Report.report(2, "MCR: " + e.getMessage());
             if (StringUtil.isNameShort(name)) {
                 throw e;
             }
@@ -124,8 +117,7 @@ public class MemberClassResolver implements TopLevelResolver {
             if (n instanceof ParsedTypeObject) {
                 return findMember(n, suffix);
             }
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
         }
 
         if (install) {
@@ -135,13 +127,11 @@ public class MemberClassResolver implements TopLevelResolver {
         throw error;
     }
 
-    protected Named findMember(Named container, String name)
-            throws SemanticException {
+    protected Named findMember(Named container, String name) throws SemanticException {
         if (container instanceof ClassType) {
             ClassType ct = (ClassType) container;
 
-            if (Report.should_report(report_topics, 2))
-                Report.report(2, "MCR: found prefix " + ct);
+            if (Report.should_report(report_topics, 2)) Report.report(2, "MCR: found prefix " + ct);
 
             // Uncomment if we should search superclasses
             // return ct.resolver().find(name);

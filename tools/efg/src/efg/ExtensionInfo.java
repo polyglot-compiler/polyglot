@@ -41,8 +41,7 @@ public class ExtensionInfo extends JL7ExtensionInfo {
     public static final EfgInfo EFG_INFO = new EfgInfo();
 
     public static final String EXT_FACTORY_BASENAME = "ExtFactory";
-    public static final String ABSTRACT_EXT_FACTORY_BASENAME =
-            "AbstractExtFactory_c";
+    public static final String ABSTRACT_EXT_FACTORY_BASENAME = "AbstractExtFactory_c";
 
     static {
         // force Topics to load
@@ -79,8 +78,9 @@ public class ExtensionInfo extends JL7ExtensionInfo {
 
     @Override
     protected NodeFactory createNodeFactory() {
-        return new EfgNodeFactory_c(EfgLang_c.INSTANCE,
-                                    new EfgExtFactory_c(new JL7ExtFactory_c(new JL5ExtFactory_c())));
+        return new EfgNodeFactory_c(
+                EfgLang_c.INSTANCE,
+                new EfgExtFactory_c(new JL7ExtFactory_c(new JL5ExtFactory_c())));
     }
 
     @Override

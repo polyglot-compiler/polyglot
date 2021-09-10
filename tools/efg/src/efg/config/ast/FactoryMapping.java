@@ -28,18 +28,21 @@ public class FactoryMapping extends Node {
         this(pos, className, superClassName, null);
     }
 
-    public FactoryMapping(Position pos, Name className,
-            List<FactoryName> factoryNames) {
+    public FactoryMapping(Position pos, Name className, List<FactoryName> factoryNames) {
         this(pos, className, null, factoryNames);
     }
 
-    public FactoryMapping(Position pos, Name className, Name superClassName,
-            List<FactoryName> factoryNames) {
+    public FactoryMapping(
+            Position pos, Name className, Name superClassName, List<FactoryName> factoryNames) {
         this(pos, className, null, superClassName, null, factoryNames);
     }
 
-    private FactoryMapping(Position pos, Name className, ClassType classType,
-            Name superClassName, ClassType superClassType,
+    private FactoryMapping(
+            Position pos,
+            Name className,
+            ClassType classType,
+            Name superClassName,
+            ClassType superClassType,
             List<FactoryName> factoryNames) {
         super(pos);
         this.className = className;
@@ -50,16 +53,11 @@ public class FactoryMapping extends Node {
         if (factoryNames == null) {
             // Use the simple form of the className by default.
             int dotPos = className.name.lastIndexOf(".");
-            Name simpleClassName =
-                    new Name(className.pos,
-                             className.name.substring(dotPos + 1));
+            Name simpleClassName = new Name(className.pos, className.name.substring(dotPos + 1));
             this.factoryNames =
-                    Collections.singletonList(new FactoryName(className.pos,
-                                                              simpleClassName));
-        }
-        else {
-            this.factoryNames =
-                    Collections.unmodifiableList(new ArrayList<>(factoryNames));
+                    Collections.singletonList(new FactoryName(className.pos, simpleClassName));
+        } else {
+            this.factoryNames = Collections.unmodifiableList(new ArrayList<>(factoryNames));
         }
     }
 
@@ -69,19 +67,16 @@ public class FactoryMapping extends Node {
     public FactoryMapping qualifyClass(Name packageName) {
         Name className = this.className;
         if (!className.name.contains(".")) {
-            className = new Name(className.pos,
-                                 packageName.name + "." + className.name);
+            className = new Name(className.pos, packageName.name + "." + className.name);
         }
 
         Name superClassName = this.superClassName;
         if (superClassName != null && !superClassName.name.contains(".")) {
             superClassName =
-                    new Name(superClassName.pos,
-                             packageName.name + "." + superClassName.name);
+                    new Name(superClassName.pos, packageName.name + "." + superClassName.name);
         }
 
-        if (className == this.className
-                && superClassName == this.superClassName) {
+        if (className == this.className && superClassName == this.superClassName) {
             return this;
         }
 
@@ -102,11 +97,7 @@ public class FactoryMapping extends Node {
             superClassType = v.validateClass(this.superClassName);
         }
 
-        return new FactoryMapping(pos,
-                                  className,
-                                  classType,
-                                  superClassName,
-                                  superClassType,
-                                  factoryNames);
+        return new FactoryMapping(
+                pos, className, classType, superClassName, superClassType, factoryNames);
     }
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -34,18 +34,17 @@ import java.util.Collection;
  *
  * Overview:
  *     This is a swiss-army-knife of iterators.  It concatenates, maps, and
- *     filters.  
+ *     filters.
  *
  *     Does not support Remove.
  **/
 public final class TransformingIterator<T, U> implements Iterator<U> {
     @SuppressWarnings("unchecked")
     public TransformingIterator(Iterator<T> iter, Transformation<T, U> trans) {
-        this(new Iterator[] { iter }, trans);
+        this(new Iterator[] {iter}, trans);
     }
 
-    public TransformingIterator(Collection<Iterator<T>> iters,
-            Transformation<T, U> trans) {
+    public TransformingIterator(Collection<Iterator<T>> iters, Transformation<T, U> trans) {
         index = 0;
         @SuppressWarnings("unchecked")
         Iterator<T>[] tmp = new Iterator[0];
@@ -84,7 +83,8 @@ public final class TransformingIterator<T, U> implements Iterator<U> {
     // Advances the internal iterator.
     private void findNextItem() {
         while (current_iter != null) {
-            inner_loop: while (current_iter.hasNext()) {
+            inner_loop:
+            while (current_iter.hasNext()) {
                 T o = current_iter.next();
                 U res = transformation.transform(o);
                 if (res == Transformation.NOTHING) continue inner_loop;
@@ -94,8 +94,7 @@ public final class TransformingIterator<T, U> implements Iterator<U> {
             index++;
             if (index < backing_iterators.length) {
                 current_iter = backing_iterators[index];
-            }
-            else {
+            } else {
                 current_iter = null;
             }
         }
@@ -105,7 +104,7 @@ public final class TransformingIterator<T, U> implements Iterator<U> {
     // AF:  if next_item==null, this iterator has no more elts to yield.
     //      otherwise, this iterator will yield next_item, followed by
     //      those elements e of backing_iterator[index] transformed by TRANS.
-    // RI: current_iter = backing_iterators[index], or null if no 
+    // RI: current_iter = backing_iterators[index], or null if no
     //     backing_iterator hasNext.
     protected U next_item;
     protected Iterator<T> current_iter;

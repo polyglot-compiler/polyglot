@@ -43,16 +43,16 @@ public class JL5MethodDeclToExt_c extends MethodDeclToExt_c {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         MethodDecl n = (MethodDecl) node();
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
-        return to_nf.MethodDecl(n.position(),
-                                n.flags(),
-                                ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
-                                n.returnType(),
-                                n.id(),
-                                n.formals(),
-                                n.throwTypes(),
-                                n.body(),
-                                ((JL5ProcedureDeclExt) JL5Ext.ext(n)).typeParams(),
-                                n.javadoc());
+        return to_nf.MethodDecl(
+                n.position(),
+                n.flags(),
+                ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
+                n.returnType(),
+                n.id(),
+                n.formals(),
+                n.throwTypes(),
+                n.body(),
+                ((JL5ProcedureDeclExt) JL5Ext.ext(n)).typeParams(),
+                n.javadoc());
     }
-
 }

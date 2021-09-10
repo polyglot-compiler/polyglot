@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -68,22 +68,22 @@ public class Constant {
     public static final byte STRING = 8;
 
     /**
-     * Constant tag for int, short, byte, char, and boolean constants. 
+     * Constant tag for int, short, byte, char, and boolean constants.
      */
     public static final byte INTEGER = 3;
 
     /**
-     * Constant tag for float constants. 
+     * Constant tag for float constants.
      */
     public static final byte FLOAT = 4;
 
     /**
-     * Constant tag for long constants. 
+     * Constant tag for long constants.
      */
     public static final byte LONG = 5;
 
     /**
-     * Constant tag for double constants. 
+     * Constant tag for double constants.
      */
     public static final byte DOUBLE = 6;
 
@@ -164,22 +164,22 @@ public class Constant {
     @Override
     public int hashCode() {
         switch (tag) {
-        case CLASS:
-        case STRING:
-        case INTEGER:
-        case FLOAT:
-        case LONG:
-        case DOUBLE:
-        case UTF8:
-        case METHOD_TYPE:
-            return tag ^ value.hashCode();
-        case FIELD_REF:
-        case METHOD_REF:
-        case INTERFACE_METHOD_REF:
-        case NAME_AND_TYPE:
-        case METHOD_HANDLE:
-        case INVOKE_DYNAMIC:
-            return tag ^ ((int[]) value)[0] ^ ((int[]) value)[1];
+            case CLASS:
+            case STRING:
+            case INTEGER:
+            case FLOAT:
+            case LONG:
+            case DOUBLE:
+            case UTF8:
+            case METHOD_TYPE:
+                return tag ^ value.hashCode();
+            case FIELD_REF:
+            case METHOD_REF:
+            case INTERFACE_METHOD_REF:
+            case NAME_AND_TYPE:
+            case METHOD_HANDLE:
+            case INVOKE_DYNAMIC:
+                return tag ^ ((int[]) value)[0] ^ ((int[]) value)[1];
         }
 
         return tag;
@@ -206,23 +206,23 @@ public class Constant {
         }
 
         switch (tag) {
-        case CLASS:
-        case STRING:
-        case INTEGER:
-        case FLOAT:
-        case LONG:
-        case DOUBLE:
-        case UTF8:
-        case METHOD_TYPE:
-            return value.equals(c.value);
-        case FIELD_REF:
-        case METHOD_REF:
-        case INTERFACE_METHOD_REF:
-        case NAME_AND_TYPE:
-        case METHOD_HANDLE:
-        case INVOKE_DYNAMIC:
-            return ((int[]) value)[0] == ((int[]) c.value)[0]
-                    && ((int[]) value)[1] == ((int[]) c.value)[1];
+            case CLASS:
+            case STRING:
+            case INTEGER:
+            case FLOAT:
+            case LONG:
+            case DOUBLE:
+            case UTF8:
+            case METHOD_TYPE:
+                return value.equals(c.value);
+            case FIELD_REF:
+            case METHOD_REF:
+            case INTERFACE_METHOD_REF:
+            case NAME_AND_TYPE:
+            case METHOD_HANDLE:
+            case INVOKE_DYNAMIC:
+                return ((int[]) value)[0] == ((int[]) c.value)[0]
+                        && ((int[]) value)[1] == ((int[]) c.value)[1];
         }
 
         return false;

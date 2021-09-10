@@ -56,9 +56,10 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
         Type type = expr.type();
 
         if (!((J5Lang) tc.lang()).isAcceptableSwitchType(s, expr.type())) {
-            throw new SemanticException("Switch index must be of type char, byte,"
-                    + " short, int, Character, Byte, Short, Integer, or an enum type.",
-                                        s.position());
+            throw new SemanticException(
+                    "Switch index must be of type char, byte,"
+                            + " short, int, Character, Byte, Short, Integer, or an enum type.",
+                    s.position());
         }
 
         ArrayList<SwitchElement> newels = new ArrayList<>(s.elements().size());
@@ -68,15 +69,14 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
                 Case c = (Case) el;
                 c = ((J5Lang) tc.lang()).resolveCaseLabel(c, tc, switchType);
                 Expr cExpr = c.expr();
-                if (cExpr != null && !ts.isImplicitCastValid(cExpr.type(), type)
+                if (cExpr != null
+                        && !ts.isImplicitCastValid(cExpr.type(), type)
                         && !ts.typeEquals(cExpr.type(), type)
-                        && !ts.numericConversionValid(type,
-                                                      tc.lang()
-                                                        .constantValue(cExpr,
-                                                                       tc.lang()))) {
-                    throw new SemanticException("Case constant \"" + cExpr
-                            + "\" is not assignable to " + type + ".",
-                                                c.position());
+                        && !ts.numericConversionValid(
+                                type, tc.lang().constantValue(cExpr, tc.lang()))) {
+                    throw new SemanticException(
+                            "Case constant \"" + cExpr + "\" is not assignable to " + type + ".",
+                            c.position());
                 }
                 el = c;
             }
@@ -89,8 +89,10 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
     @Override
     public boolean isAcceptableSwitchType(Type type) {
         JL5TypeSystem ts = (JL5TypeSystem) type.typeSystem();
-        if (ts.Char().equals(type) || ts.Byte().equals(type)
-                || ts.Short().equals(type) || ts.Int().equals(type)) {
+        if (ts.Char().equals(type)
+                || ts.Byte().equals(type)
+                || ts.Short().equals(type)
+                || ts.Int().equals(type)) {
             return true;
         }
         if (ts.wrapperClassOfPrimitive(ts.Char()).equals(type)
@@ -104,5 +106,4 @@ public class JL5SwitchExt extends JL5TermExt implements JL5SwitchOps {
         }
         return false;
     }
-
 }

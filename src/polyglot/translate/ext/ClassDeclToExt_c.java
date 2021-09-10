@@ -37,12 +37,14 @@ public class ClassDeclToExt_c extends ToExt_c {
     @Override
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         ClassDecl cd = (ClassDecl) node();
-        return rw.to_nf().ClassDecl(cd.position(),
-                                    cd.flags(),
-                                    cd.id(),
-                                    cd.superClass(),
-                                    cd.interfaces(),
-                                    cd.body(),
-                                    cd.javadoc());
+        return rw.to_nf()
+                .ClassDecl(
+                        cd.position(),
+                        cd.flags(),
+                        cd.id(),
+                        cd.superClass(),
+                        cd.interfaces(),
+                        cd.body(),
+                        cd.javadoc());
     }
 }

@@ -226,8 +226,7 @@ public abstract class NodeVisitor implements Copy<NodeVisitor> {
      * This method allows the visitor to perform any last minute cleanup,
      * including flushing buffers and I/O connections.
      */
-    public void finish() {
-    }
+    public void finish() {}
 
     public void finish(Node ast) {
         this.finish();
@@ -262,10 +261,8 @@ public abstract class NodeVisitor implements Copy<NodeVisitor> {
             }
 
             return n;
-        }
-        catch (InternalCompilerError e) {
-            if (e.position() == null && child != null)
-                e.setPosition(child.position());
+        } catch (InternalCompilerError e) {
+            if (e.position() == null && child != null) e.setPosition(child.position());
             throw e;
         }
     }
@@ -303,8 +300,7 @@ public abstract class NodeVisitor implements Copy<NodeVisitor> {
             @SuppressWarnings("unchecked")
             N result = (N) this.leave(parent, child, n, v_);
             return result;
-        }
-        catch (InternalCompilerError e) {
+        } catch (InternalCompilerError e) {
             if (e.position() == null) e.setPosition(n.position());
             throw e;
         }
@@ -314,8 +310,7 @@ public abstract class NodeVisitor implements Copy<NodeVisitor> {
     public NodeVisitor copy() {
         try {
             return (NodeVisitor) super.clone();
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");
         }
     }

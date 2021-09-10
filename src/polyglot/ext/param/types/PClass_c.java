@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -43,12 +43,11 @@ import polyglot.util.SerialVersionUID;
  * a ClassType that associates formal parameters with the class.
  * formals can be any type object.
  */
-public abstract class PClass_c<Formal extends Param, Actual extends TypeObject>
-        extends TypeObject_c implements PClass<Formal, Actual> {
+public abstract class PClass_c<Formal extends Param, Actual extends TypeObject> extends TypeObject_c
+        implements PClass<Formal, Actual> {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected PClass_c() {
-    }
+    protected PClass_c() {}
 
     public PClass_c(TypeSystem ts) {
         this(ts, null);
@@ -68,8 +67,7 @@ public abstract class PClass_c<Formal extends Param, Actual extends TypeObject>
     // Implement PClass
 
     @Override
-    public ClassType instantiate(Position pos, List<Actual> actuals)
-            throws SemanticException {
+    public ClassType instantiate(Position pos, List<Actual> actuals) throws SemanticException {
         ParamTypeSystem<Formal, Actual> pts = typeSystem();
         return pts.instantiate(pos, this, actuals);
     }
@@ -112,5 +110,4 @@ public abstract class PClass_c<Formal extends Param, Actual extends TypeObject>
     public Package package_() {
         return clazz().package_();
     }
-
 }

@@ -48,8 +48,7 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
             Ext e2;
             if (nextExtFactory() instanceof JL7ExtFactory) {
                 e2 = ((JL7ExtFactory) nextExtFactory()).extAmbDiamondTypeNode();
-            }
-            else {
+            } else {
                 e2 = nextExtFactory().extTypeNode();
             }
             e = composeExts(e, e2);
@@ -65,8 +64,7 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
             Ext e2;
             if (nextExtFactory() instanceof JL7ExtFactory) {
                 e2 = ((JL7ExtFactory) nextExtFactory()).extAmbUnionType();
-            }
-            else {
+            } else {
                 e2 = nextExtFactory().extTypeNode();
             }
             e = composeExts(e, e2);
@@ -82,8 +80,7 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
             Ext e2;
             if (nextExtFactory() instanceof JL7ExtFactory) {
                 e2 = ((JL7ExtFactory) nextExtFactory()).extMultiCatch();
-            }
-            else {
+            } else {
                 e2 = nextExtFactory().extCatch();
             }
             e = composeExts(e, e2);
@@ -99,8 +96,7 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
             Ext e2;
             if (nextExtFactory() instanceof JL7ExtFactory) {
                 e2 = ((JL7ExtFactory) nextExtFactory()).extResource();
-            }
-            else {
+            } else {
                 e2 = nextExtFactory().extLocalDecl();
             }
             e = composeExts(e, e2);
@@ -116,8 +112,7 @@ public abstract class JL7AbstractExtFactory_c extends JL5AbstractExtFactory_c
             Ext e2;
             if (nextExtFactory() instanceof JL7ExtFactory) {
                 e2 = ((JL7ExtFactory) nextExtFactory()).extTryWithResources();
-            }
-            else {
+            } else {
                 e2 = nextExtFactory().extTry();
             }
             e = composeExts(e, e2);

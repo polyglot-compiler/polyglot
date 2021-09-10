@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -52,14 +52,12 @@ public class Conditional_c extends Expr_c implements Conditional {
     protected Expr consequent;
     protected Expr alternative;
 
-//    @Deprecated
-    public Conditional_c(Position pos, Expr cond, Expr consequent,
-            Expr alternative) {
+    //    @Deprecated
+    public Conditional_c(Position pos, Expr cond, Expr consequent, Expr alternative) {
         this(pos, cond, consequent, alternative, null);
     }
 
-    public Conditional_c(Position pos, Expr cond, Expr consequent,
-            Expr alternative, Ext ext) {
+    public Conditional_c(Position pos, Expr cond, Expr consequent, Expr alternative, Ext ext) {
         super(pos, ext);
         assert (cond != null && consequent != null && alternative != null);
         this.cond = cond;
@@ -124,8 +122,8 @@ public class Conditional_c extends Expr_c implements Conditional {
     }
 
     /** Reconstruct the expression. */
-    protected <N extends Conditional_c> N reconstruct(N n, Expr cond,
-            Expr consequent, Expr alternative) {
+    protected <N extends Conditional_c> N reconstruct(
+            N n, Expr cond, Expr consequent, Expr alternative) {
         n = cond(n, cond);
         n = consequent(n, consequent);
         n = alternative(n, alternative);
@@ -150,8 +148,8 @@ public class Conditional_c extends Expr_c implements Conditional {
         Type t2 = e2.type();
 
         if (!ts.typeEquals(cond.type(), ts.Boolean())) {
-            throw new SemanticException("Condition of ternary expression must be of type boolean.",
-                                        cond.position());
+            throw new SemanticException(
+                    "Condition of ternary expression must be of type boolean.", cond.position());
         }
 
         // From the JLS, section:
@@ -178,17 +176,13 @@ public class Conditional_c extends Expr_c implements Conditional {
 
             if (t1.isIntOrLess()
                     && t2.isInt()
-                    && ts.numericConversionValid(t1,
-                                                 tc.lang()
-                                                   .constantValue(e2, tc.lang()))) {
+                    && ts.numericConversionValid(t1, tc.lang().constantValue(e2, tc.lang()))) {
                 return type(t1);
             }
 
             if (t2.isIntOrLess()
                     && t1.isInt()
-                    && ts.numericConversionValid(t2,
-                                                 tc.lang()
-                                                   .constantValue(e1, tc.lang()))) {
+                    && ts.numericConversionValid(t2, tc.lang().constantValue(e1, tc.lang()))) {
                 return type(t2);
             }
 
@@ -220,12 +214,13 @@ public class Conditional_c extends Expr_c implements Conditional {
             }
         }
 
-        throw new SemanticException("Could not determine type of ternary conditional expression; cannot assign "
-                                            + t1
-                                            + " to "
-                                            + t2
-                                            + " or vice versa.",
-                                    position());
+        throw new SemanticException(
+                "Could not determine type of ternary conditional expression; cannot assign "
+                        + t1
+                        + " to "
+                        + t2
+                        + " or vice versa.",
+                position());
     }
 
     @Override
@@ -276,55 +271,57 @@ public class Conditional_c extends Expr_c implements Conditional {
                 // Condition is constantly true, only the consequent will be executed
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY);
                 if (isBoolean)
-                    v.visitCFG(consequent,
-                               FlowGraph.EDGE_KEY_TRUE,
-                               this,
-                               EXIT,
-                               FlowGraph.EDGE_KEY_FALSE,
-                               this,
-                               EXIT);
+                    v.visitCFG(
+                            consequent,
+                            FlowGraph.EDGE_KEY_TRUE,
+                            this,
+                            EXIT,
+                            FlowGraph.EDGE_KEY_FALSE,
+                            this,
+                            EXIT);
                 else v.visitCFG(consequent, this, EXIT);
-            }
-            else {
+            } else {
                 // Condition is constantly false, only the alternative will be executed
                 v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, alternative, ENTRY);
                 if (isBoolean)
-                    v.visitCFG(alternative,
-                               FlowGraph.EDGE_KEY_TRUE,
-                               this,
-                               EXIT,
-                               FlowGraph.EDGE_KEY_FALSE,
-                               this,
-                               EXIT);
+                    v.visitCFG(
+                            alternative,
+                            FlowGraph.EDGE_KEY_TRUE,
+                            this,
+                            EXIT,
+                            FlowGraph.EDGE_KEY_FALSE,
+                            this,
+                            EXIT);
                 else v.visitCFG(alternative, this, EXIT);
             }
-        }
-        else {
+        } else {
             // not a constant condition
-            v.visitCFG(cond,
-                       FlowGraph.EDGE_KEY_TRUE,
-                       consequent,
-                       ENTRY,
-                       FlowGraph.EDGE_KEY_FALSE,
-                       alternative,
-                       ENTRY);
+            v.visitCFG(
+                    cond,
+                    FlowGraph.EDGE_KEY_TRUE,
+                    consequent,
+                    ENTRY,
+                    FlowGraph.EDGE_KEY_FALSE,
+                    alternative,
+                    ENTRY);
             if (isBoolean) {
-                v.visitCFG(consequent,
-                           FlowGraph.EDGE_KEY_TRUE,
-                           this,
-                           EXIT,
-                           FlowGraph.EDGE_KEY_FALSE,
-                           this,
-                           EXIT);
-                v.visitCFG(alternative,
-                           FlowGraph.EDGE_KEY_TRUE,
-                           this,
-                           EXIT,
-                           FlowGraph.EDGE_KEY_FALSE,
-                           this,
-                           EXIT);
-            }
-            else {
+                v.visitCFG(
+                        consequent,
+                        FlowGraph.EDGE_KEY_TRUE,
+                        this,
+                        EXIT,
+                        FlowGraph.EDGE_KEY_FALSE,
+                        this,
+                        EXIT);
+                v.visitCFG(
+                        alternative,
+                        FlowGraph.EDGE_KEY_TRUE,
+                        this,
+                        EXIT,
+                        FlowGraph.EDGE_KEY_FALSE,
+                        this,
+                        EXIT);
+            } else {
                 v.visitCFG(consequent, this, EXIT);
                 v.visitCFG(alternative, this, EXIT);
             }
@@ -335,7 +332,8 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public boolean isConstant(Lang lang) {
-        return lang.isConstant(cond, lang) && lang.isConstant(consequent, lang)
+        return lang.isConstant(cond, lang)
+                && lang.isConstant(consequent, lang)
                 && lang.isConstant(alternative, lang);
     }
 
@@ -349,8 +347,7 @@ public class Conditional_c extends Expr_c implements Conditional {
             boolean c = ((Boolean) cond_).booleanValue();
             if (c) {
                 return then_;
-            }
-            else {
+            } else {
                 return else_;
             }
         }
@@ -360,10 +357,6 @@ public class Conditional_c extends Expr_c implements Conditional {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.Conditional(this.position,
-                              this.cond,
-                              this.consequent,
-                              this.alternative);
+        return nf.Conditional(this.position, this.cond, this.consequent, this.alternative);
     }
-
 }

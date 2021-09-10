@@ -44,8 +44,8 @@ import polyglot.types.Type;
 
 public class JL7InferenceSolver_c extends InferenceSolver_c {
 
-    public JL7InferenceSolver_c(JL5ProcedureInstance pi,
-            List<? extends Type> actuals, JL5TypeSystem ts) {
+    public JL7InferenceSolver_c(
+            JL5ProcedureInstance pi, List<? extends Type> actuals, JL5TypeSystem ts) {
         super(pi, actuals, ts);
     }
 
@@ -78,12 +78,10 @@ public class JL7InferenceSolver_c extends InferenceSolver_c {
                 // C<Fi> (JL5SubstClassType) by applying substitution to itself.
                 // See JLS SE 7 | 15.9.3:
                 // The return type of mj is θj applied to C<F1,...,Fp>.
-                JL5ParsedClassType ct =
-                        (JL5ParsedClassType) container.toClass();
+                JL5ParsedClassType ct = (JL5ParsedClassType) container.toClass();
                 JL7TypeSystem ts = (JL7TypeSystem) ci.typeSystem();
                 Map<TypeVariable, ReferenceType> substm = new LinkedHashMap<>();
-                for (TypeVariable tv : ct.typeVariables())
-                    substm.put(tv, tv);
+                for (TypeVariable tv : ct.typeVariables()) substm.put(tv, tv);
                 return ts.subst(container, substm);
             }
             return container;

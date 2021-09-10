@@ -40,10 +40,8 @@ public class PDFReporter {
     public static final Font ttFont = new Font(tt, 9);
     public static final Font ttFontBold = new Font(tt, 9, Font.BOLD);
     public static final Font ttFontItalic = new Font(tt, 9, Font.ITALIC);
-    public static final Font fontLineNo =
-            new Font(tt, 9, Font.ITALIC, BaseColor.LIGHT_GRAY);
-    public static final Font invisible =
-            new Font(tt, 1, Font.NORMAL, BaseColor.WHITE);
+    public static final Font fontLineNo = new Font(tt, 9, Font.ITALIC, BaseColor.LIGHT_GRAY);
+    public static final Font invisible = new Font(tt, 1, Font.NORMAL, BaseColor.WHITE);
 
     protected String filename;
 
@@ -74,22 +72,18 @@ public class PDFReporter {
     }
 
     public void startTest(Test t) {
-        if (t instanceof ScriptTestSuite)
-            startScriptTestSuite((ScriptTestSuite) t);
+        if (t instanceof ScriptTestSuite) startScriptTestSuite((ScriptTestSuite) t);
         else if (t instanceof SourceFileTestCollection)
             startSourceFileTestCollection((SourceFileTestCollection) t);
-        else if (t instanceof SourceFileTest)
-            startSourceFileTest((SourceFileTest) t);
+        else if (t instanceof SourceFileTest) startSourceFileTest((SourceFileTest) t);
         else if (t instanceof BuildTest) startBuildTest((BuildTest) t);
     }
 
     public void finishTest(Test t) {
-        if (t instanceof ScriptTestSuite)
-            finishScriptTestSuite((ScriptTestSuite) t);
+        if (t instanceof ScriptTestSuite) finishScriptTestSuite((ScriptTestSuite) t);
         else if (t instanceof SourceFileTestCollection)
             finishSourceFileTestCollection((SourceFileTestCollection) t);
-        else if (t instanceof SourceFileTest)
-            finishSourceFileTest((SourceFileTest) t);
+        else if (t instanceof SourceFileTest) finishSourceFileTest((SourceFileTest) t);
         else if (t instanceof BuildTest) finishBuildTest((BuildTest) t);
     }
 
@@ -124,8 +118,7 @@ public class PDFReporter {
     }
 
     protected void printIndent() {
-        for (int i = 0; i < indent; i++)
-            summarysb.append(' ');
+        for (int i = 0; i < indent; i++) summarysb.append(' ');
     }
 
     protected void startScriptTestSuite(ScriptTestSuite sts) {
@@ -138,28 +131,29 @@ public class PDFReporter {
         String notice = sts.getNotice();
         if (notice != null) println(notice);
 
-        if (!sts.success() && sts.getFailureMessage() != null)
-            println(sts.getFailureMessage());
+        if (!sts.success() && sts.getFailureMessage() != null) println(sts.getFailureMessage());
 
-        println(sts.getName() + ": " + sts.getSuccessfulTestCount() + " out of "
-                + sts.getExecutedTestCount() + " tests succeeded.");
+        println(
+                sts.getName()
+                        + ": "
+                        + sts.getSuccessfulTestCount()
+                        + " out of "
+                        + sts.getExecutedTestCount()
+                        + " tests succeeded.");
     }
 
-    protected void startSourceFileTestCollection(
-            SourceFileTestCollection sftc) {
+    protected void startSourceFileTestCollection(SourceFileTestCollection sftc) {
         testCollectionName = sftc.getName();
         println("Test collection: " + testCollectionName);
         beginBlock();
     }
 
-    protected void finishSourceFileTestCollection(
-            SourceFileTestCollection sftc) {
+    protected void finishSourceFileTestCollection(SourceFileTestCollection sftc) {
         endBlock();
         String notice = sftc.getNotice();
         if (notice != null) println(notice);
 
-        if (!sftc.success() && sftc.getFailureMessage() != null)
-            println(sftc.getFailureMessage());
+        if (!sftc.success() && sftc.getFailureMessage() != null) println(sftc.getFailureMessage());
 
         println(sftc.getSummary());
     }
@@ -175,8 +169,7 @@ public class PDFReporter {
         if (notice != null) print("[" + anonymizedName(notice) + "] ");
 
         String result;
-        if (sft.success())
-            result = "OK";
+        if (sft.success()) result = "OK";
         else {
             String msg = sft.getFailureMessage();
             if (msg == null) msg = "Failed (no message)";
@@ -185,11 +178,12 @@ public class PDFReporter {
         println(result);
 
         if (!sft.success()) {
-            chapter = new Chapter(new Paragraph(
-                                                testCollectionName + ": "
-                                                        + anonymizedName(sft.getUniqueId()),
-                                                invisible),
-                                  chapterNo++);
+            chapter =
+                    new Chapter(
+                            new Paragraph(
+                                    testCollectionName + ": " + anonymizedName(sft.getUniqueId()),
+                                    invisible),
+                            chapterNo++);
             chapter.setNumberDepth(0);
 
             sft.printTestResult(this);
@@ -208,10 +202,8 @@ public class PDFReporter {
         String notice = b.getNotice();
         if (notice != null) println(notice);
 
-        if (b.success())
-            println("OK");
-        else if (b.getFailureMessage() != null)
-            println(b.getFailureMessage());
+        if (b.success()) println("OK");
+        else if (b.getFailureMessage() != null) println(b.getFailureMessage());
         else println("Failed (no message)");
     }
 
@@ -220,36 +212,28 @@ public class PDFReporter {
     }
 
     public void printText(String content) {
-        for (String line : content.split("\\n"))
-            appendChapter(chapter, line);
+        for (String line : content.split("\\n")) appendChapter(chapter, line);
     }
 
     public void printCode(File srcFile) {
         appendChapter(chapter, anonymizedName(srcFile.getPath()), ttFontItalic);
         try (BufferedReader br = new BufferedReader(new FileReader(srcFile))) {
             List<String> lines = new ArrayList<>();
-            for (String line = br.readLine(); line != null; line =
-                    br.readLine())
-                lines.add(line);
+            for (String line = br.readLine(); line != null; line = br.readLine()) lines.add(line);
 
             int numLines = lines.size();
-            int numLineDigits =
-                    numLines == 0 ? 0 : (int) Math.log10(numLines) + 1;
+            int numLineDigits = numLines == 0 ? 0 : (int) Math.log10(numLines) + 1;
             int lineNo = 1;
             String format = "%" + numLineDigits + "d ";
 
-            for (Iterator<String> itr =
-                    lines.iterator(); itr.hasNext(); lineNo++) {
+            for (Iterator<String> itr = lines.iterator(); itr.hasNext(); lineNo++) {
                 String line = itr.next();
-                phrase.add(new Chunk(String.format(format, lineNo),
-                                     fontLineNo));
+                phrase.add(new Chunk(String.format(format, lineNo), fontLineNo));
                 appendChapter(chapter, line);
             }
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             appendChapter(chapter, "<file not found>");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         appendChapter(chapter, "");
@@ -271,17 +255,14 @@ public class PDFReporter {
         appendChapter(chapter, s, font, 0);
     }
 
-    protected void appendChapter(Chapter chapter, String s, Font font,
-            int indent) {
+    protected void appendChapter(Chapter chapter, String s, Font font, int indent) {
         boolean toIndent = false;
         for (String line : s.split("\\n")) {
             chaptersb.setLength(0);
             if (toIndent) {
-                for (int i = 0; i < indent + 2; i++)
-                    chaptersb.append(' ');
+                for (int i = 0; i < indent + 2; i++) chaptersb.append(' ');
                 phrase = new Phrase(12);
-            }
-            else toIndent = true;
+            } else toIndent = true;
             line = line.replaceAll("\t", "    ");
             chaptersb.append(line);
             phrase.add(new Chunk(chaptersb.toString(), font));
@@ -304,22 +285,17 @@ public class PDFReporter {
 
             doc.add(summary);
 
-            for (Chapter chapter : chapters)
-                doc.add(chapter);
+            for (Chapter chapter : chapters) doc.add(chapter);
 
             if (writer.isPageEmpty()) {
                 outFile.close();
                 output.delete();
-            }
-            else doc.close();
-        }
-        catch (FileNotFoundException e) {
+            } else doc.close();
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        }
-        catch (DocumentException de) {
+        } catch (DocumentException de) {
             System.err.println(de.getMessage());
             de.printStackTrace();
         }
@@ -327,8 +303,7 @@ public class PDFReporter {
 
     public static class HeaderFooter extends PdfPageEventHelper {
 
-        public static final Font headerFont =
-                new Font(FontFamily.HELVETICA, 9, Font.BOLD);
+        public static final Font headerFont = new Font(FontFamily.HELVETICA, 9, Font.BOLD);
         public static final Font footerFont = new Font(FontFamily.HELVETICA, 8);
 
         /** Phrase for the header. */
@@ -346,8 +321,8 @@ public class PDFReporter {
          *      com.itextpdf.text.Paragraph)
          */
         @Override
-        public void onChapter(PdfWriter writer, Document document,
-                float paragraphPosition, Paragraph title) {
+        public void onChapter(
+                PdfWriter writer, Document document, float paragraphPosition, Paragraph title) {
             header = new Phrase(title.getContent(), headerFont);
             pagenumber = 1;
             numPages = writer.getDirectContent().createTemplate(30, 9);
@@ -372,35 +347,27 @@ public class PDFReporter {
         public void onEndPage(PdfWriter writer, Document document) {
             Rectangle rect = writer.getBoxSize("art");
             PdfContentByte dc = writer.getDirectContent();
-            ColumnText.showTextAligned(dc,
-                                       Element.ALIGN_LEFT,
-                                       header,
-                                       rect.getLeft(),
-                                       rect.getTop(-9),
-                                       0);
-            ColumnText.showTextAligned(dc,
-                                       Element.ALIGN_RIGHT,
-                                       new Phrase(String.format("%d/",
-                                                                pagenumber),
-                                                  footerFont),
-                                       (rect.getLeft() + rect.getRight()) / 2,
-                                       rect.getBottom(-18),
-                                       0);
-            dc.addTemplate(numPages,
-                           (rect.getLeft() + rect.getRight()) / 2,
-                           rect.getBottom(-18));
+            ColumnText.showTextAligned(
+                    dc, Element.ALIGN_LEFT, header, rect.getLeft(), rect.getTop(-9), 0);
+            ColumnText.showTextAligned(
+                    dc,
+                    Element.ALIGN_RIGHT,
+                    new Phrase(String.format("%d/", pagenumber), footerFont),
+                    (rect.getLeft() + rect.getRight()) / 2,
+                    rect.getBottom(-18),
+                    0);
+            dc.addTemplate(numPages, (rect.getLeft() + rect.getRight()) / 2, rect.getBottom(-18));
         }
 
         @Override
-        public void onChapterEnd(PdfWriter writer, Document document,
-                float paragraphPosition) {
-            ColumnText.showTextAligned(numPages,
-                                       Element.ALIGN_LEFT,
-                                       new Phrase(String.valueOf(pagenumber),
-                                                  footerFont),
-                                       0,
-                                       0,
-                                       0);
+        public void onChapterEnd(PdfWriter writer, Document document, float paragraphPosition) {
+            ColumnText.showTextAligned(
+                    numPages,
+                    Element.ALIGN_LEFT,
+                    new Phrase(String.valueOf(pagenumber), footerFont),
+                    0,
+                    0,
+                    0);
         }
     }
 }

@@ -58,11 +58,9 @@ public class ScriptTestSuite extends TestSuite<Test> {
         if (scriptLoaded) return true;
         scriptLoaded = true;
         if (!scriptFile.exists()) {
-            appendFailureMessage("File " + scriptFile.getName()
-                    + " not found.");
+            appendFailureMessage("File " + scriptFile.getName() + " not found.");
             return false;
-        }
-        else if (!parseScript()) return false;
+        } else if (!parseScript()) return false;
         return true;
     }
 
@@ -90,13 +88,11 @@ public class ScriptTestSuite extends TestSuite<Test> {
     protected boolean parseScript() {
         Grm grm = tf.Grm(scriptFile);
         try {
-            List<Test> value = grm.parse().<List<Test>> value();
+            List<Test> value = grm.parse().<List<Test>>value();
             tests = value;
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // Used by CUP to indicate an unrecoverable error.
             e.printStackTrace(System.out);
             appendFailureMessage("Parsing error: " + e.getMessage());
@@ -107,27 +103,25 @@ public class ScriptTestSuite extends TestSuite<Test> {
 
     protected void loadResults() {
         try (ObjectInputStream ois =
-                new ObjectInputStream(new FileInputStream(TestSuiteResult.getResultsFileName(scriptFile)))) {
+                new ObjectInputStream(
+                        new FileInputStream(TestSuiteResult.getResultsFileName(scriptFile)))) {
             TestResult tr = (TestResult) ois.readObject();
             setTestResult(tr);
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             // ignore, and fail silently
-        }
-        catch (ClassNotFoundException | IOException e) {
-            System.err.println("Unable to load results for test suite "
-                    + getName() + ": " + e.getMessage());
+        } catch (ClassNotFoundException | IOException e) {
+            System.err.println(
+                    "Unable to load results for test suite " + getName() + ": " + e.getMessage());
         }
     }
 
     protected boolean saveResults() {
         try (ObjectOutputStream oos =
-                new ObjectOutputStream(new FileOutputStream(TestSuiteResult.getResultsFileName(scriptFile)))) {
+                new ObjectOutputStream(
+                        new FileOutputStream(TestSuiteResult.getResultsFileName(scriptFile)))) {
             oos.writeObject(getTestSuiteResult());
-        }
-        catch (IOException e) {
-            System.err.println("Unable to save results for test suite "
-                    + getName());
+        } catch (IOException e) {
+            System.err.println("Unable to save results for test suite " + getName());
             return false;
         }
         return true;
@@ -138,5 +132,4 @@ public class ScriptTestSuite extends TestSuite<Test> {
         loadScript();
         return super.getTests();
     }
-
 }

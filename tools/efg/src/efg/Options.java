@@ -22,13 +22,13 @@ public class Options extends JL5Options {
 
     @Override
     protected void populateFlags(Set<OptFlag<?>> flags) {
-        flags.add(new OptFlag<String>("-conf", "<file>", "configuration file") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
-        });
+        flags.add(
+                new OptFlag<String>("-conf", "<file>", "configuration file") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
+                });
 
         super.populateFlags(flags);
     }
@@ -38,11 +38,9 @@ public class Options extends JL5Options {
         if (arg.flag().ids().contains("-conf")) {
             confFile = new File((String) arg.value());
             if (!confFile.canRead()) {
-                throw new UsageError("Unable to read configuration file '"
-                        + arg.value() + "'");
+                throw new UsageError("Unable to read configuration file '" + arg.value() + "'");
             }
-        }
-        else super.handleArg(arg);
+        } else super.handleArg(arg);
     }
 
     @Override
@@ -65,5 +63,4 @@ public class Options extends JL5Options {
     public File confFile() {
         return confFile;
     }
-
 }

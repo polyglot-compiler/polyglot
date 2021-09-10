@@ -34,8 +34,9 @@ import polyglot.types.ClassType;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
 
-public class DefiniteAssignmentChecker extends
-        AbstractDefiniteAssignmentChecker<DefiniteAssignmentChecker.ClassBodyInfo, AbstractAssignmentChecker.FlowItem> {
+public class DefiniteAssignmentChecker
+        extends AbstractDefiniteAssignmentChecker<
+                DefiniteAssignmentChecker.ClassBodyInfo, AbstractAssignmentChecker.FlowItem> {
     public DefiniteAssignmentChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
@@ -48,8 +49,8 @@ public class DefiniteAssignmentChecker extends
     }
 
     @Override
-    protected FlowItem newFlowItem(Map<VarInstance, AssignmentStatus> map,
-            boolean canTerminateNormally) {
+    protected FlowItem newFlowItem(
+            Map<VarInstance, AssignmentStatus> map, boolean canTerminateNormally) {
         return new FlowItem(map, canTerminateNormally);
     }
 

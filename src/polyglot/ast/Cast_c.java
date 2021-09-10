@@ -52,7 +52,7 @@ public class Cast_c extends Expr_c implements Cast {
     protected TypeNode castType;
     protected Expr expr;
 
-//    @Deprecated
+    //    @Deprecated
     public Cast_c(Position pos, TypeNode castType, Expr expr) {
         this(pos, castType, expr, null);
     }
@@ -104,8 +104,7 @@ public class Cast_c extends Expr_c implements Cast {
     }
 
     /** Reconstruct the expression. */
-    protected <N extends Cast_c> N reconstruct(N n, TypeNode castType,
-            Expr expr) {
+    protected <N extends Cast_c> N reconstruct(N n, TypeNode castType, Expr expr) {
         n = castType(n, castType);
         n = expr(n, expr);
         return n;
@@ -123,9 +122,13 @@ public class Cast_c extends Expr_c implements Cast {
         TypeSystem ts = tc.typeSystem();
 
         if (!ts.isCastValid(expr.type(), castType.type())) {
-            throw new SemanticException("Cannot cast the expression of type \""
-                    + expr.type() + "\" to type \"" + castType.type() + "\".",
-                                        position());
+            throw new SemanticException(
+                    "Cannot cast the expression of type \""
+                            + expr.type()
+                            + "\" to type \""
+                            + castType.type()
+                            + "\".",
+                    position());
         }
 
         return type(castType.type());
@@ -138,11 +141,9 @@ public class Cast_c extends Expr_c implements Cast {
         if (child == expr) {
             if (castType.type().isReference()) {
                 return ts.Object();
-            }
-            else if (castType.type().isNumeric()) {
+            } else if (castType.type().isNumeric()) {
                 return ts.Double();
-            }
-            else if (castType.type().isBoolean()) {
+            } else if (castType.type().isBoolean()) {
                 return ts.Boolean();
             }
         }
@@ -184,14 +185,14 @@ public class Cast_c extends Expr_c implements Cast {
             return Collections.singletonList((Type) ts.ClassCastException());
         }
 
-        return Collections.<Type> emptyList();
+        return Collections.<Type>emptyList();
     }
 
     @Override
     public boolean isConstant(Lang lang) {
-        return lang.isConstant(expr, lang) && (castType.type().isPrimitive()
-                || castType.type()
-                           .typeEquals(castType.type().typeSystem().String()));
+        return lang.isConstant(expr, lang)
+                && (castType.type().isPrimitive()
+                        || castType.type().typeEquals(castType.type().typeSystem().String()));
     }
 
     @Override
@@ -267,5 +268,4 @@ public class Cast_c extends Expr_c implements Cast {
     public Node copy(NodeFactory nf) {
         return nf.Cast(position, castType, expr);
     }
-
 }

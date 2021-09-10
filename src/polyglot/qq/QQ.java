@@ -47,47 +47,47 @@ import polyglot.util.ErrorQueue;
 import polyglot.util.Position;
 
 /**
-  Java language quasiquoter.  This class contains methods for parsing strings
-  into ASTs.
-
-  <p>
-  To use the class, invoke one of the {@code parseT} methods to create a
-  {@code Node} of type {@code T}.
-
-  <p>
-  Each {@code parseT} method takes a format string as its first argument
-  and some additional {@code Object} arguments.  Each pattern in the
-  format string is matched with its corresponding {@code Object}.
-
-  <p>
-  The format string may contain the following patterns:
-  <ul>
-    <li> {@code %s} matches {@code String} (parsed as an identifier)
-
-    <li> {@code %T} matches {@code Type} or {@code TypeNode}
-    <li> {@code %E} matches {@code Expr}
-    <li> {@code %S} matches {@code Stmt}
-    <li> {@code %D} matches {@code ClassDecl}
-    <li> {@code %M} matches {@code ClassMember}
-    <li> {@code %F} matches {@code Formal}
-
-    <li> {@code %LT} matches {@code List<Type>} or {@code List<TypeNode>}
-    <li> {@code %LE} matches {@code List<Expr>}
-    <li> {@code %LS} matches {@code List<Stmt>}
-    <li> {@code %LD} matches {@code List<ClassDecl>}
-    <li> {@code %LM} matches {@code List<ClassMember>}
-    <li> {@code %LF} matches {@code List<Formal>}
-  </ul>
-  These patterns are recognized as tokens by the lexer--surrounding the token
-  with whitespace or parens may be needed to parse the string.
-
-  <p>
-  For example:
-  <pre>
-      Expr e;
-      TypeNode t;
-      Stmt s = qq.parseStmt("%T %s = new %T(%E);", t, "tmp", t, e);
-  </pre>
+ * Java language quasiquoter.  This class contains methods for parsing strings
+ * into ASTs.
+ *
+ * <p>
+ * To use the class, invoke one of the {@code parseT} methods to create a
+ * {@code Node} of type {@code T}.
+ *
+ * <p>
+ * Each {@code parseT} method takes a format string as its first argument
+ * and some additional {@code Object} arguments.  Each pattern in the
+ * format string is matched with its corresponding {@code Object}.
+ *
+ * <p>
+ * The format string may contain the following patterns:
+ * <ul>
+ * <li> {@code %s} matches {@code String} (parsed as an identifier)
+ *
+ * <li> {@code %T} matches {@code Type} or {@code TypeNode}
+ * <li> {@code %E} matches {@code Expr}
+ * <li> {@code %S} matches {@code Stmt}
+ * <li> {@code %D} matches {@code ClassDecl}
+ * <li> {@code %M} matches {@code ClassMember}
+ * <li> {@code %F} matches {@code Formal}
+ *
+ * <li> {@code %LT} matches {@code List<Type>} or {@code List<TypeNode>}
+ * <li> {@code %LE} matches {@code List<Expr>}
+ * <li> {@code %LS} matches {@code List<Stmt>}
+ * <li> {@code %LD} matches {@code List<ClassDecl>}
+ * <li> {@code %LM} matches {@code List<ClassMember>}
+ * <li> {@code %LF} matches {@code List<Formal>}
+ * </ul>
+ * These patterns are recognized as tokens by the lexer--surrounding the token
+ * with whitespace or parens may be needed to parse the string.
+ *
+ * <p>
+ * For example:
+ * <pre>
+ * Expr e;
+ * TypeNode t;
+ * Stmt s = qq.parseStmt("%T %s = new %T(%E);", t, "tmp", t, e);
+ * </pre>
  */
 public class QQ {
     protected ExtensionInfo ext;
@@ -101,14 +101,14 @@ public class QQ {
     protected static final int FILE = 5;
 
     /** Create a new quasiquoter to create AST nodes of the given
-      language extension. */
+     * language extension. */
     public QQ(ExtensionInfo ext) {
         this(ext, null);
     }
 
     /** Create a new quasiquoter to create AST nodes of the given
-      language extension, using {@code pos} for the position
-      of the nodes created. */
+     * language extension, using {@code pos} for the position
+     * of the nodes created. */
     public QQ(ExtensionInfo ext, Position pos) {
         this.ext = ext;
         this.pos = pos;
@@ -230,8 +230,7 @@ public class QQ {
     }
 
     /** Create a quasiquoting parser. */
-    protected QQParser parser(Lexer lexer, TypeSystem ts, NodeFactory nf,
-            ErrorQueue eq) {
+    protected QQParser parser(Lexer lexer, TypeSystem ts, NodeFactory nf, ErrorQueue eq) {
         return new polyglot.qq.Grm(lexer, ts, nf, eq);
     }
 
@@ -256,12 +255,11 @@ public class QQ {
             if (o instanceof Type) {
                 Type t = (Type) o;
                 subst[i] = nf.CanonicalTypeNode(type_position(t), t);
-            }
-            else if (o instanceof List) {
+            } else if (o instanceof List) {
                 @SuppressWarnings("unchecked")
                 List<Object> l = (List<Object>) o;
 
-                for (ListIterator<Object> j = l.listIterator(); j.hasNext();) {
+                for (ListIterator<Object> j = l.listIterator(); j.hasNext(); ) {
                     Object p = j.next();
 
                     if (p instanceof Type) {
@@ -293,26 +291,26 @@ public class QQ {
             java_cup.runtime.Symbol sym;
 
             switch (kind) {
-            case EXPR:
-                sym = grm.qq_expr();
-                break;
-            case STMT:
-                sym = grm.qq_stmt();
-                break;
-            case TYPE:
-                sym = grm.qq_type();
-                break;
-            case MEMB:
-                sym = grm.qq_member();
-                break;
-            case DECL:
-                sym = grm.qq_decl();
-                break;
-            case FILE:
-                sym = grm.qq_file();
-                break;
-            default:
-                throw new QQError("bad quasi-quoting kind: " + kind, pos);
+                case EXPR:
+                    sym = grm.qq_expr();
+                    break;
+                case STMT:
+                    sym = grm.qq_stmt();
+                    break;
+                case TYPE:
+                    sym = grm.qq_type();
+                    break;
+                case MEMB:
+                    sym = grm.qq_member();
+                    break;
+                case DECL:
+                    sym = grm.qq_decl();
+                    break;
+                case FILE:
+                    sym = grm.qq_file();
+                    break;
+                default:
+                    throw new QQError("bad quasi-quoting kind: " + kind, pos);
             }
 
             if (sym != null && sym.value instanceof Node) {
@@ -323,17 +321,13 @@ public class QQ {
             }
 
             throw new QQError("Unable to parse: \"" + fmt + "\".", pos);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new QQError("Unable to parse: \"" + fmt + "\".", pos);
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // Used by cup to indicate a non-recoverable error.
-            throw new QQError("Unable to parse: \"" + fmt + "\"; "
-                    + e.getMessage(), pos);
+            throw new QQError("Unable to parse: \"" + fmt + "\"; " + e.getMessage(), pos);
         }
     }
 }

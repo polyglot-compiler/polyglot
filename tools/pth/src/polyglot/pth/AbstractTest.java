@@ -65,8 +65,7 @@ public abstract class AbstractTest implements Test {
 
         hasRun = true;
         Date lastSuccess = null;
-        if (getTestResult() != null)
-            lastSuccess = getTestResult().dateLastSuccess;
+        if (getTestResult() != null) lastSuccess = getTestResult().dateLastSuccess;
         setTestResult(createTestResult(lastSuccess));
         postRun();
         return success();
@@ -76,10 +75,10 @@ public abstract class AbstractTest implements Test {
     public boolean shouldExecute(TestResult tr) {
         if (!matchFilter()) return false;
 
-        if (Main.options.testPreviouslyFailedOnly && tr != null
+        if (Main.options.testPreviouslyFailedOnly
+                && tr != null
                 && tr.dateLastSuccess != null
-                && tr.dateLastSuccess.equals(tr.dateTestRun))
-            return false;
+                && tr.dateLastSuccess.equals(tr.dateTestRun)) return false;
         return true;
     }
 
@@ -140,13 +139,11 @@ public abstract class AbstractTest implements Test {
 
     @Override
     public String getFailureMessage() {
-        return failureMessageBuilder == null
-                ? null : failureMessageBuilder.toString();
+        return failureMessageBuilder == null ? null : failureMessageBuilder.toString();
     }
 
     public void appendNotice(String notice) {
-        if (noticeBuilder == null)
-            noticeBuilder = new StringBuffer(notice);
+        if (noticeBuilder == null) noticeBuilder = new StringBuffer(notice);
         else {
             noticeBuilder.append("\n");
             noticeBuilder.append(notice);
@@ -154,8 +151,7 @@ public abstract class AbstractTest implements Test {
     }
 
     public void appendFailureMessage(String failureMessage) {
-        if (failureMessageBuilder == null)
-            failureMessageBuilder = new StringBuffer(failureMessage);
+        if (failureMessageBuilder == null) failureMessageBuilder = new StringBuffer(failureMessage);
         else {
             failureMessageBuilder.append("\n");
             failureMessageBuilder.append(failureMessage);
@@ -199,14 +195,13 @@ public abstract class AbstractTest implements Test {
         TestResult tr = getTestResult();
 
         total++;
-        if (tr != null && tr.dateLastSuccess != null
-                && tr.dateLastSuccess.equals(tr.dateTestRun))
+        if (tr != null && tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun))
             lastSuccess++;
         if (tr == null || tr.dateTestRun == null) neverRun++;
         if (tr == null || tr.dateLastSuccess == null) neverSuccess++;
 
         outCtrl.displayTestResults(tr, getName());
 
-        return new int[] { total, lastSuccess, neverRun, neverSuccess };
+        return new int[] {total, lastSuccess, neverRun, neverSuccess};
     }
 }

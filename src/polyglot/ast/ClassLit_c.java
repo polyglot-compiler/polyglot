@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -38,17 +38,17 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 /**
- * A {@code ClassLit} represents a class literal expression. 
- * A class literal expressions is an expression consisting of the 
- * name of a class, interface, array, or primitive type followed by a period (.) 
- * and the token class. 
+ * A {@code ClassLit} represents a class literal expression.
+ * A class literal expressions is an expression consisting of the
+ * name of a class, interface, array, or primitive type followed by a period (.)
+ * and the token class.
  */
 public class ClassLit_c extends Lit_c implements ClassLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected TypeNode typeNode;
 
-//    @Deprecated
+    //    @Deprecated
     public ClassLit_c(Position pos, TypeNode typeNode) {
         this(pos, typeNode, null);
     }
@@ -77,7 +77,7 @@ public class ClassLit_c extends Lit_c implements ClassLit {
 
     /**
      * Cannot return the correct object (except for maybe
-     * some of the primitive arrays), so we just return null here. 
+     * some of the primitive arrays), so we just return null here.
      */
     public Object objValue() {
         return null;
@@ -124,7 +124,7 @@ public class ClassLit_c extends Lit_c implements ClassLit {
     }
 
     /**
-     * According to the JLS 2nd Ed, sec 15.28, a class literal 
+     * According to the JLS 2nd Ed, sec 15.28, a class literal
      * is not a compile time constant.
      */
     @Override
@@ -141,5 +141,4 @@ public class ClassLit_c extends Lit_c implements ClassLit {
     public Node copy(NodeFactory nf) {
         return nf.ClassLit(this.position, this.typeNode);
     }
-
 }

@@ -41,9 +41,8 @@ public class JL5ConstructorDeclToExt_c extends ConstructorDeclToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw)
-            throws SemanticException {
-        //Skip annotations and parameter nodes
+    public NodeVisitor toExtEnter(ExtensionRewriter rw) throws SemanticException {
+        // Skip annotations and parameter nodes
         ConstructorDecl cd = (ConstructorDecl) node();
         rw = (ExtensionRewriter) rw.bypass(((AnnotatedElement) JL5Ext.ext(cd)).annotationElems());
         return rw.bypass(((JL5ProcedureDeclExt) JL5Ext.ext(cd)).typeParams());
@@ -53,14 +52,15 @@ public class JL5ConstructorDeclToExt_c extends ConstructorDeclToExt_c {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
         ConstructorDecl n = (ConstructorDecl) node();
-        return to_nf.ConstructorDecl(n.position(),
-                                     n.flags(),
-                                     ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
-                                     n.id(),
-                                     n.formals(),
-                                     n.throwTypes(),
-                                     n.body(),
-                                     ((JL5ProcedureDeclExt) JL5Ext.ext(n)).typeParams(),
-                                     n.javadoc());
+        return to_nf.ConstructorDecl(
+                n.position(),
+                n.flags(),
+                ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
+                n.id(),
+                n.formals(),
+                n.throwTypes(),
+                n.body(),
+                ((JL5ProcedureDeclExt) JL5Ext.ext(n)).typeParams(),
+                n.javadoc());
     }
 }

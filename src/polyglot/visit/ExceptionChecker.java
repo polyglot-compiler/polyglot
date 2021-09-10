@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -49,9 +49,9 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
     /**
      * Set of exceptions that can be caught. Combined with the outer
      * field, these sets form a stack of exceptions, representing
-     * all and only the exceptions that are permitted to be thrown 
+     * all and only the exceptions that are permitted to be thrown
      * at this point in the code.
-     * 
+     *
      * Note: Consider the following code, where A,B,C,D are Exception subclasses.
      * <pre>
      *    void m() throws A, B {
@@ -61,7 +61,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
      *       catch (C ex) { ... }
      *       catch (D ex) { ... }
      *    }
-     * </pre>  
+     * </pre>
      * Inside the try-block, the stack of catchable sets is:
      *     { C }
      *     { D }
@@ -155,12 +155,11 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
      * @param old The original state of root of the current subtree.
      * @param n The current state of the root of the current subtree.
      * @param v The {@code NodeVisitor} object used to visit the children.
-     * @return The final result of the traversal of the tree rooted at 
+     * @return The final result of the traversal of the tree rooted at
      *  {@code n}.
      */
     @Override
-    protected Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
 
         ExceptionChecker inner = (ExceptionChecker) v;
 
@@ -189,7 +188,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
      * type t is not allowed to be thrown at this point; the exception t will be
      * added to the throwsSet of all exception checkers in the stack, up to (and
      * not including) the exception checker that catches the exception.
-     * 
+     *
      * @param t The type of exception that the node throws.
      * @throws SemanticException
      */
@@ -231,8 +230,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
         return this.throwsSet;
     }
 
-    protected void reportUncaughtException(Type t, Position pos)
-            throws SemanticException {
+    protected void reportUncaughtException(Type t, Position pos) throws SemanticException {
         ExceptionChecker ec = this;
         UncaughtReporter ur = null;
         while (ec != null && ur == null) {
@@ -249,11 +247,12 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
         /**
          * This method must throw a SemanticException, reporting
          * that the Exception type t must be caught.
-         * @throws SemanticException 
+         * @throws SemanticException
          */
         public void uncaughtType(Type t, Position pos) throws SemanticException {
-            throw new SemanticException("The exception \"" + t
-                    + "\" must either be caught or declared to be thrown.", pos);
+            throw new SemanticException(
+                    "The exception \"" + t + "\" must either be caught or declared to be thrown.",
+                    pos);
         }
     }
 
@@ -266,8 +265,8 @@ public class ExceptionChecker extends ErrorHandlingVisitor {
 
         @Override
         public void uncaughtType(Type t, Position pos) throws SemanticException {
-            throw new SemanticException("A " + codeType + " cannot "
-                    + "throw a \"" + t + "\".", pos);
+            throw new SemanticException(
+                    "A " + codeType + " cannot " + "throw a \"" + t + "\".", pos);
         }
     }
 }

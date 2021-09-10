@@ -79,5 +79,4 @@ public class JLExtensionInfo extends ParserlessJLExtensionInfo {
     public Set<String> keywords() {
         return new Lexer_c(null).keywords();
     }
-
 }

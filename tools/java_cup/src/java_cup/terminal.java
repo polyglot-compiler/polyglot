@@ -2,11 +2,11 @@ package java_cup;
 
 import java.util.HashMap;
 
-/** This class represents a terminal symbol in the grammar.  Each terminal 
- *  has a textual name, an index, and a string which indicates the type of 
- *  object it will be implemented with at runtime (i.e. the class of object 
- *  that will be returned by the scanner and pushed on the parse stack to 
- *  represent it). 
+/** This class represents a terminal symbol in the grammar.  Each terminal
+ *  has a textual name, an index, and a string which indicates the type of
+ *  object it will be implemented with at runtime (i.e. the class of object
+ *  that will be returned by the scanner and pushed on the parse stack to
+ *  represent it).
  *
  * @version last updated: 7/3/96
  * @author  Frank Flannery
@@ -21,18 +21,17 @@ public class terminal extends symbol {
      * @param nm the name of the terminal.
      * @param tp the type of the terminal.
      */
-    public terminal(String nm, String tp, int precedence_side,
-            int precedence_num) {
+    public terminal(String nm, String tp, int precedence_side, int precedence_num) {
         /* superclass does most of the work */
         super(nm, tp);
 
         /* add to set of all terminals and check for duplicates */
         Object conflict = _all.put(nm, this);
         if (conflict != null)
-        // can't throw an execption here because this is used in static 
-        // initializers, so we do a crash instead
-        // was:
-        // throw new internal_error("Duplicate terminal (" + nm + ") created");
+            // can't throw an execption here because this is used in static
+            // initializers, so we do a crash instead
+            // was:
+            // throw new internal_error("Duplicate terminal (" + nm + ") created");
             new internal_error("Duplicate terminal (" + nm + ") created").crash();
 
         /* assign a unique index */
@@ -49,15 +48,14 @@ public class terminal extends symbol {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Constructor for non-precedented terminal
-      */
-
+     */
     public terminal(String nm, String tp) {
         this(nm, tp, assoc.no_prec, -1);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Constructor with default type. 
+    /** Constructor with default type.
      * @param nm the name of the terminal.
      */
     public terminal(String nm) {
@@ -75,12 +73,12 @@ public class terminal extends symbol {
     /*--- (Access to) Static (Class) Variables ------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Table of all terminals.  Elements are stored using name strings as 
-     *  the key 
+    /** Table of all terminals.  Elements are stored using name strings as
+     *  the key
      */
     protected static HashMap<String, terminal> _all = new HashMap<>();
 
-    //Hm Added clear  to clear all static fields
+    // Hm Added clear  to clear all static fields
     public static void clear() {
         _all.clear();
         _all_by_index.clear();
@@ -96,16 +94,14 @@ public class terminal extends symbol {
 
     /** Lookup a terminal by name string. */
     public static terminal find(String with_name) {
-        if (with_name == null)
-            return null;
+        if (with_name == null) return null;
         else return _all.get(with_name);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Table of all terminals indexed by their index number. */
-    protected static HashMap<Integer, terminal> _all_by_index =
-            new HashMap<>();
+    protected static HashMap<Integer, terminal> _all_by_index = new HashMap<>();
 
     /** Lookup a terminal by index. */
     public static terminal find(int indx) {

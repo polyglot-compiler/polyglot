@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -64,7 +64,7 @@ public class Initializer_c extends Term_c implements Initializer {
     protected Block body;
     protected InitializerInstance ii;
 
-//    @Deprecated
+    //    @Deprecated
     public Initializer_c(Position pos, Flags flags, Block body) {
         this(pos, flags, body, null);
     }
@@ -118,8 +118,7 @@ public class Initializer_c extends Term_c implements Initializer {
         return initializerInstance(this, ii);
     }
 
-    protected <N extends Initializer_c> N initializerInstance(N n,
-            InitializerInstance ii) {
+    protected <N extends Initializer_c> N initializerInstance(N n, InitializerInstance ii) {
         if (n.ii == ii) return n;
         n = copyIfNeeded(n);
         n.ii = ii;
@@ -184,35 +183,31 @@ public class Initializer_c extends Term_c implements Initializer {
 
         try {
             ts.checkInitializerFlags(flags());
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), position());
         }
 
         // check that inner classes do not declare static initializers
-        if (flags().isStatic()
-                && initializerInstance().container().toClass().isInnerClass()) {
+        if (flags().isStatic() && initializerInstance().container().toClass().isInnerClass()) {
             // it's a static initializer in an inner class.
-            throw new SemanticException("Inner classes cannot declare "
-                    + "static initializers.", this.position());
+            throw new SemanticException(
+                    "Inner classes cannot declare " + "static initializers.", this.position());
         }
 
         return this;
     }
 
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException {
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
         if (initializerInstance().flags().isStatic()) {
             return ec.push(new ExceptionChecker.CodeTypeReporter("static initializer block"));
         }
 
         if (!initializerInstance().container().toClass().isAnonymous()) {
-            ec =
-                    ec.push(new ExceptionChecker.CodeTypeReporter("instance initializer block"));
+            ec = ec.push(new ExceptionChecker.CodeTypeReporter("instance initializer block"));
 
             // An instance initializer of a named class may not throw
-            // a checked exception unless that exception or one of its 
+            // a checked exception unless that exception or one of its
             // superclasses is explicitly declared in the throws clause
             // of each constructor or its class, and the class has at least
             // one explicitly declared constructor.
@@ -224,8 +219,7 @@ public class Initializer_c extends Term_c implements Initializer {
                 if (allowed == null) {
                     allowed = new SubtypeSet(throwable);
                     allowed.addAll(ci.throwTypes());
-                }
-                else {
+                } else {
                     // intersect allowed with ci.throwTypes()
                     SubtypeSet other = new SubtypeSet(throwable);
                     other.addAll(ci.throwTypes());
@@ -303,5 +297,4 @@ public class Initializer_c extends Term_c implements Initializer {
     public Node copy(NodeFactory nf) {
         return nf.Initializer(this.position, this.flags, this.body);
     }
-
 }

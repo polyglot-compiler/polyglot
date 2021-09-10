@@ -8,12 +8,12 @@ package java_cup.runtime;
  */
 
 /* *************************************************
-  Interface SymbolFactory
+ Interface SymbolFactory
 
-  interface for creating new symbols
-  You can also use this interface for your own callback hooks
-  Declare Your own factory methods for creation of Objects in Your scanner!
- ***************************************************/
+ interface for creating new symbols
+ You can also use this interface for your own callback hooks
+ Declare Your own factory methods for creation of Objects in Your scanner!
+***************************************************/
 public interface SymbolFactory {
     // Factory methods
     /**
@@ -26,8 +26,7 @@ public interface SymbolFactory {
      * @param right   symbol, to take the right location from
      * @param value   value, attached to this symbol
      */
-    public Symbol newSymbol(String name, int id, Symbol left, Symbol right,
-            Object value);
+    public Symbol newSymbol(String name, int id, Symbol left, Symbol right, Object value);
 
     /**
      * newSymbol

@@ -53,8 +53,7 @@ public interface TypeSystem {
      *                 or other source files.
      * @param extInfo The ExtensionInfo the TypeSystem is being created for.
      */
-    void initialize(TopLevelResolver resolver, ExtensionInfo extInfo)
-            throws SemanticException;
+    void initialize(TopLevelResolver resolver, ExtensionInfo extInfo) throws SemanticException;
 
     /** Return the language extension this type system is for. */
     ExtensionInfo extensionInfo();
@@ -89,8 +88,7 @@ public interface TypeSystem {
     /**
      * Constructs a new ClassFileLazyClassInitializer for the given class file.
      */
-    ClassFileLazyClassInitializer classFileLazyClassInitializer(
-            ClassFile clazz);
+    ClassFileLazyClassInitializer classFileLazyClassInitializer(ClassFile clazz);
 
     /**
      * Create an import table for the source file.
@@ -137,8 +135,7 @@ public interface TypeSystem {
      * @param container Containing class of the initializer.
      * @param flags The initializer's flags.
      */
-    InitializerInstance initializerInstance(Position pos, ClassType container,
-            Flags flags);
+    InitializerInstance initializerInstance(Position pos, ClassType container, Flags flags);
 
     /**
      * Create a constructor instance.
@@ -148,8 +145,11 @@ public interface TypeSystem {
      * @param argTypes The constructor's formal parameter types.
      * @param excTypes The constructor's exception throw types.
      */
-    ConstructorInstance constructorInstance(Position pos, ClassType container,
-            Flags flags, List<? extends Type> argTypes,
+    ConstructorInstance constructorInstance(
+            Position pos,
+            ClassType container,
+            Flags flags,
+            List<? extends Type> argTypes,
             List<? extends Type> excTypes);
 
     /**
@@ -162,9 +162,14 @@ public interface TypeSystem {
      * @param argTypes The method's formal parameter types.
      * @param excTypes The method's exception throw types.
      */
-    MethodInstance methodInstance(Position pos, ReferenceType container,
-            Flags flags, Type returnType, String name,
-            List<? extends Type> argTypes, List<? extends Type> excTypes);
+    MethodInstance methodInstance(
+            Position pos,
+            ReferenceType container,
+            Flags flags,
+            Type returnType,
+            String name,
+            List<? extends Type> argTypes,
+            List<? extends Type> excTypes);
 
     /**
      * Create a field instance.
@@ -174,8 +179,8 @@ public interface TypeSystem {
      * @param type The field's type.
      * @param name The field's name.
      */
-    FieldInstance fieldInstance(Position pos, ReferenceType container,
-            Flags flags, Type type, String name);
+    FieldInstance fieldInstance(
+            Position pos, ReferenceType container, Flags flags, Type type, String name);
 
     /**
      * Create a local variable instance.
@@ -184,8 +189,7 @@ public interface TypeSystem {
      * @param type The local variable's type.
      * @param name The local variable's name.
      */
-    LocalInstance localInstance(Position pos, Flags flags, Type type,
-            String name);
+    LocalInstance localInstance(Position pos, Flags flags, Type type, String name);
 
     /**
      * Create a default constructor instance.
@@ -296,16 +300,14 @@ public interface TypeSystem {
      * Checks whether a class member can be accessed from code that is
      * declared in the type {@code contextType}.
      */
-    boolean isAccessible(MemberInstance mi, ReferenceType contextType,
-            boolean fromClient);
+    boolean isAccessible(MemberInstance mi, ReferenceType contextType, boolean fromClient);
 
     /**
      * Checks whether a class member mi, which is declared in container or
      * an ancestor of container, can be accessed from code that is declared
      * in type {@code contextType}, accessing it via the type container.
      */
-    boolean isAccessible(MemberInstance mi, ReferenceType container,
-            ReferenceType contextType);
+    boolean isAccessible(MemberInstance mi, ReferenceType container, ReferenceType contextType);
 
     /**
      * Checks whether a member mi, which is declared in container or
@@ -313,8 +315,11 @@ public interface TypeSystem {
      * in type {@code context}.  fromClient indicates whether this member is
      * being access from a client (true) or by inheritance (false).
      */
-    boolean isAccessible(MemberInstance mi, ReferenceType container,
-            ReferenceType contextType, boolean fromClient);
+    boolean isAccessible(
+            MemberInstance mi,
+            ReferenceType container,
+            ReferenceType contextType,
+            boolean fromClient);
 
     /**
      * Checks whether {@code targetClass} can be accessed from {@code context}.
@@ -415,8 +420,8 @@ public interface TypeSystem {
      * @deprecated
      */
     @Deprecated
-    FieldInstance findField(ReferenceType container, String name,
-            ClassType currClass) throws SemanticException;
+    FieldInstance findField(ReferenceType container, String name, ClassType currClass)
+            throws SemanticException;
 
     /**
      * Returns the FieldInstance for the field {@code name} defined
@@ -425,8 +430,9 @@ public interface TypeSystem {
      * @exception SemanticException if the field cannot be found or is
      * inaccessible.
      */
-    FieldInstance findField(ReferenceType container, String name,
-            ClassType currClass, boolean fromClient) throws SemanticException;
+    FieldInstance findField(
+            ReferenceType container, String name, ClassType currClass, boolean fromClient)
+            throws SemanticException;
 
     /**
      * Returns the FieldInstance for the field {@code name} defined
@@ -435,7 +441,15 @@ public interface TypeSystem {
      * inaccessible.
      */
     @Deprecated
-    FieldInstance findField(ReferenceType container, String name)
+    FieldInstance findField(ReferenceType container, String name) throws SemanticException;
+
+    /**
+     * Deprecated version of the findMethod method.
+     * @deprecated
+     */
+    @Deprecated
+    MethodInstance findMethod(
+            ReferenceType container, String name, List<? extends Type> argTypes, Context c)
             throws SemanticException;
 
     /**
@@ -443,17 +457,12 @@ public interface TypeSystem {
      * @deprecated
      */
     @Deprecated
-    MethodInstance findMethod(ReferenceType container, String name,
-            List<? extends Type> argTypes, Context c) throws SemanticException;
-
-    /**
-     * Deprecated version of the findMethod method.
-     * @deprecated
-     */
-    @Deprecated
-    MethodInstance findMethod(ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass)
-                    throws SemanticException;
+    MethodInstance findMethod(
+            ReferenceType container,
+            String name,
+            List<? extends Type> argTypes,
+            ClassType currClass)
+            throws SemanticException;
 
     /**
      * Requires: all type arguments are canonical.
@@ -467,26 +476,30 @@ public interface TypeSystem {
      * @exception SemanticException if the method cannot be found or is
      * inaccessible.
      */
-    MethodInstance findMethod(ReferenceType container, String name,
-            List<? extends Type> argTypes, ClassType currClass,
-            boolean fromClient) throws SemanticException;
+    MethodInstance findMethod(
+            ReferenceType container,
+            String name,
+            List<? extends Type> argTypes,
+            ClassType currClass,
+            boolean fromClient)
+            throws SemanticException;
 
     /**
      * Deprecated version of the findConstructor method.
      * @deprecated
      */
     @Deprecated
-    ConstructorInstance findConstructor(ClassType container,
-            List<? extends Type> argTypes, Context c) throws SemanticException;
+    ConstructorInstance findConstructor(
+            ClassType container, List<? extends Type> argTypes, Context c) throws SemanticException;
 
     /**
      * Deprecated version of the findConstructor method.
      * @deprecated
      */
     @Deprecated
-    ConstructorInstance findConstructor(ClassType container,
-            List<? extends Type> argTypes, ClassType currClass)
-                    throws SemanticException;
+    ConstructorInstance findConstructor(
+            ClassType container, List<? extends Type> argTypes, ClassType currClass)
+            throws SemanticException;
 
     /**
      * Find a constructor.  We need to pass the class from which the constructor
@@ -497,9 +510,12 @@ public interface TypeSystem {
      * @exception SemanticException if the constructor cannot be found or is
      * inaccessible.
      */
-    ConstructorInstance findConstructor(ClassType container,
-            List<? extends Type> argTypes, ClassType currClass,
-            boolean fromClient) throws SemanticException;
+    ConstructorInstance findConstructor(
+            ClassType container,
+            List<? extends Type> argTypes,
+            ClassType currClass,
+            boolean fromClient)
+            throws SemanticException;
 
     /**
      * Find a member class.
@@ -507,24 +523,22 @@ public interface TypeSystem {
      * @exception SemanticException if the class cannot be found or is
      * inaccessible.
      */
-    ClassType findMemberClass(ClassType container, String name,
-            ClassType currClass) throws SemanticException;
+    ClassType findMemberClass(ClassType container, String name, ClassType currClass)
+            throws SemanticException;
 
     /**
      * Deprecated version of the findMemberClass method.
      * @deprecated
      */
     @Deprecated
-    ClassType findMemberClass(ClassType container, String name, Context c)
-            throws SemanticException;
+    ClassType findMemberClass(ClassType container, String name, Context c) throws SemanticException;
 
     /**
      * Find a member class.
      * @exception SemanticException if the class cannot be found or is
      * inaccessible.
      */
-    ClassType findMemberClass(ClassType container, String name)
-            throws SemanticException;
+    ClassType findMemberClass(ClassType container, String name) throws SemanticException;
 
     /**
      * Returns the immediate supertype of type, or null if type has no
@@ -562,8 +576,7 @@ public interface TypeSystem {
      * Returns true iff {@code t} has a method with name {@code name}
      * either defined in {@code t} or inherited into it that is accessible from currClass.
      */
-    boolean hasAccessibleMethodNamed(ReferenceType t, String name,
-            ClassType currClass);
+    boolean hasAccessibleMethodNamed(ReferenceType t, String name, ClassType currClass);
 
     /**
      * Returns true iff {@code m1} is the same method as {@code m2}.
@@ -745,8 +758,7 @@ public interface TypeSystem {
      * Return a package by name with the given outer package.
      * Fail if the package does not exists.
      */
-    Package packageForName(Package prefix, String name)
-            throws SemanticException;
+    Package packageForName(Package prefix, String name) throws SemanticException;
 
     /**
      * Return a package by name.
@@ -804,8 +816,7 @@ public interface TypeSystem {
     /**
      * Create a new empty class.
      */
-    ParsedClassType createClassType(LazyClassInitializer init,
-            Source fromSource);
+    ParsedClassType createClassType(LazyClassInitializer init, Source fromSource);
 
     /**
      * Create a new empty class.
@@ -877,8 +888,7 @@ public interface TypeSystem {
      * Return true if {@code mi} can be called with name {@code name}
      * and actual parameters of types {@code actualTypes}.
      */
-    boolean methodCallValid(MethodInstance mi, String name,
-            List<? extends Type> argTypes);
+    boolean methodCallValid(MethodInstance mi, String name, List<? extends Type> argTypes);
 
     /**
      * Return true if {@code pi} can be called with
@@ -902,8 +912,7 @@ public interface TypeSystem {
      * Throw a SemanticException if {@code mi} cannot override
      * {@code mj}.
      */
-    void checkOverride(MethodInstance mi, MethodInstance mj)
-            throws SemanticException;
+    void checkOverride(MethodInstance mi, MethodInstance mj) throws SemanticException;
 
     /**
      * Get the list of methods {@code mi} implements, in no
@@ -1027,8 +1036,7 @@ public interface TypeSystem {
      * @return a suitable implementation of the method mi in the class
      *         {@code ct} or a supertype thereof, null if none exists.
      */
-    public MethodInstance findImplementingMethod(ClassType ct,
-            MethodInstance mi);
+    public MethodInstance findImplementingMethod(ClassType ct, MethodInstance mi);
 
     /**
      * Returns {@code t}, modified as necessary to make it a legal
@@ -1074,5 +1082,4 @@ public interface TypeSystem {
     public Flags Volatile();
 
     public Flags StrictFP();
-
 }

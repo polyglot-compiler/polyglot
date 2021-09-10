@@ -44,8 +44,8 @@ import javax.tools.SimpleJavaFileObject;
  */
 public class ExtFileObject extends SimpleJavaFileObject {
 
-    final protected ByteArrayOutputStream baos;
-    private final static int BUF_SIZE = 4096;
+    protected final ByteArrayOutputStream baos;
+    private static final int BUF_SIZE = 4096;
 
     public ExtFileObject(URI u, Kind k) {
         super(u, k);
@@ -78,12 +78,10 @@ public class ExtFileObject extends SimpleJavaFileObject {
                 // Read until end of stream (NB: \\A is the beginning of
                 // input marker, so it won't ever be found)
                 return s.useDelimiter("\\A").next();
-            }
-            catch (java.util.NoSuchElementException e) {
+            } catch (java.util.NoSuchElementException e) {
                 return "";
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             return null;
         }
     }

@@ -28,10 +28,9 @@ public class ErrorManager {
         return errorManager;
     }
 
-    private ErrorManager() {
-    }
+    private ErrorManager() {}
 
-    //TODO: migrate to java.util.logging
+    // TODO: migrate to java.util.logging
     /**
      * Error message format:
      * ERRORLEVEL at (LINE/COLUMN)@SYMBOL: MESSAGE
@@ -43,7 +42,8 @@ public class ErrorManager {
     }
 
     public void emit_fatal(String message, Symbol sym) {
-        //System.err.println("Fatal at ("+sym.left+"/"+sym.right+")@"+convSymbol(sym)+" : "+message);
+        // System.err.println("Fatal at ("+sym.left+"/"+sym.right+")@"+convSymbol(sym)+" :
+        // "+message);
         System.err.println("Fatal: " + message + " @ " + sym);
         fatals++;
     }
@@ -54,7 +54,8 @@ public class ErrorManager {
     }
 
     public void emit_warning(String message, Symbol sym) {
-//        System.err.println("Warning at ("+sym.left+"/"+sym.right+")@"+convSymbol(sym)+" : "+message);
+        //        System.err.println("Warning at ("+sym.left+"/"+sym.right+")@"+convSymbol(sym)+" :
+        // "+message);
         System.err.println("Fatal: " + message + " @ " + sym);
         warnings++;
     }
@@ -65,7 +66,8 @@ public class ErrorManager {
     }
 
     public void emit_error(String message, Symbol sym) {
-//        System.err.println("Error at ("+sym.left+"/"+sym.right+")@"+convSymbol(sym)+" : "+message);
+        //        System.err.println("Error at ("+sym.left+"/"+sym.right+")@"+convSymbol(sym)+" :
+        // "+message);
         System.err.println("Error: " + message + " @ " + sym);
         errors++;
     }

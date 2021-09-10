@@ -26,26 +26,26 @@ public class EfgScheduler extends JL7Scheduler {
     }
 
     public Goal ValidationBarrier(Job job) {
-        Goal g = new Barrier("Validated", this) {
-            @Override
-            public Goal goalForJob(Job job) {
-                return Validated(job);
-            }
-        };
+        Goal g =
+                new Barrier("Validated", this) {
+                    @Override
+                    public Goal goalForJob(Job job) {
+                        return Validated(job);
+                    }
+                };
 
         return internGoal(g);
     }
 
     public Goal EfgInfoCollected(Job job) {
-        Goal g = new VisitorGoal(job,
-                                 new EFGInfoCollector(job,
-                                                      extInfo,
-                                                      extInfo.typeSystem(),
-                                                      extInfo.nodeFactory()));
+        Goal g =
+                new VisitorGoal(
+                        job,
+                        new EFGInfoCollector(
+                                job, extInfo, extInfo.typeSystem(), extInfo.nodeFactory()));
         try {
             g.addPrerequisiteGoal(ValidationBarrier(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
 
@@ -53,12 +53,13 @@ public class EfgScheduler extends JL7Scheduler {
     }
 
     public Goal EfgInfoCollectionBarrier(Job job) {
-        Goal g = new Barrier("EFGInfoCollected", this) {
-            @Override
-            public Goal goalForJob(Job job) {
-                return EfgInfoCollected(job);
-            }
-        };
+        Goal g =
+                new Barrier("EFGInfoCollected", this) {
+                    @Override
+                    public Goal goalForJob(Job job) {
+                        return EfgInfoCollected(job);
+                    }
+                };
 
         return internGoal(g);
     }
@@ -67,8 +68,7 @@ public class EfgScheduler extends JL7Scheduler {
         Goal g = new EfgInfoValidationGoal(job);
         try {
             g.addPrerequisiteGoal(EfgInfoCollectionBarrier(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
@@ -83,13 +83,12 @@ public class EfgScheduler extends JL7Scheduler {
         try {
             // Create a goal to compile each generated source.
             Scheduler outScheduler = outExtInfo.scheduler();
-            ExtFactoryGenerator efg =
-                    new ExtFactoryGenerator(extInfo, outExtInfo);
+            ExtFactoryGenerator efg = new ExtFactoryGenerator(extInfo, outExtInfo);
             Job[] jobs =
-                    new Job[] { addExtFactoryJob(efg, outExtInfo, outScheduler),
-                            addAbstractExtFactoryJob(efg,
-                                                     outExtInfo,
-                                                     outScheduler) };
+                    new Job[] {
+                        addExtFactoryJob(efg, outExtInfo, outScheduler),
+                        addAbstractExtFactoryJob(efg, outExtInfo, outScheduler)
+                    };
             for (Job job : jobs) {
                 if (job != null) {
                     outScheduler.addGoal(outExtInfo.getCompileGoal(job));
@@ -99,8 +98,7 @@ public class EfgScheduler extends JL7Scheduler {
             cleanup();
 
             return outExtInfo.scheduler().runToCompletion();
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError(e);
         }
     }
@@ -111,10 +109,11 @@ public class EfgScheduler extends JL7Scheduler {
      *
      * @return the added job.
      */
-    protected Job addExtFactoryJob(ExtFactoryGenerator efg,
-            JL7ExtensionInfo outExtInfo, Scheduler outScheduler) {
-        Source source = new NullSource(efg.extFactorySimpleName() + "."
-                + outExtInfo.defaultFileExtension());
+    protected Job addExtFactoryJob(
+            ExtFactoryGenerator efg, JL7ExtensionInfo outExtInfo, Scheduler outScheduler) {
+        Source source =
+                new NullSource(
+                        efg.extFactorySimpleName() + "." + outExtInfo.defaultFileExtension());
 
         SourceFile ast = efg.genExtFactory().source(source);
         return outScheduler.addJob(source, ast);
@@ -126,11 +125,15 @@ public class EfgScheduler extends JL7Scheduler {
      *
      * @return the added job.
      */
-    protected Job addAbstractExtFactoryJob(ExtFactoryGenerator efg,
+    protected Job addAbstractExtFactoryJob(
+            ExtFactoryGenerator efg,
             polyglot.frontend.ExtensionInfo outExtInfo,
             Scheduler outScheduler) {
-        Source source = new NullSource(efg.abstractExtFactorySimpleName() + "."
-                + outExtInfo.defaultFileExtension());
+        Source source =
+                new NullSource(
+                        efg.abstractExtFactorySimpleName()
+                                + "."
+                                + outExtInfo.defaultFileExtension());
 
         SourceFile ast = efg.genAbstractExtFactory().source(source);
         return outScheduler.addJob(source, ast);

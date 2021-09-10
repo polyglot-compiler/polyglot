@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -48,8 +48,8 @@ public class TypeInputStream extends ObjectInputStream {
     protected boolean enableReplace;
     protected Set<Object> placeHoldersUsed;
 
-    public TypeInputStream(InputStream in, TypeSystem ts,
-            Map<Object, Object> cache) throws IOException {
+    public TypeInputStream(InputStream in, TypeSystem ts, Map<Object, Object> cache)
+            throws IOException {
         super(in);
 
         enableResolveObject(true);
@@ -73,7 +73,7 @@ public class TypeInputStream extends ObjectInputStream {
         return ts;
     }
 
-    private final static Object UNRESOLVED = new Object();
+    private static final Object UNRESOLVED = new Object();
 
     public void installInPlaceHolderCache(PlaceHolder p, TypeObject t) {
         cache.put(p, t);
@@ -81,8 +81,7 @@ public class TypeInputStream extends ObjectInputStream {
         if (t instanceof Named && p instanceof NamedPlaceHolder) {
             NamedPlaceHolder pp = (NamedPlaceHolder) p;
             if (Report.should_report(Report.serialize, 2))
-                Report.report(2, "Forcing " + pp.name()
-                        + " into system resolver");
+                Report.report(2, "Forcing " + pp.name() + " into system resolver");
             ts.systemResolver().install(pp.name(), (Named) t);
         }
 
@@ -90,15 +89,13 @@ public class TypeInputStream extends ObjectInputStream {
         if (Report.should_report(Report.serialize, 2)) {
             try {
                 s = t.toString();
-            }
-            catch (NullPointerException e) {
+            } catch (NullPointerException e) {
                 s = "<NullPointerException thrown>";
             }
         }
 
         if (Report.should_report(Report.serialize, 2)) {
-            Report.report(2, "- Installing " + p + " -> " + s
-                    + " in place holder cache");
+            Report.report(2, "- Installing " + p + " -> " + s + " in place holder cache");
         }
     }
 
@@ -115,8 +112,7 @@ public class TypeInputStream extends ObjectInputStream {
         if (Report.should_report(Report.serialize, 2)) {
             try {
                 s = o.toString();
-            }
-            catch (NullPointerException e) {
+            } catch (NullPointerException e) {
                 s = "<NullPointerException thrown>";
             }
         }
@@ -140,47 +136,53 @@ public class TypeInputStream extends ObjectInputStream {
                 // this pass is rerun.
                 failed = true;
                 return null;
-            }
-            else if (t == null) {
+            } else if (t == null) {
                 try {
                     cache.put(o, UNRESOLVED);
                     t = ((PlaceHolder) o).resolve(ts);
                     if (t == null) {
-                        throw new InternalCompilerError("Resolved " + s
-                                + " to null.");
+                        throw new InternalCompilerError("Resolved " + s + " to null.");
                     }
                     cache.put(o, t);
                     if (Report.should_report(Report.serialize, 2)) {
-                        Report.report(2,
-                                      "- Resolving " + s + " : " + o.getClass()
-                                              + " to " + t + " : "
-                                              + t.getClass());
+                        Report.report(
+                                2,
+                                "- Resolving "
+                                        + s
+                                        + " : "
+                                        + o.getClass()
+                                        + " to "
+                                        + t
+                                        + " : "
+                                        + t.getClass());
                     }
-                }
-                catch (CannotResolvePlaceHolderException e) {
+                } catch (CannotResolvePlaceHolderException e) {
                     failed = true;
                     if (Report.should_report(Report.serialize, 2)) {
-                        Report.report(2,
-                                      "- Resolving " + s + " : " + o.getClass()
-                                              + " to " + e);
+                        Report.report(2, "- Resolving " + s + " : " + o.getClass() + " to " + e);
                     }
                 }
-            }
-            else {
+            } else {
                 if (Report.should_report(Report.serialize, 2)) {
-                    Report.report(2, "- Resolving " + s + " : " + o.getClass()
-                            + " to (cached) " + t + " : " + t.getClass());
+                    Report.report(
+                            2,
+                            "- Resolving "
+                                    + s
+                                    + " : "
+                                    + o.getClass()
+                                    + " to (cached) "
+                                    + t
+                                    + " : "
+                                    + t.getClass());
                 }
             }
             return t;
-        }
-        else if (o instanceof Internable) {
+        } else if (o instanceof Internable) {
             if (Report.should_report(Report.serialize, 2)) {
                 Report.report(2, "- Interning " + s + " : " + o.getClass());
             }
             return ((Internable) o).intern();
-        }
-        else {
+        } else {
             if (Report.should_report(Report.serialize, 2)) {
                 Report.report(2, "- " + s + " : " + o.getClass());
             }

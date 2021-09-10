@@ -65,14 +65,12 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
      * @param name The name to search for.
      */
     @Override
-    public Named find(String name, ClassType accessor)
-            throws SemanticException {
+    public Named find(String name, ClassType accessor) throws SemanticException {
         if (Report.should_report(TOPICS, 2))
             Report.report(2, "Looking for " + name + " in " + this);
 
         if (!StringUtil.isNameShort(name)) {
-            throw new InternalCompilerError("Cannot lookup qualified name "
-                    + name);
+            throw new InternalCompilerError("Cannot lookup qualified name " + name);
         }
 
         LinkedList<ClassType> typeQueue = new LinkedList<>();
@@ -111,8 +109,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                 if (useLoadedResolver) {
                     try {
                         m = ts.systemResolver().find(rawName);
-                    }
-                    catch (SemanticException e) {
+                    } catch (SemanticException e) {
                         // Not found; will fall through to error handling code
                     }
                 }
@@ -122,15 +119,22 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                 MemberInstance mi = (MemberInstance) m;
                 if (!ts.isMember(mi, this.type)) {
                     if (error == null)
-                        error = new SemanticException("Member class " + m
-                                + " is not visible in class " + this.type);
-                }
-                else if (!canAccess(mi, accessor)) {
+                        error =
+                                new SemanticException(
+                                        "Member class "
+                                                + m
+                                                + " is not visible in class "
+                                                + this.type);
+                } else if (!canAccess(mi, accessor)) {
                     if (error == null)
-                        error = new SemanticException("Cannot access member type \""
-                                + m + "\" from class " + accessor + ".");
-                }
-                else acceptable.add(mi);
+                        error =
+                                new SemanticException(
+                                        "Cannot access member type \""
+                                                + m
+                                                + "\" from class "
+                                                + accessor
+                                                + ".");
+                } else acceptable.add(mi);
                 continue;
             }
 
@@ -152,8 +156,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
 
         if (acceptable.size() == 0) {
             throw error == null ? new NoClassException(name, type) : error;
-        }
-        else if (acceptable.size() > 1) {
+        } else if (acceptable.size() > 1) {
             Set<ReferenceType> containers = new HashSet<>(acceptable.size());
             for (MemberInstance mi : acceptable) {
                 containers.add(mi.container());
@@ -163,20 +166,30 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                 Iterator<ReferenceType> i = containers.iterator();
                 Type t1 = i.next();
                 Type t2 = i.next();
-                throw new SemanticException("Member \"" + name + "\" of " + type
-                        + " is ambiguous; it is defined in both " + t1 + " and "
-                        + t2 + ".");
-            }
-            else {
-                throw new SemanticException("Member \"" + name + "\" of " + type
-                        + " is ambiguous; it is defined in " + containers
-                        + ".");
+                throw new SemanticException(
+                        "Member \""
+                                + name
+                                + "\" of "
+                                + type
+                                + " is ambiguous; it is defined in both "
+                                + t1
+                                + " and "
+                                + t2
+                                + ".");
+            } else {
+                throw new SemanticException(
+                        "Member \""
+                                + name
+                                + "\" of "
+                                + type
+                                + " is ambiguous; it is defined in "
+                                + containers
+                                + ".");
             }
         }
         MemberInstance mi = acceptable.iterator().next();
 
-        if (Report.should_report(TOPICS, 2))
-            Report.report(2, "Found member class " + mi);
+        if (Report.should_report(TOPICS, 2)) Report.report(2, "Found member class " + mi);
 
         return (Named) mi;
     }
@@ -194,5 +207,4 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
 
     private static final Collection<String> TOPICS =
             CollectionUtil.list(Report.types, Report.resolver);
-
 }

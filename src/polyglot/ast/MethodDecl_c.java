@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -66,47 +66,56 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+    public MethodDecl_c(
+            Position pos,
+            Flags flags,
+            TypeNode returnType,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body) {
         this(pos, flags, returnType, name, formals, throwTypes, body, null, null);
     }
 
-//    @Deprecated
-    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes,
-            Block body, Javadoc javadoc) {
-        this(pos,
-             flags,
-             returnType,
-             name,
-             formals,
-             throwTypes,
-             body,
-             javadoc,
-             null);
+    //    @Deprecated
+    public MethodDecl_c(
+            Position pos,
+            Flags flags,
+            TypeNode returnType,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
+            Javadoc javadoc) {
+        this(pos, flags, returnType, name, formals, throwTypes, body, javadoc, null);
     }
 
     /**
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes,
-            Block body, Ext ext) {
-        this(pos,
-             flags,
-             returnType,
-             name,
-             formals,
-             throwTypes,
-             body,
-             null,
-             ext);
+    public MethodDecl_c(
+            Position pos,
+            Flags flags,
+            TypeNode returnType,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
+            Ext ext) {
+        this(pos, flags, returnType, name, formals, throwTypes, body, null, ext);
     }
 
-    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes,
-            Block body, Javadoc javadoc, Ext ext) {
+    public MethodDecl_c(
+            Position pos,
+            Flags flags,
+            TypeNode returnType,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
+            Javadoc javadoc,
+            Ext ext) {
         super(pos, flags, name, formals, throwTypes, body, javadoc, ext);
         assert (returnType != null);
         this.returnType = returnType;
@@ -162,8 +171,13 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     }
 
     /** Reconstruct the method. */
-    protected <N extends MethodDecl_c> N reconstruct(N n, TypeNode returnType,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+    protected <N extends MethodDecl_c> N reconstruct(
+            N n,
+            TypeNode returnType,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body) {
         n = super.reconstruct(n, name, formals, throwTypes, body);
         n = returnType(n, returnType);
         return n;
@@ -206,13 +220,14 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
         }
 
         MethodInstance mi =
-                ts.methodInstance(position(),
-                                  ct,
-                                  f,
-                                  ts.unknownType(position()),
-                                  name.id(),
-                                  formalTypes,
-                                  throwTypes);
+                ts.methodInstance(
+                        position(),
+                        ct,
+                        f,
+                        ts.unknownType(position()),
+                        name.id(),
+                        formalTypes,
+                        throwTypes);
         ct.addMethod(mi);
         return methodInstance(mi);
     }
@@ -228,8 +243,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
     @Override
     public Context enterScope(Context c) {
-        if (Report.should_report(TOPICS, 5))
-            Report.report(5, "enter scope of method " + name);
+        if (Report.should_report(TOPICS, 5)) Report.report(5, "enter scope of method " + name);
         c = c.pushCode(mi);
         return c;
     }
@@ -244,15 +258,13 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
         if (tc.context().currentClass().flags().isInterface()) {
             if (flags.isProtected() || flags.isPrivate()) {
-                throw new SemanticException("Interface methods must be public.",
-                                            position());
+                throw new SemanticException("Interface methods must be public.", position());
             }
         }
 
         try {
             ts.checkMethodFlags(flags);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), position());
         }
 
@@ -261,24 +273,21 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
         }
 
         if (body != null && (flags.isAbstract() || flags.isNative())) {
-            throw new SemanticException("An abstract method cannot have a body.",
-                                        position());
+            throw new SemanticException("An abstract method cannot have a body.", position());
         }
 
         if (body != null && flags.isNative()) {
-            throw new SemanticException("A native method cannot have a body.",
-                                        position());
+            throw new SemanticException("A native method cannot have a body.", position());
         }
 
         // check that all the thrown types are subtypes of Throwable
         throwsCheck(tc);
 
         // check that inner classes do not declare static methods
-        if (flags.isStatic()
-                && methodInstance().container().toClass().isInnerClass()) {
+        if (flags.isStatic() && methodInstance().container().toClass().isInnerClass()) {
             // it's a static method in an inner class.
-            throw new SemanticException("Inner classes cannot declare "
-                    + "static methods.", this.position());
+            throw new SemanticException(
+                    "Inner classes cannot declare " + "static methods.", this.position());
         }
 
         overrideMethodCheck(tc);
@@ -291,11 +300,9 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
         for (TypeNode tn : throwTypes()) {
             Type t = tn.type();
             if (!t.isThrowable()) {
-                throw new SemanticException("Type \""
-                                                    + t
-                                                    + "\" is not a subclass of \""
-                                                    + ts.Throwable() + "\".",
-                                            tn.position());
+                throw new SemanticException(
+                        "Type \"" + t + "\" is not a subclass of \"" + ts.Throwable() + "\".",
+                        tn.position());
             }
         }
     }
@@ -303,8 +310,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     public void overrideMethodCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        for (MethodInstance mj : mi.implemented())
-            ts.checkOverride(mi, mj);
+        for (MethodInstance mj : mi.implemented()) ts.checkOverride(mi, mj);
     }
 
     @Override
@@ -330,7 +336,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
         w.allowBreak(2, 2, "", 0);
         w.begin(0);
 
-        for (Iterator<Formal> i = formals.iterator(); i.hasNext();) {
+        for (Iterator<Formal> i = formals.iterator(); i.hasNext(); ) {
             Formal f = i.next();
             print(f, w, tr);
 
@@ -347,7 +353,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
             w.allowBreak(6);
             w.write("throws ");
 
-            for (Iterator<TypeNode> i = throwTypes().iterator(); i.hasNext();) {
+            for (Iterator<TypeNode> i = throwTypes().iterator(); i.hasNext(); ) {
                 TypeNode tn = i.next();
                 print(tn, w, tr);
 
@@ -382,8 +388,7 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
         if (body() == null) {
             v.visitCFG(returnType(), this, EXIT);
-        }
-        else {
+        } else {
             v.visitCFG(returnType(), body(), ENTRY);
             v.visitCFG(body(), this, EXIT);
         }
@@ -396,14 +401,14 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.MethodDecl(this.position,
-                             this.flags,
-                             this.returnType,
-                             this.name,
-                             this.formals,
-                             this.throwTypes,
-                             this.body,
-                             javadoc);
+        return nf.MethodDecl(
+                this.position,
+                this.flags,
+                this.returnType,
+                this.name,
+                this.formals,
+                this.throwTypes,
+                this.body,
+                javadoc);
     }
-
 }

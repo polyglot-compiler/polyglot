@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -56,8 +56,7 @@ public class Position implements Serializable {
 
     public static final int UNKNOWN = -1;
     public static final int END_UNUSED = -2;
-    public static final Position COMPILER_GENERATED =
-            new Position("Compiler Generated", true);
+    public static final Position COMPILER_GENERATED = new Position("Compiler Generated", true);
 
     public static final int THIS_METHOD = 1;
     public static final int CALLER = THIS_METHOD + 1;
@@ -67,16 +66,14 @@ public class Position implements Serializable {
      * depth.  Depth 1 is the caller.  Depth 2 is the caller's caller, etc.
      */
     public static Position compilerGenerated(int depth) {
-        if (!Options.global.precise_compiler_generated_positions)
-            return COMPILER_GENERATED;
+        if (!Options.global.precise_compiler_generated_positions) return COMPILER_GENERATED;
         StackTraceElement[] stack = new Exception().getStackTrace();
         if (depth < stack.length) {
-            return new Position(stack[depth].getFileName()
-                                        + " (compiler generated)",
-                                stack[depth].getLineNumber(),
-                                true);
-        }
-        else {
+            return new Position(
+                    stack[depth].getFileName() + " (compiler generated)",
+                    stack[depth].getLineNumber(),
+                    true);
+        } else {
             return COMPILER_GENERATED;
         }
     }
@@ -130,13 +127,19 @@ public class Position implements Serializable {
         this(path, file, line, column, END_UNUSED, END_UNUSED);
     }
 
-    public Position(String path, String file, int line, int column,
-            int endLine, int endColumn) {
+    public Position(String path, String file, int line, int column, int endLine, int endColumn) {
         this(path, file, line, column, endLine, endColumn, 0, 0);
     }
 
-    public Position(String path, String file, int line, int column,
-            int endLine, int endColumn, int offset, int endOffset) {
+    public Position(
+            String path,
+            String file,
+            int line,
+            int column,
+            int endLine,
+            int endColumn,
+            int offset,
+            int endOffset) {
         this.file = file;
         this.path = path;
         this.line = line;
@@ -148,10 +151,15 @@ public class Position implements Serializable {
     }
 
     public Position(Position start, Position end) {
-        this(start.path(), start.file(), start.line, start.column, end == null
-                ? start.endLine : end.endLine, end == null
-                ? start.endColumn : end.endColumn, start.offset, end == null
-                ? start.endOffset : end.endOffset);
+        this(
+                start.path(),
+                start.file(),
+                start.line,
+                start.column,
+                end == null ? start.endLine : end.endLine,
+                end == null ? start.endColumn : end.endColumn,
+                start.offset,
+                end == null ? start.endOffset : end.endOffset);
     }
 
     public Position truncateEnd(int len) {
@@ -161,18 +169,14 @@ public class Position implements Serializable {
         int el = endLine;
         int ec = endColumn;
 
-        if (eo >= offset + len)
-            eo -= len;
+        if (eo >= offset + len) eo -= len;
         else eo = offset;
 
         if (line == el) {
-            if (ec >= column + len)
-                ec -= len;
+            if (ec >= column + len) ec -= len;
             else ec = column;
-        }
-        else {
-            if (ec >= len)
-                ec -= len;
+        } else {
+            if (ec >= len) ec -= len;
             else {
                 el = line;
                 ec = column;
@@ -184,26 +188,13 @@ public class Position implements Serializable {
 
     public Position startOf() {
         if (this == COMPILER_GENERATED) return this;
-        return new Position(path,
-                            file,
-                            line,
-                            column,
-                            line,
-                            column,
-                            offset,
-                            offset);
+        return new Position(path, file, line, column, line, column, offset, offset);
     }
 
     public Position endOf() {
         if (this == COMPILER_GENERATED) return this;
-        return new Position(path,
-                            file,
-                            endLine,
-                            endColumn,
-                            endLine,
-                            endColumn,
-                            endOffset,
-                            endOffset);
+        return new Position(
+                path, file, endLine, endColumn, endLine, endColumn, endOffset, endOffset);
     }
 
     public int line() {
@@ -291,12 +282,10 @@ public class Position implements Serializable {
 
             if (column != UNKNOWN) {
                 s += "," + column;
-                if (line == endLine && endColumn != UNKNOWN
-                        && endColumn != END_UNUSED) {
+                if (line == endLine && endColumn != UNKNOWN && endColumn != END_UNUSED) {
                     s += "-" + endColumn;
                 }
-                if (line != endLine && endColumn != UNKNOWN
-                        && endColumn != END_UNUSED) {
+                if (line != endLine && endColumn != UNKNOWN && endColumn != END_UNUSED) {
                     s += "-" + endLine + "," + endColumn;
                 }
             }
@@ -319,11 +308,9 @@ public class Position implements Serializable {
 
         if (pos1.compilerGenerated || pos2.compilerGenerated) return false;
 
-        if (pos1.file == null || pos2.file == null
-                || !pos1.file.equals(pos2.file)) return false;
+        if (pos1.file == null || pos2.file == null || !pos1.file.equals(pos2.file)) return false;
 
-        if (pos1.path == null || pos2.path == null
-                || !pos1.path.equals(pos2.path)) return false;
+        if (pos1.path == null || pos2.path == null || !pos1.path.equals(pos2.path)) return false;
 
         if (pos1.line == UNKNOWN || pos2.line == UNKNOWN) return false;
 
@@ -331,8 +318,7 @@ public class Position implements Serializable {
 
         if (pos1.endLine == UNKNOWN || pos2.endLine == UNKNOWN) return false;
 
-        if (pos1.endColumn == UNKNOWN || pos2.endColumn == UNKNOWN)
-            return false;
+        if (pos1.endColumn == UNKNOWN || pos2.endColumn == UNKNOWN) return false;
 
         return true;
     }
@@ -360,8 +346,7 @@ public class Position implements Serializable {
 
         if (pos1.endLine > pos2.endLine) return pos1;
 
-        if (pos1.endLine == pos2.endLine && pos1.endColumn >= pos2.endColumn)
-            return pos1;
+        if (pos1.endLine == pos2.endLine && pos1.endColumn >= pos2.endColumn) return pos1;
 
         return pos2;
     }

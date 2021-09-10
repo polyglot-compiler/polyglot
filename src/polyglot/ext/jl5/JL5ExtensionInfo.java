@@ -66,7 +66,7 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
     @Override
     public String[] defaultFileExtensions() {
         String ext = defaultFileExtension();
-        return new String[] { ext, "java" };
+        return new String[] {ext, "java"};
     }
 
     @Override
@@ -95,8 +95,7 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
     }
 
     @Override
-    public ClassFile createClassFile(FileObject classFileSource, byte[] code)
-            throws IOException {
+    public ClassFile createClassFile(FileObject classFileSource, byte[] code) throws IOException {
         return new JL5ClassFile(classFileSource, code, this);
     }
 
@@ -116,7 +115,7 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
 
     @Override
     public Set<String> keywords() {
-	return new Lexer_c(null).keywords();
+        return new Lexer_c(null).keywords();
     }
 
     @Override
@@ -124,8 +123,7 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
         if (outputExtensionInfo == null) {
             if (((JL5Options) getOptions()).leaveCovariantReturns) {
                 outputExtensionInfo = new CovarRetOutputExtensionInfo(this);
-            }
-            else {
+            } else {
                 outputExtensionInfo = new JLOutputExtensionInfo(this);
             }
         }
@@ -136,5 +134,4 @@ public class JL5ExtensionInfo extends JLExtensionInfo {
     public Version version() {
         return new JL5Version();
     }
-
 }

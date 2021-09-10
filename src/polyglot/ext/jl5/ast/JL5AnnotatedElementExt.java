@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -43,8 +43,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
-        AnnotatedElement {
+public abstract class JL5AnnotatedElementExt extends JL5TermExt implements AnnotatedElement {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<AnnotationElem> annotations;
@@ -63,8 +62,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
         return annotationElems(node(), annotations);
     }
 
-    protected <N extends Node> N annotationElems(N n,
-            List<AnnotationElem> annotations) {
+    protected <N extends Node> N annotationElems(N n, List<AnnotationElem> annotations) {
         JL5AnnotatedElementExt ext = (JL5AnnotatedElementExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.annotations, annotations)) return n;
         if (n == node) {
@@ -103,8 +101,7 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
     }
 
     @Override
-    public Node annotationCheck(AnnotationChecker annoCheck)
-            throws SemanticException {
+    public Node annotationCheck(AnnotationChecker annoCheck) throws SemanticException {
         Node n = this.node();
         for (AnnotationElem elem : annotations) {
             annoCheck.checkAnnotationApplicability(elem, this.declaration());
@@ -119,5 +116,4 @@ public abstract class JL5AnnotatedElementExt extends JL5TermExt implements
 
     @Override
     public abstract void setAnnotations(Annotations annotations);
-
 }

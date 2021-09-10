@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * Method represents a method in a Java classfile.  A method's name and
  * value (the types of its parameters and its return type) are modeled
- * as indices into it class's constant pool.  A method has modifiers 
+ * as indices into it class's constant pool.  A method has modifiers
  * that determine whether it is public, private, static, final, etc.
  * Methods have a number of attributes such as their Code and any
  * Exceptions they may throw.
@@ -101,7 +101,7 @@ public class Method {
                 }
             }
 
-            //if (0 != (modifiers & ACC_SYNTHETIC)) synthetic = true;
+            // if (0 != (modifiers & ACC_SYNTHETIC)) synthetic = true;
 
             if (attrs[i] == null) {
                 long n = in.skip(length);
@@ -110,7 +110,8 @@ public class Method {
                 }
             }
         }
-        this.in = null; // RMF 7/23/2008 - Don't need the input stream any more, so don't hang onto it
+        this.in =
+                null; // RMF 7/23/2008 - Don't need the input stream any more, so don't hang onto it
     }
 
     public boolean isSynthetic() {

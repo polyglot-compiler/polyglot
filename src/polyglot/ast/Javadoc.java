@@ -30,6 +30,4 @@ package polyglot.ast;
  * Javadoc is an AST node and represents a Javadoc comment.
  * A Javadoc comment can be associated with declarations of classes, interfaces, constructors, methods and fields.
  */
-public interface Javadoc extends Comment {
-
-}
+public interface Javadoc extends Comment {}

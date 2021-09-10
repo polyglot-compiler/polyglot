@@ -12,10 +12,13 @@ public interface TestFactory {
 
     Lexer Lexer(Reader scriptFileReader);
 
-    SourceFileTestCollection SourceFileTestCollection(String testCommand,
-            String name, String testDir, String args,
+    SourceFileTestCollection SourceFileTestCollection(
+            String testCommand,
+            String name,
+            String testDir,
+            String args,
             List<SourceFileTest> tests);
 
-    SourceFileTest SourceFileTest(List<List<String>> compilationUnits,
-            List<ExpectedFailure> expectedFailures);
+    SourceFileTest SourceFileTest(
+            List<List<String>> compilationUnits, List<ExpectedFailure> expectedFailures);
 }

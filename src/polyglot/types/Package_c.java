@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -45,8 +45,7 @@ public class Package_c extends TypeObject_c implements Package {
     protected String fullname = null;
 
     /** Used for deserializing types. */
-    protected Package_c() {
-    }
+    protected Package_c() {}
 
     public Package_c(TypeSystem ts) {
         this(ts, null, null);
@@ -68,8 +67,7 @@ public class Package_c extends TypeObject_c implements Package {
     @Override
     public Resolver resolver() {
         if (memberCache == null) {
-            memberCache =
-                    new CachingResolver(ts.createPackageContextResolver(this));
+            memberCache = new CachingResolver(ts.createPackageContextResolver(this));
         }
         return memberCache;
     }
@@ -98,8 +96,7 @@ public class Package_c extends TypeObject_c implements Package {
         if (o instanceof Package) {
             Package p = (Package) o;
             if (name.equals(p.name())) {
-                if (prefix == null)
-                    return p.prefix() == null;
+                if (prefix == null) return p.prefix() == null;
                 else return ts.equals(prefix, p.prefix());
             }
         }
@@ -114,8 +111,7 @@ public class Package_c extends TypeObject_c implements Package {
     @Override
     public boolean packageEqualsImpl(Package p) {
         if (name.equals(p.name())) {
-            if (prefix == null)
-                return p.prefix() == null;
+            if (prefix == null) return p.prefix() == null;
             else return ts.packageEquals(prefix, p.prefix());
         }
         return false;
@@ -163,8 +159,7 @@ public class Package_c extends TypeObject_c implements Package {
     @Override
     public String fullName() {
         if (fullname == null) {
-            fullname =
-                    prefix() == null ? name : prefix().fullName() + "." + name;
+            fullname = prefix() == null ? name : prefix().fullName() + "." + name;
         }
         return fullname;
     }

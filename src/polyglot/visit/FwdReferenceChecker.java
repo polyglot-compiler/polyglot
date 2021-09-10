@@ -67,32 +67,27 @@ public class FwdReferenceChecker extends ContextVisitor {
             frc.inInitialization = true;
             frc.inStaticInit = fd.flags().isStatic();
             return frc;
-        }
-        else if (n instanceof EnumConstantDecl) {
+        } else if (n instanceof EnumConstantDecl) {
             EnumConstantDecl ec = (EnumConstantDecl) n;
             declaredFields.add(ec.enumInstance());
             return this;
-        }
-        else if (n instanceof Initializer) {
+        } else if (n instanceof Initializer) {
             FwdReferenceChecker frc = (FwdReferenceChecker) copy();
             frc.inInitialization = true;
             frc.inStaticInit = ((Initializer) n).flags().isStatic();
             return frc;
-        }
-        else if (n instanceof FieldAssign) {
+        } else if (n instanceof FieldAssign) {
             FieldAssign fa = (FieldAssign) n;
             if (fa.operator() != Assign.ASSIGN) return this;
             FwdReferenceChecker frc = (FwdReferenceChecker) copy();
             frc.fieldAssignLHS = ((FieldAssign) n).left();
             return frc;
-        }
-        else if (n instanceof Field) {
+        } else if (n instanceof Field) {
             if (fieldAssignLHS == n) {
                 // the field is on the left hand side of an assignment.
                 // we can ignore it
                 fieldAssignLHS = null;
-            }
-            else if (inInitialization) {
+            } else if (inInitialization) {
                 // we need to check if this is an illegal fwd reference.
                 Field f = (Field) n;
 
@@ -106,12 +101,10 @@ public class FwdReferenceChecker extends ContextVisitor {
                 // then all is ok
 
                 if (inStaticInit == f.fieldInstance().flags().isStatic()
-                        && context().currentClass()
-                                    .equals(f.fieldInstance().container())
+                        && context().currentClass().equals(f.fieldInstance().container())
                         && !declaredFields.contains(f.fieldInstance().orig())
                         && f.isTargetImplicit()) {
-                    throw new SemanticException("Illegal forward reference",
-                                                f.position());
+                    throw new SemanticException("Illegal forward reference", f.position());
                 }
             }
         }

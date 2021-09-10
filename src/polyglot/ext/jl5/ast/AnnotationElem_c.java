@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -64,8 +64,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
     protected TypeNode typeName;
     protected List<ElementValuePair> elements;
 
-    public AnnotationElem_c(Position pos, TypeNode typeName,
-            List<ElementValuePair> elements) {
+    public AnnotationElem_c(Position pos, TypeNode typeName, List<ElementValuePair> elements) {
         super(pos);
         this.typeName = typeName;
         this.elements = ListUtil.copy(elements, true);
@@ -97,8 +96,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
         return this.elements;
     }
 
-    protected <N extends AnnotationElem_c> N elements(N n,
-            List<ElementValuePair> elements) {
+    protected <N extends AnnotationElem_c> N elements(N n, List<ElementValuePair> elements) {
         AnnotationElem_c ext = n;
         if (CollectionUtil.equals(ext.elements, elements)) return n;
         if (n == this) {
@@ -109,8 +107,8 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
         return n;
     }
 
-    protected <N extends AnnotationElem_c> N reconstruct(N n,
-            TypeNode typeName, List<ElementValuePair> elements) {
+    protected <N extends AnnotationElem_c> N reconstruct(
+            N n, TypeNode typeName, List<ElementValuePair> elements) {
         n = typeName(n, typeName);
         n = elements(n, elements);
         return n;
@@ -129,9 +127,8 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
         // only make annotation elements out of annotation types
         if (!typeName.type().isClass()
                 || !JL5Flags.isAnnotation(typeName.type().toClass().flags())) {
-            throw new SemanticException("Annotation: " + typeName
-                    + " must be an annotation type, ", n.position());
-
+            throw new SemanticException(
+                    "Annotation: " + typeName + " must be an annotation type, ", n.position());
         }
         return n;
     }
@@ -150,10 +147,9 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
         if (this.isSingleElementAnnotation()) {
             ElementValuePair p = elements().get(0);
             print(p.value(), w, pp);
-        }
-        else {
+        } else {
 
-            for (Iterator<ElementValuePair> it = elements().iterator(); it.hasNext();) {
+            for (Iterator<ElementValuePair> it = elements().iterator(); it.hasNext(); ) {
                 print(it.next(), w, pp);
                 if (it.hasNext()) {
                     w.write(", ");
@@ -189,8 +185,7 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
 
     @Override
     public boolean isSingleElementAnnotation() {
-        return elements().size() == 1
-                && elements().get(0).name().equals("value");
+        return elements().size() == 1 && elements().get(0).name().equals("value");
     }
 
     @Override
@@ -201,21 +196,22 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             List<? extends MethodInstance> methods =
                     this.typeName().type().toClass().methodsNamed(p.name());
             if (methods.size() != 1) {
-                throw new InternalCompilerError("Annotation has more than one method named \""
-                        + p.name() + "\": " + methods);
+                throw new InternalCompilerError(
+                        "Annotation has more than one method named \""
+                                + p.name()
+                                + "\": "
+                                + methods);
             }
             MethodInstance mi = methods.get(0);
             Type intendedType = mi.returnType();
 
-            AnnotationElementValue v =
-                    toAnnotationElementValue(lang, p.value(), intendedType, ts);
+            AnnotationElementValue v = toAnnotationElementValue(lang, p.value(), intendedType, ts);
 
-            if (intendedType.isArray()
-                    && !(v instanceof AnnotationElementValueArray)) {
+            if (intendedType.isArray() && !(v instanceof AnnotationElementValueArray)) {
                 // it's actually meant to be an array type, but a singleton was entered
                 v =
-                        ts.AnnotationElementValueArray(p.value().position(),
-                                                       Collections.singletonList(v));
+                        ts.AnnotationElementValueArray(
+                                p.value().position(), Collections.singletonList(v));
             }
 
             m.put(p.name(), v);
@@ -223,22 +219,20 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
         return m;
     }
 
-    private AnnotationElementValue toAnnotationElementValue(Lang lang,
-            Term value, Type intendedType, JL5TypeSystem ts)
-            throws SemanticException {
+    private AnnotationElementValue toAnnotationElementValue(
+            Lang lang, Term value, Type intendedType, JL5TypeSystem ts) throws SemanticException {
         Type intendedBaseType;
         if (intendedType.isArray()) {
             intendedBaseType = intendedType.toArray().base();
-        }
-        else {
+        } else {
             intendedBaseType = intendedType;
         }
 
         if (value instanceof ElementValueArrayInit) {
             if (!intendedType.isArray()) {
-                throw new SemanticException("Array given when expected type is "
-                                                    + intendedType.toString(),
-                                            value.position());
+                throw new SemanticException(
+                        "Array given when expected type is " + intendedType.toString(),
+                        value.position());
             }
             ElementValueArrayInit init = (ElementValueArrayInit) value;
             List<AnnotationElementValue> vals = new ArrayList<>();
@@ -251,20 +245,17 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             AnnotationElem ae = (AnnotationElem) value;
             Type aeType = ae.typeName().type();
             // Check against intended type.
-            if (aeType.isCanonical()
-                    && !ts.isImplicitCastValid(aeType, intendedBaseType)) {
-                throw new SemanticException("Expected a value of type "
-                        + intendedBaseType, value.position());
+            if (aeType.isCanonical() && !ts.isImplicitCastValid(aeType, intendedBaseType)) {
+                throw new SemanticException(
+                        "Expected a value of type " + intendedBaseType, value.position());
             }
-            return ts.AnnotationElementValueAnnotation(value.position(),
-                                                       aeType,
-                                                       ae.toAnnotationElementValues(lang,
-                                                                                    ts));
+            return ts.AnnotationElementValueAnnotation(
+                    value.position(), aeType, ae.toAnnotationElementValues(lang, ts));
         }
         // Otherwise, it should be a constant value.
         if (!(value instanceof Expr)) {
-            throw new InternalCompilerError("Unexpected node: " + value + " : "
-                    + value.getClass(), value.position());
+            throw new InternalCompilerError(
+                    "Unexpected node: " + value + " : " + value.getClass(), value.position());
         }
         Expr ev = (Expr) value;
         ts.checkAnnotationValueConstant(ev);
@@ -273,15 +264,12 @@ public class AnnotationElem_c extends Term_c implements AnnotationElem {
             constVal = ((ClassLit) value).typeNode().type();
         }
         // Check against intended type
-        if (ev.type().isCanonical()
-                && !ts.isImplicitCastValid(ev.type(), intendedBaseType)) {
-            throw new SemanticException("Expected a value of type "
-                    + intendedBaseType, value.position());
+        if (ev.type().isCanonical() && !ts.isImplicitCastValid(ev.type(), intendedBaseType)) {
+            throw new SemanticException(
+                    "Expected a value of type " + intendedBaseType, value.position());
         }
         AnnotationElementValue c =
-                ts.AnnotationElementValueConstant(value.position(),
-                                                  intendedBaseType,
-                                                  constVal);
+                ts.AnnotationElementValueConstant(value.position(), intendedBaseType, constVal);
 
         return c;
     }

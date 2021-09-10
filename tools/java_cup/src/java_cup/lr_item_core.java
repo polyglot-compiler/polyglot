@@ -17,8 +17,7 @@ package java_cup;
  * @see     java_cup.lalr_state
  * @version last updated: 11/25/95
  * @author  Scott Hudson
-*/
-
+ */
 public class lr_item_core {
 
     /*-----------------------------------------------------------*/
@@ -48,8 +47,7 @@ public class lr_item_core {
         /* cache the symbol after the dot */
         if (_dot_pos < _the_production.rhs_length()) {
             part = _the_production.rhs(_dot_pos);
-            if (!part.is_action())
-                _symbol_after_dot = ((symbol_part) part).the_symbol();
+            if (!part.is_action()) _symbol_after_dot = ((symbol_part) part).the_symbol();
         }
     }
 
@@ -129,8 +127,7 @@ public class lr_item_core {
         sym = symbol_after_dot();
 
         /* if it exists and is a non terminal, return it */
-        if (sym != null && sym.is_non_term())
-            return (non_terminal) sym;
+        if (sym != null && sym.is_non_term()) return (non_terminal) sym;
         else return null;
     }
 
@@ -140,8 +137,7 @@ public class lr_item_core {
      *  position to the right.
      */
     public lr_item_core shift_core() throws internal_error {
-        if (dot_at_end())
-            throw new internal_error("Attempt to shift past end of an lr_item_core");
+        if (dot_at_end()) throw new internal_error("Attempt to shift past end of an lr_item_core");
 
         return new lr_item_core(_the_production, _dot_pos + 1);
     }
@@ -152,7 +148,8 @@ public class lr_item_core {
      *  need separate access in a super class.
      */
     public boolean core_equals(lr_item_core other) {
-        return other != null && _the_production.equals(other._the_production)
+        return other != null
+                && _the_production.equals(other._the_production)
                 && _dot_pos == other._dot_pos;
     }
 
@@ -168,8 +165,7 @@ public class lr_item_core {
     /** Generic equality comparison. */
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof lr_item_core))
-            return false;
+        if (!(other instanceof lr_item_core)) return false;
         else return equals((lr_item_core) other);
     }
 
@@ -222,13 +218,10 @@ public class lr_item_core {
             /* print the name of the part */
             if (_the_production.rhs(i) == null) {
                 result += "$$NULL$$";
-            }
-            else {
+            } else {
                 part = _the_production.rhs(i);
-                if (part == null)
-                    result += "$$NULL$$";
-                else if (part.is_action())
-                    result += "{ACTION}";
+                if (part == null) result += "$$NULL$$";
+                else if (part.is_action()) result += "{ACTION}";
                 else if (((symbol_part) part).the_symbol() != null
                         && ((symbol_part) part).the_symbol().name() != null)
                     result += ((symbol_part) part).the_symbol().name();
@@ -250,8 +243,7 @@ public class lr_item_core {
         /* can't throw here since super class doesn't, so we crash instead */
         try {
             return to_simple_string();
-        }
-        catch (internal_error e) {
+        } catch (internal_error e) {
             e.crash();
             return null;
         }

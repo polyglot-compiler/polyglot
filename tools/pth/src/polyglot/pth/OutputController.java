@@ -49,30 +49,24 @@ public abstract class OutputController {
         Calendar now = Calendar.getInstance();
 
         today.clear();
-        today.set(now.get(Calendar.YEAR),
-                  now.get(Calendar.MONTH),
-                  now.get(Calendar.DATE));
+        today.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DATE));
         week.setTimeInMillis(today.getTimeInMillis());
         week.add(Calendar.DATE, -6);
     }
 
     public void startTest(Test t) {
-        if (t instanceof ScriptTestSuite)
-            startScriptTestSuite((ScriptTestSuite) t);
+        if (t instanceof ScriptTestSuite) startScriptTestSuite((ScriptTestSuite) t);
         else if (t instanceof SourceFileTestCollection)
             startSourceFileTestCollection((SourceFileTestCollection) t);
-        else if (t instanceof SourceFileTest)
-            startSourceFileTest((SourceFileTest) t);
+        else if (t instanceof SourceFileTest) startSourceFileTest((SourceFileTest) t);
         else if (t instanceof BuildTest) startBuildTest((BuildTest) t);
     }
 
     public void finishTest(Test t) {
-        if (t instanceof ScriptTestSuite)
-            finishScriptTestSuite((ScriptTestSuite) t);
+        if (t instanceof ScriptTestSuite) finishScriptTestSuite((ScriptTestSuite) t);
         else if (t instanceof SourceFileTestCollection)
             finishSourceFileTestCollection((SourceFileTestCollection) t);
-        else if (t instanceof SourceFileTest)
-            finishSourceFileTest((SourceFileTest) t);
+        else if (t instanceof SourceFileTest) finishSourceFileTest((SourceFileTest) t);
         else if (t instanceof BuildTest) finishBuildTest((BuildTest) t);
     }
 
@@ -109,19 +103,16 @@ public abstract class OutputController {
     }
 
     protected void printIndent() {
-        for (int i = 0; i < indent; i++)
-            out.print(' ');
+        for (int i = 0; i < indent; i++) out.print(' ');
     }
 
     protected abstract void startScriptTestSuite(ScriptTestSuite sts);
 
     protected abstract void finishScriptTestSuite(ScriptTestSuite sts);
 
-    protected abstract void startSourceFileTestCollection(
-            SourceFileTestCollection sftc);
+    protected abstract void startSourceFileTestCollection(SourceFileTestCollection sftc);
 
-    protected abstract void finishSourceFileTestCollection(
-            SourceFileTestCollection sftc);
+    protected abstract void finishSourceFileTestCollection(SourceFileTestCollection sftc);
 
     protected abstract void startSourceFileTest(SourceFileTest sft);
 
@@ -135,8 +126,8 @@ public abstract class OutputController {
 
     public abstract void printTestSuiteHeader(TestSuiteResult tsr);
 
-    public abstract void printTestSuiteFooter(int total, int grandTotal,
-            int lastSuccess, int neverRun, int neverSuccess);
+    public abstract void printTestSuiteFooter(
+            int total, int grandTotal, int lastSuccess, int neverRun, int neverSuccess);
 
     public abstract void displayTestResults(TestResult tr, String testName);
 
@@ -163,12 +154,9 @@ public abstract class OutputController {
         Calendar dt = Calendar.getInstance();
         dt.setTime(d);
 
-        if (dt.after(today))
-            df = getTodayDateFormat();
-        else if (dt.after(week))
-            df = getSameWeekDateFormat();
-        else if (dt.get(Calendar.YEAR) == today.get(Calendar.YEAR))
-            df = getSameYearDateFormat();
+        if (dt.after(today)) df = getTodayDateFormat();
+        else if (dt.after(week)) df = getSameWeekDateFormat();
+        else if (dt.get(Calendar.YEAR) == today.get(Calendar.YEAR)) df = getSameYearDateFormat();
         else df = getDefaultDateFormat();
 
         return df.format(d);

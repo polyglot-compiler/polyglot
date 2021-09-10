@@ -23,8 +23,8 @@ public class PolyglotSourceFileTest extends SourceFileTest {
 
     protected final SilentErrorQueue eq;
 
-    public PolyglotSourceFileTest(List<List<String>> compilationUnits,
-            List<ExpectedFailure> expectedFailures) {
+    public PolyglotSourceFileTest(
+            List<List<String>> compilationUnits, List<ExpectedFailure> expectedFailures) {
         super(compilationUnits, expectedFailures);
         eq = new SilentErrorQueue(100, getName());
     }
@@ -44,35 +44,33 @@ public class PolyglotSourceFileTest extends SourceFileTest {
     }
 
     @Override
-    public int invokeCompiler(String compilerDirname, List<String> cmdLineHdr,
-            List<String> sourceFileNames) {
+    public int invokeCompiler(
+            String compilerDirname, List<String> cmdLineHdr, List<String> sourceFileNames) {
         PolyglotTestDriver td = getTestDriver();
         try {
             List<String> cmdLine = new LinkedList<>(cmdLineHdr);
             cmdLine.addAll(sourceFileNames);
 
             // TODO
-//            if (addDestDirToCmdLine) {
-//                cmdLine.add("-d");
-//                cmdLine.add(prependTestPath(destDir.getName()));
-//            }
-//
-//            // To get separate compilation, add the output directory to the
-//            // class path only if we are compiling subsequent sets of files.
-//            if (addClassPath) {
-//                cmdLine.add("-cp");
-//                cmdLine.add(prependTestPath(destDir.getName()));
-//            }
-//            else addClassPath = true;
+            //            if (addDestDirToCmdLine) {
+            //                cmdLine.add("-d");
+            //                cmdLine.add(prependTestPath(destDir.getName()));
+            //            }
+            //
+            //            // To get separate compilation, add the output directory to the
+            //            // class path only if we are compiling subsequent sets of files.
+            //            if (addClassPath) {
+            //                cmdLine.add("-cp");
+            //                cmdLine.add(prependTestPath(destDir.getName()));
+            //            }
+            //            else addClassPath = true;
             return td.invokeCompiler(this, cmdLine);
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             if (e.getMessage() != null) {
                 appendFailureMessage(e.getMessage());
                 e.printStackTrace();
                 return 1;
-            }
-            else {
+            } else {
                 appendFailureMessage("Uncaught " + e.getClass().getName());
                 e.printStackTrace();
                 return 1;
@@ -92,7 +90,7 @@ public class PolyglotSourceFileTest extends SourceFileTest {
             }
 
             boolean found = false;
-            for (Iterator<ErrorInfo> j = errors.iterator(); j.hasNext();) {
+            for (Iterator<ErrorInfo> j = errors.iterator(); j.hasNext(); ) {
                 ErrorInfo e = j.next();
                 if (f.matches(e)) {
                     // this error info has been matched. remove it.
@@ -110,8 +108,7 @@ public class PolyglotSourceFileTest extends SourceFileTest {
         // are there any unaccounted for errors?
         if (!errors.isEmpty() && !swallowRemainingFailures) {
             StringBuffer sb = new StringBuffer();
-            for (Iterator<ErrorInfo> iter =
-                    errors.iterator(); iter.hasNext();) {
+            for (Iterator<ErrorInfo> iter = errors.iterator(); iter.hasNext(); ) {
                 ErrorInfo err = iter.next();
                 sb.append(err.getMessage());
                 if (err.getPosition() != null) {

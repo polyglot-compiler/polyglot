@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -71,11 +71,9 @@ public class JL5Context_c extends Context_c implements JL5Context {
     public ClassType findFieldScope(String name) throws SemanticException {
         try {
             return super.findFieldScope(name);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             VarInstance vi = findVariableInStaticImport(name);
-            if (vi instanceof FieldInstance)
-                return ((FieldInstance) vi).container().toClass();
+            if (vi instanceof FieldInstance) return ((FieldInstance) vi).container().toClass();
             throw e;
         }
     }
@@ -102,18 +100,12 @@ public class JL5Context_c extends Context_c implements JL5Context {
                 for (String next : jit.singleStaticImports()) {
                     String id = StringUtil.getShortNameComponent(next);
                     if (name.equals(id)) {
-                        Named nt =
-                                ts.forName(StringUtil.getPackageComponent(next));
+                        Named nt = ts.forName(StringUtil.getPackageComponent(next));
                         if (nt instanceof Type) {
                             Type t = (Type) nt;
                             try {
-                                vi =
-                                        ts.findField(t.toClass(),
-                                                     name,
-                                                     t.toClass(),
-                                                     true);
-                            }
-                            catch (SemanticException e) {
+                                vi = ts.findField(t.toClass(), name, t.toClass(), true);
+                            } catch (SemanticException e) {
                             }
                             if (vi != null && vi.flags().isStatic()) {
                                 return vi;
@@ -127,13 +119,8 @@ public class JL5Context_c extends Context_c implements JL5Context {
                         if (nt instanceof Type) {
                             Type t = (Type) nt;
                             try {
-                                vi =
-                                        ts.findField(t.toClass(),
-                                                     name,
-                                                     t.toClass(),
-                                                     true);
-                            }
-                            catch (SemanticException e) {
+                                vi = ts.findField(t.toClass(), name, t.toClass(), true);
+                            } catch (SemanticException e) {
                             }
                             if (vi != null && vi.flags().isStatic()) {
                                 return vi;
@@ -142,8 +129,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
                     }
                 }
             }
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
         }
 
         return null;
@@ -177,8 +163,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
 
     @Override
     public TypeVariable findTypeVariableInThisScope(String name) {
-        if (typeVariable != null && typeVariable.name().equals(name))
-            return typeVariable;
+        if (typeVariable != null && typeVariable.name().equals(name)) return typeVariable;
         if (typeVars != null && typeVars.containsKey(name)) {
             return typeVars.get(name);
         }
@@ -200,8 +185,7 @@ public class JL5Context_c extends Context_c implements JL5Context {
 
     @Override
     public String toString() {
-        return super.toString() + "; type var: " + typeVariable
-                + "; type vars: " + typeVars;
+        return super.toString() + "; type var: " + typeVariable + "; type vars: " + typeVars;
     }
 
     @Override
@@ -236,27 +220,21 @@ public class JL5Context_c extends Context_c implements JL5Context {
             throws SemanticException {
         try {
             return super.findMethod(name, argTypes);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             // couldn't find the method.
             // try static imports.
             JL5ImportTable it = (JL5ImportTable) this.importTable();
             if (it != null && this.currentClass() != null) {
                 for (ReferenceType rt : it.findTypesContainingMethodOrField(name)) {
                     try {
-                        return ts.findMethod(rt,
-                                             name,
-                                             argTypes,
-                                             this.currentClass(),
-                                             false);
-                    }
-                    catch (SemanticException f) {
-                        // ignore this exception and 
+                        return ts.findMethod(rt, name, argTypes, this.currentClass(), false);
+                    } catch (SemanticException f) {
+                        // ignore this exception and
                         // try the next containing type.
                     }
                 }
             }
-            // couldn't find anything in the static imports.            
+            // couldn't find anything in the static imports.
             // throw the original exception.
             throw e;
         }
@@ -271,5 +249,4 @@ public class JL5Context_c extends Context_c implements JL5Context {
     public ClassType extendsClauseDeclaringClass() {
         return this.declaringClass;
     }
-
 }

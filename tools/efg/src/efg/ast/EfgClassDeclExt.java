@@ -33,8 +33,8 @@ public class EfgClassDeclExt extends EfgExt implements ClassDeclOps {
     }
 
     @Override
-    public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
-            ConstructorInstance defaultConstructorInstance)
+    public Node addDefaultConstructor(
+            TypeSystem ts, NodeFactory nf, ConstructorInstance defaultConstructorInstance)
             throws SemanticException {
         return node();
     }
@@ -57,5 +57,4 @@ public class EfgClassDeclExt extends EfgExt implements ClassDeclOps {
 
         return cd;
     }
-
 }

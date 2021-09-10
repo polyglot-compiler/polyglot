@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -103,7 +103,8 @@ public class Field {
                 }
             }
         }
-        this.in = null; // RMF 7/23/2008 - Don't need the input stream any more, so don't hang onto it
+        this.in =
+                null; // RMF 7/23/2008 - Don't need the input stream any more, so don't hang onto it
     }
 
     /**
@@ -112,7 +113,8 @@ public class Field {
      * yet be set.
      */
     public boolean isString(Type t) {
-        return t.isClass() && t.toClass().isTopLevel()
+        return t.isClass()
+                && t.toClass().isTopLevel()
                 && t.toClass().fullName().equals("java.lang.String");
     }
 
@@ -141,8 +143,8 @@ public class Field {
             return v.intValue();
         }
 
-        throw new SemanticException("Could not find expected constant "
-                + "pool entry with tag INTEGER.");
+        throw new SemanticException(
+                "Could not find expected constant " + "pool entry with tag INTEGER.");
     }
 
     public float getFloat() throws SemanticException {
@@ -153,8 +155,8 @@ public class Field {
             return v.floatValue();
         }
 
-        throw new SemanticException("Could not find expected constant "
-                + "pool entry with tag FLOAT.");
+        throw new SemanticException(
+                "Could not find expected constant " + "pool entry with tag FLOAT.");
     }
 
     public double getDouble() throws SemanticException {
@@ -165,8 +167,8 @@ public class Field {
             return v.doubleValue();
         }
 
-        throw new SemanticException("Could not find expected constant "
-                + "pool entry with tag DOUBLE.");
+        throw new SemanticException(
+                "Could not find expected constant " + "pool entry with tag DOUBLE.");
     }
 
     public long getLong() throws SemanticException {
@@ -177,8 +179,8 @@ public class Field {
             return v.longValue();
         }
 
-        throw new SemanticException("Could not find expected constant "
-                + "pool entry with tag LONG.");
+        throw new SemanticException(
+                "Could not find expected constant " + "pool entry with tag LONG.");
     }
 
     public String getString() throws SemanticException {
@@ -194,8 +196,8 @@ public class Field {
             }
         }
 
-        throw new SemanticException("Could not find expected constant "
-                + "pool entry with tag STRING or UTF8.");
+        throw new SemanticException(
+                "Could not find expected constant " + "pool entry with tag STRING or UTF8.");
     }
 
     public Attribute[] getAttrs() {

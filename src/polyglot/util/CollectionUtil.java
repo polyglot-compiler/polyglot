@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -112,8 +112,7 @@ public class CollectionUtil {
         return l;
     }
 
-    public static <T, U extends T, V extends T> T firstOrElse(Collection<U> l,
-            V alt) {
+    public static <T, U extends T, V extends T> T firstOrElse(Collection<U> l, V alt) {
         Iterator<U> i = l.iterator();
         if (i.hasNext()) return i.next();
         return alt;
@@ -131,13 +130,13 @@ public class CollectionUtil {
 
     /**
      * Apply {@code t} to each element of {@code l}.
-     * {@code l} is not modified.  
+     * {@code l} is not modified.
      * @return A list containing the result of each transformation,
      * in the same order as the original elements.
      */
     public static <T, U> List<U> map(List<T> l, Transformation<T, U> t) {
         List<U> m = new ArrayList<>(l.size());
-        for (Iterator<U> i = new TransformingIterator<>(l.iterator(), t); i.hasNext();) {
+        for (Iterator<U> i = new TransformingIterator<>(l.iterator(), t); i.hasNext(); ) {
             m.add(i.next());
         }
         return m;
@@ -145,7 +144,7 @@ public class CollectionUtil {
 
     /**
      * Return an empty non-null list if the argument list is null.
-     * 
+     *
      * @param l a possibly null list
      * @return a non-null list
      */

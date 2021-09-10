@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -109,8 +109,7 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         return n;
     }
 
-    protected <N extends ParamTypeNode_c> N reconstruct(N n,
-            List<TypeNode> bounds) {
+    protected <N extends ParamTypeNode_c> N reconstruct(N n, List<TypeNode> bounds) {
         n = bounds(n, bounds);
         return n;
     }
@@ -153,12 +152,11 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         TypeVariable iType = ts.typeVariable(position, id.id(), intersection);
 
         return n.type(iType);
-
     }
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        // all of the children (bounds list) will have already been 
+        // all of the children (bounds list) will have already been
         // disambiguated and should there for be actual types
         JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
         TypeNode n = this;
@@ -170,17 +168,18 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
                 // not disambiguated yet
                 ambiguous = true;
             }
-//			if (!tn.type().isReference()) {
-//			    throw new SemanticException("Cannot instantiate a type parameter with type " + tn.type());
-//			}
+            //			if (!tn.type().isReference()) {
+            //			    throw new SemanticException("Cannot instantiate a type parameter with type " +
+            // tn.type());
+            //			}
             typeList.add(tn.type());
         }
         if (!ambiguous) {
             TypeVariable tv = (TypeVariable) n.type();
-            //		System.err.println("paramtypenode_c : dismab and setting bounds of " + tv + " to " + typeList);
+            //		System.err.println("paramtypenode_c : dismab and setting bounds of " + tv + " to " +
+            // typeList);
             List<ReferenceType> refTypeList = new ArrayList<>();
-            for (Type t : typeList)
-                refTypeList.add((ReferenceType) t);
+            for (Type t : typeList) refTypeList.add((ReferenceType) t);
             tv.setUpperBound(ts.intersectionType(n.position(), refTypeList));
         }
         return n;
@@ -193,8 +192,8 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
             for (int j = i + 1; j < bounds.size(); j++) {
                 TypeNode tj = bounds.get(j);
                 if (tc.typeSystem().equals(ti.type(), tj.type())) {
-                    throw new SemanticException("Duplicate bound in type variable declaration",
-                                                tj.position());
+                    throw new SemanticException(
+                            "Duplicate bound in type variable declaration", tj.position());
                 }
             }
         }
@@ -202,8 +201,8 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         for (int i = 0; i < bounds.size(); i++) {
             TypeNode ti = bounds.get(i);
             if (ti.type() instanceof ArrayType) {
-                throw new SemanticException("Unexpected type bound in type variable declaration",
-                                            ti.position());
+                throw new SemanticException(
+                        "Unexpected type bound in type variable declaration", ti.position());
             }
         }
 
@@ -211,19 +210,18 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         for (int i = 0; i < bounds.size(); i++) {
             TypeNode tn = bounds.get(i);
             if (i > 0 && !tn.type().toClass().flags().isInterface()) {
-                throw new SemanticException("Interface expected here.",
-                                            tn.position());
+                throw new SemanticException("Interface expected here.", tn.position());
             }
         }
 
         // if first bound is a type variable, the type variable must be the only bound
         if (bounds.size() > 1 && bounds.get(0).type() instanceof TypeVariable)
-            throw new SemanticException("Cannot specify any additional bound "
-                    + "when first bound is a type variable.", bounds.get(1)
-                                                                    .position());
+            throw new SemanticException(
+                    "Cannot specify any additional bound " + "when first bound is a type variable.",
+                    bounds.get(1).position());
 
-        //XXX: are these checks necessary for us?
-        //ts.checkIntersectionBounds(tv.bounds(), false);
+        // XXX: are these checks necessary for us?
+        // ts.checkIntersectionBounds(tv.bounds(), false);
 
         return super.typeCheck(tc);
     }
@@ -239,7 +237,7 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
         w.write(id.id());
         if (bounds() != null && !bounds().isEmpty()) {
             w.write(" extends ");
-            for (Iterator<TypeNode> it = bounds.iterator(); it.hasNext();) {
+            for (Iterator<TypeNode> it = bounds.iterator(); it.hasNext(); ) {
                 TypeNode tn = it.next();
                 print(tn, w, tr);
                 if (it.hasNext()) {

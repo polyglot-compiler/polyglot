@@ -24,5 +24,4 @@ public class JL5TermExt extends JL5Ext implements TermOps {
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         return superLang().acceptCFG(node(), v, succs);
     }
-
 }

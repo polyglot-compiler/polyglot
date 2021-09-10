@@ -52,7 +52,7 @@ public class Throw_c extends Stmt_c implements Throw {
 
     protected Expr expr;
 
-//    @Deprecated
+    //    @Deprecated
     public Throw_c(Position pos, Expr expr) {
         this(pos, expr, null);
     }
@@ -95,8 +95,9 @@ public class Throw_c extends Stmt_c implements Throw {
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (!expr.type().isSubtype(tc.typeSystem().Throwable())) {
-            throw new SemanticException("Can only throw subclasses of \""
-                    + tc.typeSystem().Throwable() + "\".", expr.position());
+            throw new SemanticException(
+                    "Can only throw subclasses of \"" + tc.typeSystem().Throwable() + "\".",
+                    expr.position());
         }
 
         return this;
@@ -135,7 +136,7 @@ public class Throw_c extends Stmt_c implements Throw {
         v.visitCFG(expr, this, EXIT);
 
         // Throw edges will be handled by visitor.
-        return Collections.<T> emptyList();
+        return Collections.<T>emptyList();
     }
 
     @Override
@@ -143,7 +144,7 @@ public class Throw_c extends Stmt_c implements Throw {
         // if the exception that a throw statement is given to throw is null,
         // then a NullPointerException will be thrown.
         if (expr.type().typeEquals(ts.Null()))
-            return Collections.<Type> singletonList(ts.NullPointerException());
+            return Collections.<Type>singletonList(ts.NullPointerException());
         return CollectionUtil.list(expr.type(), ts.NullPointerException());
     }
 
@@ -151,5 +152,4 @@ public class Throw_c extends Stmt_c implements Throw {
     public Node copy(NodeFactory nf) {
         return nf.Throw(position, expr);
     }
-
 }

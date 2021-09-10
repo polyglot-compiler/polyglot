@@ -46,8 +46,8 @@ public class StateItem {
      * @return A set of StateItems that result from making a reverse transition
      *          from this StateItem on the given symbol and lookahead set.
      */
-    protected List<StateItem> reverseTransition(symbol sym,
-            Set<symbol> lookahead, Set<lalr_state> guide) {
+    protected List<StateItem> reverseTransition(
+            symbol sym, Set<symbol> lookahead, Set<lalr_state> guide) {
         List<StateItem> result = new LinkedList<>();
         result.add(null);
         List<StateItem> init = new LinkedList<>();
@@ -62,8 +62,7 @@ public class StateItem {
             // is compatible.
             for (StateItem prev : prevs) {
                 if (guide != null && !guide.contains(prev.state)) continue;
-                if (ss.lookahead != null
-                        && !intersect(prev.item.lookahead(), ss.lookahead))
+                if (ss.lookahead != null && !intersect(prev.item.lookahead(), ss.lookahead))
                     continue;
                 result.add(prev);
             }
@@ -92,8 +91,7 @@ public class StateItem {
         List<List<StateItem>> result = new LinkedList<>();
         List<StateItem> init = new LinkedList<>();
         init.add(this);
-        for (SearchState ss : new SearchState(init,
-                                              lookahead).reverseProduction(false)) {
+        for (SearchState ss : new SearchState(init, lookahead).reverseProduction(false)) {
             List<StateItem> seq = new LinkedList<>(ss.sis);
             seq.remove(seq.size() - 1);
             result.add(seq);
@@ -156,8 +154,7 @@ public class StateItem {
                         if (!intersect(prevLookahead, lookahead)) continue;
                         nextLookahead = new HashSet<>(symbolSet(prevLookahead));
                         nextLookahead.retainAll(lookahead);
-                    }
-                    else { // shift item
+                    } else { // shift item
                         if (lookahead != null) {
                             // Check that lookahead is compatible with the first
                             // possible symbols in the rest of the production.
@@ -166,18 +163,16 @@ public class StateItem {
                             // the lookahead of the corresponding item.
                             boolean applicable = false;
                             boolean nullable = true;
-                            for (int pos = prevPos; !applicable && nullable
-                                    && pos < prevLen; pos++) {
+                            for (int pos = prevPos;
+                                    !applicable && nullable && pos < prevLen;
+                                    pos++) {
                                 symbol nextSym = rhs(prevProd, pos);
                                 if (nextSym instanceof terminal) {
-                                    applicable = intersect((terminal) nextSym,
-                                                           lookahead);
+                                    applicable = intersect((terminal) nextSym, lookahead);
                                     nullable = false;
-                                }
-                                else if (nextSym instanceof non_terminal) {
+                                } else if (nextSym instanceof non_terminal) {
                                     non_terminal nt = (non_terminal) nextSym;
-                                    applicable = intersect(nt.first_set(),
-                                                           lookahead);
+                                    applicable = intersect(nt.first_set(), lookahead);
                                     if (!applicable) nullable = nt.nullable();
                                 }
                             }
@@ -206,8 +201,7 @@ public class StateItem {
         if (syms == null) return true;
         for (symbol sym : syms) {
             if (sym instanceof terminal && t.equals(sym)) return true;
-            if (sym instanceof non_terminal
-                    && ((non_terminal) sym).first_set().contains(t))
+            if (sym instanceof non_terminal && ((non_terminal) sym).first_set().contains(t))
                 return true;
         }
         return false;
@@ -224,10 +218,8 @@ public class StateItem {
     protected static boolean intersect(terminal_set ts, Set<symbol> syms) {
         if (syms == null) return true;
         for (symbol sym : syms) {
-            if (sym instanceof terminal && ts.contains((terminal) sym))
-                return true;
-            if (sym instanceof non_terminal
-                    && ts.intersects(((non_terminal) sym).first_set()))
+            if (sym instanceof terminal && ts.contains((terminal) sym)) return true;
+            if (sym instanceof non_terminal && ts.intersects(((non_terminal) sym).first_set()))
                 return true;
         }
         return false;
@@ -255,18 +247,15 @@ public class StateItem {
             stateItmSize += stateItm.size();
         System.out.println("items:\n" + stateItmSize);
         int prodSize = 0;
-        for (Set<lalr_item> prod : prods.values())
-            prodSize += prod.size();
+        for (Set<lalr_item> prod : prods.values()) prodSize += prod.size();
         System.out.println("productions:\n" + prodSize);
         int revTranSize = 0;
         for (Map<symbol, Set<StateItem>> revTran : revTrans.values())
-            for (Set<StateItem> rev : revTran.values())
-                revTranSize += rev.size();
+            for (Set<StateItem> rev : revTran.values()) revTranSize += rev.size();
         System.out.println("reverse transitions:\n" + revTranSize);
         int revProdSize = 0;
         for (Map<non_terminal, Set<lalr_item>> revProd : revProds.values())
-            for (Set<lalr_item> rev : revProd.values())
-                revProdSize += rev.size();
+            for (Set<lalr_item> rev : revProd.values()) revProdSize += rev.size();
         System.out.println("reverse productions:\n" + revProdSize);
     }
 
@@ -312,8 +301,7 @@ public class StateItem {
         revTrans = new HashMap<>();
         for (lalr_state src : lalr_state.all_states()) {
             Map<symbol, lalr_state> transitions = new HashMap<>();
-            for (lalr_transition t = src.transitions(); t != null; t =
-                    t.next()) {
+            for (lalr_transition t = src.transitions(); t != null; t = t.next()) {
                 symbol sym = t.on_symbol();
                 lalr_state dst = t.to_state();
                 transitions.put(sym, dst);
@@ -430,8 +418,7 @@ public class StateItem {
     }
 
     /** Cache of symbol-set representations of terminal sets */
-    protected static Map<terminal_set, Set<symbol>> symbolSets =
-            new HashMap<>();
+    protected static Map<terminal_set, Set<symbol>> symbolSets = new HashMap<>();
 
     /**
      * Return a symbol-set representation of the given terminal set.
@@ -469,8 +456,7 @@ public class StateItem {
      * @return true if {@code nextProd} is possible after {@code prod}; false
      *          otherwise.
      */
-    protected static boolean productionAllowed(production prod,
-            production nextProd) {
+    protected static boolean productionAllowed(production prod, production nextProd) {
         int prodPred = prod.precedence_num();
         int nextProdPred = nextProd.precedence_num();
         if (prodPred >= 0 && nextProdPred >= 0) {

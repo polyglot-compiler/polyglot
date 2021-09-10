@@ -28,7 +28,7 @@ public class Validated extends SourceFileGoal {
     public Collection<Goal> prerequisiteGoals(Scheduler scheduler) {
         List<Goal> l = new ArrayList<>();
         l.add(scheduler.TypeChecked(job));
-//        l.add(scheduler.ConstantsChecked(job));
+        //        l.add(scheduler.ConstantsChecked(job));
         l.add(scheduler.ReachabilityChecked(job));
         l.add(scheduler.ExceptionsChecked(job));
         l.add(scheduler.ExitPathsChecked(job));

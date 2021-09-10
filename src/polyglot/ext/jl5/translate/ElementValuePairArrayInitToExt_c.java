@@ -18,5 +18,4 @@ public class ElementValuePairArrayInitToExt_c extends ToExt_c {
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
         return to_nf.ElementValueArrayInit(n.position(), ext.elements());
     }
-
 }

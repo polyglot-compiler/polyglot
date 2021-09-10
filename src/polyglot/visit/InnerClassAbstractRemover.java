@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -88,7 +88,7 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
 
         List<ClassType> env = new ArrayList<>();
 
-        for (ClassType outer = ct.outer();; outer = outer.outer()) {
+        for (ClassType outer = ct.outer(); ; outer = outer.outer()) {
             env.add(outer);
             if (!outer.isInnerClass()) {
                 break;
@@ -120,16 +120,13 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
         int arg = 1;
         for (ClassType ct : env) {
             LocalInstance li =
-                    ts.localInstance(Position.compilerGenerated(),
-                                     Flags.FINAL,
-                                     ct,
-                                     "arg" + arg);
+                    ts.localInstance(Position.compilerGenerated(), Flags.FINAL, ct, "arg" + arg);
             Formal f =
-                    nf.Formal(li.position(),
-                              li.flags(),
-                              nf.CanonicalTypeNode(Position.compilerGenerated(),
-                                                   li.type()),
-                              nf.Id(li.position(), li.name()));
+                    nf.Formal(
+                            li.position(),
+                            li.flags(),
+                            nf.CanonicalTypeNode(Position.compilerGenerated(), li.type()),
+                            nf.Id(li.position(), li.name()));
             f = f.localInstance(li);
             formals.add(f);
         }
@@ -139,7 +136,7 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
     /**
      * Turns an inner class's environment into a list of actual arguments to be
      * used when constructing the inner class.
-     * 
+     *
      * @param env
      *          the inner class's environment.
      * @param outer
@@ -162,14 +159,13 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
                 FieldInstance fi = outer.fieldNamed(name);
                 if (fi != null && fi.type().equals(ct)) {
                     // Use the field.
-                    Special this_ =
-                            nf.Special(Position.compilerGenerated(),
-                                       Special.THIS);
+                    Special this_ = nf.Special(Position.compilerGenerated(), Special.THIS);
                     this_ = (Special) this_.type(ct);
                     Field field =
-                            nf.Field(Position.compilerGenerated(),
-                                     this_,
-                                     nf.Id(Position.compilerGenerated(), name));
+                            nf.Field(
+                                    Position.compilerGenerated(),
+                                    this_,
+                                    nf.Id(Position.compilerGenerated(), name));
                     field = field.fieldInstance(fi);
                     field = (Field) field.type(fi.type());
                     actuals.add(field);
@@ -177,10 +173,8 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor {
                 }
             }
 
-            TypeNode tn =
-                    nf.CanonicalTypeNode(Position.compilerGenerated(), ct);
-            Special this_ =
-                    nf.Special(Position.compilerGenerated(), Special.THIS, tn);
+            TypeNode tn = nf.CanonicalTypeNode(Position.compilerGenerated(), ct);
+            Special this_ = nf.Special(Position.compilerGenerated(), Special.THIS, tn);
             this_ = (Special) this_.type(ct);
             actuals.add(this_);
         }

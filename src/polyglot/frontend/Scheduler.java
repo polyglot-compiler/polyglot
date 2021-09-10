@@ -83,6 +83,7 @@ public abstract class Scheduler {
      * Collection of uncompleted goals.
      */
     protected Set<Goal> inWorklist;
+
     protected LinkedList<Goal> worklist;
 
     /**
@@ -148,10 +149,8 @@ public abstract class Scheduler {
      */
     public void addCorequisiteDependency(Goal goal, Goal subgoal) {
         if (!goal.corequisiteGoals(this).contains(subgoal)) {
-            if (Report.should_report(Report.frontend, 3)
-                    || Report.should_report("deps", 1))
-                Report.report(3, "Adding coreq edge: " + subgoal + " -> "
-                        + goal);
+            if (Report.should_report(Report.frontend, 3) || Report.should_report("deps", 1))
+                Report.report(3, "Adding coreq edge: " + subgoal + " -> " + goal);
             goal.addCorequisiteGoal(subgoal, this);
         }
     }
@@ -161,17 +160,14 @@ public abstract class Scheduler {
         // addGoal(subgoal);
     }
 
-    public void addDependencyAndEnqueue(Goal goal, Goal subgoal,
-            boolean prerequisite) {
+    public void addDependencyAndEnqueue(Goal goal, Goal subgoal, boolean prerequisite) {
         if (prerequisite) {
             try {
                 addPrerequisiteDependency(goal, subgoal);
-            }
-            catch (CyclicDependencyException e) {
+            } catch (CyclicDependencyException e) {
                 throw new InternalCompilerError(e);
             }
-        }
-        else {
+        } else {
             addCorequisiteDependency(goal, subgoal);
         }
         // addGoal(subgoal);
@@ -189,17 +185,14 @@ public abstract class Scheduler {
     public void addPrerequisiteDependency(Goal goal, Goal subgoal)
             throws CyclicDependencyException {
         if (!goal.prerequisiteGoals(this).contains(subgoal)) {
-            if (Report.should_report(Report.frontend, 3)
-                    || Report.should_report("deps", 1))
-                Report.report(3, "Adding prereq edge: " + subgoal + " => "
-                        + goal);
+            if (Report.should_report(Report.frontend, 3) || Report.should_report("deps", 1))
+                Report.report(3, "Adding prereq edge: " + subgoal + " => " + goal);
             goal.addPrerequisiteGoal(subgoal, this);
         }
     }
 
     /** Add prerequisite dependencies between adjacent items in a list of goals. */
-    public void addPrerequisiteDependencyChain(List<Goal> deps)
-            throws CyclicDependencyException {
+    public void addPrerequisiteDependencyChain(List<Goal> deps) throws CyclicDependencyException {
         Goal prev = null;
         for (Goal curr : deps) {
             if (prev != null) addPrerequisiteDependency(curr, prev);
@@ -218,8 +211,7 @@ public abstract class Scheduler {
         if (g == null) {
             g = goal;
             goals.put(g, g);
-            if (Report.should_report(Report.frontend, 4))
-                Report.report(4, "new goal " + g);
+            if (Report.should_report(Report.frontend, 4)) Report.report(4, "new goal " + g);
             if (Report.should_report(Report.frontend, 5))
                 Report.report(5, "goals = " + goals.keySet());
         }
@@ -332,9 +324,12 @@ public abstract class Scheduler {
         }
 
         if (Report.should_report(Report.frontend, 1))
-            Report.report(1, "Finished all passes for "
-                    + this.getClass().getName() + " -- "
-                    + (okay ? "okay" : "failed"));
+            Report.report(
+                    1,
+                    "Finished all passes for "
+                            + this.getClass().getName()
+                            + " -- "
+                            + (okay ? "okay" : "failed"));
 
         return okay;
     }
@@ -400,26 +395,19 @@ public abstract class Scheduler {
     }
 
     protected boolean attemptGoal(Goal goal, Set<Goal> above) {
-        if (Report.should_report("dump-dep-graph", 2))
-            dumpInFlightDependenceGraph();
+        if (Report.should_report("dump-dep-graph", 2)) dumpInFlightDependenceGraph();
 
-        if (Report.should_report(Report.frontend, 2))
-            Report.report(2, "Running to goal " + goal);
+        if (Report.should_report(Report.frontend, 2)) Report.report(2, "Running to goal " + goal);
 
         if (Report.should_report(Report.frontend, 4)) {
             Report.report(4, "  Reachable = " + goal.isReachable());
-            Report.report(4,
-                          "  Prerequisites for " + goal + " = "
-                                  + goal.prerequisiteGoals(this));
-            Report.report(4,
-                          "  Corequisites for " + goal + " = "
-                                  + goal.corequisiteGoals(this));
+            Report.report(4, "  Prerequisites for " + goal + " = " + goal.prerequisiteGoals(this));
+            Report.report(4, "  Corequisites for " + goal + " = " + goal.corequisiteGoals(this));
         }
 
         if (above.contains(goal)) {
             if (Report.should_report(Report.frontend, 4))
-                Report.report(4, goal
-                        + " is being attempted by a caller; returning");
+                Report.report(4, goal + " is being attempted by a caller; returning");
             return true;
         }
 
@@ -469,8 +457,7 @@ public abstract class Scheduler {
             }
 
             // Now, run the goal itself.
-            if (Report.should_report(Report.frontend, 4))
-                Report.report(4, "running goal " + goal);
+            if (Report.should_report(Report.frontend, 4)) Report.report(4, "running goal " + goal);
 
             boolean result = runGoal(goal);
 
@@ -541,8 +528,7 @@ public abstract class Scheduler {
         Job job = goal.job();
 
         if (extInfo.getOptions().disable_passes.contains(pass.name())) {
-            if (Report.should_report(Report.frontend, 1))
-                Report.report(1, "Skipping pass " + pass);
+            if (Report.should_report(Report.frontend, 1)) Report.report(1, "Skipping pass " + pass);
 
             goal.setState(Goal.REACHED);
             return true;
@@ -552,8 +538,7 @@ public abstract class Scheduler {
             Report.report(1, "Running pass " + pass + " for " + goal);
 
         if (reached(goal)) {
-            throw new InternalCompilerError("Cannot run a pass for completed goal "
-                    + goal);
+            throw new InternalCompilerError("Cannot run a pass for completed goal " + goal);
         }
 
         Integer countObj = runCount.get(goal);
@@ -562,14 +547,17 @@ public abstract class Scheduler {
         runCount.put(goal, count);
 
         if (count >= maxRunCount()) {
-            String[] suffix = new String[] { "th", "st", "nd", "rd" };
+            String[] suffix = new String[] {"th", "st", "nd", "rd"};
             int index = count % 10;
             if (index > 3) index = 0;
             if (11 <= count && count <= 13) index = 0;
             String cardinal = count + suffix[index];
             String message =
                     "Possible infinite loop detected trying to run a pass for "
-                            + goal + " for the " + cardinal + " time.";
+                            + goal
+                            + " for the "
+                            + cardinal
+                            + " time.";
 
             // Report the infinite loop.
             ErrorQueue eq = extInfo.compiler().errorQueue();
@@ -584,11 +572,12 @@ public abstract class Scheduler {
                 Report.addTopic(Report.frontend, 4);
                 Report.addTopic("deps", 1);
 
-                eq.enqueue(ErrorInfo.DEBUG,
-                           message
-                                   + "  The compiler will attempt the goal one more time with reporting enabled, then abort.");
-            }
-            else {
+                eq.enqueue(
+                        ErrorInfo.DEBUG,
+                        message
+                                + "  The compiler will attempt the goal one more time with"
+                                + " reporting enabled, then abort.");
+            } else {
                 // Disable reporting.
                 Report.setTopic(Report.frontend, infiniteFrontEnd);
                 Report.setTopic("deps", infiniteDeps);
@@ -596,13 +585,10 @@ public abstract class Scheduler {
                 if (goal.equals(infiniteLoopGoal)) {
                     // We've gone around the loop once, abort the compiler.
 
-                    if (Report.should_report("dump-dep-graph", 1))
-                        dumpInFlightDependenceGraph();
-                    if (Report.should_report("dump-dep-graph", 1))
-                        dumpDependenceGraph();
+                    if (Report.should_report("dump-dep-graph", 1)) dumpInFlightDependenceGraph();
+                    if (Report.should_report("dump-dep-graph", 1)) dumpDependenceGraph();
 
-                    eq.enqueue(ErrorInfo.INTERNAL_ERROR, message
-                            + "  Aborting.");
+                    eq.enqueue(ErrorInfo.INTERNAL_ERROR, message + "  Aborting.");
                     throw new Main.TerminationException(1);
                 }
             }
@@ -641,49 +627,41 @@ public abstract class Scheduler {
 
                 if (!result) {
                     extInfo.getStats().accumPassTimes(key + " failures", 1, 1);
-                    extInfo.getStats().accumPassTimes("total goal failures",
-                                                      1,
-                                                      1);
+                    extInfo.getStats().accumPassTimes("total goal failures", 1, 1);
 
                     goal.setState(Goal.UNREACHABLE);
                     if (Report.should_report(Report.frontend, 1))
                         Report.report(1, "Failed pass " + pass + " for " + goal);
-                }
-                else {
+                } else {
                     if (goal.state() == Goal.RUNNING) {
-                        extInfo.getStats().accumPassTimes(key + " reached",
-                                                          1,
-                                                          1);
-                        extInfo.getStats().accumPassTimes("total goal reached",
-                                                          1,
-                                                          1);
+                        extInfo.getStats().accumPassTimes(key + " reached", 1, 1);
+                        extInfo.getStats().accumPassTimes("total goal reached", 1, 1);
 
                         goal.setState(Goal.REACHED);
                         if (Report.should_report(Report.frontend, 1))
-                            Report.report(1, "Completed pass " + pass + " for "
-                                    + goal);
-                    }
-                    else {
-                        extInfo.getStats().accumPassTimes(key + " unreached",
-                                                          1,
-                                                          1);
-                        extInfo.getStats()
-                               .accumPassTimes("total goal unreached", 1, 1);
+                            Report.report(1, "Completed pass " + pass + " for " + goal);
+                    } else {
+                        extInfo.getStats().accumPassTimes(key + " unreached", 1, 1);
+                        extInfo.getStats().accumPassTimes("total goal unreached", 1, 1);
 
                         goal.setState(Goal.ATTEMPTED);
                         if (Report.should_report(Report.frontend, 1))
-                            Report.report(1, "Completed (unreached) pass "
-                                    + pass + " for " + goal);
+                            Report.report(1, "Completed (unreached) pass " + pass + " for " + goal);
                     }
                 }
-            }
-            catch (MissingDependencyException e) {
+            } catch (MissingDependencyException e) {
                 if (Report.should_report(Report.frontend, 1))
-                    Report.report(1, "Did not complete pass " + pass + " for "
-                            + goal + " (missing " + e.goal() + ")");
+                    Report.report(
+                            1,
+                            "Did not complete pass "
+                                    + pass
+                                    + " for "
+                                    + goal
+                                    + " (missing "
+                                    + e.goal()
+                                    + ")");
 
-                if (Report.should_report(Report.frontend, 3))
-                    e.printStackTrace();
+                if (Report.should_report(Report.frontend, 3)) e.printStackTrace();
 
                 extInfo.getStats().accumPassTimes(key + " aborts", 1, 1);
                 extInfo.getStats().accumPassTimes("total goal aborts", 1, 1);
@@ -692,19 +670,16 @@ public abstract class Scheduler {
 
                 goal.setState(Goal.ATTEMPTED);
                 result = true;
-            }
-            catch (SchedulerException e) {
+            } catch (SchedulerException e) {
                 if (Report.should_report(Report.frontend, 1))
-                    Report.report(1, "Did not complete pass " + pass + " for "
-                            + goal);
+                    Report.report(1, "Did not complete pass " + pass + " for " + goal);
 
                 extInfo.getStats().accumPassTimes(key + " aborts", 1, 1);
                 extInfo.getStats().accumPassTimes("goal aborts", 1, 1);
 
                 goal.setState(Goal.ATTEMPTED);
                 result = true;
-            }
-            finally {
+            } finally {
                 t = System.currentTimeMillis() - t;
                 extInfo.getStats().accumPassTimes(key, t, t);
 
@@ -730,20 +705,20 @@ public abstract class Scheduler {
 
                 // pretty-print this pass if we need to.
                 if (options.print_ast.contains(passName)) {
-                    System.err.println("--------------------------------"
-                            + "--------------------------------");
-                    System.err.println("Pretty-printing AST for " + job
-                            + " after " + passName);
+                    System.err.println(
+                            "--------------------------------"
+                                    + "--------------------------------");
+                    System.err.println("Pretty-printing AST for " + job + " after " + passName);
 
                     lang.prettyPrint(job.ast(), lang, System.err);
                 }
 
                 // dump this pass if we need to.
                 if (options.dump_ast.contains(passName)) {
-                    System.err.println("--------------------------------"
-                            + "--------------------------------");
-                    System.err.println("Dumping AST for " + job + " after "
-                            + passName);
+                    System.err.println(
+                            "--------------------------------"
+                                    + "--------------------------------");
+                    System.err.println("Dumping AST for " + job + " after " + passName);
 
                     lang.dump(job.ast(), lang, System.err);
                 }
@@ -758,9 +733,7 @@ public abstract class Scheduler {
         }
 
         Stats stats = extInfo.getStats();
-        stats.accumPassTimes(pass.name(),
-                             pass.inclusiveTime(),
-                             pass.exclusiveTime());
+        stats.accumPassTimes(pass.name(), pass.inclusiveTime(), pass.exclusiveTime());
 
         if (!result) {
             failed = true;
@@ -769,15 +742,18 @@ public abstract class Scheduler {
         // Record the progress made before running the pass and then update
         // the current progress.
         if (Report.should_report(Report.time, 2)) {
-            Report.report(2,
-                          "Finished " + pass + " status="
-                                  + statusString(result) + " inclusive_time="
-                                  + pass.inclusiveTime() + " exclusive_time="
-                                  + pass.exclusiveTime());
-        }
-        else if (Report.should_report(Report.frontend, 1)) {
-            Report.report(1, "Finished " + pass + " status="
-                    + statusString(result));
+            Report.report(
+                    2,
+                    "Finished "
+                            + pass
+                            + " status="
+                            + statusString(result)
+                            + " inclusive_time="
+                            + pass.inclusiveTime()
+                            + " exclusive_time="
+                            + pass.exclusiveTime());
+        } else if (Report.should_report(Report.frontend, 1)) {
+            Report.report(1, "Finished " + pass + " status=" + statusString(result));
         }
 
         if (job != null) {
@@ -790,8 +766,7 @@ public abstract class Scheduler {
     protected static String statusString(boolean okay) {
         if (okay) {
             return "done";
-        }
-        else {
+        } else {
             return "failed";
         }
     }
@@ -894,8 +869,8 @@ public abstract class Scheduler {
         jobs.put(source, job);
 
         if (Report.should_report(Report.frontend, 4)) {
-            Report.report(4, "Adding job for " + source + " at the "
-                    + "request of pass " + currentPass);
+            Report.report(
+                    4, "Adding job for " + source + " at the " + "request of pass " + currentPass);
         }
 
         return job;
@@ -936,8 +911,7 @@ public abstract class Scheduler {
         name += dumpCounter++;
 
         Report.report(2, "digraph " + name + " {");
-        Report.report(2,
-                      "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
+        Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
         for (Goal g : new ArrayList<>(goals.keySet())) {
             g = internGoal(g);
@@ -945,9 +919,7 @@ public abstract class Scheduler {
             int h = System.identityHashCode(g);
 
             // dump out this node
-            Report.report(2,
-                          h + " [ label = \"" + StringUtil.escape(g.toString())
-                                  + "\" ];");
+            Report.report(2, h + " [ label = \"" + StringUtil.escape(g.toString()) + "\" ];");
 
             // dump out the successors.
             for (Goal g2 : g.prerequisiteGoals(this)) {
@@ -974,15 +946,15 @@ public abstract class Scheduler {
         name += dumpCounter++;
 
         Report.report(2, "digraph " + name + " {");
-        Report.report(2,
-                      "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
+        Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
         Set<Goal> print = new LinkedHashSet<>();
 
         for (Goal g : new ArrayList<>(goals.keySet())) {
             g = internGoal(g);
 
-            if (g.state() == Goal.REACHED || g.state() == Goal.UNREACHED
+            if (g.state() == Goal.REACHED
+                    || g.state() == Goal.UNREACHED
                     || g.state() == Goal.UNREACHABLE) {
                 continue;
             }
@@ -1006,9 +978,7 @@ public abstract class Scheduler {
             int h = System.identityHashCode(g);
 
             // dump out this node
-            Report.report(2,
-                          h + " [ label = \"" + StringUtil.escape(g.toString())
-                                  + "\" ];");
+            Report.report(2, h + " [ label = \"" + StringUtil.escape(g.toString()) + "\" ];");
 
             // dump out the successors.
             for (Goal g2 : g.prerequisiteGoals(this)) {
@@ -1037,16 +1007,14 @@ public abstract class Scheduler {
         name += dumpCounter++;
 
         Report.report(2, "digraph " + name + " {");
-        Report.report(2,
-                      "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
+        Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
         g = internGoal(g);
 
         int h = System.identityHashCode(g);
 
         // dump out this node
-        Report.report(2, h + " [ label = \"" + StringUtil.escape(g.toString())
-                + "\" ];");
+        Report.report(2, h + " [ label = \"" + StringUtil.escape(g.toString()) + "\" ];");
 
         Set<Integer> seen = new HashSet<>();
         seen.add(h);
@@ -1057,10 +1025,7 @@ public abstract class Scheduler {
             int h2 = System.identityHashCode(g2);
             if (!seen.contains(h2)) {
                 seen.add(h2);
-                Report.report(2,
-                              h2 + " [ label = \""
-                                      + StringUtil.escape(g2.toString())
-                                      + "\" ];");
+                Report.report(2, h2 + " [ label = \"" + StringUtil.escape(g2.toString()) + "\" ];");
             }
             Report.report(2, h2 + " -> " + h + " [style=bold]");
         }
@@ -1070,10 +1035,7 @@ public abstract class Scheduler {
             int h2 = System.identityHashCode(g2);
             if (!seen.contains(h2)) {
                 seen.add(h2);
-                Report.report(2,
-                              h2 + " [ label = \""
-                                      + StringUtil.escape(g2.toString())
-                                      + "\" ];");
+                Report.report(2, h2 + " [ label = \"" + StringUtil.escape(g2.toString()) + "\" ];");
             }
             Report.report(2, h2 + " -> " + h);
         }

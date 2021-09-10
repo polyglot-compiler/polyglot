@@ -85,12 +85,10 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(TypeClosure(job), this);
             g.addPrerequisiteGoal(AutoBoxing(job), this);
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
-
     }
 
     public Goal AutoBoxing(Job job) {
@@ -103,12 +101,10 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
             g.addPrerequisiteGoal(SimplifyExpressionsForBoxing(job), this);
             g.addPrerequisiteGoal(AnnotationCheck(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
-
     }
 
     public Goal TypeErasureProcDecls(Job job) {
@@ -120,12 +116,10 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(CastsInserted(job), this);
             g.addPrerequisiteGoal(AutoBoxing(job), this);
             g.addPrerequisiteGoal(RemoveExtendedFors(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
-
     }
 
     public Goal RemoveVarArgs(Job job) {
@@ -134,8 +128,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new RemoveVarargVisitor(job, ts, nf));
         try {
             g.addPrerequisiteGoal(PreRemoveJava5isms(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
@@ -147,8 +140,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new SimplifyExpressionsForBoxing(nf, ts));
         try {
             g.addPrerequisiteGoal(PreRemoveJava5isms(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
@@ -163,8 +155,7 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(RemoveStaticImports(job), this);
             g.addPrerequisiteGoal(RemoveVarArgs(job), this);
             g.addPrerequisiteGoal(AutoBoxing(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
@@ -177,8 +168,7 @@ public class JL5Scheduler extends JLScheduler {
         try {
             g.addPrerequisiteGoal(PreRemoveJava5isms(job), this);
             g.addPrerequisiteGoal(RemoveEnums(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
@@ -190,12 +180,10 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new RemoveExtendedFors(job, ts, nf));
         try {
             g.addPrerequisiteGoal(PreRemoveJava5isms(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
-
     }
 
     public Goal RemoveStaticImports(Job job) {
@@ -204,12 +192,10 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = new VisitorGoal(job, new RemoveStaticImports(job, ts, nf));
         try {
             g.addPrerequisiteGoal(PreRemoveJava5isms(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
-
     }
 
     public Goal RemoveAnnotations(Job job) {
@@ -219,12 +205,10 @@ public class JL5Scheduler extends JLScheduler {
         try {
             g.addPrerequisiteGoal(PreRemoveJava5isms(job), this);
             g.addPrerequisiteGoal(RemoveStaticImports(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
-
     }
 
     public Goal PreRemoveJava5isms(Job job) {
@@ -234,8 +218,7 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(AnnotationCheck(job), this);
             // make sure we serialize before we start changing things.
             g.addPrerequisiteGoal(Serialized(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
@@ -243,14 +226,16 @@ public class JL5Scheduler extends JLScheduler {
 
     public Goal RemoveJava5isms(Job job) {
         Options opts = extInfo.getOptions();
-        boolean typecheckResult = !(opts instanceof JL5Options
-                && ((JL5Options) opts).skip524checks);
-        Goal g = typecheckResult
-                ? internGoal(new VisitorGoal(job,
-                                             new JL5ToJLRewriter(job,
-                                                                 extInfo,
-                                                                 extInfo.outputExtensionInfo())))
-                : new EmptyGoal(job, "RemoveJava5isms");
+        boolean typecheckResult =
+                !(opts instanceof JL5Options && ((JL5Options) opts).skip524checks);
+        Goal g =
+                typecheckResult
+                        ? internGoal(
+                                new VisitorGoal(
+                                        job,
+                                        new JL5ToJLRewriter(
+                                                job, extInfo, extInfo.outputExtensionInfo())))
+                        : new EmptyGoal(job, "RemoveJava5isms");
         try {
             g.addPrerequisiteGoal(PreRemoveJava5isms(job), this);
             g.addPrerequisiteGoal(CastsInserted(job), this);
@@ -263,8 +248,7 @@ public class JL5Scheduler extends JLScheduler {
             g.addPrerequisiteGoal(RemoveStaticImports(job), this);
             g.addPrerequisiteGoal(RemoveAnnotations(job), this);
 
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
 
@@ -279,22 +263,20 @@ public class JL5Scheduler extends JLScheduler {
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
             g.addPrerequisiteGoal(AnnotationsResolved(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
-
     }
 
     public Goal TypeClosure(Job job) {
-        Goal g = internGoal(new VisitorGoal(job,
-                                            new polyglot.visit.TypeClosure(extInfo.nodeFactory()
-                                                                                  .lang())));
+        Goal g =
+                internGoal(
+                        new VisitorGoal(
+                                job, new polyglot.visit.TypeClosure(extInfo.nodeFactory().lang())));
         try {
             g.addPrerequisiteGoal(TypeChecked(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
@@ -304,18 +286,17 @@ public class JL5Scheduler extends JLScheduler {
     public Goal CodeGenerated(Job job) {
         Options opts = extInfo.getOptions();
         if (opts instanceof JL5Options && ((JL5Options) opts).removeJava5isms) {
-            Goal g = ((JL5Options) opts).skip524checks
-                    ? JL5CodeGenerated.create(this, job)
-                    : new EmptyGoal(job, "CodeGenerated");
+            Goal g =
+                    ((JL5Options) opts).skip524checks
+                            ? JL5CodeGenerated.create(this, job)
+                            : new EmptyGoal(job, "CodeGenerated");
             try {
                 g.addPrerequisiteGoal(RemoveJava5isms(job), this);
-            }
-            catch (CyclicDependencyException e) {
+            } catch (CyclicDependencyException e) {
                 throw new InternalCompilerError(e);
             }
             return g;
-        }
-        else return JL5CodeGenerated.create(this, job);
+        } else return JL5CodeGenerated.create(this, job);
     }
 
     @Override
@@ -323,8 +304,7 @@ public class JL5Scheduler extends JLScheduler {
         Goal g = super.Validated(job);
         try {
             g.addPrerequisiteGoal(AnnotationCheck(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
@@ -339,10 +319,8 @@ public class JL5Scheduler extends JLScheduler {
 
             // Create a goal to compile every source file.
             for (Job job : outExtInfo.scheduler().jobs()) {
-                Job newJob =
-                        outExtInfo.scheduler().addJob(job.source(), job.ast());
-                outExtInfo.scheduler()
-                          .addGoal(outExtInfo.getCompileGoal(newJob));
+                Job newJob = outExtInfo.scheduler().addJob(job.source(), job.ast());
+                outExtInfo.scheduler().addGoal(outExtInfo.getCompileGoal(newJob));
             }
             cleanup();
             return outExtInfo.scheduler().runToCompletion();
@@ -375,10 +353,7 @@ public class JL5Scheduler extends JLScheduler {
         public Pass createPass(ExtensionInfo extInfo) {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
-            return new OutputPass(this, new JL5Translator(job(),
-                                                          ts,
-                                                          nf,
-                                                          extInfo.targetFactory()));
+            return new OutputPass(this, new JL5Translator(job(), ts, nf, extInfo.targetFactory()));
         }
     }
 
@@ -386,15 +361,12 @@ public class JL5Scheduler extends JLScheduler {
     public Goal InitializationsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = new VisitorGoal(job,
-                                 new JL5DefiniteAssignmentChecker(job, ts, nf));
+        Goal g = new VisitorGoal(job, new JL5DefiniteAssignmentChecker(job, ts, nf));
         try {
             g.addPrerequisiteGoal(ReachabilityChecked(job), this);
-        }
-        catch (CyclicDependencyException e) {
+        } catch (CyclicDependencyException e) {
             throw new InternalCompilerError(e);
         }
         return internGoal(g);
     }
-
 }

@@ -2,14 +2,14 @@ package java_cup.runtime;
 
 import java.util.Stack;
 
-/** This class implements a temporary or "virtual" parse stack that 
- *  replaces the top portion of the actual parse stack (the part that 
+/** This class implements a temporary or "virtual" parse stack that
+ *  replaces the top portion of the actual parse stack (the part that
  *  has been changed by some set of operations) while maintaining its
- *  original contents.  This data structure is used when the parse needs 
- *  to "parse ahead" to determine if a given error recovery attempt will 
- *  allow the parse to continue far enough to consider it successful.  Once 
- *  success or failure of parse ahead is determined the system then 
- *  reverts to the original parse stack (which has not actually been 
+ *  original contents.  This data structure is used when the parse needs
+ *  to "parse ahead" to determine if a given error recovery attempt will
+ *  allow the parse to continue far enough to consider it successful.  Once
+ *  success or failure of parse ahead is determined the system then
+ *  reverts to the original parse stack (which has not actually been
  *  modified).  Since parse ahead does not execute actions, only parse
  *  state is maintained on the virtual stack, not full Symbol objects.
  *
@@ -17,15 +17,13 @@ import java.util.Stack;
  * @version last updated: 7/3/96
  * @author  Frank Flannery
  */
-
 public class virtual_parse_stack {
     /*-----------------------------------------------------------*/
     /*--- Constructor(s) ----------------------------------------*/
     /*-----------------------------------------------------------*/
 
     /** Constructor to build a virtual stack out of a real stack. */
-    public virtual_parse_stack(Stack<Symbol> shadowing_stack)
-            throws java.lang.Exception {
+    public virtual_parse_stack(Stack<Symbol> shadowing_stack) throws java.lang.Exception {
         /* sanity check */
         if (shadowing_stack == null)
             throw new Exception("Internal parser error: attempt to create null virtual stack");
@@ -53,7 +51,7 @@ public class virtual_parse_stack {
 
     /** Top of stack indicator for where we leave off in the real stack.
      *  This is measured from top of stack, so 0 would indicate that no
-     *  elements have been "moved" from the real to virtual stack. 
+     *  elements have been "moved" from the real to virtual stack.
      */
     protected int real_next;
 
@@ -62,8 +60,8 @@ public class virtual_parse_stack {
     /** The virtual top portion of the stack.  This stack contains Integer
      *  objects with state numbers.  This stack shadows the top portion
      *  of the real stack within the area that has been modified (via operations
-     *  on the virtual stack).  When this portion of the stack becomes empty we 
-     *  transfer elements from the underlying stack onto this stack. 
+     *  on the virtual stack).  When this portion of the stack becomes empty we
+     *  transfer elements from the underlying stack onto this stack.
      */
     protected Stack<Integer> vstack;
 
@@ -71,8 +69,8 @@ public class virtual_parse_stack {
     /*--- General Methods ---------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Transfer an element from the real to the virtual stack.  This assumes 
-     *  that the virtual stack is currently empty.  
+    /** Transfer an element from the real to the virtual stack.  This assumes
+     *  that the virtual stack is currently empty.
      */
     protected void get_from_real() {
         Symbol stack_sym;
@@ -94,7 +92,7 @@ public class virtual_parse_stack {
 
     /** Indicate whether the stack is empty. */
     public boolean empty() {
-        /* if vstack is empty then we were unable to transfer onto it and 
+        /* if vstack is empty then we were unable to transfer onto it and
         the whole thing is empty. */
         return vstack.empty();
     }

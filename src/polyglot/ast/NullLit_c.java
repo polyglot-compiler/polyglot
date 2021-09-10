@@ -38,7 +38,7 @@ import polyglot.visit.TypeChecker;
 public class NullLit_c extends Lit_c implements NullLit {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
+    //    @Deprecated
     public NullLit_c(Position pos) {
         this(pos, null);
     }
@@ -81,5 +81,4 @@ public class NullLit_c extends Lit_c implements NullLit {
     public Node copy(NodeFactory nf) {
         return nf.NullLit(position);
     }
-
 }

@@ -68,22 +68,24 @@ public class EfgClassInfo {
      */
     protected final Map<Name, Name> basenames;
 
-    public EfgClassInfo(ExtensionInfo extInfo, EfgClassInfo.State state,
-            Position pos, ClassType classType) {
+    public EfgClassInfo(
+            ExtensionInfo extInfo, EfgClassInfo.State state, Position pos, ClassType classType) {
         this.pos = pos;
         this.extInfo = extInfo;
         ts = extInfo.typeSystem();
         this.classType = classType;
         this.state = state;
-        basenames = new TreeMap<>(new Comparator<Name>() {
-            @Override
-            public int compare(Name o1, Name o2) {
-                if (o1 == o2) return 0;
-                if (o1 == null) return 1;
-                if (o2 == null) return -1;
-                return o1.name.compareTo(o2.name);
-            }
-        });
+        basenames =
+                new TreeMap<>(
+                        new Comparator<Name>() {
+                            @Override
+                            public int compare(Name o1, Name o2) {
+                                if (o1 == o2) return 0;
+                                if (o1 == null) return 1;
+                                if (o2 == null) return -1;
+                                return o1.name.compareTo(o2.name);
+                            }
+                        });
     }
 
     /**
@@ -99,11 +101,8 @@ public class EfgClassInfo {
         superType = fm.superClassType;
 
         if (fm.factoryNames == null) {
-            basenames.put(new Name(fm.className.pos,
-                                   extInfo.defaultBasename(classType)),
-                          null);
-        }
-        else {
+            basenames.put(new Name(fm.className.pos, extInfo.defaultBasename(classType)), null);
+        } else {
             for (FactoryName fn : fm.factoryNames) {
                 basenames.put(fn.basename, fn.delegate);
             }
@@ -120,9 +119,7 @@ public class EfgClassInfo {
             return;
         }
 
-        basenames.put(new Name(cd.id().position(),
-                               extInfo.defaultBasename(cd.type())),
-                      null);
+        basenames.put(new Name(cd.id().position(), extInfo.defaultBasename(cd.type())), null);
     }
 
     /**
@@ -149,16 +146,17 @@ public class EfgClassInfo {
      * @param allBasenames
      *         the basenames of all factory methods that will be generated.
      */
-    public void checkDelegates(ErrorQueue eq, ClassType superInterfaceCT,
-            Set<String> allBasenames) {
+    public void checkDelegates(
+            ErrorQueue eq, ClassType superInterfaceCT, Set<String> allBasenames) {
         for (Name delegate : basenames.values()) {
             if (delegate == null) continue;
 
             if (!allBasenames.contains(delegate.name)
                     && ts.hasFactory(superInterfaceCT, delegate.name) == null) {
-                eq.enqueue(ErrorInfo.SEMANTIC_ERROR,
-                           "Extension factory method is undefined",
-                           delegate.pos);
+                eq.enqueue(
+                        ErrorInfo.SEMANTIC_ERROR,
+                        "Extension factory method is undefined",
+                        delegate.pos);
             }
         }
     }
@@ -173,18 +171,15 @@ public class EfgClassInfo {
      * @param allBasenames
      *         the basenames of all factory methods that will be generated.
      */
-    public void fillInDefaults(ErrorQueue eq, ClassType superInterfaceCT,
-            Set<String> allBasenames) {
+    public void fillInDefaults(
+            ErrorQueue eq, ClassType superInterfaceCT, Set<String> allBasenames) {
         // Only need a super type if at least one extension factory method will
         // be generated.
         if (superType == null && !isEmpty()) {
             try {
                 superType = findSuperType();
-            }
-            catch (SemanticException e) {
-                eq.enqueue(ErrorInfo.SEMANTIC_ERROR,
-                           e.getMessage(),
-                           e.position());
+            } catch (SemanticException e) {
+                eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), e.position());
             }
         }
 
@@ -194,15 +189,14 @@ public class EfgClassInfo {
                 if (entry.getValue() != null) continue;
 
                 Name defaultDelegate =
-                        new Name(Position.compilerGenerated(),
-                                 findDefaultDelegateBasename(entry.getKey(),
-                                                             superInterfaceCT,
-                                                             allBasenames));
+                        new Name(
+                                Position.compilerGenerated(),
+                                findDefaultDelegateBasename(
+                                        entry.getKey(), superInterfaceCT, allBasenames));
 
                 entry.setValue(defaultDelegate);
             }
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), e.position());
         }
     }
@@ -249,15 +243,17 @@ public class EfgClassInfo {
 
         Set<ClassType> mostSpecific = mostSpecific(candidates);
         if (mostSpecific.isEmpty()) {
-            throw new SemanticException("No base factory found for "
-                    + classType.name(), pos);
+            throw new SemanticException("No base factory found for " + classType.name(), pos);
         }
 
         if (mostSpecific.size() > 1) {
-            throw new SemanticException("Multiple base factories found for "
-                    + classType.name()
-                    + ". Please specify one in the configuration file.\n"
-                    + "Candidate base factories: " + mostSpecific, pos);
+            throw new SemanticException(
+                    "Multiple base factories found for "
+                            + classType.name()
+                            + ". Please specify one in the configuration file.\n"
+                            + "Candidate base factories: "
+                            + mostSpecific,
+                    pos);
         }
 
         return mostSpecific.iterator().next();
@@ -270,8 +266,8 @@ public class EfgClassInfo {
      *
      * @param name the basename for which we are finding the default delegate.
      */
-    protected String findDefaultDelegateBasename(Name basename,
-            ClassType superInterfaceCT, Set<String> allBasenames)
+    protected String findDefaultDelegateBasename(
+            Name basename, ClassType superInterfaceCT, Set<String> allBasenames)
             throws SemanticException {
         // We prune supertypes of types that we have already found, since we
         // will eventually be taking the most specific one.
@@ -298,17 +294,18 @@ public class EfgClassInfo {
 
         Set<ClassType> mostSpecific = mostSpecific(candidates.keySet());
         if (mostSpecific.isEmpty()) {
-            throw new SemanticException("No delegate found for "
-                    + classType.name(), pos);
+            throw new SemanticException("No delegate found for " + classType.name(), pos);
         }
 
         if (mostSpecific.size() > 1) {
             candidates.keySet().retainAll(mostSpecific);
-            throw new SemanticException("Multiple possible delegates found for "
-                    + classType.name()
-                    + ". Please specify one in the configuration file.\n"
-                    + "Candidate delegates: "
-                    + new HashSet<>(candidates.values()), pos);
+            throw new SemanticException(
+                    "Multiple possible delegates found for "
+                            + classType.name()
+                            + ". Please specify one in the configuration file.\n"
+                            + "Candidate delegates: "
+                            + new HashSet<>(candidates.values()),
+                    pos);
         }
 
         return candidates.get(mostSpecific.iterator().next());
@@ -323,8 +320,7 @@ public class EfgClassInfo {
         if (superType != null) s.add(superType.toClass());
 
         @SuppressWarnings("unchecked")
-        Collection<ClassType> interfaces =
-                (Collection<ClassType>) ct.interfaces();
+        Collection<ClassType> interfaces = (Collection<ClassType>) ct.interfaces();
         s.addAll(interfaces);
     }
 

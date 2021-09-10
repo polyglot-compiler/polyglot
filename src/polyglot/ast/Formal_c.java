@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -57,7 +57,7 @@ public class Formal_c extends Term_c implements Formal {
     protected TypeNode type;
     protected Id name;
 
-//    @Deprecated
+    //    @Deprecated
     public Formal_c(Position pos, Flags flags, TypeNode type, Id name) {
         this(pos, flags, type, name, null);
     }
@@ -192,10 +192,7 @@ public class Formal_c extends Term_c implements Formal {
         TypeSystem ts = tb.typeSystem();
 
         LocalInstance li =
-                ts.localInstance(position(),
-                                 flags(),
-                                 ts.unknownType(position()),
-                                 name());
+                ts.localInstance(position(), flags(), ts.unknownType(position()), name());
 
         n = localInstance(n, li);
         return n;
@@ -222,17 +219,21 @@ public class Formal_c extends Term_c implements Formal {
         LocalInstance outerLocal = c.findLocalSilent(li.name());
 
         if (outerLocal != null && outerLocal != li && c.isLocal(li.name())) {
-            throw new SemanticException("Local variable \"" + name
-                    + "\" multiply defined.  " + "Previous definition at "
-                    + outerLocal.position() + ".", position());
+            throw new SemanticException(
+                    "Local variable \""
+                            + name
+                            + "\" multiply defined.  "
+                            + "Previous definition at "
+                            + outerLocal.position()
+                            + ".",
+                    position());
         }
 
         TypeSystem ts = tc.typeSystem();
 
         try {
             ts.checkLocalFlags(flags());
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), position());
         }
 
@@ -283,5 +284,4 @@ public class Formal_c extends Term_c implements Formal {
     public Node copy(NodeFactory nf) {
         return nf.Formal(this.position, this.flags, this.type, this.name);
     }
-
 }

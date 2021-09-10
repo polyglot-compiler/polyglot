@@ -1,16 +1,15 @@
 package java_cup;
 
-/** This class serves as the base class for entries in a parse action table.  
+/** This class serves as the base class for entries in a parse action table.
  *  Full entries will either be SHIFT(state_num), REDUCE(production), NONASSOC,
  *  or ERROR. Objects of this base class will default to ERROR, while
- *  the other three types will be represented by subclasses. 
- * 
+ *  the other three types will be represented by subclasses.
+ *
  * @see     java_cup.reduce_action
  * @see     java_cup.shift_action
  * @version last updated: 7/2/96
  * @author  Frank Flannery
  */
-
 public class parse_action {
 
     /*-----------------------------------------------------------*/
@@ -66,8 +65,7 @@ public class parse_action {
     /** Generic equality test. */
     @Override
     public boolean equals(Object other) {
-        if (other instanceof parse_action)
-            return equals((parse_action) other);
+        if (other instanceof parse_action) return equals((parse_action) other);
         else return false;
     }
 

@@ -76,14 +76,17 @@ import polyglot.visit.FlowGraph.Peer;
 /**
  * A visitor that checks that variables are initialized correctly.
  */
-public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentChecker.ClassBodyInfo<CBI>, FI extends AbstractAssignmentChecker.FlowItem>
+public abstract class AbstractAssignmentChecker<
+                CBI extends AbstractAssignmentChecker.ClassBodyInfo<CBI>,
+                FI extends AbstractAssignmentChecker.FlowItem>
         extends DataFlow<FI> {
     public AbstractAssignmentChecker(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job,
-              ts,
-              nf,
-              true /* forward analysis */,
-              false /* perform dataflow when leaving CodeDecls, not when entering */);
+        super(
+                job,
+                ts,
+                nf,
+                true /* forward analysis */,
+                false /* perform dataflow when leaving CodeDecls, not when entering */);
     }
 
     protected CBI curCBI = null;
@@ -93,7 +96,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * initialization checking of a class declaration. These objects form a
      * stack, since class declarations can be nested.
      */
-    public static abstract class ClassBodyInfo<This extends ClassBodyInfo<This>> {
+    public abstract static class ClassBodyInfo<This extends ClassBodyInfo<This>> {
         /**
          * The {@link ClassBodyInfo} for the outer {@link ClassBody}. This forms
          * a stack.
@@ -128,15 +131,13 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
         /**
          * The constructors for the current class that call {@code this()}.
          */
-        public final Set<ConstructorDecl> constructorsCallingThis =
-                new HashSet<>();
+        public final Set<ConstructorDecl> constructorsCallingThis = new HashSet<>();
 
         /**
          * The constructors for the current class that cannot terminate
          * normally. This is a subset of {@link #allConstructors}.
          */
-        public final Set<ConstructorDecl> constructorsCannotTerminateNormally =
-                new HashSet<>();
+        public final Set<ConstructorDecl> constructorsCannotTerminateNormally = new HashSet<>();
 
         /**
          * Maps {@link ConstructorInstance}s to the {@link FieldInstances} of
@@ -165,8 +166,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
          * This information is used to ensure that local variables are
          * definitely assigned before the class declaration of C.
          */
-        public final Map<ClassBody, Set<LocalInstance>> localsUsedInClassBodies =
-                new HashMap<>();
+        public final Map<ClassBody, Set<LocalInstance>> localsUsedInClassBodies = new HashMap<>();
 
         /**
          * The {@link LocalInstance}s that we have seen declarations for in the
@@ -189,46 +189,48 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * definitely assigned (or not), and definitely unassigned (or not).
      */
     protected static enum AssignmentStatus {
-        BOTH(true, true), ASSIGNED(true, false), UNASSIGNED(false, true),
+        BOTH(true, true),
+        ASSIGNED(true, false),
+        UNASSIGNED(false, true),
         NEITHER(false, false);
 
         public final boolean definitelyAssigned;
         public final boolean definitelyUnassigned;
 
-        AssignmentStatus(boolean definitelyAssigned,
-                boolean definitelyUnassigned) {
+        AssignmentStatus(boolean definitelyAssigned, boolean definitelyUnassigned) {
             this.definitelyAssigned = definitelyAssigned;
             this.definitelyUnassigned = definitelyUnassigned;
         }
 
         @Override
         public String toString() {
-            return "[" + (definitelyAssigned ? "definitely assigned " : "")
+            return "["
+                    + (definitelyAssigned ? "definitely assigned " : "")
                     + (definitelyUnassigned ? "definitely unassigned " : "")
                     + "]";
         }
 
-        public static AssignmentStatus join(AssignmentStatus as1,
-                AssignmentStatus as2) {
+        public static AssignmentStatus join(AssignmentStatus as1, AssignmentStatus as2) {
             if (as1 == null) return as2;
             if (as2 == null) return as1;
             boolean defAss = as1.definitelyAssigned && as2.definitelyAssigned;
-            boolean defUnass =
-                    as1.definitelyUnassigned && as2.definitelyUnassigned;
+            boolean defUnass = as1.definitelyUnassigned && as2.definitelyUnassigned;
             return construct(defAss, defUnass);
         }
 
-        private static AssignmentStatus construct(boolean defAss,
-                boolean defUnass) {
+        private static AssignmentStatus construct(boolean defAss, boolean defUnass) {
             for (AssignmentStatus as : AssignmentStatus.values()) {
-                if (as.definitelyAssigned == defAss
-                        && as.definitelyUnassigned == defUnass)
+                if (as.definitelyAssigned == defAss && as.definitelyUnassigned == defUnass)
                     return as;
             }
 
-            throw new InternalCompilerError("Unable to construct assignment "
-                    + "status from (defAss=" + defAss + ", defUnass=" + defUnass
-                    + ")");
+            throw new InternalCompilerError(
+                    "Unable to construct assignment "
+                            + "status from (defAss="
+                            + defAss
+                            + ", defUnass="
+                            + defUnass
+                            + ")");
         }
     }
 
@@ -245,8 +247,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
          */
         public final boolean normalTermination;
 
-        protected FlowItem(Map<VarInstance, AssignmentStatus> map,
-                boolean canTerminateNormally) {
+        protected FlowItem(Map<VarInstance, AssignmentStatus> map, boolean canTerminateNormally) {
             assignmentStatus = Collections.unmodifiableMap(new HashMap<>(map));
             normalTermination = canTerminateNormally;
         }
@@ -284,8 +285,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * @param canTerminateNormally indicates whether the current path for the
      *         flow item can terminate normally.
      */
-    protected abstract FI newFlowItem(Map<VarInstance, AssignmentStatus> map,
-            boolean canTerminateNormally);
+    protected abstract FI newFlowItem(
+            Map<VarInstance, AssignmentStatus> map, boolean canTerminateNormally);
 
     /**
      * Reconstructs a flow item by replacing the assignment-status map.
@@ -293,8 +294,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * @param fi the flow item to reconstruct.
      * @param map the assignment-status map to use in the reconstructed object.
      */
-    protected FI reconstructFlowItem(FI fi,
-            Map<VarInstance, AssignmentStatus> map) {
+    protected FI reconstructFlowItem(FI fi, Map<VarInstance, AssignmentStatus> map) {
         return newFlowItem(map, fi.normalTermination);
     }
 
@@ -304,7 +304,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * Constructs the flow item at the bottom of the lattice.
      */
     protected FI BOTTOM() {
-        return newFlowItem(Collections.<VarInstance, AssignmentStatus> emptyMap());
+        return newFlowItem(Collections.<VarInstance, AssignmentStatus>emptyMap());
     }
 
     @Override
@@ -319,8 +319,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * {@inheritDoc}
      */
     @Override
-    protected NodeVisitor enterCall(Node parent, Node n)
-            throws SemanticException {
+    protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         if (n instanceof ClassBody) {
             // Starting to process a class declaration, but haven't done any of
             // the dataflow analysis yet.
@@ -329,14 +328,13 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
             ClassType ct = null;
             if (parent instanceof ClassDecl) {
                 ct = ((ClassDecl) parent).type();
-            }
-            else if (parent instanceof New) {
+            } else if (parent instanceof New) {
                 ct = ((New) parent).anonType();
             }
 
             if (ct == null) {
-                throw new InternalCompilerError("ClassBody found but cannot "
-                        + "find the class.", n.position());
+                throw new InternalCompilerError(
+                        "ClassBody found but cannot " + "find the class.", n.position());
             }
 
             setupClassBody(ct, (ClassBody) n);
@@ -346,8 +344,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
     }
 
     @Override
-    protected Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof ConstructorDecl) {
             // Postpone checking of constructors until the end of the class
             // declaration, to ensure that all the initializer blocks are
@@ -374,11 +371,9 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
 
                 // copy the locals used to the outer scope
                 if (curCBI.outer != null) {
-                    curCBI.outer.localsUsedInClassBodies.put(cb,
-                                                             curCBI.outerLocalsUsed);
+                    curCBI.outer.localsUsedInClassBodies.put(cb, curCBI.outerLocalsUsed);
                 }
-            }
-            finally {
+            } finally {
                 // Pop the stack.
                 curCBI = curCBI.outer;
             }
@@ -392,8 +387,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * leaving the class body, after performing dataflow on the class's
      * constructors.
      */
-    protected abstract void leaveClassBody(ClassBody cb)
-            throws SemanticException;
+    protected abstract void leaveClassBody(ClassBody cb) throws SemanticException;
 
     /**
      * Factory method for creating {@link CBI}s.
@@ -405,8 +399,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * ClassBodyInfo#curClassFieldAsgtStatuses} of the new {@link CBI} to
      * contain mappings for all the fields of the class.
      */
-    protected void setupClassBody(ClassType ct, ClassBody n)
-            throws SemanticException {
+    protected void setupClassBody(ClassType ct, ClassBody n) throws SemanticException {
         curCBI = newCBI(curCBI, ct);
 
         // Set up curClassfieldAsgtStatuses to contain mappings for all fields
@@ -415,15 +408,14 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
             if (!(cm instanceof FieldDecl)) continue;
 
             FieldDecl fd = (FieldDecl) cm;
-            AssignmentStatus asgtStatus = fd.init() == null
-                    ? AssignmentStatus.UNASSIGNED : AssignmentStatus.ASSIGNED;
+            AssignmentStatus asgtStatus =
+                    fd.init() == null ? AssignmentStatus.UNASSIGNED : AssignmentStatus.ASSIGNED;
 
             // do dataflow over the initialization expression
             // to pick up any uses of outer local variables.
             if (fd.init() != null && curCBI.outer != null) dataflow(fd.init());
 
-            curCBI.curClassFieldAsgtStatuses.put(fd.fieldInstance().orig(),
-                                                 asgtStatus);
+            curCBI.curClassFieldAsgtStatuses.put(fd.fieldInstance().orig(), asgtStatus);
         }
     }
 
@@ -457,15 +449,16 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * ClassBodyInfo#curClassFieldAsgtStatuses}.
      */
     protected FI createInitDFI() {
-        return newFlowItem(new HashMap<VarInstance, AssignmentStatus>(curCBI.curClassFieldAsgtStatuses));
+        return newFlowItem(
+                new HashMap<VarInstance, AssignmentStatus>(curCBI.curClassFieldAsgtStatuses));
     }
 
     @Override
     protected CFGBuilder<FI> createCFGBuilder(TypeSystem ts, FlowGraph<FI> g) {
         CFGBuilder<FI> v = new CFGBuilder<>(lang(), ts, g, this);
         // skip dead loops bodies and dead if branches. See JLS 2nd edition, Section 16.
-//        v = v.skipDeadIfBranches(true);
-//        v = v.skipDeadLoopBodies(true);
+        //        v = v.skipDeadIfBranches(true);
+        //        v = v.skipDeadLoopBodies(true);
         return v;
     }
 
@@ -478,16 +471,18 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * {@link #confluence(List, Peer, FlowGraph)} is called instead.
      */
     @Override
-    protected FI confluence(List<FI> items, List<EdgeKey> itemKeys,
-            Peer<FI> peer, FlowGraph<FI> graph) {
+    protected FI confluence(
+            List<FI> items, List<EdgeKey> itemKeys, Peer<FI> peer, FlowGraph<FI> graph) {
         Node node = peer.node();
         if (node instanceof Initializer || node instanceof ConstructorDecl) {
             List<FI> filtered = filterItemsNonException(items, itemKeys);
             if (filtered.isEmpty()) {
                 // Record the fact that this dataflow item was not produced for
                 // a node that can be reached by normal termination.
-                return newFlowItem(new HashMap<VarInstance, AssignmentStatus>(curCBI.curClassFieldAsgtStatuses),
-                                   false);
+                return newFlowItem(
+                        new HashMap<VarInstance, AssignmentStatus>(
+                                curCBI.curClassFieldAsgtStatuses),
+                        false);
             }
 
             if (filtered.size() == 1) {
@@ -507,16 +502,14 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * minimum of all mins and the maximum of all maxes.
      */
     @Override
-    protected FI confluence(List<FI> inItems, Peer<FI> peer,
-            FlowGraph<FI> graph) {
+    protected FI confluence(List<FI> inItems, Peer<FI> peer, FlowGraph<FI> graph) {
         // Resolve any conflicts pairwise.
         Map<VarInstance, AssignmentStatus> m = null;
         for (FI itm : inItems) {
             if (itm == BOTTOM) continue;
             if (m == null) {
                 m = new HashMap<>(itm.assignmentStatus);
-            }
-            else {
+            } else {
                 Map<VarInstance, AssignmentStatus> n = itm.assignmentStatus;
                 for (Entry<VarInstance, AssignmentStatus> e : n.entrySet()) {
                     VarInstance v = e.getKey();
@@ -533,8 +526,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
     }
 
     @Override
-    protected Map<EdgeKey, FI> flow(List<FI> inItems, List<EdgeKey> inItemKeys,
-            FlowGraph<FI> graph, Peer<FI> peer) {
+    protected Map<EdgeKey, FI> flow(
+            List<FI> inItems, List<EdgeKey> inItemKeys, FlowGraph<FI> graph, Peer<FI> peer) {
         return flowToBooleanFlow(inItems, inItemKeys, graph, peer);
     }
 
@@ -555,16 +548,18 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * </ul>
      */
     @Override
-    protected Map<EdgeKey, FI> flow(FI trueItem, FI falseItem, FI otherItem,
-            FlowGraph<FI> graph, Peer<FI> peer) {
-        FI inItem = safeConfluence(trueItem,
-                                   FlowGraph.EDGE_KEY_TRUE,
-                                   falseItem,
-                                   FlowGraph.EDGE_KEY_FALSE,
-                                   otherItem,
-                                   FlowGraph.EDGE_KEY_OTHER,
-                                   peer,
-                                   graph);
+    protected Map<EdgeKey, FI> flow(
+            FI trueItem, FI falseItem, FI otherItem, FlowGraph<FI> graph, Peer<FI> peer) {
+        FI inItem =
+                safeConfluence(
+                        trueItem,
+                        FlowGraph.EDGE_KEY_TRUE,
+                        falseItem,
+                        FlowGraph.EDGE_KEY_FALSE,
+                        otherItem,
+                        FlowGraph.EDGE_KEY_OTHER,
+                        peer,
+                        graph);
 
         Node n = peer.node();
         if (peer.isEntry()) {
@@ -590,47 +585,25 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
         if (n instanceof Formal) {
             // formal argument declaration.
             ret = flowFormal(inDFItem, graph, (Formal) n, peer.succEdgeKeys());
-        }
-        else if (n instanceof LocalDecl) {
+        } else if (n instanceof LocalDecl) {
             // local variable declaration.
-            ret = flowLocalDecl(inDFItem,
-                                graph,
-                                (LocalDecl) n,
-                                peer.succEdgeKeys());
-        }
-        else if (n instanceof LocalAssign) {
+            ret = flowLocalDecl(inDFItem, graph, (LocalDecl) n, peer.succEdgeKeys());
+        } else if (n instanceof LocalAssign) {
             // assignment to a local variable
-            ret = flowLocalAssign(inDFItem,
-                                  graph,
-                                  (LocalAssign) n,
-                                  peer.succEdgeKeys());
-        }
-        else if (n instanceof FieldAssign) {
+            ret = flowLocalAssign(inDFItem, graph, (LocalAssign) n, peer.succEdgeKeys());
+        } else if (n instanceof FieldAssign) {
             // assignment to a field
-            ret = flowFieldAssign(inDFItem,
-                                  graph,
-                                  (FieldAssign) n,
-                                  peer.succEdgeKeys());
-        }
-        else if (n instanceof ConstructorCall) {
+            ret = flowFieldAssign(inDFItem, graph, (FieldAssign) n, peer.succEdgeKeys());
+        } else if (n instanceof ConstructorCall) {
             // call to another constructor.
-            ret = flowConstructorCall(inDFItem,
-                                      graph,
-                                      (ConstructorCall) n,
-                                      peer.succEdgeKeys());
-        }
-        else if (n instanceof Expr && ((Expr) n).type().isBoolean()
-                && (n instanceof Binary || n instanceof Conditional
-                        || n instanceof Unary)) {
+            ret = flowConstructorCall(inDFItem, graph, (ConstructorCall) n, peer.succEdgeKeys());
+        } else if (n instanceof Expr
+                && ((Expr) n).type().isBoolean()
+                && (n instanceof Binary || n instanceof Conditional || n instanceof Unary)) {
             if (trueItem == null) trueItem = inDFItem;
             if (falseItem == null) falseItem = inDFItem;
-            ret = flowBooleanConditions(trueItem,
-                                        falseItem,
-                                        inDFItem,
-                                        graph,
-                                        peer);
-        }
-        else {
+            ret = flowBooleanConditions(trueItem, falseItem, inDFItem, graph, peer);
+        } else {
             ret = flowOther(inDFItem, graph, n, peer.succEdgeKeys());
         }
         if (ret == null) {
@@ -641,23 +614,17 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
             if (lang().isConstant(e, lang()) && e.type().isBoolean()) {
                 if (Boolean.TRUE.equals(lang().constantValue(e, lang()))) {
                     // the false branch is dead
-                    ret = remap(ret,
-                                FlowGraph.EDGE_KEY_FALSE,
-                                AssignmentStatus.BOTH);
-                }
-                else {
+                    ret = remap(ret, FlowGraph.EDGE_KEY_FALSE, AssignmentStatus.BOTH);
+                } else {
                     // the true branch is dead
-                    ret = remap(ret,
-                                FlowGraph.EDGE_KEY_TRUE,
-                                AssignmentStatus.BOTH);
+                    ret = remap(ret, FlowGraph.EDGE_KEY_TRUE, AssignmentStatus.BOTH);
                 }
             }
         }
         return ret;
     }
 
-    private Map<EdgeKey, FI> remap(Map<EdgeKey, FI> m, EdgeKey ek,
-            AssignmentStatus asgtStatus) {
+    private Map<EdgeKey, FI> remap(Map<EdgeKey, FI> m, EdgeKey ek, AssignmentStatus asgtStatus) {
         FI fi = m.get(ek);
         if (fi == null) {
             return m;
@@ -677,58 +644,52 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
     /**
      * Performs the appropriate flow operations for a {@link Formal}.
      */
-    protected Map<EdgeKey, FI> flowFormal(FI inItem, FlowGraph<FI> graph,
-            Formal f, Set<EdgeKey> succEdgeKeys) {
-        Map<VarInstance, AssignmentStatus> m =
-                new HashMap<>(inItem.assignmentStatus);
+    protected Map<EdgeKey, FI> flowFormal(
+            FI inItem, FlowGraph<FI> graph, Formal f, Set<EdgeKey> succEdgeKeys) {
+        Map<VarInstance, AssignmentStatus> m = new HashMap<>(inItem.assignmentStatus);
         // a formal argument is always defined.
         m.put(f.localInstance().orig(), AssignmentStatus.ASSIGNED);
 
         // record the fact that we have seen the formal declaration
         curCBI.localDeclarations.add(f.localInstance().orig());
 
-        return DataFlow.<FI> itemToMap(reconstructFlowItem(inItem, m),
-                                       succEdgeKeys);
+        return DataFlow.<FI>itemToMap(reconstructFlowItem(inItem, m), succEdgeKeys);
     }
 
     /**
      * Performs the appropriate flow operations for a {@link LocalDecl}.
      */
-    protected Map<EdgeKey, FI> flowLocalDecl(FI inItem, FlowGraph<FI> graph,
-            LocalDecl ld, Set<EdgeKey> succEdgeKeys) {
-        Map<VarInstance, AssignmentStatus> m =
-                new HashMap<>(inItem.assignmentStatus);
+    protected Map<EdgeKey, FI> flowLocalDecl(
+            FI inItem, FlowGraph<FI> graph, LocalDecl ld, Set<EdgeKey> succEdgeKeys) {
+        Map<VarInstance, AssignmentStatus> m = new HashMap<>(inItem.assignmentStatus);
 
-        AssignmentStatus asgtStatus = ld.init() == null
-                ? AssignmentStatus.UNASSIGNED : AssignmentStatus.ASSIGNED;
+        AssignmentStatus asgtStatus =
+                ld.init() == null ? AssignmentStatus.UNASSIGNED : AssignmentStatus.ASSIGNED;
         m.put(ld.localInstance().orig(), asgtStatus);
 
         // record the fact that we have seen a local declaration
         curCBI.localDeclarations.add(ld.localInstance());
 
-        return DataFlow.<FI> itemToMap(reconstructFlowItem(inItem, m),
-                                       succEdgeKeys);
+        return DataFlow.<FI>itemToMap(reconstructFlowItem(inItem, m), succEdgeKeys);
     }
 
     /**
      * Performs the appropriate flow operations for a {@link LocalAssign}.
      */
-    protected Map<EdgeKey, FI> flowLocalAssign(FI inItem, FlowGraph<FI> graph,
-            LocalAssign a, Set<EdgeKey> succEdgeKeys) {
+    protected Map<EdgeKey, FI> flowLocalAssign(
+            FI inItem, FlowGraph<FI> graph, LocalAssign a, Set<EdgeKey> succEdgeKeys) {
         Local l = a.left();
-        Map<VarInstance, AssignmentStatus> m =
-                new HashMap<>(inItem.assignmentStatus);
+        Map<VarInstance, AssignmentStatus> m = new HashMap<>(inItem.assignmentStatus);
         m.put(l.localInstance().orig(), AssignmentStatus.ASSIGNED);
 
-        return DataFlow.<FI> itemToMap(reconstructFlowItem(inItem, m),
-                                       succEdgeKeys);
+        return DataFlow.<FI>itemToMap(reconstructFlowItem(inItem, m), succEdgeKeys);
     }
 
     /**
      * Performs the appropriate flow operations for a {@link FieldAssign}.
      */
-    protected Map<EdgeKey, FI> flowFieldAssign(FI inItem, FlowGraph<FI> graph,
-            FieldAssign a, Set<EdgeKey> succEdgeKeys) {
+    protected Map<EdgeKey, FI> flowFieldAssign(
+            FI inItem, FlowGraph<FI> graph, FieldAssign a, Set<EdgeKey> succEdgeKeys) {
         Field f = a.left();
         FieldInstance fi = f.fieldInstance();
 
@@ -736,8 +697,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
         // what we are interested in.
         if (!isFieldsTargetAppropriate(graph, f)) return null;
 
-        Map<VarInstance, AssignmentStatus> m =
-                new HashMap<>(inItem.assignmentStatus);
+        Map<VarInstance, AssignmentStatus> m = new HashMap<>(inItem.assignmentStatus);
 
         // m.get(fi.orig()) may be null if the field is defined in an
         // outer class. If so, ignore this assignment.
@@ -745,16 +705,14 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
 
         // The field is now definitely assigned.
         m.put(fi.orig(), AssignmentStatus.ASSIGNED);
-        return DataFlow.<FI> itemToMap(reconstructFlowItem(inItem, m),
-                                       succEdgeKeys);
+        return DataFlow.<FI>itemToMap(reconstructFlowItem(inItem, m), succEdgeKeys);
     }
 
     /**
      * Performs the appropriate flow operations for a {@link ConstructorCall}.
      */
-    protected Map<EdgeKey, FI> flowConstructorCall(FI inItem,
-            FlowGraph<FI> graph, ConstructorCall cc,
-            Set<EdgeKey> succEdgeKeys) {
+    protected Map<EdgeKey, FI> flowConstructorCall(
+            FI inItem, FlowGraph<FI> graph, ConstructorCall cc, Set<EdgeKey> succEdgeKeys) {
         if (ConstructorCall.THIS.equals(cc.kind())) {
             // currCodeDecl must be a ConstructorDecl, as that
             // is the only place constructor calls are allowed
@@ -777,8 +735,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
     /**
      * Allows subclasses to override if necessary.
      */
-    protected Map<EdgeKey, FI> flowOther(FI inItem, FlowGraph<FI> graph, Node n,
-            Set<EdgeKey> succEdgeKeys) {
+    protected Map<EdgeKey, FI> flowOther(
+            FI inItem, FlowGraph<FI> graph, Node n, Set<EdgeKey> succEdgeKeys) {
         return null;
     }
 
@@ -793,13 +751,11 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
 
         if (f.fieldInstance().flags().isStatic()) {
             return containingClass.equals(f.fieldInstance().orig().container());
-        }
-        else {
+        } else {
             if (f.target() instanceof Special) {
                 Special s = (Special) f.target();
                 if (Special.THIS.equals(s.kind())) {
-                    return s.qualifier() == null
-                            || containingClass.equals(s.qualifier().type());
+                    return s.qualifier() == null || containingClass.equals(s.qualifier().type());
                 }
             }
             return false;
@@ -815,8 +771,9 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * ClassBodyInfo#curClassFieldAsgtStatuses}.
      */
     @Override
-    protected void check(FlowGraph<FI> graph, Term n, boolean entry, FI inItem,
-            Map<EdgeKey, FI> outItems) throws SemanticException {
+    protected void check(
+            FlowGraph<FI> graph, Term n, boolean entry, FI inItem, Map<EdgeKey, FI> outItems)
+            throws SemanticException {
         FI dfIn = inItem;
         if (dfIn == null) {
             // There is no input data flow item. This can happen if we are
@@ -837,55 +794,34 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
             dfOut = outItems.values().iterator().next();
             if (n instanceof Field) {
                 checkField(graph, (Field) n, dfIn);
-            }
-            else if (n instanceof Local) {
+            } else if (n instanceof Local) {
                 checkLocal(graph, (Local) n, dfIn);
-            }
-            else if (n instanceof LocalAssign) {
-                checkLocalAssign(graph,
-                                 ((LocalAssign) n).left().localInstance(),
-                                 n.position(),
-                                 dfIn);
-            }
-            else if (n instanceof LocalDecl) {
-                checkLocalAssign(graph,
-                                 ((LocalDecl) n).localInstance(),
-                                 n.position(),
-                                 dfIn);
-            }
-            else if (n instanceof FieldAssign) {
+            } else if (n instanceof LocalAssign) {
+                checkLocalAssign(
+                        graph, ((LocalAssign) n).left().localInstance(), n.position(), dfIn);
+            } else if (n instanceof LocalDecl) {
+                checkLocalAssign(graph, ((LocalDecl) n).localInstance(), n.position(), dfIn);
+            } else if (n instanceof FieldAssign) {
                 checkFieldAssign(graph, (FieldAssign) n, dfIn);
-            }
-            else if (n instanceof ClassBody) {
+            } else if (n instanceof ClassBody) {
                 checkClassBody(graph, (ClassBody) n, dfIn, dfOut);
-            }
-            else {
+            } else {
                 checkOther(graph, n, dfIn, dfOut);
             }
-        }
-        else {
+        } else {
             // this local assign node has not had data flow performed over it.
             // probably a node in a finally block. Just ignore it.
         }
 
         if (n == graph.root() && !entry) {
             if (curCBI.curCodeDecl instanceof FieldDecl) {
-                finishFieldDecl(graph,
-                                (FieldDecl) curCBI.curCodeDecl,
-                                dfIn,
-                                dfOut);
+                finishFieldDecl(graph, (FieldDecl) curCBI.curCodeDecl, dfIn, dfOut);
             }
             if (curCBI.curCodeDecl instanceof ConstructorDecl) {
-                finishConstructorDecl(graph,
-                                      (ConstructorDecl) curCBI.curCodeDecl,
-                                      dfIn,
-                                      dfOut);
+                finishConstructorDecl(graph, (ConstructorDecl) curCBI.curCodeDecl, dfIn, dfOut);
             }
             if (curCBI.curCodeDecl instanceof Initializer) {
-                finishInitializer(graph,
-                                  (Initializer) curCBI.curCodeDecl,
-                                  dfIn,
-                                  dfOut);
+                finishInitializer(graph, (Initializer) curCBI.curCodeDecl, dfIn, dfOut);
             }
         }
     }
@@ -905,21 +841,21 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
     /**
      * Checks that an assignment to the given {@link LocalInstance} is correct.
      */
-    protected abstract void checkLocalAssign(FlowGraph<FI> graph,
-            LocalInstance li, Position pos, FI dfIn) throws SemanticException;
+    protected abstract void checkLocalAssign(
+            FlowGraph<FI> graph, LocalInstance li, Position pos, FI dfIn) throws SemanticException;
 
     /**
      * Checks that the given {@link FieldAssign} is correct.
      */
-    protected abstract void checkFieldAssign(FlowGraph<FI> graph, FieldAssign a,
-            FI dfIn) throws SemanticException;
+    protected abstract void checkFieldAssign(FlowGraph<FI> graph, FieldAssign a, FI dfIn)
+            throws SemanticException;
 
     /**
      * Checks that the usage of locals in the given {@link ClassBody} (which
      * represents an inner class) is correct.
      */
-    protected void checkClassBody(FlowGraph<FI> graph, ClassBody cb, FI dfIn,
-            FI dfOut) throws SemanticException {
+    protected void checkClassBody(FlowGraph<FI> graph, ClassBody cb, FI dfIn, FI dfOut)
+            throws SemanticException {
         // we need to check that the locals used inside this class body
         // have all been defined at this point.
         Set<LocalInstance> localsUsed = curCBI.localsUsedInClassBodies.get(cb);
@@ -934,8 +870,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * locals used in the inner class having the given {@link ClassBody})
      * are initialized before the class declaration.
      */
-    protected abstract void checkLocalsUsedByInnerClass(FlowGraph<FI> graph,
-            ClassBody cb, Set<LocalInstance> localsUsed, FI dfIn, FI dfOut)
+    protected abstract void checkLocalsUsedByInnerClass(
+            FlowGraph<FI> graph, ClassBody cb, Set<LocalInstance> localsUsed, FI dfIn, FI dfOut)
             throws SemanticException;
 
     /**
@@ -943,8 +879,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * @throws SemanticException
      */
     protected void checkOther(FlowGraph<FI> graph, Node n, FI dfIn, FI dfOut)
-            throws SemanticException {
-    }
+            throws SemanticException {}
 
     /**
      * Performs the necessary actions upon finishing the checking of the given
@@ -954,8 +889,7 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * fields into {@link ClassBodyInfo#curClassFieldAsgtStatuses} so that they
      * are correct for the next field declaration, initializer, or constructor.
      */
-    protected void finishFieldDecl(FlowGraph<FI> graph, FieldDecl fd, FI dfIn,
-            FI dfOut) {
+    protected void finishFieldDecl(FlowGraph<FI> graph, FieldDecl fd, FI dfIn, FI dfOut) {
         for (Entry<VarInstance, AssignmentStatus> e : dfOut.assignmentStatus.entrySet()) {
             if (!(e.getKey() instanceof FieldInstance)) continue;
 
@@ -976,8 +910,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * The default implementation updates the state of {@link
      * ClassBodyInfo#fieldsConstructorInitializes}.
      */
-    protected void finishConstructorDecl(FlowGraph<FI> graph,
-            ConstructorDecl cd, FI dfIn, FI dfOut) {
+    protected void finishConstructorDecl(
+            FlowGraph<FI> graph, ConstructorDecl cd, FI dfIn, FI dfOut) {
         ConstructorInstance ci = cd.constructorInstance();
 
         // We need to set currCBI.fieldsConstructorInitializes correctly. It is
@@ -1002,10 +936,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
             if (fi.flags().isStatic()) continue;
 
             AssignmentStatus asgtStatus = e.getValue();
-            AssignmentStatus origAsgtStatus =
-                    curCBI.curClassFieldAsgtStatuses.get(fi);
-            if (asgtStatus.definitelyAssigned
-                    && !origAsgtStatus.definitelyAssigned) {
+            AssignmentStatus origAsgtStatus = curCBI.curClassFieldAsgtStatuses.get(fi);
+            if (asgtStatus.definitelyAssigned && !origAsgtStatus.definitelyAssigned) {
                 // the constructor initialized this field
                 s.add(fi);
             }
@@ -1029,8 +961,8 @@ public abstract class AbstractAssignmentChecker<CBI extends AbstractAssignmentCh
      * fields into {@link ClassBodyInfo#curClassFieldAsgtStatuses} so that they
      * are correct for the next field declaration, initializer, or constructor.
      */
-    protected void finishInitializer(FlowGraph<FI> graph,
-            Initializer initializer, FI dfIn, FI dfOut) {
+    protected void finishInitializer(
+            FlowGraph<FI> graph, Initializer initializer, FI dfIn, FI dfOut) {
         for (Entry<VarInstance, AssignmentStatus> e : dfOut.assignmentStatus.entrySet()) {
             if (!(e.getKey() instanceof FieldInstance)) continue;
 

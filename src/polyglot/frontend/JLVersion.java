@@ -11,17 +11,27 @@ package polyglot.frontend;
  */
 public class JLVersion extends polyglot.main.Version {
     @Override
-    public String name() { return "jl"; }
+    public String name() {
+        return "jl";
+    }
 
     @Override
-    public int major() { return 2; }
+    public int major() {
+        return 2;
+    }
 
     @Override
-    public int minor() { return 7; }
+    public int minor() {
+        return 7;
+    }
 
     @Override
-    public int patch_level() { return 1; }
+    public int patch_level() {
+        return 1;
+    }
 
     @Override
-    public String toString() { return "2.7.1 (2016-06-23 21:13:50)"; }
+    public String toString() {
+        return "2.7.1 (2016-06-23 21:13:50)";
+    }
 }

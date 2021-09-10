@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -51,8 +51,7 @@ public class Name {
         this(nf, ts, pos, null, name);
     }
 
-    public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix,
-            Id name) {
+    public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, Id name) {
         this.nf = nf;
         this.ts = ts;
         this.pos = pos != null ? pos : Position.compilerGenerated();
@@ -100,11 +99,8 @@ public class Name {
     public PackageNode toPackage() {
         if (prefix == null) {
             return nf.PackageNode(pos, ts.createPackage(null, name.id()));
-        }
-        else {
-            return nf.PackageNode(pos, ts.createPackage(prefix.toPackage()
-                                                              .package_(),
-                                                        name.id()));
+        } else {
+            return nf.PackageNode(pos, ts.createPackage(prefix.toPackage().package_(), name.id()));
         }
     }
 

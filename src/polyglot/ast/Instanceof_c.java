@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -50,7 +50,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     protected Expr expr;
     protected TypeNode compareType;
 
-//    @Deprecated
+    //    @Deprecated
     public Instanceof_c(Position pos, Expr expr, TypeNode compareType) {
         this(pos, expr, compareType, null);
     }
@@ -102,8 +102,7 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     }
 
     /** Reconstruct the expression. */
-    protected <N extends Instanceof_c> N reconstruct(N n, Expr expr,
-            TypeNode compareType) {
+    protected <N extends Instanceof_c> N reconstruct(N n, Expr expr, TypeNode compareType) {
         n = expr(n, expr);
         n = compareType(n, compareType);
         return n;
@@ -121,14 +120,19 @@ public class Instanceof_c extends Expr_c implements Instanceof {
         TypeSystem ts = tc.typeSystem();
 
         if (!compareType.type().isReference()) {
-            throw new SemanticException("Type operand " + compareType.type()
-                    + " must be a reference type.", compareType.position());
+            throw new SemanticException(
+                    "Type operand " + compareType.type() + " must be a reference type.",
+                    compareType.position());
         }
 
         if (!ts.isCastValid(expr.type(), compareType.type())) {
-            throw new SemanticException("Expression operand type "
-                    + expr.type() + " is incompatible with type operand "
-                    + compareType.type() + ".", expr.position());
+            throw new SemanticException(
+                    "Expression operand type "
+                            + expr.type()
+                            + " is incompatible with type operand "
+                            + compareType.type()
+                            + ".",
+                    expr.position());
         }
 
         return type(ts.Boolean());
@@ -173,5 +177,4 @@ public class Instanceof_c extends Expr_c implements Instanceof {
     public Node copy(NodeFactory nf) {
         return nf.Instanceof(this.position, this.expr, this.compareType);
     }
-
 }

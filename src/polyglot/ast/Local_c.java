@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -44,7 +44,7 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
 
-/** 
+/**
  * A local variable expression.
  */
 public class Local_c extends Expr_c implements Local {
@@ -53,7 +53,7 @@ public class Local_c extends Expr_c implements Local {
     protected Id name;
     protected LocalInstance li;
 
-//    @Deprecated
+    //    @Deprecated
     public Local_c(Position pos, Id name) {
         this(pos, name, null);
     }
@@ -142,10 +142,7 @@ public class Local_c extends Expr_c implements Local {
         TypeSystem ts = tb.typeSystem();
 
         LocalInstance li =
-                ts.localInstance(position(),
-                                 Flags.NONE,
-                                 ts.unknownType(position()),
-                                 name.id());
+                ts.localInstance(position(), Flags.NONE, ts.unknownType(position()), name.id());
         n = localInstance(n, li);
         return n;
     }
@@ -159,11 +156,12 @@ public class Local_c extends Expr_c implements Local {
         if (!c.isLocal(li.name())) {
             // this local is defined in an outer class
             if (!li.flags().isFinal()) {
-                throw new SemanticException("Local variable \""
-                                                    + li.name()
-                                                    + "\" is accessed from an inner class, and must be declared "
-                                                    + "final.",
-                                            this.position());
+                throw new SemanticException(
+                        "Local variable \""
+                                + li.name()
+                                + "\" is accessed from an inner class, and must be declared "
+                                + "final.",
+                        this.position());
             }
         }
 
@@ -232,5 +230,4 @@ public class Local_c extends Expr_c implements Local {
     public Node copy(NodeFactory nf) {
         return nf.Local(this.position, this.name);
     }
-
 }

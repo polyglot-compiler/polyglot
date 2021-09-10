@@ -113,9 +113,9 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
 
     private void updateInternal(Token t) {
         tokenStream.add(t);
-        positionToTokenIndexMap.put(new Pair<>(t.getPosition().line(),
-                                               t.getPosition().column()),
-                                    tokenStream.size() - 1);
+        positionToTokenIndexMap.put(
+                new Pair<>(t.getPosition().line(), t.getPosition().column()),
+                tokenStream.size() - 1);
 
         // use two positions, since the parser does one token lookahead
         position = prev_pos;
@@ -137,8 +137,7 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
      * Override the default CUP routine.
      */
     @Override
-    public void report_fatal_error(String message, Object info)
-            throws Exception {
+    public void report_fatal_error(String message, Object info) throws Exception {
         report_error(message, info);
         die();
     }
@@ -168,20 +167,15 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     protected Position posForObject(Object o) {
         if (o instanceof Node) {
             return pos((Node) o);
-        }
-        else if (o instanceof Token) {
+        } else if (o instanceof Token) {
             return pos((Token) o);
-        }
-        else if (o instanceof Type) {
+        } else if (o instanceof Type) {
             return pos((Type) o);
-        }
-        else if (o instanceof List) {
+        } else if (o instanceof List) {
             return pos((List<?>) o);
-        }
-        else if (o instanceof VarDeclarator) {
+        } else if (o instanceof VarDeclarator) {
             return pos((VarDeclarator) o);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -191,7 +185,8 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     }
 
     public Position pos(Object first, Object last, Object noEndDefault) {
-        //System.out.println("first: "+first+" class: "+first.getClass()+" last: "+last+" class: "+last.getClass());
+        // System.out.println("first: "+first+" class: "+first.getClass()+" last: "+last+" class:
+        // "+last.getClass());
         Position fpos = posForObject(first);
         Position epos = posForObject(last);
 
@@ -208,7 +203,6 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
             return posForObject(noEndDefault);
         }
         return null;
-
     }
 
     /**
@@ -276,8 +270,7 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
                 return nf.CanonicalTypeNode(pos(n), ts.arrayOf(t, dims));
             }
             return nf.ArrayTypeNode(pos(n), array(n, dims - 1));
-        }
-        else {
+        } else {
             return n;
         }
     }
@@ -298,11 +291,9 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
             AmbReceiver a = (AmbReceiver) p;
 
             if (a.prefix() != null) {
-                return nf.AmbQualifierNode(pos(p),
-                                           prefixToQualifier(a.prefix()),
-                                           nf.Id(pos(p), a.name()));
-            }
-            else {
+                return nf.AmbQualifierNode(
+                        pos(p), prefixToQualifier(a.prefix()), nf.Id(pos(p), a.name()));
+            } else {
                 return nf.AmbQualifierNode(pos(p), nf.Id(pos(p), a.name()));
             }
         }
@@ -311,11 +302,9 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
             AmbPrefix a = (AmbPrefix) p;
 
             if (a.prefix() != null) {
-                return nf.AmbQualifierNode(pos(p),
-                                           prefixToQualifier(a.prefix()),
-                                           nf.Id(pos(p), a.name()));
-            }
-            else {
+                return nf.AmbQualifierNode(
+                        pos(p), prefixToQualifier(a.prefix()), nf.Id(pos(p), a.name()));
+            } else {
                 return nf.AmbQualifierNode(pos(p), nf.Id(pos(p), a.name()));
             }
         }
@@ -332,11 +321,8 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
             AmbTypeNode a = (AmbTypeNode) t;
 
             if (a.qualifier() != null) {
-                return nf.AmbQualifierNode(pos(t),
-                                           a.qual(),
-                                           nf.Id(pos(t), a.name()));
-            }
-            else {
+                return nf.AmbQualifierNode(pos(t), a.qual(), nf.Id(pos(t), a.name()));
+            } else {
                 return nf.AmbQualifierNode(pos(t), nf.Id(pos(t), a.name()));
             }
         }
@@ -357,9 +343,7 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
         if (e instanceof Field) {
             Field f = (Field) e;
             Receiver r = f.target();
-            return nf.AmbQualifierNode(pos(e),
-                                       prefixToQualifier(r),
-                                       nf.Id(pos(e), f.name()));
+            return nf.AmbQualifierNode(pos(e), prefixToQualifier(r), nf.Id(pos(e), f.name()));
         }
 
         die(pos(e));
@@ -379,9 +363,7 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
         if (e instanceof Field) {
             Field f = (Field) e;
             Receiver r = f.target();
-            return nf.AmbTypeNode(pos(e),
-                                  prefixToQualifier(r),
-                                  nf.Id(pos(e), f.name()));
+            return nf.AmbTypeNode(pos(e), prefixToQualifier(r), nf.Id(pos(e), f.name()));
         }
 
         die(pos(e));
@@ -394,14 +376,12 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser {
     public Javadoc javadoc(Position pos) {
         if (pos == null) return null;
 
-        Integer index =
-                positionToTokenIndexMap.get(new Pair<>(pos.line(), pos.column()));
+        Integer index = positionToTokenIndexMap.get(new Pair<>(pos.line(), pos.column()));
 
         if (index != null && index > 0 && index < tokenStream.size()) {
             Token token = tokenStream.get(index - 1);
             if (token instanceof JavadocToken)
-                return nf.Javadoc(token.getPosition(),
-                                  ((JavadocToken) token).getText());
+                return nf.Javadoc(token.getPosition(), ((JavadocToken) token).getText());
         }
 
         return null;

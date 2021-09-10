@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -45,7 +45,7 @@ public class IntLit_c extends NumLit_c implements IntLit {
     /** The kind of literal: INT or LONG. */
     protected Kind kind;
 
-//    @Deprecated
+    //    @Deprecated
     public IntLit_c(Position pos, Kind kind, long value) {
         this(pos, kind, value, null);
     }
@@ -104,11 +104,9 @@ public class IntLit_c extends NumLit_c implements IntLit {
 
         if (kind == INT) {
             return type(ts.Int());
-        }
-        else if (kind == LONG) {
+        } else if (kind == LONG) {
             return type(ts.Long());
-        }
-        else {
+        } else {
             throw new InternalCompilerError("Unrecognized IntLit kind " + kind);
         }
     }
@@ -119,23 +117,18 @@ public class IntLit_c extends NumLit_c implements IntLit {
             if (boundary()) {
                 // the literal is negative, but print it as positive.
                 return "9223372036854775808L";
-            }
-            else if (value < 0) {
+            } else if (value < 0) {
                 return "0x" + Long.toHexString(value) + "L";
-            }
-            else {
+            } else {
                 return Long.toString(value) + "L";
             }
-        }
-        else {
+        } else {
             if (boundary()) {
                 // the literal is negative, but print it as positive.
                 return "2147483648";
-            }
-            else if ((int) value < 0) {
+            } else if ((int) value < 0) {
                 return "0x" + Integer.toHexString((int) value);
-            }
-            else {
+            } else {
                 return Integer.toString((int) value);
             }
         }
@@ -145,8 +138,7 @@ public class IntLit_c extends NumLit_c implements IntLit {
     public String toString() {
         if (kind() == LONG) {
             return Long.toString(value) + "L";
-        }
-        else {
+        } else {
             return Long.toString((int) value);
         }
     }
@@ -160,8 +152,7 @@ public class IntLit_c extends NumLit_c implements IntLit {
     public Object constantValue(Lang lang) {
         if (kind() == LONG) {
             return new Long(value);
-        }
-        else {
+        } else {
             return new Integer((int) value);
         }
     }
@@ -170,8 +161,7 @@ public class IntLit_c extends NumLit_c implements IntLit {
     public Precedence precedence() {
         if (value < 0L && !boundary()) {
             return Precedence.UNARY;
-        }
-        else {
+        } else {
             return Precedence.LITERAL;
         }
     }
@@ -180,5 +170,4 @@ public class IntLit_c extends NumLit_c implements IntLit {
     public Node copy(NodeFactory nf) {
         return nf.IntLit(this.position, this.kind, this.value);
     }
-
 }

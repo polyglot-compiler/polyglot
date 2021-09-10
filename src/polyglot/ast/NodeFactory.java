@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -90,11 +90,9 @@ public interface NodeFactory {
 
     /** @deprecated */
     @Deprecated
-    AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qual,
-            String name);
+    AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qual, String name);
 
-    QualifierNode QualifierNodeFromQualifiedName(Position pos,
-            String qualifiedName);
+    QualifierNode QualifierNodeFromQualifiedName(Position pos, String qualifiedName);
 
     // package or type or expr
     AmbPrefix AmbPrefix(Position pos, Id name);
@@ -141,17 +139,14 @@ public interface NodeFactory {
 
     Assign Assign(Position pos, Expr target, Assign.Operator op, Expr source);
 
-    LocalAssign LocalAssign(Position pos, Local target, Assign.Operator op,
-            Expr source);
+    LocalAssign LocalAssign(Position pos, Local target, Assign.Operator op, Expr source);
 
-    FieldAssign FieldAssign(Position pos, Field target, Assign.Operator op,
-            Expr source);
+    FieldAssign FieldAssign(Position pos, Field target, Assign.Operator op, Expr source);
 
-    ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess target,
-            Assign.Operator op, Expr source);
+    ArrayAccessAssign ArrayAccessAssign(
+            Position pos, ArrayAccess target, Assign.Operator op, Expr source);
 
-    AmbAssign AmbAssign(Position pos, Expr target, Assign.Operator op,
-            Expr source);
+    AmbAssign AmbAssign(Position pos, Expr target, Assign.Operator op, Expr source);
 
     Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right);
 
@@ -223,23 +218,37 @@ public interface NodeFactory {
 
     ClassBody ClassBody(Position pos, List<ClassMember> members);
 
-    ClassDecl ClassDecl(Position pos, Flags flags, Id name,
-            TypeNode superClass, List<TypeNode> interfaces, ClassBody body,
+    ClassDecl ClassDecl(
+            Position pos,
+            Flags flags,
+            Id name,
+            TypeNode superClass,
+            List<TypeNode> interfaces,
+            ClassBody body,
             Javadoc javadoc);
 
     @Deprecated
-    ClassDecl ClassDecl(Position pos, Flags flags, Id name,
-            TypeNode superClass, List<TypeNode> interfaces, ClassBody body);
+    ClassDecl ClassDecl(
+            Position pos,
+            Flags flags,
+            Id name,
+            TypeNode superClass,
+            List<TypeNode> interfaces,
+            ClassBody body);
 
     /** @deprecated */
     @Deprecated
-    ClassDecl ClassDecl(Position pos, Flags flags, String name,
-            TypeNode superClass, List<TypeNode> interfaces, ClassBody body);
+    ClassDecl ClassDecl(
+            Position pos,
+            Flags flags,
+            String name,
+            TypeNode superClass,
+            List<TypeNode> interfaces,
+            ClassBody body);
 
     ClassLit ClassLit(Position pos, TypeNode typeNode);
 
-    Conditional Conditional(Position pos, Expr cond, Expr consequent,
-            Expr alternative);
+    Conditional Conditional(Position pos, Expr cond, Expr consequent, Expr alternative);
 
     ConstructorCall ThisCall(Position pos, List<Expr> args);
 
@@ -249,33 +258,46 @@ public interface NodeFactory {
 
     ConstructorCall SuperCall(Position pos, Expr outer, List<Expr> args);
 
-    ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind,
-            List<Expr> args);
+    ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, List<Expr> args);
 
-    ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind,
-            Expr outer, List<Expr> args);
+    ConstructorCall ConstructorCall(
+            Position pos, ConstructorCall.Kind kind, Expr outer, List<Expr> args);
 
-    ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+    ConstructorDecl ConstructorDecl(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
             Javadoc javadoc);
 
     /** @deprecated */
     @Deprecated
-    ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body);
+    ConstructorDecl ConstructorDecl(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body);
 
     /** @deprecated */
     @Deprecated
-    ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body);
+    ConstructorDecl ConstructorDecl(
+            Position pos,
+            Flags flags,
+            String name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body);
 
     FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name);
 
-    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name,
-            Expr init);
+    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init);
 
-    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name,
-            Expr init, Javadoc javadoc);
+    FieldDecl FieldDecl(
+            Position pos, Flags flags, TypeNode type, Id name, Expr init, Javadoc javadoc);
 
     /** @deprecated */
     @Deprecated
@@ -283,8 +305,7 @@ public interface NodeFactory {
 
     /** @deprecated */
     @Deprecated
-    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name,
-            Expr init);
+    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name, Expr init);
 
     Do Do(Position pos, Stmt body, Expr cond);
 
@@ -306,8 +327,7 @@ public interface NodeFactory {
 
     FloatLit FloatLit(Position pos, FloatLit.Kind kind, double value);
 
-    For For(Position pos, List<ForInit> inits, Expr cond,
-            List<ForUpdate> iters, Stmt body);
+    For For(Position pos, List<ForInit> inits, Expr cond, List<ForUpdate> iters, Stmt body);
 
     Formal Formal(Position pos, Flags flags, TypeNode type, Id name);
 
@@ -343,8 +363,7 @@ public interface NodeFactory {
 
     LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name);
 
-    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name,
-            Expr init);
+    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init);
 
     /** @deprecated */
     @Deprecated
@@ -352,22 +371,38 @@ public interface NodeFactory {
 
     /** @deprecated */
     @Deprecated
-    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name,
-            Expr init);
+    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name, Expr init);
 
-    MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes,
-            Block body, Javadoc javadoc);
+    MethodDecl MethodDecl(
+            Position pos,
+            Flags flags,
+            TypeNode returnType,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
+            Javadoc javadoc);
 
     /** @deprecated */
     @Deprecated
-    MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
-            Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body);
+    MethodDecl MethodDecl(
+            Position pos,
+            Flags flags,
+            TypeNode returnType,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body);
 
     /** @deprecated */
     @Deprecated
-    MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
-            String name, List<Formal> formals, List<TypeNode> throwTypes,
+    MethodDecl MethodDecl(
+            Position pos,
+            Flags flags,
+            TypeNode returnType,
+            String name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
             Block body);
 
     New New(Position pos, TypeNode type, List<Expr> args);
@@ -376,8 +411,7 @@ public interface NodeFactory {
 
     New New(Position pos, Expr outer, TypeNode objectType, List<Expr> args);
 
-    New New(Position pos, Expr outer, TypeNode objectType, List<Expr> args,
-            ClassBody body);
+    New New(Position pos, Expr outer, TypeNode objectType, List<Expr> args, ClassBody body);
 
     NewArray NewArray(Position pos, TypeNode base, List<Expr> dims);
 
@@ -385,8 +419,7 @@ public interface NodeFactory {
 
     NewArray NewArray(Position pos, TypeNode base, int addDims, ArrayInit init);
 
-    NewArray NewArray(Position pos, TypeNode base, List<Expr> dims,
-            int addDims, ArrayInit init);
+    NewArray NewArray(Position pos, TypeNode base, List<Expr> dims, int addDims, ArrayInit init);
 
     NullLit NullLit(Position pos);
 
@@ -398,11 +431,10 @@ public interface NodeFactory {
 
     SourceFile SourceFile(Position pos, List<TopLevelDecl> decls);
 
-    SourceFile SourceFile(Position pos, List<Import> imports,
-            List<TopLevelDecl> decls);
+    SourceFile SourceFile(Position pos, List<Import> imports, List<TopLevelDecl> decls);
 
-    SourceFile SourceFile(Position pos, PackageNode packageName,
-            List<Import> imports, List<TopLevelDecl> decls);
+    SourceFile SourceFile(
+            Position pos, PackageNode packageName, List<Import> imports, List<TopLevelDecl> decls);
 
     Special This(Position pos);
 
@@ -426,8 +458,7 @@ public interface NodeFactory {
 
     Try Try(Position pos, Block tryBlock, List<Catch> catchBlocks);
 
-    Try Try(Position pos, Block tryBlock, List<Catch> catchBlocks,
-            Block finallyBlock);
+    Try Try(Position pos, Block tryBlock, List<Catch> catchBlocks, Block finallyBlock);
 
     PackageNode PackageNode(Position pos, Package p);
 

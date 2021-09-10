@@ -58,8 +58,7 @@ public class ParserPass extends AbstractPass {
 
             Parser p = goal.job().extensionInfo().parser(reader, source, eq);
 
-            if (Report.should_report(Report.frontend, 2))
-                Report.report(2, "Using parser " + p);
+            if (Report.should_report(Report.frontend, 2)) Report.report(2, "Using parser " + p);
 
             Node ast = p.parse();
 
@@ -69,16 +68,12 @@ public class ParserPass extends AbstractPass {
             }
 
             return false;
-        }
-        catch (IOException e) {
-            eq.enqueue(ErrorInfo.IO_ERROR,
-                       e.getMessage(),
-                       new Position(goal.job().source().path(),
-                                    goal.job().source().name(),
-                                    1,
-                                    1,
-                                    1,
-                                    1));
+        } catch (IOException e) {
+            eq.enqueue(
+                    ErrorInfo.IO_ERROR,
+                    e.getMessage(),
+                    new Position(
+                            goal.job().source().path(), goal.job().source().name(), 1, 1, 1, 1));
 
             return false;
         }

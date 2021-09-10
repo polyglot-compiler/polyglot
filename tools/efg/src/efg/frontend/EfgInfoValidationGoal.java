@@ -15,5 +15,4 @@ public class EfgInfoValidationGoal extends AbstractGoal {
     public Pass createPass(ExtensionInfo extInfo) {
         return new EfgInfoValidationPass(this);
     }
-
 }

@@ -1,6 +1,6 @@
 package java_cup;
 
-/** 
+/**
  * This class represents a part of a production which contains an
  * action.  These are eventually eliminated from productions and converted
  * to trailing actions by factoring out with a production that derives the
@@ -10,18 +10,17 @@ package java_cup;
  * @version last update: 11/25/95
  * @author Scott Hudson
  */
-
 public class action_part extends production_part {
 
     /*-----------------------------------------------------------*/
     /*--- Constructors ------------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Simple constructor. 
+    /** Simple constructor.
      * @param code_str string containing the actual user code.
      */
     public action_part(String code_str) {
-        super(/* never have a label on code */null);
+        super(/* never have a label on code */ null);
         _code_string = code_str;
     }
 
@@ -61,8 +60,7 @@ public class action_part extends production_part {
     /** Equality comparison for properly typed object. */
     public boolean equals(action_part other) {
         /* compare the strings */
-        return other != null && super.equals(other)
-                && other.code_string().equals(code_string());
+        return other != null && super.equals(other) && other.code_string().equals(code_string());
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -70,8 +68,7 @@ public class action_part extends production_part {
     /** Generic equality comparison. */
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof action_part))
-            return false;
+        if (!(other instanceof action_part)) return false;
         else return equals((action_part) other);
     }
 
@@ -80,8 +77,7 @@ public class action_part extends production_part {
     /** Produce a hash code. */
     @Override
     public int hashCode() {
-        return super.hashCode()
-                ^ (code_string() == null ? 0 : code_string().hashCode());
+        return super.hashCode() ^ (code_string() == null ? 0 : code_string().hashCode());
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/

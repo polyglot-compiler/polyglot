@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -37,12 +37,10 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public abstract class JL5ClassType_c extends ClassType_c implements
-        JL5ClassType {
+public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected JL5ClassType_c() {
-    }
+    protected JL5ClassType_c() {}
 
     public JL5ClassType_c(JL5TypeSystem ts) {
         this(ts, null);
@@ -86,8 +84,7 @@ public abstract class JL5ClassType_c extends ClassType_c implements
             chain = new LinkedList<>();
             chain.add(this);
             chain.add(toType);
-        }
-        else if (toType.isPrimitive()) {
+        } else if (toType.isPrimitive()) {
             // see if unboxing will let us cast to the primitive
             PrimitiveType pt = toType.toPrimitive();
             ClassType wrapperType = ts.wrapperClassOfPrimitive(pt);
@@ -108,12 +105,10 @@ public abstract class JL5ClassType_c extends ClassType_c implements
                 container = ((JL5SubstClassType) container).base();
             }
             if (container instanceof JL5ParsedClassType
-                    && !((JL5ParsedClassType) container).typeVariables()
-                                                        .isEmpty()) {
+                    && !((JL5ParsedClassType) container).typeVariables().isEmpty()) {
                 return container().translate(c) + "." + name();
             }
         }
         return super.translate(c);
     }
-
 }

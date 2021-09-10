@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -47,13 +47,12 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class JL5SubstClassType_c extends
-        SubstClassType_c<TypeVariable, ReferenceType> implements
-        JL5SubstClassType {
+public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, ReferenceType>
+        implements JL5SubstClassType {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public JL5SubstClassType_c(JL5TypeSystem ts, Position pos,
-            JL5ParsedClassType base, JL5Subst subst) {
+    public JL5SubstClassType_c(
+            JL5TypeSystem ts, Position pos, JL5ParsedClassType base, JL5Subst subst) {
         super(ts, pos, base, subst);
         this.setDeclaration(base);
     }
@@ -141,17 +140,13 @@ public class JL5SubstClassType_c extends
                 sb.append(package_() + ".");
             }
             sb.append(name());
-        }
-        else if (isMember()) {
+        } else if (isMember()) {
             sb.append(container().toString() + "." + name());
-        }
-        else if (isLocal()) {
+        } else if (isLocal()) {
             sb.append(name());
-        }
-        else if (isAnonymous()) {
+        } else if (isAnonymous()) {
             sb.append("<anonymous class>");
-        }
-        else {
+        } else {
             sb.append("<unknown class>");
         }
 
@@ -209,25 +204,28 @@ public class JL5SubstClassType_c extends
 
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
 
-//        System.err.println("jl5substclasstype: descends from " + this + " <: " + ancestor);
-//        System.err.println("    superclass of  " + this + " is " + this.superType());
-//        System.err.println("    base class of  " + this + " is " + this.base());
-//        System.err.println("       super of " + this.base() + " is " + this.base().superType());
-//        System.err.println("    subst  of  " + this + " is " + this.subst());
-//        System.err.println("   applying subst " + subst.substType(this.base()) + " super " + ((ReferenceType)subst.substType(this.base())).superType());
+        //        System.err.println("jl5substclasstype: descends from " + this + " <: " +
+        // ancestor);
+        //        System.err.println("    superclass of  " + this + " is " + this.superType());
+        //        System.err.println("    base class of  " + this + " is " + this.base());
+        //        System.err.println("       super of " + this.base() + " is " +
+        // this.base().superType());
+        //        System.err.println("    subst  of  " + this + " is " + this.subst());
+        //        System.err.println("   applying subst " + subst.substType(this.base()) + " super "
+        // + ((ReferenceType)subst.substType(this.base())).superType());
 
         // See JLS 3rd ed 4.10.2
         if (hasWildCardArg()) {
             Type captured;
             try {
                 captured = ts.applyCaptureConversion(this, null);
-                // Note: we want descendsFrom, not isSubtype, since the direct ancestors of this class
+                // Note: we want descendsFrom, not isSubtype, since the direct ancestors of this
+                // class
                 // are the direct ancestors of captured, but not captured itself.
                 if (ts.descendsFrom(captured, ancestor)) {
                     return true;
                 }
-            }
-            catch (SemanticException e) {
+            } catch (SemanticException e) {
                 // nope, can't apply capture conversion.
             }
         }
@@ -242,16 +240,17 @@ public class JL5SubstClassType_c extends
         }
         if (ancestor instanceof JL5SubstClassType_c) {
             JL5SubstClassType_c anc = (JL5SubstClassType_c) ancestor;
-//            System.err.println("      C");
+            //            System.err.println("      C");
             if (this.base.equals(anc.base)) {
-//                System.err.println("      D");
+                //                System.err.println("      D");
                 // same base. check the params
                 // go through each type variable, and check containment
                 boolean allContained = true;
                 for (TypeVariable tv : ts.classAndEnclosingTypeVariables(base())) {
                     Type ti = this.subst.substType(tv);
                     Type si = anc.subst.substType(tv);
-//                    System.err.println("      E " + ti + " contained in "+si+" ? " + ts.isContained(ti, si));
+                    //                    System.err.println("      E " + ti + " contained in "+si+"
+                    // ? " + ts.isContained(ti, si));
                     if (!ts.isContained(ti, si)) {
                         allContained = false;
                         break;
@@ -260,7 +259,6 @@ public class JL5SubstClassType_c extends
                 if (allContained) {
                     return true;
                 }
-
             }
         }
 
@@ -308,14 +306,12 @@ public class JL5SubstClassType_c extends
                         sb.append(ct.name());
                         done = true;
                     }
-                }
-                catch (SemanticException e) {
+                } catch (SemanticException e) {
                 }
             }
 
             if (!done) sb.append(ct.package_().translate(c) + "." + ct.name());
-        }
-        else if (ct.isMember()) {
+        } else if (ct.isMember()) {
             boolean done = false;
             // Use only the short name if the outer class is anonymous.
             if (ct.container().toClass().isAnonymous()) {
@@ -343,8 +339,7 @@ public class JL5SubstClassType_c extends
                             sb.append(ct.name());
                             done = true;
                         }
-                    }
-                    catch (SemanticException e) {
+                    } catch (SemanticException e) {
                     }
                 }
             }
@@ -352,19 +347,14 @@ public class JL5SubstClassType_c extends
             if (!done) {
                 if (ct.isInnerClass()) {
                     // If ct is inner class, need to translate this substitution on the outer class.
-                    sb.append(translate((JL5ParsedClassType) ct.outer(), c)
-                            + "." + ct.name());
-                }
-                else sb.append(ct.outer().translate(c) + "." + ct.name());
+                    sb.append(translate((JL5ParsedClassType) ct.outer(), c) + "." + ct.name());
+                } else sb.append(ct.outer().translate(c) + "." + ct.name());
             }
-        }
-        else if (isLocal()) {
+        } else if (isLocal()) {
             sb.append(ct.name());
-        }
-        else {
-            throw new InternalCompilerError("Cannot translate an anonymous class: "
-                                                    + ct,
-                                            ct.position());
+        } else {
+            throw new InternalCompilerError(
+                    "Cannot translate an anonymous class: " + ct, ct.position());
         }
 
         if (ct.typeVariables().isEmpty()) {
@@ -398,14 +388,12 @@ public class JL5SubstClassType_c extends
                     if (ts.equals(this, x)) {
                         return name();
                     }
-                }
-                catch (SemanticException e) {
+                } catch (SemanticException e) {
                 }
             }
 
             return package_().translate(c) + "." + name();
-        }
-        else if (isMember()) {
+        } else if (isMember()) {
             // Use only the short name if the outer class is anonymous.
             if (container().toClass().isAnonymous()) {
                 return name();
@@ -421,14 +409,11 @@ public class JL5SubstClassType_c extends
                 container = (ReferenceType) ts.erasureType(this.container());
             }
             return container.translate(c) + "." + name();
-        }
-        else if (isLocal()) {
+        } else if (isLocal()) {
             return name();
-        }
-        else {
-            throw new InternalCompilerError("Cannot translate an anonymous class: "
-                                                    + this,
-                                            this.position());
+        } else {
+            throw new InternalCompilerError(
+                    "Cannot translate an anonymous class: " + this, this.position());
         }
     }
 
@@ -450,8 +435,7 @@ public class JL5SubstClassType_c extends
         }
         // try it with the stripped out outer...
         if (outer() != null && super.outer() != this.outer()) {
-            return super.outer().equals(maybe_outer)
-                    || super.outer().isEnclosed(maybe_outer);
+            return super.outer().equals(maybe_outer) || super.outer().isEnclosed(maybe_outer);
         }
         return false;
     }
@@ -464,7 +448,7 @@ public class JL5SubstClassType_c extends
     @Override
     public Set<Type> superclasses() {
         if (this.superType() == null) {
-            return Collections.<Type> emptySet();
+            return Collections.<Type>emptySet();
         }
         return Collections.singleton(this.superType());
     }

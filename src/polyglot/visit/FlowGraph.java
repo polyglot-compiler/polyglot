@@ -85,8 +85,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         this(root, forward, true);
     }
 
-    public FlowGraph(Term root, boolean forward,
-            boolean alwaysHaveSuccEdgeKey) {
+    public FlowGraph(Term root, boolean forward, boolean alwaysHaveSuccEdgeKey) {
         this.root = root;
         this.forward = forward;
         this.peerMap = new HashMap<>();
@@ -146,13 +145,11 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      * {@code entry} can be Term.ENTRY or Term.EXIT.
      */
     public Peer<FlowItem> peer(Term n, int entry) {
-        return peer(n, Collections.<Term> emptyList(), entry);
+        return peer(n, Collections.<Term>emptyList(), entry);
     }
 
     public Peer<FlowItem> peer(Term n, boolean isEntry) {
-        return peer(n,
-                    Collections.<Term> emptyList(),
-                    isEntry ? Term.ENTRY : Term.EXIT);
+        return peer(n, Collections.<Term>emptyList(), isEntry ? Term.ENTRY : Term.EXIT);
     }
 
     /**
@@ -210,10 +207,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         Peer<FlowItem> p = pathMap.get(peerKey);
 
         if (p == null) {
-            p = new Peer<>(n,
-                           peerKey.list,
-                           peerKey.entry,
-                           this.alwaysHaveSuccEdgeKey);
+            p = new Peer<>(n, peerKey.list, peerKey.entry, this.alwaysHaveSuccEdgeKey);
             pathMap.put(peerKey, p);
         }
 
@@ -246,8 +240,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
 
         @Override
         public boolean equals(Object other) {
-            return other instanceof EdgeKey
-                    && ((EdgeKey) other).o.equals(this.o);
+            return other instanceof EdgeKey && ((EdgeKey) other).o.equals(this.o);
         }
 
         @Override
@@ -285,8 +278,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
 
         @Override
         public String toString() {
-            return type().isClass()
-                    ? type().toClass().name() : type().toString();
+            return type().isClass() ? type().toClass().name() : type().toString();
         }
     }
 
@@ -342,7 +334,6 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         public String toString() {
             return "(" + key + ")" + target;
         }
-
     }
 
     /**
@@ -355,7 +346,9 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
      */
     public static class Peer<FlowItem extends DataFlow.Item> {
         protected FlowItem inItem; // Input Item for dataflow analysis
-        protected Map<EdgeKey, FlowItem> outItems; // Output Items for dataflow analysis, a map from EdgeKeys to DataFlowlItems
+        protected Map<EdgeKey, FlowItem>
+                outItems; // Output Items for dataflow analysis, a map from EdgeKeys to
+        // DataFlowlItems
         protected Term node; // The AST node that this peer is an occurrence of.
         protected List<Edge<FlowItem>> succs; // List of successor Edges
         protected List<Edge<FlowItem>> preds; // List of predecessor Edges
@@ -376,8 +369,8 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
          */
         private Set<EdgeKey> succEdgeKeys;
 
-        public Peer(Term node, List<Term> path_to_finally, int entry,
-                boolean alwaysHaveSuccEdgeKey) {
+        public Peer(
+                Term node, List<Term> path_to_finally, int entry, boolean alwaysHaveSuccEdgeKey) {
             this.node = node;
             this.path_to_finally = path_to_finally;
             this.inItem = null;
@@ -428,8 +421,7 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
 
         @Override
         public String toString() {
-            return (entry == Term.ENTRY ? "entry: " : "") + node + " "
-                    + path_to_finally;
+            return (entry == Term.ENTRY ? "entry: " : "") + node + " " + path_to_finally;
         }
 
         public boolean isEntry() {
@@ -480,12 +472,10 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
             if (other instanceof PeerKey) {
                 PeerKey k = (PeerKey) other;
                 return CollectionUtil.equals(list, k.list) && entry == k.entry;
-            }
-            else {
+            } else {
                 return false;
             }
         }
-
     }
 
     @Override
@@ -498,12 +488,14 @@ public class FlowGraph<FlowItem extends DataFlow.Item> {
         while (!queue.isEmpty()) {
             Peer<FlowItem> p = queue.removeFirst();
             todo.remove(p);
-//        sb.append(StringUtil.getShortNameComponent(p.node.getClass().getName()) + " ["+p.node+"]" + "\n");
+            //        sb.append(StringUtil.getShortNameComponent(p.node.getClass().getName()) + "
+            // ["+p.node+"]" + "\n");
             sb.append(p + " (" + p.node.position() + ")\n");
             for (Edge<FlowItem> e : p.succs) {
                 Peer<FlowItem> q = e.getTarget();
                 sb.append("    -> " + q + " (" + q.node.position() + ")\n");
-                //sb.append("  " + StringUtil.getShortNameComponent(q.node.getClass().getName()) + " ["+q.node+"]" + "\n");
+                // sb.append("  " + StringUtil.getShortNameComponent(q.node.getClass().getName()) +
+                // " ["+q.node+"]" + "\n");
                 if (todo.contains(q) && !queue.contains(q)) {
                     queue.addLast(q);
                 }

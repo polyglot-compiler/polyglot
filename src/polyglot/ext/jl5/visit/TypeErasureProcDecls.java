@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -68,7 +68,7 @@ import polyglot.visit.NodeVisitor;
 
 /**
  * This class rewrites method decls to change the type of arguments and the return value
- * so that the appropriate override relationships will hold in Java 1.4. Also adds in 
+ * so that the appropriate override relationships will hold in Java 1.4. Also adds in
  * new MethodDecls to match the erased signature of any overridden methods.
  */
 public class TypeErasureProcDecls extends ErrorHandlingVisitor {
@@ -89,8 +89,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
     }
 
     @Override
-    protected Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof MethodDecl) {
             return rewriteMethodDecl((MethodDecl) n);
         }
@@ -125,12 +124,10 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
             if (mk == mi) {
                 // don't bother if mk is the same as mi
                 continue;
-            }
-            else if (mj == null) {
+            } else if (mj == null) {
                 // best so far!
                 mj = mk;
-            }
-            else if (mk.container().isClass()
+            } else if (mk.container().isClass()
                     && !mk.container().toClass().flags().isInterface()) {
                 // we found a class Let's prefer that, unless mk overrides mj.
                 if (!ts.implemented(mk).contains(mj)) {
@@ -155,7 +152,8 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         }
         MethodInstance mjErased = erasedMethodInstance(mj);
 
-        // we need to rewrite the method decl to have the same arguments as mjErased, the erased version of mj.
+        // we need to rewrite the method decl to have the same arguments as mjErased, the erased
+        // version of mj.
         List<? extends Type> mjErasedFormals = erase(mjErased.formalTypes());
         boolean changed = false;
         List<Formal> newFormals = new ArrayList<>(n.formals().size());
@@ -169,30 +167,22 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         }
 
         TypeNode newRetType = n.returnType();
-        newRetType =
-                newRetType.type(erasedReturnType(mjErased, n.returnType()
-                                                            .type()));
+        newRetType = newRetType.type(erasedReturnType(mjErased, n.returnType().type()));
         changed |= (n.returnType().type() != newRetType.type());
 
         // if we are not an interface, then add a method decl for each overridden method.
         if (n.methodInstance().container().isClass()
-                && !n.methodInstance()
-                     .container()
-                     .toClass()
-                     .flags()
-                     .isInterface()) {
-            Set<List<? extends Type>> alreadyAddedMethods =
-                    new LinkedHashSet<>();
+                && !n.methodInstance().container().toClass().flags().isInterface()) {
+            Set<List<? extends Type>> alreadyAddedMethods = new LinkedHashSet<>();
             alreadyAddedMethods.add(mjErasedFormals);
 
-            // now we need to go through all the other methods we override, 
-            // and check to see if we 
+            // now we need to go through all the other methods we override,
+            // and check to see if we
             // need to add a new method for it...
             for (MethodInstance mk : implemented) {
                 // do we have a method that overrides mk correctly?
                 MethodInstance mkErased = erasedMethodInstance(mk);
-                List<? extends Type> mkErasedFormals =
-                        erase(mkErased.formalTypes());
+                List<? extends Type> mkErasedFormals = erase(mkErased.formalTypes());
 
                 if (alreadyAddedMethods.contains(mkErasedFormals)) {
                     // we already have a method that erases to the required signature
@@ -201,12 +191,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
                 alreadyAddedMethods.add(mkErasedFormals);
 
                 // we need to add a method declaration for mkErased
-                addMethodDecl(mkErased,
-                              mk.returnType(),
-                              mjErased,
-                              n,
-                              mjErasedFormals);
-
+                addMethodDecl(mkErased, mk.returnType(), mjErased, n, mjErasedFormals);
             }
         }
         if (!changed) {
@@ -215,8 +200,7 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         return n.returnType(newRetType).formals(newFormals);
     }
 
-    protected Type erasedReturnType(MethodInstance mjErased,
-            Type originalReturnType) {
+    protected Type erasedReturnType(MethodInstance mjErased, Type originalReturnType) {
         Type t = originalReturnType;
         JL5Options opts = (JL5Options) ts.extensionInfo().getOptions();
         if (!opts.leaveCovariantReturns) {
@@ -226,48 +210,43 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         return t;
     }
 
-    protected void addMethodDecl(MethodInstance mkErased, Type origReturnType,
-            MethodInstance callee, MethodDecl n,
+    protected void addMethodDecl(
+            MethodInstance mkErased,
+            Type origReturnType,
+            MethodInstance callee,
+            MethodDecl n,
             List<? extends Type> dispatchArgTypes) {
         Position pos = Position.compilerGenerated();
         Flags flags = n.flags();
         if (flags.isAbstract()
                 && n.memberInstance().container().isClass()
-                && !n.memberInstance()
-                     .container()
-                     .toClass()
-                     .flags()
-                     .isInterface()) {
-            // n is abstract, but it is not in an interface, so lets add a method body to dispatch correctly.
+                && !n.memberInstance().container().toClass().flags().isInterface()) {
+            // n is abstract, but it is not in an interface, so lets add a method body to dispatch
+            // correctly.
             flags = flags.clearAbstract();
         }
         TypeNode returnType =
-                nodeFactory().CanonicalTypeNode(pos,
-                                                erasedReturnType(mkErased,
-                                                                 origReturnType));
+                nodeFactory().CanonicalTypeNode(pos, erasedReturnType(mkErased, origReturnType));
 
         List<? extends Type> mkErasedFormals = erase(mkErased.formalTypes());
         List<Formal> formals = new ArrayList<>(mkErased.formalTypes().size());
         int i = 0;
         for (Type ft : mkErasedFormals) {
             Formal f =
-                    nodeFactory().Formal(pos,
-                                         Flags.NONE,
-                                         nodeFactory().CanonicalTypeNode(pos,
-                                                                         ft),
-                                         nodeFactory().Id(pos, "arg" + (++i)));
+                    nodeFactory()
+                            .Formal(
+                                    pos,
+                                    Flags.NONE,
+                                    nodeFactory().CanonicalTypeNode(pos, ft),
+                                    nodeFactory().Id(pos, "arg" + (++i)));
             JL5LocalInstance li =
-                    (JL5LocalInstance) ts.localInstance(pos,
-                                                        Flags.NONE,
-                                                        ft,
-                                                        "arg" + i);
+                    (JL5LocalInstance) ts.localInstance(pos, Flags.NONE, ft, "arg" + i);
             li.setProcedureFormal(true);
             f = f.localInstance(li);
             formals.add(f);
         }
 
-        List<TypeNode> throwTypes =
-                new ArrayList<>(mkErased.throwTypes().size());
+        List<TypeNode> throwTypes = new ArrayList<>(mkErased.throwTypes().size());
         for (Type tt : mkErased.throwTypes()) {
             throwTypes.add(nodeFactory().CanonicalTypeNode(pos, tt));
         }
@@ -276,20 +255,14 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         i = 0;
         for (Type dt : dispatchArgTypes) {
             LocalInstance li = formals.get(i).localInstance();
-            Local l =
-                    nodeFactory().Local(pos,
-                                        nodeFactory().Id(pos, "arg" + (++i)));
+            Local l = nodeFactory().Local(pos, nodeFactory().Id(pos, "arg" + (++i)));
 
             l = l.localInstance(li);
             l = (Local) l.type(li.type());
 
             Expr arg = l;
             if (!li.type().isPrimitive()) {
-                Cast cst =
-                        nodeFactory().Cast(pos,
-                                           nodeFactory().CanonicalTypeNode(pos,
-                                                                           dt),
-                                           l);
+                Cast cst = nodeFactory().Cast(pos, nodeFactory().CanonicalTypeNode(pos, dt), l);
                 cst = (Cast) cst.type(dt);
                 arg = cst;
             }
@@ -299,22 +272,18 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
         if (!flags.isAbstract()) {
             // we need a body that dispatches to another method
             Special spec =
-                    (Special) nodeFactory().Special(pos, Special.THIS)
-                                           .type(callee.container());
+                    (Special) nodeFactory().Special(pos, Special.THIS).type(callee.container());
 
             Call c =
-                    nodeFactory().Call(pos,
-                                       spec,
-                                       nodeFactory().Id(pos, mkErased.name()),
-                                       actualArgs);
+                    nodeFactory()
+                            .Call(pos, spec, nodeFactory().Id(pos, mkErased.name()), actualArgs);
             c = c.methodInstance(callee);
             c = (Call) c.type(callee.returnType());
 
             Stmt s;
             if (origReturnType.isVoid()) {
                 s = nodeFactory().Eval(pos, c);
-            }
-            else {
+            } else {
                 Cast cast = nodeFactory().Cast(pos, returnType, c);
                 cast = (Cast) cast.type(returnType.type());
                 s = nodeFactory().Return(pos, cast);
@@ -322,21 +291,26 @@ public class TypeErasureProcDecls extends ErrorHandlingVisitor {
             body = nodeFactory().Block(pos, s);
         }
         MethodDecl newMd =
-                nodeFactory().MethodDecl(pos,
-                                         flags,
-                                         returnType,
-                                         nodeFactory().Id(pos, mkErased.name()),
-                                         formals,
-                                         throwTypes,
-                                         body);
+                nodeFactory()
+                        .MethodDecl(
+                                pos,
+                                flags,
+                                returnType,
+                                nodeFactory().Id(pos, mkErased.name()),
+                                formals,
+                                throwTypes,
+                                body);
         newMd =
-                newMd.methodInstance(typeSystem().methodInstance(pos,
-                                                                 callee.container(),
-                                                                 flags,
-                                                                 returnType.type(),
-                                                                 callee.name(),
-                                                                 mkErasedFormals,
-                                                                 mkErased.throwTypes()));
+                newMd.methodInstance(
+                        typeSystem()
+                                .methodInstance(
+                                        pos,
+                                        callee.container(),
+                                        flags,
+                                        returnType.type(),
+                                        callee.name(),
+                                        mkErasedFormals,
+                                        mkErased.throwTypes()));
         this.newMethodDecls.add(newMd);
     }
 

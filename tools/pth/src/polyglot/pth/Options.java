@@ -35,8 +35,8 @@ import java.util.StringTokenizer;
  *
  */
 public class Options {
-    private final static int USAGE_FLAG_WIDTH = 21;
-    private final static int USAGE_SCREEN_WIDTH = 75;
+    private static final int USAGE_FLAG_WIDTH = 21;
+    private static final int USAGE_SCREEN_WIDTH = 75;
 
     protected List<String> inputFilenames = new LinkedList<>();
 
@@ -88,166 +88,163 @@ public class Options {
     // array of the possible command line options.
     // the order in the array is the order that they will be applied in.
     protected CommandLineOption[] commandLineOpts = {
-            new CommandLineOption(new String[] { "f", "filter" },
-                                  "regexp",
-                                  "only execute the tests for which the regular expression regexp occurs somewhere in the test's name.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    testFilters.add(".*" + getStringArg(++index, args) + ".*");
-                    return index + 1;
-                }
-            },
-            new CommandLineOption(new String[] { "fc", "filtercollection" },
-                                  "regexp",
-                                  "only execute the test collections for which the regular expression regexp occurs somewhere in the test collection's name.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    testCollectionFilters.add(".*" + getStringArg(++index, args)
-                            + ".*");
-                    return index + 1;
-                }
-            },
-            new CommandLineOption(new String[] { "p", "preserve" },
-                                  "preserve output files between tests; default is to delete") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    deleteOutputFiles = false;
-                    return index + 1;
-                }
-            },
-            new CommandLineOption(new String[] { "q", "question" },
-                                  "show the latest results for the scripts; don't run any tests") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    showResultsOnly = true;
-                    return index + 1;
-                }
-            },
-            new CommandLineOption("s",
-                                  "only execute the tests which did not succeed last time they were executed.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    testPreviouslyFailedOnly = true;
-                    return index + 1;
-                }
-            },
-            new CommandLineOption("noout",
-                                  "suppress compiler outputs to the console") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    suppressCompilerOutputs = true;
-                    return index + 1;
-                }
-            },
-            new CommandLineOption("ec",
-                                  "terminate with nonzero exit code if a test fails") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    nonzeroExitCodeOnFailedTests = true;
-                    return index + 1;
-                }
-            },
-            new CommandLineOption(new String[] { "v" },
-                                  "n",
-                                  "set verbosity level to n. n should be between 0 (quiet) and 9 (most verbose).") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    verbosity = getIntArg(++index, args);
-                    if (verbosity < 0 || verbosity > 9)
-                        throw new IllegalArgumentException("Verbosity must be "
-                                + "between 0 and 9 inclusive.");
-                    return index + 1;
-                }
-            }, new CommandLineOption(new String[] { "pdf" },
-                                     "filename",
-                                     "generate PDF report.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    pdffilename = getStringArg(++index, args);
-                    return index + 1;
-                }
-            },
-//            new CommandLineOption(new String[] { "cp", "classpath" },
-//                                  "path",
-//                                  "set the class path for the compiler.") {
-//                @Override
-//                protected int invoke(int index, String[] args) {
-//                    classpath = getStringArg(++index, args);
-//                    return index + 1;
-//                }
-//            },
-            new CommandLineOption(new String[] { "compilerpath" },
-                                  "path",
-                                  "where to find the compiler.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    compilerpath = getStringArg(++index, args);
-                    if (!compilerpath.endsWith(File.separator))
-                        compilerpath += File.separator;
-                    return index + 1;
-                }
-            },
-            new CommandLineOption(new String[] { "refpath" },
-                                  "path",
-                                  "where to find the reference compiler.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    refpath = getStringArg(++index, args);
-                    if (!refpath.endsWith(File.separator))
-                        refpath += File.separator;
-                    return index + 1;
-                }
-            }, new CommandLineOption(new String[] { "testpath" },
-                                     "path",
-                                     "where to find test files.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    testpath = getStringArg(++index, args);
-                    if (!testpath.endsWith(File.separator))
-                        testpath += File.separator;
-                    return index + 1;
-                }
-            },
-            new CommandLineOption(new String[] { "workpath" },
-                                  "path",
-                                  "the compiler's working directory.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    workpath = getStringArg(++index, args);
-                    if (!workpath.endsWith(File.separator))
-                        workpath += File.separator;
-                    return index + 1;
-                }
-            },
-            new CommandLineOption(new String[] { "args" },
-                                  "extraArgs",
-                                  "provide additional command line arguments to the compiler.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    extraArgs = getStringArg(++index, args);
-                    return index + 1;
-                }
-            }, new CommandLineOption(new String[] { "h", "help", "?" },
-                                     "Display this message.") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    usage(System.out);
-                    System.exit(0);
-                    return index + 1;
-                }
-            }, new CommandLineOption(new String[] {}, "Files") {
-                @Override
-                protected int invoke(int index, String[] args) {
-                    return index;
-                }
+        new CommandLineOption(
+                new String[] {"f", "filter"},
+                "regexp",
+                "only execute the tests for which the regular expression regexp occurs somewhere in"
+                        + " the test's name.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                testFilters.add(".*" + getStringArg(++index, args) + ".*");
+                return index + 1;
+            }
+        },
+        new CommandLineOption(
+                new String[] {"fc", "filtercollection"},
+                "regexp",
+                "only execute the test collections for which the regular expression regexp occurs"
+                        + " somewhere in the test collection's name.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                testCollectionFilters.add(".*" + getStringArg(++index, args) + ".*");
+                return index + 1;
+            }
+        },
+        new CommandLineOption(
+                new String[] {"p", "preserve"},
+                "preserve output files between tests; default is to delete") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                deleteOutputFiles = false;
+                return index + 1;
+            }
+        },
+        new CommandLineOption(
+                new String[] {"q", "question"},
+                "show the latest results for the scripts; don't run any tests") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                showResultsOnly = true;
+                return index + 1;
+            }
+        },
+        new CommandLineOption(
+                "s", "only execute the tests which did not succeed last time they were executed.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                testPreviouslyFailedOnly = true;
+                return index + 1;
+            }
+        },
+        new CommandLineOption("noout", "suppress compiler outputs to the console") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                suppressCompilerOutputs = true;
+                return index + 1;
+            }
+        },
+        new CommandLineOption("ec", "terminate with nonzero exit code if a test fails") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                nonzeroExitCodeOnFailedTests = true;
+                return index + 1;
+            }
+        },
+        new CommandLineOption(
+                new String[] {"v"},
+                "n",
+                "set verbosity level to n. n should be between 0 (quiet) and 9 (most verbose).") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                verbosity = getIntArg(++index, args);
+                if (verbosity < 0 || verbosity > 9)
+                    throw new IllegalArgumentException(
+                            "Verbosity must be " + "between 0 and 9 inclusive.");
+                return index + 1;
+            }
+        },
+        new CommandLineOption(new String[] {"pdf"}, "filename", "generate PDF report.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                pdffilename = getStringArg(++index, args);
+                return index + 1;
+            }
+        },
+        //            new CommandLineOption(new String[] { "cp", "classpath" },
+        //                                  "path",
+        //                                  "set the class path for the compiler.") {
+        //                @Override
+        //                protected int invoke(int index, String[] args) {
+        //                    classpath = getStringArg(++index, args);
+        //                    return index + 1;
+        //                }
+        //            },
+        new CommandLineOption(
+                new String[] {"compilerpath"}, "path", "where to find the compiler.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                compilerpath = getStringArg(++index, args);
+                if (!compilerpath.endsWith(File.separator)) compilerpath += File.separator;
+                return index + 1;
+            }
+        },
+        new CommandLineOption(
+                new String[] {"refpath"}, "path", "where to find the reference compiler.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                refpath = getStringArg(++index, args);
+                if (!refpath.endsWith(File.separator)) refpath += File.separator;
+                return index + 1;
+            }
+        },
+        new CommandLineOption(new String[] {"testpath"}, "path", "where to find test files.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                testpath = getStringArg(++index, args);
+                if (!testpath.endsWith(File.separator)) testpath += File.separator;
+                return index + 1;
+            }
+        },
+        new CommandLineOption(
+                new String[] {"workpath"}, "path", "the compiler's working directory.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                workpath = getStringArg(++index, args);
+                if (!workpath.endsWith(File.separator)) workpath += File.separator;
+                return index + 1;
+            }
+        },
+        new CommandLineOption(
+                new String[] {"args"},
+                "extraArgs",
+                "provide additional command line arguments to the compiler.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                extraArgs = getStringArg(++index, args);
+                return index + 1;
+            }
+        },
+        new CommandLineOption(new String[] {"h", "help", "?"}, "Display this message.") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                usage(System.out);
+                System.exit(0);
+                return index + 1;
+            }
+        },
+        new CommandLineOption(new String[] {}, "Files") {
+            @Override
+            protected int invoke(int index, String[] args) {
+                return index;
+            }
 
-                @Override
-                protected int parse(int index, String[] args) {
-                    if (!args[index].startsWith("-"))
-                        inputFilenames.add(args[index++]);
-                    return index;
-                }
-            }, };
+            @Override
+            protected int parse(int index, String[] args) {
+                if (!args[index].startsWith("-")) inputFilenames.add(args[index++]);
+                return index;
+            }
+        },
+    };
 
     protected void usage(PrintStream out) {
         out.println("xic Test Harness");
@@ -280,8 +277,7 @@ public class Options {
         }
 
         // print space to get up to indentation level
-        if (cur < USAGE_FLAG_WIDTH)
-            printSpaces(out, USAGE_FLAG_WIDTH - cur);
+        if (cur < USAGE_FLAG_WIDTH) printSpaces(out, USAGE_FLAG_WIDTH - cur);
         else {
             // the flag is long. Get a new line before printing the
             // description.
@@ -301,27 +297,26 @@ public class Options {
             }
             out.print(s);
             cur += s.length();
-            if (st.hasMoreTokens()) if (cur + 1 > USAGE_SCREEN_WIDTH) {
-                out.println();
-                printSpaces(out, USAGE_FLAG_WIDTH);
-                cur = USAGE_FLAG_WIDTH;
-            }
-            else {
-                out.print(" ");
-                cur++;
-            }
+            if (st.hasMoreTokens())
+                if (cur + 1 > USAGE_SCREEN_WIDTH) {
+                    out.println();
+                    printSpaces(out, USAGE_FLAG_WIDTH);
+                    cur = USAGE_FLAG_WIDTH;
+                } else {
+                    out.print(" ");
+                    cur++;
+                }
         }
         out.println();
     }
 
     protected static void printSpaces(PrintStream out, int n) {
-        while (n-- > 0)
-            out.print(' ');
+        while (n-- > 0) out.print(' ');
     }
 
     protected void parseCommandLine(String[] args) {
         int ind = 0;
-        if (args == null || args.length == 0) args = new String[] { "-h" };
+        if (args == null || args.length == 0) args = new String[] {"-h"};
         while (ind < args.length) {
             int newInd = ind;
             for (int i = 0; i < commandLineOpts.length && newInd == ind; i++) {
@@ -330,12 +325,11 @@ public class Options {
             }
 
             if (newInd == ind)
-                throw new IllegalArgumentException("Unknown switch: "
-                        + args[ind] + "\nTry -h for help.");
+                throw new IllegalArgumentException(
+                        "Unknown switch: " + args[ind] + "\nTry -h for help.");
             ind = newInd;
         }
     }
-
 }
 
 abstract class CommandLineOption {
@@ -347,9 +341,8 @@ abstract class CommandLineOption {
         this(swtch, null, explanation);
     }
 
-    public CommandLineOption(String swtch, String additionalArgs,
-            String explanation) {
-        switches = new String[] { swtch };
+    public CommandLineOption(String swtch, String additionalArgs, String explanation) {
+        switches = new String[] {swtch};
         this.explanation = explanation;
         additionalArg = additionalArgs;
     }
@@ -358,8 +351,7 @@ abstract class CommandLineOption {
         this(switches, null, explanation);
     }
 
-    public CommandLineOption(String[] switches, String additionalArgs,
-            String explanation) {
+    public CommandLineOption(String[] switches, String additionalArgs, String explanation) {
         this.switches = switches;
         this.explanation = explanation;
         additionalArg = additionalArgs;
@@ -370,8 +362,7 @@ abstract class CommandLineOption {
     protected int parse(int currentInd, String[] args) {
         String s = args[currentInd];
         if (s.startsWith("-")) {
-            while (s.startsWith("-"))
-                s = s.substring(1);
+            while (s.startsWith("-")) s = s.substring(1);
 
             for (String switche : switches)
                 if (switche.equals(s)) {
@@ -388,26 +379,26 @@ abstract class CommandLineOption {
     protected int getIntArg(int index, String[] args) {
         try {
             return Integer.parseInt(args[index]);
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
-            throw new IllegalArgumentException("Expected an integer for the "
-                    + "option " + args[currOpt]
-                    + (additionalArg == null ? "" : " " + additionalArg));
-        }
-        catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Expected an integer, not "
-                    + args[index]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new IllegalArgumentException(
+                    "Expected an integer for the "
+                            + "option "
+                            + args[currOpt]
+                            + (additionalArg == null ? "" : " " + additionalArg));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Expected an integer, not " + args[index]);
         }
     }
 
     protected String getStringArg(int index, String[] args) {
         try {
             return args[index];
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
-            throw new IllegalArgumentException("Expected a string for the "
-                    + "option " + args[currOpt]
-                    + (additionalArg == null ? "" : " " + additionalArg));
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new IllegalArgumentException(
+                    "Expected a string for the "
+                            + "option "
+                            + args[currOpt]
+                            + (additionalArg == null ? "" : " " + additionalArg));
         }
     }
 }

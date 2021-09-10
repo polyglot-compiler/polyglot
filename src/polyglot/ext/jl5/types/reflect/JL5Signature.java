@@ -160,7 +160,6 @@ public class JL5Signature extends Attribute {
      *  B | C | D | F | I | J | S | Z
      *
      */
-
     JL5Signature(ClassFile clazz, DataInputStream in, int nameIndex, int length)
             throws IOException {
         super(nameIndex, length);
@@ -196,8 +195,7 @@ public class JL5Signature extends Attribute {
     private boolean createTypeVars;
 
     class ClassSig {
-        public ClassSig(List<TypeVariable> typeVars, Type superType,
-                List<ClassType> interfaces) {
+        public ClassSig(List<TypeVariable> typeVars, Type superType, List<ClassType> interfaces) {
             this.typeVars = typeVars;
             this.superType = superType;
             this.interfaces = interfaces;
@@ -223,8 +221,11 @@ public class JL5Signature extends Attribute {
     }
 
     class MethodSig {
-        public MethodSig(List<TypeVariable> typeVars, List<Type> formalTypes,
-                Type returnType, List<ReferenceType> throwTypes) {
+        public MethodSig(
+                List<TypeVariable> typeVars,
+                List<Type> formalTypes,
+                Type returnType,
+                List<ReferenceType> throwTypes) {
             this.typeVars = typeVars;
             this.formalTypes = formalTypes;
             this.returnType = returnType;
@@ -283,10 +284,10 @@ public class JL5Signature extends Attribute {
 
         Result<List<TypeVariable>> fres = null;
         if (token == LEFT_ANGLE) {
-            //fres = formalTypeParamList(value, ++pos);
+            // fres = formalTypeParamList(value, ++pos);
             fres = useFormalTypeParamList(value, ++pos);
             pos = fres.pos();
-            //typeVars = (List)fres.result();
+            // typeVars = (List)fres.result();
         }
         Result<ClassType> sres = classTypeSig(value, pos);
         List<ClassType> superInterfaces = new ArrayList<>();
@@ -295,21 +296,22 @@ public class JL5Signature extends Attribute {
             Result<ClassType> ires = classTypeSig(value, pos);
             pos = ires.pos();
             superInterfaces.add(ires.result());
-            //pos++;
+            // pos++;
         }
-        return new Result<>(new ClassSig(fres == null
-                ? new ArrayList<TypeVariable>()
-                : (List<TypeVariable>) fres.result(),
-                                         sres.result(),
-                                         superInterfaces),
-                            pos);
+        return new Result<>(
+                new ClassSig(
+                        fres == null
+                                ? new ArrayList<TypeVariable>()
+                                : (List<TypeVariable>) fres.result(),
+                        sres.result(),
+                        superInterfaces),
+                pos);
     }
 
-    public Result<List<TypeVariable>> createFormalTypeParamList(String value,
-            int pos) {
+    public Result<List<TypeVariable>> createFormalTypeParamList(String value, int pos) {
         typeVars = null;
         createTypeVars = true;
-        //do it twice. second time, bounds will be resolved
+        // do it twice. second time, bounds will be resolved
         List<TypeVariable> list = new ArrayList<>();
         char token = value.charAt(pos);
         while (token != RIGHT_ANGLE) {
@@ -322,10 +324,9 @@ public class JL5Signature extends Attribute {
         return new Result<>(list, pos);
     }
 
-    public Result<List<TypeVariable>> useFormalTypeParamList(String value,
-            int pos) {
+    public Result<List<TypeVariable>> useFormalTypeParamList(String value, int pos) {
         createTypeVars = false;
-        //do it twice. second time, bounds will be resolved
+        // do it twice. second time, bounds will be resolved
         List<TypeVariable> list = new ArrayList<>();
         char token = value.charAt(pos);
         while (token != RIGHT_ANGLE) {
@@ -338,13 +339,12 @@ public class JL5Signature extends Attribute {
         return new Result<>(list, pos);
     }
 
-    public Result<List<TypeVariable>> formalTypeParamList(String value,
-            int pos) {
-        //System.err.println("### Parsing formal type param list " + value.substring(pos));
+    public Result<List<TypeVariable>> formalTypeParamList(String value, int pos) {
+        // System.err.println("### Parsing formal type param list " + value.substring(pos));
         typeVars = null;
         int oldpos = pos;
         createTypeVars = true;
-        //do it twice. second time, bounds will be resolved
+        // do it twice. second time, bounds will be resolved
         List<TypeVariable> list = new ArrayList<>();
         char token = value.charAt(pos);
         while (token != RIGHT_ANGLE) {
@@ -372,7 +372,7 @@ public class JL5Signature extends Attribute {
 
     // ID classBound interfaceBoundList(opt)
     public Result<TypeVariable> formalTypeParam(String value, int pos) {
-        //System.err.println("### Parsing formalTypeParam " + value.substring(pos));
+        // System.err.println("### Parsing formalTypeParam " + value.substring(pos));
         String id = "";
         char token = value.charAt(pos);
         while (token != COLON) {
@@ -384,8 +384,7 @@ public class JL5Signature extends Attribute {
         Result<? extends ReferenceType> cres = classBound(value, pos);
         pos = cres.pos();
         ReferenceType cresResult = cres.result();
-        if (cresResult != null && !cresResult.equals(ts.Object()))
-            bounds.add(cresResult);
+        if (cresResult != null && !cresResult.equals(ts.Object())) bounds.add(cresResult);
         Result<? extends ReferenceType> ires = null;
         token = value.charAt(pos);
         while (token != RIGHT_ANGLE) {
@@ -395,14 +394,10 @@ public class JL5Signature extends Attribute {
             bounds.add(ires.result());
         }
         if (createTypeVars) {
-            //System.err.println("\ncreating type variable " + id + "\n");
-            return new Result<>(ts.typeVariable(position,
-                                                id,
-                                                ts.intersectionType(position,
-                                                                    bounds)),
-                                pos);
-        }
-        else {
+            // System.err.println("\ncreating type variable " + id + "\n");
+            return new Result<>(
+                    ts.typeVariable(position, id, ts.intersectionType(position, bounds)), pos);
+        } else {
             TypeVariable tv = findTypeVar(id);
             tv.setUpperBound(ts.intersectionType(position, bounds));
             return new Result<>(tv, pos);
@@ -418,19 +413,19 @@ public class JL5Signature extends Attribute {
     // typeVarSig T...;
     // arrayTypeSig [...;
     public Result<? extends ReferenceType> fieldTypeSig(String value, int pos) {
-        //System.err.println("### Parsing field type sig " + value.substring(pos));
+        // System.err.println("### Parsing field type sig " + value.substring(pos));
         char token = value.charAt(pos);
         switch (token) {
-        case L:
-            return classTypeSig(value, pos);
-        case LEFT_SQUARE:
-            return arrayTypeSig(value, pos);
-        case T:
-            return typeVarSig(value, pos);
-        case COLON:
-            return new Result<>(ts.Object(), pos);
-        default:
-            return null;
+            case L:
+                return classTypeSig(value, pos);
+            case LEFT_SQUARE:
+                return arrayTypeSig(value, pos);
+            case T:
+                return typeVarSig(value, pos);
+            case COLON:
+                return new Result<>(ts.Object(), pos);
+            default:
+                return null;
         }
     }
 
@@ -443,100 +438,101 @@ public class JL5Signature extends Attribute {
         token = value.charAt(pos);
         while (token != SEMI_COLON) {
             switch (token) {
-            case SLASH: { // id is a package
-                className += id;
-                className += ".";
-                id = "";
-                pos++;
-                token = value.charAt(pos);
-                break;
-            }
-            case DOT: { // id is a className
-                className += id;
-                className += "$";
-                id = "";
-                pos++;
-                token = value.charAt(pos);
-                break;
-            }
-            case LEFT_ANGLE: { // id is a className
-                               //System.err.println("Parsing type arg list " + value.substring(pos));
-                Result<List<ReferenceType>> tres = typeArgList(value, pos);
-                //System.err.println("Got " + tres.result());
-                pos = tres.pos();
-                classArgsMap.put(id, tres.result());
-                //System.err.println("Adding " + tres.result() + " to map for " + id);
-                token = value.charAt(pos);
-                break;
-            }
-            default: {
-                id += token;
-                pos++;
-                token = value.charAt(pos);
-                break;
-            }
+                case SLASH:
+                    { // id is a package
+                        className += id;
+                        className += ".";
+                        id = "";
+                        pos++;
+                        token = value.charAt(pos);
+                        break;
+                    }
+                case DOT:
+                    { // id is a className
+                        className += id;
+                        className += "$";
+                        id = "";
+                        pos++;
+                        token = value.charAt(pos);
+                        break;
+                    }
+                case LEFT_ANGLE:
+                    { // id is a className
+                        // System.err.println("Parsing type arg list " + value.substring(pos));
+                        Result<List<ReferenceType>> tres = typeArgList(value, pos);
+                        // System.err.println("Got " + tres.result());
+                        pos = tres.pos();
+                        classArgsMap.put(id, tres.result());
+                        // System.err.println("Adding " + tres.result() + " to map for " + id);
+                        token = value.charAt(pos);
+                        break;
+                    }
+                default:
+                    {
+                        id += token;
+                        pos++;
+                        token = value.charAt(pos);
+                        break;
+                    }
             }
         }
         className += id;
         ClassType ct = null;
         try {
-            //System.err.println("<><> " + className);
-            //ct = (ClassType) ts.typeForName(className);
-            //ct = cls.typeForName()
+            // System.err.println("<><> " + className);
+            // ct = (ClassType) ts.typeForName(className);
+            // ct = cls.typeForName()
             ct = (ClassType) ts.systemResolver().find(className);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError("could not load " + className, e);
         }
         // look up in the map the last part of className, i.e., the part after the last '.'.
         // This means that java.util.Map$Entry will go to
-        String lookupClassName =
-                className.substring(className.lastIndexOf('.') + 1);
-        //System.err.println("Now looking up " + ct.name() + " with class name '" + className +"'  in classArgsMap " + classArgsMap + "  " + classArgsMap.containsKey(className) + "  " + createTypeVars);
-//        if (!className.equals(ct.name())) {
-//            System.err.println("---- uh oh:   " + className + "   " + ct.name() +"   " + lookupClassName +"  " +classArgsMap);
-//        }
+        String lookupClassName = className.substring(className.lastIndexOf('.') + 1);
+        // System.err.println("Now looking up " + ct.name() + " with class name '" + className +"'
+        // in classArgsMap " + classArgsMap + "  " + classArgsMap.containsKey(className) + "  " +
+        // createTypeVars);
+        //        if (!className.equals(ct.name())) {
+        //            System.err.println("---- uh oh:   " + className + "   " + ct.name() +"   " +
+        // lookupClassName +"  " +classArgsMap);
+        //        }
         if (classArgsMap.containsKey(lookupClassName)) {
             JL5ParsedClassType pct = parsedClassTypeForClass(ct);
             if (!createTypeVars) {
                 try {
-                    ct = ts.instantiate(position,
-                                        pct,
-                                        classArgsMap.get(lookupClassName));
-                }
-                catch (SemanticException e) {
+                    ct = ts.instantiate(position, pct, classArgsMap.get(lookupClassName));
+                } catch (SemanticException e) {
                     throw new InternalCompilerError(e);
                 }
             }
-        }
-        else {
+        } else {
             // Check if ct is a generic class.  If so, then make a raw class
             // since the signature doesn't instantiate any params
             JL5ParsedClassType pct = parsedClassTypeForClass(ct);
-            if (!pct.typeVariables().isEmpty())
-                ct = ts.rawClass(pct, Position.compilerGenerated());
+            if (!pct.typeVariables().isEmpty()) ct = ts.rawClass(pct, Position.compilerGenerated());
         }
         ClassType current = ct;
         ClassType outer = current.outer();
         while (outer != null) {
             if (classArgsMap.containsKey(outer.name())) {
                 // XXX SC: very unsure if this is correct behavior.
-                // This is dealing with instantiating for nested classes, but it's unclear what it should do.
-//                System.err.println("Current is " + current);
-//                System.err.println("Outer is " + outer.name() + " and classArgsMap is " + classArgsMap + " outer is " + outer.getClass());
-//                System.err.println("  outer base is " + ((JL5SubstClassType)outer).base());
-//                System.err.println("  outer subst is " + ((JL5SubstClassType)outer).subst());
+                // This is dealing with instantiating for nested classes, but it's unclear what it
+                // should do.
+                //                System.err.println("Current is " + current);
+                //                System.err.println("Outer is " + outer.name() + " and classArgsMap
+                // is " + classArgsMap + " outer is " + outer.getClass());
+                //                System.err.println("  outer base is " +
+                // ((JL5SubstClassType)outer).base());
+                //                System.err.println("  outer subst is " +
+                // ((JL5SubstClassType)outer).subst());
                 JL5ParsedClassType pct = parsedClassTypeForClass(outer);
                 try {
                     ClassType pt =
-                            ts.instantiate(position,
-                                           pct.pclass(),
-                                           classArgsMap.get(outer.name()));
+                            ts.instantiate(position, pct.pclass(), classArgsMap.get(outer.name()));
                     if (current instanceof JL5ParsedClassType) {
                         ((JL5ParsedClassType) current).outer(pt);
                     }
-                }
-                catch (SemanticException e) {
+                } catch (SemanticException e) {
                     throw new InternalCompilerError(e);
                 }
             }
@@ -551,36 +547,33 @@ public class JL5Signature extends Attribute {
     private static JL5ParsedClassType parsedClassTypeForClass(ClassType ct) {
         if (ct instanceof JL5ParsedClassType) {
             return (JL5ParsedClassType) ct;
-        }
-        else if (ct instanceof RawClass) {
+        } else if (ct instanceof RawClass) {
             return ((RawClass) ct).base();
-        }
-        else if (ct instanceof JL5SubstClassType) {
+        } else if (ct instanceof JL5SubstClassType) {
             return ((JL5SubstClassType) ct).base();
-        }
-        else {
-            throw new InternalCompilerError("Don't know how to deal with finding base of class "
-                    + ct);
+        } else {
+            throw new InternalCompilerError(
+                    "Don't know how to deal with finding base of class " + ct);
         }
     }
 
     public Result<TypeVariable> typeVarSig(String value, int pos) {
-        //System.err.println("### Parsing type var sig " + value.substring(pos));
+        // System.err.println("### Parsing type var sig " + value.substring(pos));
         char token = value.charAt(pos);
         switch (token) {
-        case T:
-            String id = "";
-            pos++;
-            token = value.charAt(pos);
-            while (token != SEMI_COLON) {
-                id += token;
+            case T:
+                String id = "";
                 pos++;
                 token = value.charAt(pos);
-            }
-            pos++;
-            return new Result<>(findTypeVar(id), pos);
-        default:
-            return null;
+                while (token != SEMI_COLON) {
+                    id += token;
+                    pos++;
+                    token = value.charAt(pos);
+                }
+                pos++;
+                return new Result<>(findTypeVar(id), pos);
+            default:
+                return null;
         }
     }
 
@@ -600,48 +593,49 @@ public class JL5Signature extends Attribute {
     public Result<? extends ReferenceType> typeArg(String value, int pos) {
         char token = value.charAt(pos);
         switch (token) {
-        case PLUS: {
-            Result<? extends Type> fres = fieldTypeSig(value, ++pos);
-            return new Result<>(ts.wildCardType(position,
-                                                (ReferenceType) fres.result(),
-                                                null),
-                                fres.pos());
-        }
-        case MINUS: {
-            Result<? extends Type> fres = fieldTypeSig(value, ++pos);
-            return new Result<>(ts.wildCardType(position,
-                                                null,
-                                                (ReferenceType) fres.result()),
-                                fres.pos());
-        }
-        case STAR:
-            pos++;
-            return new Result<>(ts.wildCardType(position), pos);
-        case L:
-        case LEFT_SQUARE:
-        case T:
-            return fieldTypeSig(value, pos);
-        default:
-            return null;
+            case PLUS:
+                {
+                    Result<? extends Type> fres = fieldTypeSig(value, ++pos);
+                    return new Result<>(
+                            ts.wildCardType(position, (ReferenceType) fres.result(), null),
+                            fres.pos());
+                }
+            case MINUS:
+                {
+                    Result<? extends Type> fres = fieldTypeSig(value, ++pos);
+                    return new Result<>(
+                            ts.wildCardType(position, null, (ReferenceType) fres.result()),
+                            fres.pos());
+                }
+            case STAR:
+                pos++;
+                return new Result<>(ts.wildCardType(position), pos);
+            case L:
+            case LEFT_SQUARE:
+            case T:
+                return fieldTypeSig(value, pos);
+            default:
+                return null;
         }
     }
 
     public Result<ArrayType> arrayTypeSig(String value, int pos) {
         char token = value.charAt(pos);
         switch (token) {
-        case LEFT_SQUARE: {
-            pos++;
-            Result<? extends Type> tres = typeSig(value, pos);
-            Type type = tres.result();
-            return new Result<>(ts.arrayOf(position, type, 1), tres.pos());
-        }
-        default:
-            return null;
+            case LEFT_SQUARE:
+                {
+                    pos++;
+                    Result<? extends Type> tres = typeSig(value, pos);
+                    Type type = tres.result();
+                    return new Result<>(ts.arrayOf(position, type, 1), tres.pos());
+                }
+            default:
+                return null;
         }
     }
 
     public Result<List<Type>> typeSigList(String value, int pos) {
-        //System.err.println("### Parsing type sig list " + value.substring(pos));
+        // System.err.println("### Parsing type sig list " + value.substring(pos));
         List<Type> formals = new ArrayList<>();
         char token = value.charAt(pos);
         while (token != RIGHT_BRACE) {
@@ -658,26 +652,26 @@ public class JL5Signature extends Attribute {
         // System.err.println("### Parsing type sig " + value.substring(pos));
         char token = value.charAt(pos);
         switch (token) {
-        case L:
-        case LEFT_SQUARE:
-        case T:
-            return fieldTypeSig(value, pos);
-        case B:
-        case C:
-        case D:
-        case F:
-        case I:
-        case J:
-        case S:
-        case Z:
-            return baseType(value, pos);
-        default:
-            return null;
+            case L:
+            case LEFT_SQUARE:
+            case T:
+                return fieldTypeSig(value, pos);
+            case B:
+            case C:
+            case D:
+            case F:
+            case I:
+            case J:
+            case S:
+            case Z:
+                return baseType(value, pos);
+            default:
+                return null;
         }
     }
 
     public Result<MethodSig> methodTypeSig(String value, int pos) {
-        //System.err.println("### Parsing method type sig " + value.substring(pos));
+        // System.err.println("### Parsing method type sig " + value.substring(pos));
         char token = value.charAt(pos);
         Result<List<TypeVariable>> fres = null;
         if (token == LEFT_ANGLE) {
@@ -697,43 +691,41 @@ public class JL5Signature extends Attribute {
             tres = throwsSigList(value, pos);
             pos = tres.pos();
         }
-        return new Result<>(new MethodSig(fres == null
-                ? new ArrayList<TypeVariable>() : fres.result(),
-                                          ares == null
-                                                  ? new ArrayList<Type>()
-                                                  : ares.result(),
-                                          rres.result(),
-                                          tres == null
-                                                  ? new ArrayList<ReferenceType>()
-                                                  : tres.result()),
-                            pos);
+        return new Result<>(
+                new MethodSig(
+                        fres == null ? new ArrayList<TypeVariable>() : fres.result(),
+                        ares == null ? new ArrayList<Type>() : ares.result(),
+                        rres.result(),
+                        tres == null ? new ArrayList<ReferenceType>() : tres.result()),
+                pos);
     }
 
     // returnType used in methodSig
     // starts pointing at char
     // ends after (may be end of string
     public Result<? extends Type> returnType(String value, int pos) {
-        //System.err.println("### Parsing return type sig " + value.substring(pos));
+        // System.err.println("### Parsing return type sig " + value.substring(pos));
         char token = value.charAt(pos);
         switch (token) {
-        case L:
-        case LEFT_SQUARE:
-        case T:
-        case B:
-        case C:
-        case D:
-        case F:
-        case I:
-        case J:
-        case S:
-        case Z:
-            return typeSig(value, pos);
-        case V: {
-            pos++;
-            return new Result<>(ts.Void(), pos);
-        }
-        default:
-            return null;
+            case L:
+            case LEFT_SQUARE:
+            case T:
+            case B:
+            case C:
+            case D:
+            case F:
+            case I:
+            case J:
+            case S:
+            case Z:
+                return typeSig(value, pos);
+            case V:
+                {
+                    pos++;
+                    return new Result<>(ts.Void(), pos);
+                }
+            default:
+                return null;
         }
     }
 
@@ -757,19 +749,20 @@ public class JL5Signature extends Attribute {
     public Result<? extends ReferenceType> throwsSig(String value, int pos) {
         char token = value.charAt(pos);
         switch (token) {
-        case HAT: {
-            token = value.charAt(++pos);
-            switch (token) {
-            case L:
-                return classTypeSig(value, pos);
-            case T:
-                return typeVarSig(value, pos);
+            case HAT:
+                {
+                    token = value.charAt(++pos);
+                    switch (token) {
+                        case L:
+                            return classTypeSig(value, pos);
+                        case T:
+                            return typeVarSig(value, pos);
+                        default:
+                            return null;
+                    }
+                }
             default:
                 return null;
-            }
-        }
-        default:
-            return null;
         }
     }
 
@@ -780,24 +773,24 @@ public class JL5Signature extends Attribute {
     public Result<PrimitiveType> baseType(String value, int pos) {
         char token = value.charAt(pos);
         switch (token) {
-        case B:
-            return new Result<>(ts.Byte(), ++pos);
-        case C:
-            return new Result<>(ts.Char(), ++pos);
-        case D:
-            return new Result<>(ts.Double(), ++pos);
-        case F:
-            return new Result<>(ts.Float(), ++pos);
-        case I:
-            return new Result<>(ts.Int(), ++pos);
-        case J:
-            return new Result<>(ts.Long(), ++pos);
-        case S:
-            return new Result<>(ts.Short(), ++pos);
-        case Z:
-            return new Result<>(ts.Boolean(), ++pos);
-        default:
-            return null;
+            case B:
+                return new Result<>(ts.Byte(), ++pos);
+            case C:
+                return new Result<>(ts.Char(), ++pos);
+            case D:
+                return new Result<>(ts.Double(), ++pos);
+            case F:
+                return new Result<>(ts.Float(), ++pos);
+            case I:
+                return new Result<>(ts.Int(), ++pos);
+            case J:
+                return new Result<>(ts.Long(), ++pos);
+            case S:
+                return new Result<>(ts.Short(), ++pos);
+            case Z:
+                return new Result<>(ts.Boolean(), ++pos);
+            default:
+                return null;
         }
     }
 
@@ -808,12 +801,12 @@ public class JL5Signature extends Attribute {
         classSignature = classSig(sigValue, 0).result();
     }
 
-    public List<TypeVariable> parseClassTypeVariables(TypeSystem ts,
-            Position pos) {
+    public List<TypeVariable> parseClassTypeVariables(TypeSystem ts, Position pos) {
         this.ts = (JL5TypeSystem) ts;
         position = pos;
         String sigValue = (String) cls.getConstants()[index].value();
-        char token = sigValue.charAt(0);;
+        char token = sigValue.charAt(0);
+        ;
         List<TypeVariable> results = null;
         if (token == LEFT_ANGLE) {
             results = createFormalTypeParamList(sigValue, 1).result();
@@ -822,8 +815,7 @@ public class JL5Signature extends Attribute {
         return results;
     }
 
-    public void parseMethodSignature(TypeSystem ts, Position pos,
-            ClassType ct) {
+    public void parseMethodSignature(TypeSystem ts, Position pos, ClassType ct) {
         this.ts = (JL5TypeSystem) ts;
         position = pos;
         curClass = ct;
@@ -841,25 +833,25 @@ public class JL5Signature extends Attribute {
     }
 
     private TypeVariable findTypeVar(String next) {
-        //System.err.println("### calling findTypeVar " + next + " in " + typeVars);
+        // System.err.println("### calling findTypeVar " + next + " in " + typeVars);
         if (typeVars != null) {
             for (TypeVariable iType : typeVars) {
                 if (iType.name().equals(next)) return iType;
             }
         }
-        //System.err.println("curClass " + curClass);
+        // System.err.println("curClass " + curClass);
         if (curClass != null) {
             /* If curClass is an inner class and the type variable is not found,
              * need to examine the outer class.
              */
             for (ClassType ct = curClass; ct != null; ct = ct.outer()) {
-                //System.err.println("### ct is the right type");
+                // System.err.println("### ct is the right type");
                 if (ct instanceof JL5ParsedClassType) {
                     JL5ParsedClassType pct = (JL5ParsedClassType) ct;
                     if (pct.typeVariables() != null) {
-                        //System.err.println("### typeVariables is not null");
+                        // System.err.println("### typeVariables is not null");
                         for (TypeVariable iType : pct.typeVariables()) {
-                            //System.err.println("### Checking against " + iType.name());
+                            // System.err.println("### Checking against " + iType.name());
                             if (iType.name().equals(next)) return iType;
                         }
                     }
@@ -878,5 +870,4 @@ public class JL5Signature extends Attribute {
     public String toString() {
         return (String) cls.getConstants()[index].value();
     }
-
 }

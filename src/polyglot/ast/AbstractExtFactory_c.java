@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -32,30 +32,28 @@ import java.util.Iterator;
  * This abstract implementation of {@code ExtFactory} provides
  * a way of chaining together ExtFactories, and default implementations
  * of factory methods for each node.
- * 
+ *
  * <p>
  * For a given type of AST node {@code N}, there are three methods:
- * {@code extN()},  {@code extNImpl()} and {@code postExtN(Ext)}. 
+ * {@code extN()},  {@code extNImpl()} and {@code postExtN(Ext)}.
  * The method {@code extN()} calls {@code extNImpl()} to create
- * an appropriate extension object, and if other {@code ExtFactory}s are 
- * chained onto this one, it will also call {@code extN()} on the next 
- * {@code ExtFactory}. The method {@code extN()} will then 
+ * an appropriate extension object, and if other {@code ExtFactory}s are
+ * chained onto this one, it will also call {@code extN()} on the next
+ * {@code ExtFactory}. The method {@code extN()} will then
  * call {@code postExtN}, passing in the newly created extension object.
- * 
+ *
  * <p>
  * The default implementation of {@code extNImpl()} is to simply call
- * {@code extMImpl()}, where {@code M} is the immediate 
+ * {@code extMImpl()}, where {@code M} is the immediate
  * superclass of {@code N}. Similarly, the default implementation of
  * {@code postExtN(Ext)} is to call {@code postExtM(Ext)}.
- * 
- * @see polyglot.ast.AbstractDelFactory_c has a very similar structure. 
+ *
+ * @see polyglot.ast.AbstractDelFactory_c has a very similar structure.
  */
 public abstract class AbstractExtFactory_c implements ExtFactory {
     // use an empty implementation of AbstractExtFactory_c,
     // so we don't need to do null checks
-    public static final ExtFactory emptyExtFactory =
-            new AbstractExtFactory_c() {
-            };
+    public static final ExtFactory emptyExtFactory = new AbstractExtFactory_c() {};
 
     protected AbstractExtFactory_c() {
         this(emptyExtFactory);
@@ -81,9 +79,9 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
     /**
      * Compose two extensions together. Order is important: e1 gets added
      * at the end of e2's chain of extensions.
-     * @param e1 the {@code Ext} object to add to the end of e2's 
-     *             chain of extensions. 
-     * @param e2 the second {@code Ext} object that will have e1 added to 
+     * @param e1 the {@code Ext} object to add to the end of e2's
+     *             chain of extensions.
+     * @param e2 the second {@code Ext} object that will have e1 added to
      *             its chain of extensions.
      * @return the result of adding e1 to the end of e2's chain of extensions.
      */
@@ -95,7 +93,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
     }
 
     // ******************************************
-    // Final methods that call the Impl methods to construct 
+    // Final methods that call the Impl methods to construct
     // extensions, and then check with nextExtFactory to see if it
     // also has an extension. Finally, call an appropriate post method,
     // to allow subclasses to perform operations on the construction Exts
@@ -1951,5 +1949,4 @@ public abstract class AbstractExtFactory_c implements ExtFactory {
             }
         };
     }
-
 }

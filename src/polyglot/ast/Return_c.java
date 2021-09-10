@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -58,7 +58,7 @@ public class Return_c extends Stmt_c implements Return {
 
     protected Expr expr;
 
-//    @Deprecated
+    //    @Deprecated
     public Return_c(Position pos, Expr expr) {
         this(pos, expr, null);
     }
@@ -106,14 +106,12 @@ public class Return_c extends Stmt_c implements Return {
         CodeInstance ci = c.currentCode();
 
         if (ci instanceof InitializerInstance) {
-            throw new SemanticException("Cannot return from an initializer block.",
-                                        position());
+            throw new SemanticException("Cannot return from an initializer block.", position());
         }
 
         if (ci instanceof ConstructorInstance) {
             if (expr != null) {
-                throw new SemanticException("Cannot return a value from " + ci
-                        + ".", position());
+                throw new SemanticException("Cannot return a value from " + ci + ".", position());
             }
 
             return this;
@@ -124,30 +122,27 @@ public class Return_c extends Stmt_c implements Return {
 
             if (fi.returnType().isVoid()) {
                 if (expr != null) {
-                    throw new SemanticException("Cannot return a value from "
-                            + fi + ".", position());
-                }
-                else {
+                    throw new SemanticException(
+                            "Cannot return a value from " + fi + ".", position());
+                } else {
                     return this;
                 }
-            }
-            else if (expr == null) {
-                throw new SemanticException("Must return a value from " + fi
-                        + ".", position());
+            } else if (expr == null) {
+                throw new SemanticException("Must return a value from " + fi + ".", position());
             }
 
             if (ts.isImplicitCastValid(expr.type(), fi.returnType())) {
                 return this;
             }
 
-            if (ts.numericConversionValid(fi.returnType(),
-                                          tc.lang().constantValue(expr,
-                                                                  tc.lang()))) {
+            if (ts.numericConversionValid(
+                    fi.returnType(), tc.lang().constantValue(expr, tc.lang()))) {
                 return this;
             }
 
-            throw new SemanticException("Cannot return expression of type "
-                    + expr.type() + " from " + fi + ".", expr.position());
+            throw new SemanticException(
+                    "Cannot return expression of type " + expr.type() + " from " + fi + ".",
+                    expr.position());
         }
 
         throw new InternalCompilerError("Unrecognized code type.");
@@ -197,12 +192,11 @@ public class Return_c extends Stmt_c implements Return {
         }
 
         v.visitReturn(this);
-        return Collections.<T> emptyList();
+        return Collections.<T>emptyList();
     }
 
     @Override
     public Node copy(NodeFactory nf) {
         return nf.Return(this.position, this.expr);
     }
-
 }

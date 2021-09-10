@@ -23,7 +23,7 @@ import polyglot.util.InternalCompilerError;
  * Modelled on {@link JLOutputExtensionInfo}.
  */
 public class JL7OutputExtensionInfo extends JL7ExtensionInfo {
-    final protected ExtensionInfo parent;
+    protected final ExtensionInfo parent;
 
     public JL7OutputExtensionInfo(ExtensionInfo parent) {
         this.parent = parent;
@@ -34,7 +34,7 @@ public class JL7OutputExtensionInfo extends JL7ExtensionInfo {
         return new JL7OutputScheduler(this);
     }
 
-    static protected class JL7OutputOptions extends JL5Options {
+    protected static class JL7OutputOptions extends JL5Options {
         public JL7OutputOptions(ExtensionInfo extension) {
             super(extension);
         }
@@ -43,8 +43,7 @@ public class JL7OutputExtensionInfo extends JL7ExtensionInfo {
          * Skip checks regarding source files.
          */
         @Override
-        protected void validateArgs() throws UsageError {
-        }
+        protected void validateArgs() throws UsageError {}
     }
 
     @Override
@@ -55,11 +54,10 @@ public class JL7OutputExtensionInfo extends JL7ExtensionInfo {
         // Filter the parent's options by the ones this extension understands.
         List<Arg<?>> arguments = parentOpts.filterArgs(opt.flags());
         try {
-            opt.processArguments(arguments, Collections.<String> emptySet());
-        }
-        catch (UsageError e) {
-            throw new InternalCompilerError("Got usage error while configuring "
-                    + "output extension", e);
+            opt.processArguments(arguments, Collections.<String>emptySet());
+        } catch (UsageError e) {
+            throw new InternalCompilerError(
+                    "Got usage error while configuring " + "output extension", e);
         }
 
         return opt;
@@ -82,13 +80,11 @@ public class JL7OutputExtensionInfo extends JL7ExtensionInfo {
             try {
                 g.addPrerequisiteGoal(Validated(job), this);
                 g.addPrerequisiteGoal(AnnotationCheck(job), this);
-            }
-            catch (CyclicDependencyException e) {
+            } catch (CyclicDependencyException e) {
                 throw new InternalCompilerError(e);
             }
 
             return internGoal(g);
         }
-
     }
 }

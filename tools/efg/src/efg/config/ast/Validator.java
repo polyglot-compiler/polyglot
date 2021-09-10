@@ -18,10 +18,8 @@ public class Validator {
         this.ts = ts;
 
         try {
-            baseExtFactoryCT =
-                    (ClassType) ts.typeForName(ExtFactory.class.getName());
-        }
-        catch (SemanticException e) {
+            baseExtFactoryCT = (ClassType) ts.typeForName(ExtFactory.class.getName());
+        } catch (SemanticException e) {
             throw new InternalCompilerError(e);
         }
     }
@@ -29,8 +27,7 @@ public class Validator {
     public ClassType validateClass(Name name) throws SemanticException {
         try {
             return ts.typeForName(name.name).toClass();
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), name.pos);
         }
     }

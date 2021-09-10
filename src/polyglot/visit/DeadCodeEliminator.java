@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -71,10 +71,14 @@ import polyglot.visit.FlowGraph.Peer;
  * Visitor which performs dead code elimination.  (Note that "dead code" is not
  * unreachable code, but is actually code that has no effect.)
  */
-public class DeadCodeEliminator extends
-        DataFlow<DeadCodeEliminator.DataFlowItem> {
+public class DeadCodeEliminator extends DataFlow<DeadCodeEliminator.DataFlowItem> {
     public DeadCodeEliminator(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, ts, nf, false /* backward analysis */, true /* perform dataflow on entry to CodeDecls */);
+        super(
+                job,
+                ts,
+                nf,
+                false /* backward analysis */,
+                true /* perform dataflow on entry to CodeDecls */);
     }
 
     protected static class DataFlowItem extends polyglot.visit.DataFlow.Item {
@@ -156,8 +160,7 @@ public class DeadCodeEliminator extends
             if (!(o instanceof DataFlowItem)) return false;
 
             DataFlowItem dfi = (DataFlowItem) o;
-            return liveVars.equals(dfi.liveVars)
-                    && liveDecls.equals(dfi.liveDecls);
+            return liveVars.equals(dfi.liveVars) && liveDecls.equals(dfi.liveDecls);
         }
 
         @Override
@@ -167,14 +170,13 @@ public class DeadCodeEliminator extends
     }
 
     @Override
-    public DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph,
-            Term node, boolean entry) {
+    public DataFlowItem createInitialItem(FlowGraph<DataFlowItem> graph, Term node, boolean entry) {
         return new DataFlowItem();
     }
 
     @Override
-    public DataFlowItem confluence(List<DataFlowItem> inItems,
-            Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
+    public DataFlowItem confluence(
+            List<DataFlowItem> inItems, Peer<DataFlowItem> peer, FlowGraph<DataFlowItem> graph) {
         return confluence(inItems);
     }
 
@@ -184,8 +186,7 @@ public class DeadCodeEliminator extends
         for (DataFlowItem inItem : inItems) {
             if (result == null) {
                 result = new DataFlowItem(inItem);
-            }
-            else {
+            } else {
                 result.union(inItem);
             }
         }
@@ -194,8 +195,8 @@ public class DeadCodeEliminator extends
     }
 
     @Override
-    public Map<EdgeKey, DataFlowItem> flow(DataFlowItem in,
-            FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
+    public Map<EdgeKey, DataFlowItem> flow(
+            DataFlowItem in, FlowGraph<DataFlowItem> graph, Peer<DataFlowItem> peer) {
         DataFlowItem result = new DataFlowItem(in);
 
         if (peer.isEntry()) {
@@ -213,24 +214,18 @@ public class DeadCodeEliminator extends
             result.removeDecl(to);
 
             du = getDefUse(n.init());
-        }
-        else if (t instanceof Stmt && !(t instanceof CompoundStmt)) {
+        } else if (t instanceof Stmt && !(t instanceof CompoundStmt)) {
             du = getDefUse(t);
-        }
-        else if (t instanceof CompoundStmt) {
+        } else if (t instanceof CompoundStmt) {
             if (t instanceof If) {
                 du = getDefUse(((If) t).cond());
-            }
-            else if (t instanceof Switch) {
+            } else if (t instanceof Switch) {
                 du = getDefUse(((Switch) t).expr());
-            }
-            else if (t instanceof Do) {
+            } else if (t instanceof Do) {
                 du = getDefUse(((Do) t).cond());
-            }
-            else if (t instanceof For) {
+            } else if (t instanceof For) {
                 du = getDefUse(((For) t).cond());
-            }
-            else if (t instanceof While) {
+            } else if (t instanceof While) {
                 du = getDefUse(((While) t).cond());
             }
         }
@@ -244,8 +239,7 @@ public class DeadCodeEliminator extends
     }
 
     @Override
-    public void post(FlowGraph<DataFlowItem> graph, Term root)
-            throws SemanticException {
+    public void post(FlowGraph<DataFlowItem> graph, Term root) throws SemanticException {
         // No need to do any checking.
         if (Report.should_report(Report.cfg, 2)) {
             dumpFlowGraph(graph, root);
@@ -253,15 +247,18 @@ public class DeadCodeEliminator extends
     }
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
     @Override
-    public void check(FlowGraph<DataFlowItem> graph, Term n, boolean entry,
-            DataFlowItem inItem, Map<EdgeKey, DataFlowItem> outItems)
+    public void check(
+            FlowGraph<DataFlowItem> graph,
+            Term n,
+            boolean entry,
+            DataFlowItem inItem,
+            Map<EdgeKey, DataFlowItem> outItems)
             throws SemanticException {
 
-        throw new InternalCompilerError("DeadCodeEliminator.check should "
-                + "never be called.");
+        throw new InternalCompilerError("DeadCodeEliminator.check should " + "never be called.");
     }
 
     protected DataFlowItem getItem(Term n) {
@@ -280,8 +277,7 @@ public class DeadCodeEliminator extends
     }
 
     @Override
-    public Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
 
         if (n instanceof LocalDecl) {
             LocalDecl ld = (LocalDecl) n;
@@ -303,20 +299,17 @@ public class DeadCodeEliminator extends
 
                 if (!(left instanceof Local)) return n;
                 local = (Local) left;
-            }
-            else if (expr instanceof Unary) {
+            } else if (expr instanceof Unary) {
                 Unary unary = (Unary) expr;
                 expr = unary.expr();
                 if (!(expr instanceof Local)) return n;
                 local = (Local) expr;
-            }
-            else {
+            } else {
                 return n;
             }
 
             DataFlowItem in = getItem(eval);
-            if (in == null || in.needDef(local.localInstance().orig()))
-                return n;
+            if (in == null || in.needDef(local.localInstance().orig())) return n;
 
             if (right != null) {
                 return getEffects(right);
@@ -329,7 +322,7 @@ public class DeadCodeEliminator extends
             // Get rid of empty statements.
             Block b = (Block) n;
             List<Stmt> stmts = new ArrayList<>(b.statements());
-            for (Iterator<Stmt> it = stmts.iterator(); it.hasNext();) {
+            for (Iterator<Stmt> it = stmts.iterator(); it.hasNext(); ) {
                 if (it.next() instanceof Empty) it.remove();
             }
 
@@ -355,8 +348,7 @@ public class DeadCodeEliminator extends
         return new Pair<>(def, use);
     }
 
-    protected NodeVisitor createDefUseFinder(Set<LocalInstance> def,
-            Set<LocalInstance> use) {
+    protected NodeVisitor createDefUseFinder(Set<LocalInstance> def, Set<LocalInstance> use) {
         return new DefUseFinder(lang(), def, use);
     }
 
@@ -364,8 +356,7 @@ public class DeadCodeEliminator extends
         protected Set<LocalInstance> def;
         protected Set<LocalInstance> use;
 
-        public DefUseFinder(JLang lang, Set<LocalInstance> def,
-                Set<LocalInstance> use) {
+        public DefUseFinder(JLang lang, Set<LocalInstance> def, Set<LocalInstance> use) {
             super(lang);
             this.def = def;
             this.use = use;
@@ -384,8 +375,7 @@ public class DeadCodeEliminator extends
         public Node leave(Node old, Node n, NodeVisitor v) {
             if (n instanceof Local) {
                 use.add(((Local) n).localInstance().orig());
-            }
-            else if (n instanceof Assign) {
+            } else if (n instanceof Assign) {
                 Expr left = ((Assign) n).left();
                 if (left instanceof Local) {
                     def.add(((Local) left).localInstance().orig());
@@ -407,46 +397,50 @@ public class DeadCodeEliminator extends
         final List<Stmt> result = new LinkedList<>();
         final Position pos = Position.compilerGenerated();
 
-        NodeVisitor v = new HaltingVisitor(lang()) {
-            @Override
-            public NodeVisitor enter(Node n) {
-                if (n instanceof Assign || n instanceof ProcedureCall) {
-                    return bypassChildren(n);
-                }
+        NodeVisitor v =
+                new HaltingVisitor(lang()) {
+                    @Override
+                    public NodeVisitor enter(Node n) {
+                        if (n instanceof Assign || n instanceof ProcedureCall) {
+                            return bypassChildren(n);
+                        }
 
-                // XXX Cast
+                        // XXX Cast
 
-                if (n instanceof Unary) {
-                    Unary.Operator op = ((Unary) n).operator();
-                    if (op == Unary.POST_INC || op == Unary.POST_DEC
-                            || op == Unary.PRE_INC || op == Unary.PRE_INC) {
+                        if (n instanceof Unary) {
+                            Unary.Operator op = ((Unary) n).operator();
+                            if (op == Unary.POST_INC
+                                    || op == Unary.POST_DEC
+                                    || op == Unary.PRE_INC
+                                    || op == Unary.PRE_INC) {
 
-                        return bypassChildren(n);
+                                return bypassChildren(n);
+                            }
+                        }
+
+                        return this;
                     }
-                }
 
-                return this;
-            }
+                    @Override
+                    public Node leave(Node old, Node n, NodeVisitor v) {
+                        if (n instanceof Assign || n instanceof ProcedureCall) {
+                            result.add(nf.Eval(pos, (Expr) n));
+                        } else if (n instanceof Unary) {
+                            Unary.Operator op = ((Unary) n).operator();
+                            if (op == Unary.POST_INC
+                                    || op == Unary.POST_DEC
+                                    || op == Unary.PRE_INC
+                                    || op == Unary.PRE_INC) {
 
-            @Override
-            public Node leave(Node old, Node n, NodeVisitor v) {
-                if (n instanceof Assign || n instanceof ProcedureCall) {
-                    result.add(nf.Eval(pos, (Expr) n));
-                }
-                else if (n instanceof Unary) {
-                    Unary.Operator op = ((Unary) n).operator();
-                    if (op == Unary.POST_INC || op == Unary.POST_DEC
-                            || op == Unary.PRE_INC || op == Unary.PRE_INC) {
+                                result.add(nf.Eval(pos, (Expr) n));
+                            }
+                        }
 
-                        result.add(nf.Eval(pos, (Expr) n));
+                        // XXX Cast
+
+                        return n;
                     }
-                }
-
-                // XXX Cast
-
-                return n;
-            }
-        };
+                };
 
         expr.visit(v);
 

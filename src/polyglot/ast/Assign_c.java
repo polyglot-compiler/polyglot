@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -143,20 +143,15 @@ public abstract class Assign_c extends Expr_c implements Assign {
         TypeSystem ts = tc.typeSystem();
 
         if (!(left instanceof Variable)) {
-            throw new SemanticException("Target of assignment must be a variable.",
-                                        position());
+            throw new SemanticException("Target of assignment must be a variable.", position());
         }
 
         if (op == ASSIGN) {
             if (!ts.isImplicitCastValid(s, t)
                     && !ts.typeEquals(s, t)
-                    && !ts.numericConversionValid(t,
-                                                  tc.lang()
-                                                    .constantValue(right,
-                                                                   tc.lang()))) {
+                    && !ts.numericConversionValid(t, tc.lang().constantValue(right, tc.lang()))) {
 
-                throw new SemanticException("Cannot assign " + s + " to " + t
-                        + ".", position());
+                throw new SemanticException("Cannot assign " + s + " to " + t + ".", position());
             }
 
             return type(t);
@@ -164,8 +159,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
 
         if (op == ADD_ASSIGN) {
             // t += s
-            if (ts.typeEquals(t, ts.String())
-                    && ts.canCoerceToString(s, tc.context())) {
+            if (ts.typeEquals(t, ts.String()) && ts.canCoerceToString(s, tc.context())) {
                 return type(ts.String());
             }
 
@@ -173,18 +167,18 @@ public abstract class Assign_c extends Expr_c implements Assign {
                 return type(ts.promote(t, s));
             }
 
-            throw new SemanticException("The " + op + " operator must have "
-                    + "numeric or String operands.", position());
+            throw new SemanticException(
+                    "The " + op + " operator must have " + "numeric or String operands.",
+                    position());
         }
 
-        if (op == SUB_ASSIGN || op == MUL_ASSIGN || op == DIV_ASSIGN
-                || op == MOD_ASSIGN) {
+        if (op == SUB_ASSIGN || op == MUL_ASSIGN || op == DIV_ASSIGN || op == MOD_ASSIGN) {
             if (t.isNumeric() && s.isNumeric()) {
                 return type(ts.promote(t, s));
             }
 
-            throw new SemanticException("The " + op + " operator must have "
-                    + "numeric operands.", position());
+            throw new SemanticException(
+                    "The " + op + " operator must have " + "numeric operands.", position());
         }
 
         if (op == BIT_AND_ASSIGN || op == BIT_OR_ASSIGN || op == BIT_XOR_ASSIGN) {
@@ -192,28 +186,26 @@ public abstract class Assign_c extends Expr_c implements Assign {
                 return type(ts.Boolean());
             }
 
-            if (ts.isImplicitCastValid(t, ts.Long())
-                    && ts.isImplicitCastValid(s, ts.Long())) {
+            if (ts.isImplicitCastValid(t, ts.Long()) && ts.isImplicitCastValid(s, ts.Long())) {
                 return type(ts.promote(t, s));
             }
 
-            throw new SemanticException("The " + op + " operator must have "
-                    + "integral or boolean operands.", position());
+            throw new SemanticException(
+                    "The " + op + " operator must have " + "integral or boolean operands.",
+                    position());
         }
 
         if (op == SHL_ASSIGN || op == SHR_ASSIGN || op == USHR_ASSIGN) {
-            if (ts.isImplicitCastValid(t, ts.Long())
-                    && ts.isImplicitCastValid(s, ts.Long())) {
+            if (ts.isImplicitCastValid(t, ts.Long()) && ts.isImplicitCastValid(s, ts.Long())) {
                 // Only promote the left of a shift.
                 return type(ts.promote(t));
             }
 
-            throw new SemanticException("The " + op + " operator must have "
-                    + "integral operands.", position());
+            throw new SemanticException(
+                    "The " + op + " operator must have " + "integral operands.", position());
         }
 
-        throw new InternalCompilerError("Unrecognized assignment operator "
-                + op + ".");
+        throw new InternalCompilerError("Unrecognized assignment operator " + op + ".");
     }
 
     @Override
@@ -232,14 +224,18 @@ public abstract class Assign_c extends Expr_c implements Assign {
                 return child.type();
             }
         }
-        if (op == ADD_ASSIGN || op == SUB_ASSIGN || op == MUL_ASSIGN
-                || op == DIV_ASSIGN || op == MOD_ASSIGN || op == SHL_ASSIGN
-                || op == SHR_ASSIGN || op == USHR_ASSIGN) {
+        if (op == ADD_ASSIGN
+                || op == SUB_ASSIGN
+                || op == MUL_ASSIGN
+                || op == DIV_ASSIGN
+                || op == MOD_ASSIGN
+                || op == SHL_ASSIGN
+                || op == SHR_ASSIGN
+                || op == USHR_ASSIGN) {
             if (left.type().isNumeric() && right.type().isNumeric()) {
                 try {
                     return ts.promote(left.type(), child.type());
-                }
-                catch (SemanticException e) {
+                } catch (SemanticException e) {
                     throw new InternalCompilerError(e);
                 }
             }
@@ -253,8 +249,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
             if (left.type().isNumeric() && right.type().isNumeric()) {
                 try {
                     return ts.promote(left.type(), child.type());
-                }
-                catch (SemanticException e) {
+                } catch (SemanticException e) {
                     throw new InternalCompilerError(e);
                 }
             }
@@ -262,8 +257,7 @@ public abstract class Assign_c extends Expr_c implements Assign {
             return child.type();
         }
 
-        throw new InternalCompilerError("Unrecognized assignment operator "
-                + op + ".");
+        throw new InternalCompilerError("Unrecognized assignment operator " + op + ".");
     }
 
     @Override
@@ -300,14 +294,13 @@ public abstract class Assign_c extends Expr_c implements Assign {
     }
 
     @Override
-    abstract public Term firstChild();
+    public abstract Term firstChild();
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         if (operator() == ASSIGN) {
             acceptCFGAssign(v);
-        }
-        else {
+        } else {
             acceptCFGOpAssign(v);
         }
         return succs;
@@ -340,5 +333,4 @@ public abstract class Assign_c extends Expr_c implements Assign {
     public Node copy(NodeFactory nf) {
         return nf.Assign(this.position, this.left, this.op, this.right);
     }
-
 }

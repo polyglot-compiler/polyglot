@@ -29,8 +29,7 @@ public class Counterexample {
      * @param timeout true if the timeout was reached, resulting in a
      *          nonunifying counterexample, false otherwise
      */
-    public Counterexample(Derivation d1, Derivation d2, boolean unifying,
-            boolean timeout) {
+    public Counterexample(Derivation d1, Derivation d2, boolean unifying, boolean timeout) {
         this.d1 = d1;
         this.d2 = d2;
         this.unifying = unifying;

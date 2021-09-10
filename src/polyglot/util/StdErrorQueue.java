@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -48,8 +48,8 @@ public class StdErrorQueue extends AbstractErrorQueue {
     public void displayError(ErrorInfo e) {
         String message =
                 e.getErrorKind() != ErrorInfo.DEBUG
-                        ? e.getMessage() : e.getErrorString() + " -- "
-                                + e.getMessage();
+                        ? e.getMessage()
+                        : e.getErrorString() + " -- " + e.getMessage();
 
         Position position = e.getPosition();
 
@@ -91,7 +91,7 @@ public class StdErrorQueue extends AbstractErrorQueue {
         */
 
         // I (Nate) tried without success to get CodeWriter to do this.
-        // It would be nice if we could specify where breaks are allowed 
+        // It would be nice if we could specify where breaks are allowed
         // when generating the error.  We don't want to break Jif labels,
         // for instance.
 
@@ -105,8 +105,7 @@ public class StdErrorQueue extends AbstractErrorQueue {
 
         StringTokenizer lines = new StringTokenizer(message, "\n", true);
         boolean needNewline = false;
-        boolean isPostCompilerError =
-                e.getErrorKind() == ErrorInfo.POST_COMPILER_ERROR;
+        boolean isPostCompilerError = e.getErrorKind() == ErrorInfo.POST_COMPILER_ERROR;
         boolean lineHasContent = prefix.length() > 0;
 
         while (lines.hasMoreTokens()) {
@@ -118,8 +117,7 @@ public class StdErrorQueue extends AbstractErrorQueue {
                     // so print the message as is, but indent on new lines.
                     sb.append(line);
                     lineHasContent = true;
-                }
-                else {
+                } else {
                     StringTokenizer st = new StringTokenizer(line, " ", true);
 
                     while (st.hasMoreTokens()) {
@@ -130,8 +128,7 @@ public class StdErrorQueue extends AbstractErrorQueue {
                                 err.println(sb.toString());
                                 lineHasContent = false;
                             }
-                            for (int i = 0; i < lmargin; i++)
-                                sb.setCharAt(i, ' ');
+                            for (int i = 0; i < lmargin; i++) sb.setCharAt(i, ' ');
                             sb.setLength(lmargin);
                             width = lmargin;
                         }
@@ -144,8 +141,7 @@ public class StdErrorQueue extends AbstractErrorQueue {
                 }
 
                 needNewline = true;
-            }
-            else {
+            } else {
                 err.print(line);
                 needNewline = false;
             }
@@ -155,12 +151,10 @@ public class StdErrorQueue extends AbstractErrorQueue {
                     err.print(sb.toString());
                     lineHasContent = false;
                 }
-                for (int i = 0; i < lmargin; i++)
-                    sb.setCharAt(i, ' ');
+                for (int i = 0; i < lmargin; i++) sb.setCharAt(i, ' ');
                 sb.setLength(lmargin);
                 width = lmargin;
-            }
-            else if (needNewline) {
+            } else if (needNewline) {
                 err.println(sb.toString());
             }
         }
@@ -207,8 +201,9 @@ public class StdErrorQueue extends AbstractErrorQueue {
                         // print some ellipsis.
                         if (pos.endLine() - pos.line() > 1) {
                             // add some whitespace first
-                            for (int j = 0; j < s.length()
-                                    && Character.isWhitespace(s.charAt(j)); j++) {
+                            for (int j = 0;
+                                    j < s.length() && Character.isWhitespace(s.charAt(j));
+                                    j++) {
                                 err.print(s.charAt(j));
                             }
                             err.println("...");
@@ -228,8 +223,7 @@ public class StdErrorQueue extends AbstractErrorQueue {
             }
 
             err.println();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
         }
     }
 
@@ -254,8 +248,7 @@ public class StdErrorQueue extends AbstractErrorQueue {
         if (stopIndAt < startIndAt) {
             stopIndAt = startIndAt;
         }
-        if (pos.endColumn() == Position.UNKNOWN
-                || pos.endColumn() == Position.END_UNUSED) {
+        if (pos.endColumn() == Position.UNKNOWN || pos.endColumn() == Position.END_UNUSED) {
             stopIndAt = startIndAt;
         }
 
@@ -284,8 +277,7 @@ public class StdErrorQueue extends AbstractErrorQueue {
     public void flush() {
         if (!flushed) {
             if (errorCount() > 0) {
-                err.println(errorCount() + " error"
-                        + (errorCount() > 1 ? "s." : "."));
+                err.println(errorCount() + " error" + (errorCount() > 1 ? "s." : "."));
             }
         }
         super.flush();

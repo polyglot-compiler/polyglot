@@ -20,5 +20,4 @@ public class EfgImportExt extends EfgExt {
 
         return superLang().typeCheck(n, tc);
     }
-
 }

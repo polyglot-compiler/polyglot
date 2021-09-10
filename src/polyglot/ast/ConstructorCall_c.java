@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -57,8 +57,7 @@ import polyglot.visit.TypeChecker;
  * A {@code ConstructorCall} represents a direct call to a constructor.
  * For instance, {@code super(...)} or {@code this(...)}.
  */
-public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
-        ProcedureCallOps {
+public class ConstructorCall_c extends Stmt_c implements ConstructorCall, ProcedureCallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Kind kind;
@@ -66,14 +65,14 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     protected List<Expr> arguments;
     protected ConstructorInstance ci;
 
-//    @Deprecated
-    public ConstructorCall_c(Position pos, Kind kind, Expr qualifier,
-            List<? extends Expr> arguments) {
+    //    @Deprecated
+    public ConstructorCall_c(
+            Position pos, Kind kind, Expr qualifier, List<? extends Expr> arguments) {
         this(pos, kind, qualifier, arguments, null);
     }
 
-    public ConstructorCall_c(Position pos, Kind kind, Expr qualifier,
-            List<? extends Expr> arguments, Ext ext) {
+    public ConstructorCall_c(
+            Position pos, Kind kind, Expr qualifier, List<? extends Expr> arguments, Ext ext) {
         super(pos, ext);
         assert (kind != null && arguments != null); // qualifier may be null
         this.kind = kind;
@@ -125,8 +124,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
         return arguments(this, arguments);
     }
 
-    protected <N extends ConstructorCall_c> N arguments(N n,
-            List<Expr> arguments) {
+    protected <N extends ConstructorCall_c> N arguments(N n, List<Expr> arguments) {
         if (CollectionUtil.equals(n.arguments, arguments)) return n;
         n = copyIfNeeded(n);
         n.arguments = ListUtil.copy(arguments, true);
@@ -148,8 +146,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
         return constructorInstance(this, ci);
     }
 
-    protected <N extends ConstructorCall_c> N constructorInstance(N n,
-            ConstructorInstance ci) {
+    protected <N extends ConstructorCall_c> N constructorInstance(N n, ConstructorInstance ci) {
         if (n.ci == ci) return n;
         n = copyIfNeeded(n);
         n.ci = ci;
@@ -166,8 +163,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     }
 
     /** Reconstruct the constructor call. */
-    protected <N extends ConstructorCall_c> N reconstruct(N n, Expr qualifier,
-            List<Expr> arguments) {
+    protected <N extends ConstructorCall_c> N reconstruct(
+            N n, Expr qualifier, List<Expr> arguments) {
         n = qualifier(n, qualifier);
         n = arguments(n, arguments);
         return n;
@@ -187,8 +184,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
         // Remove super() calls for java.lang.Object.
         // XXX Avoid using ts.Object(), which might throw MissingDependencyException,
         // and cause everything before the constructor declaration to be added twice.
-        if (kind == SUPER
-                && tb.currentClass().fullName().equals("java.lang.Object")) {
+        if (kind == SUPER && tb.currentClass().fullName().equals("java.lang.Object")) {
             return tb.nodeFactory().Empty(position());
         }
 
@@ -200,11 +196,12 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
         }
 
         ConstructorInstance ci =
-                ts.constructorInstance(position(),
-                                       tb.currentClass(),
-                                       Flags.NONE,
-                                       l,
-                                       Collections.<Type> emptyList());
+                ts.constructorInstance(
+                        position(),
+                        tb.currentClass(),
+                        Flags.NONE,
+                        l,
+                        Collections.<Type>emptyList());
         n = constructorInstance(n, ci);
         return n;
     }
@@ -241,80 +238,81 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
             }
 
             if (kind != SUPER) {
-                throw new SemanticException("Can only qualify a \"super\""
-                        + "constructor invocation.", position());
+                throw new SemanticException(
+                        "Can only qualify a \"super\"" + "constructor invocation.", position());
             }
 
-            if (!superType.isClass() || !superType.toClass().isInnerClass()
+            if (!superType.isClass()
+                    || !superType.toClass().isInnerClass()
                     || superType.toClass().inStaticContext()) {
-                throw new SemanticException("The class \""
-                                                    + superType
-                                                    + "\""
-                                                    + " is not an inner class, or was declared in a static "
-                                                    + "context; a qualified constructor invocation cannot "
-                                                    + "be used.",
-                                            position());
+                throw new SemanticException(
+                        "The class \""
+                                + superType
+                                + "\""
+                                + " is not an inner class, or was declared in a static "
+                                + "context; a qualified constructor invocation cannot "
+                                + "be used.",
+                        position());
             }
 
             Type qt = qualifier.type();
 
             if (!qt.isClass() || !qt.isSubtype(superType.toClass().outer())) {
-                throw new SemanticException("The type of the qualifier "
-                                                    + "\""
-                                                    + qt
-                                                    + "\" does not match the immediately enclosing "
-                                                    + "class  of the super class \""
-                                                    + superType.toClass()
-                                                               .outer() + "\".",
-                                            qualifier.position());
+                throw new SemanticException(
+                        "The type of the qualifier "
+                                + "\""
+                                + qt
+                                + "\" does not match the immediately enclosing "
+                                + "class  of the super class \""
+                                + superType.toClass().outer()
+                                + "\".",
+                        qualifier.position());
             }
         }
 
         if (kind == SUPER) {
             if (!superType.isClass()) {
-                throw new SemanticException("Super type of " + ct
-                        + " is not a class.", position());
+                throw new SemanticException("Super type of " + ct + " is not a class.", position());
             }
 
             Expr q = qualifier;
 
             // If the super class is an inner class (i.e., has an enclosing
-            // instance of its container class), then either a qualifier 
+            // instance of its container class), then either a qualifier
             // must be provided, or ct must have an enclosing instance of the
             // super class's container class, or a subclass thereof.
             // See JLS 2nd Ed. | 8.8.5.1.
-            if (q == null && superType.isClass()
+            if (q == null
+                    && superType.isClass()
                     && superType.toClass().isInnerClass()
                     && !superType.toClass().inStaticContext()) {
                 ClassType superContainer = superType.toClass().outer();
-                // ct needs an enclosing instance of superContainer, 
+                // ct needs an enclosing instance of superContainer,
                 // or a subclass of superContainer.
                 ClassType e = ct.outer();
 
                 while (e != null) {
-                    if (e.isSubtype(superContainer)
-                            && ct.hasEnclosingInstance(e)) {
+                    if (e.isSubtype(superContainer) && ct.hasEnclosingInstance(e)) {
                         NodeFactory nf = tc.nodeFactory();
                         // If an enclosing instance is of an anonymous class,
                         // there is no qualifier.
                         q =
                                 e.isAnonymous()
                                         ? null
-                                        : nf.This(position(),
-                                                  nf.CanonicalTypeNode(position(),
-                                                                       e))
-                                            .type(e);
+                                        : nf.This(position(), nf.CanonicalTypeNode(position(), e))
+                                                .type(e);
                         break;
                     }
                     e = e.outer();
                 }
 
                 if (e == null) {
-                    throw new SemanticException(ct
-                                                        + " must have an enclosing instance"
-                                                        + " that is a subtype of "
-                                                        + superContainer,
-                                                position());
+                    throw new SemanticException(
+                            ct
+                                    + " must have an enclosing instance"
+                                    + " that is a subtype of "
+                                    + superContainer,
+                            position());
                 }
             }
 
@@ -334,8 +332,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
             ct = ct.superType().toClass();
         }
 
-        ConstructorInstance ci =
-                ts.findConstructor(ct, argTypes, c.currentClass(), false);
+        ConstructorInstance ci = ts.findConstructor(ct, argTypes, c.currentClass(), false);
         n = constructorInstance(n, ci);
         return n;
     }
@@ -394,7 +391,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
         w.allowBreak(2, 2, "", 0);
         w.begin(0);
 
-        for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
+        for (Iterator<Expr> i = arguments.iterator(); i.hasNext(); ) {
             Expr e = i.next();
 
             print(e, w, tr);
@@ -413,8 +410,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
     public Term firstChild() {
         if (qualifier != null) {
             return qualifier;
-        }
-        else {
+        } else {
             return listChild(arguments, (Expr) null);
         }
     }
@@ -425,12 +421,10 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
             if (!arguments.isEmpty()) {
                 v.visitCFG(qualifier, listChild(arguments, (Expr) null), ENTRY);
                 v.visitCFGList(arguments, this, EXIT);
-            }
-            else {
+            } else {
                 v.visitCFG(qualifier, this, EXIT);
             }
-        }
-        else {
+        } else {
             if (!arguments.isEmpty()) {
                 v.visitCFGList(arguments, this, EXIT);
             }
@@ -449,10 +443,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ConstructorCall(this.position,
-                                  this.kind,
-                                  this.qualifier,
-                                  this.arguments);
+        return nf.ConstructorCall(this.position, this.kind, this.qualifier, this.arguments);
     }
 
     protected void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp) {
@@ -460,8 +451,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall,
             w.write("(");
             printBlock(expr, w, pp);
             w.write(")");
-        }
-        else {
+        } else {
             print(expr, w, pp);
         }
     }

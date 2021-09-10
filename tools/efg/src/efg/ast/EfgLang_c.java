@@ -16,15 +16,13 @@ public class EfgLang_c extends J7Lang_c implements EfgLang {
         while (n != null) {
             Lang lang = n.lang();
             if (lang instanceof EfgLang) return (EfgLang) lang;
-            if (n instanceof Ext)
-                n = ((Ext) n).pred();
+            if (n instanceof Ext) n = ((Ext) n).pred();
             else return null;
         }
         throw new InternalCompilerError("Impossible to reach");
     }
 
-    protected EfgLang_c() {
-    }
+    protected EfgLang_c() {}
 
     protected static EfgExt efgExt(Node n) {
         return EfgExt.ext(n);
@@ -39,5 +37,4 @@ public class EfgLang_c extends J7Lang_c implements EfgLang {
     protected ClassDeclOps ClassDeclOps(ClassDecl n) {
         return (ClassDeclOps) efgExt(n);
     }
-
 }

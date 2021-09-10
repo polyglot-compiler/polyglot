@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -47,7 +47,7 @@ public class JL5Method extends Method {
 
     public JL5Method(DataInputStream in, ClassFile clazz) {
         super(in, clazz);
-//        System.err.println("JL5Method created for " + clazz);
+        //        System.err.println("JL5Method created for " + clazz);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class JL5Method extends Method {
 
         name = in.readUnsignedShort();
         type = in.readUnsignedShort();
-//        System.err.println("JL5Method.initialize() for " + clazz );
+        //        System.err.println("JL5Method.initialize() for " + clazz );
 
         int numAttributes = in.readUnsignedShort();
 
@@ -67,7 +67,7 @@ public class JL5Method extends Method {
             int length = in.readInt();
 
             Constant name = clazz.getConstants()[nameIndex];
-//            System.err.println("    " + name.value());
+            //            System.err.println("    " + name.value());
 
             if (name != null) {
                 if ("Exceptions".equals(name.value())) {
@@ -85,13 +85,11 @@ public class JL5Method extends Method {
                     attrs[i] = signature;
                 }
                 if ("RuntimeVisibleAnnotations".equals(name.value())) {
-                    runtimeVisibleAnnotations =
-                            new Annotations(clazz, in, nameIndex, length);
+                    runtimeVisibleAnnotations = new Annotations(clazz, in, nameIndex, length);
                     attrs[i] = runtimeVisibleAnnotations;
                 }
                 if ("RuntimeInvisibleAnnotations".equals(name.value())) {
-                    runtimeVisibleAnnotations =
-                            new Annotations(clazz, in, nameIndex, length);
+                    runtimeVisibleAnnotations = new Annotations(clazz, in, nameIndex, length);
                     attrs[i] = runtimeVisibleAnnotations;
                 }
             }
@@ -104,7 +102,7 @@ public class JL5Method extends Method {
             }
         }
         this.in = null; // RMF 7/23/2008 - Don't need the input stream any more,
-                        // so don't hang onto it
+        // so don't hang onto it
     }
 
     public JL5Signature getSignature() {

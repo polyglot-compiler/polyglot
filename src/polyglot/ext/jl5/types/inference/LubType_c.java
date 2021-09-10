@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -102,13 +102,13 @@ public class LubType_c extends ClassType_c implements LubType {
     private ReferenceType lub_force() {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
 
-        // st is the set of all supertypes of the lubElems.        
+        // st is the set of all supertypes of the lubElems.
         Set<ReferenceType> st = new LinkedHashSet<>();
 
         // est is the intersection of all erased supertypes of lubElems.
         // That is, during the loop below, it is the intersection of
         // the sets of erased supertypes of elements considered so far.
-        // By the end of the loop it will be mec, the minimal erased 
+        // By the end of the loop it will be mec, the minimal erased
         // candidate set (JLS 3rd ed, 15.12.2, p 464.)
         Set<ReferenceType> est = null;
 
@@ -119,8 +119,7 @@ public class LubType_c extends ClassType_c implements LubType {
             for (ReferenceType u_super : ts.allAncestorsOf(u)) {
                 if (u_super instanceof RawClass) {
                     u_supers.add(((RawClass) u_super).erased());
-                }
-                else u_supers.add(u_super);
+                } else u_supers.add(u_super);
             }
 
             Set<ReferenceType> est_of_u = new LinkedHashSet<>();
@@ -128,14 +127,12 @@ public class LubType_c extends ClassType_c implements LubType {
                 if (super_of_u instanceof JL5SubstClassType) {
                     JL5SubstClassType g = (JL5SubstClassType) super_of_u;
                     est_of_u.add(g.base());
-                }
-                else est_of_u.add(super_of_u);
+                } else est_of_u.add(super_of_u);
             }
             if (est == null) {
                 est = new LinkedHashSet<>();
                 est.addAll(est_of_u);
-            }
-            else {
+            } else {
                 est.retainAll(est_of_u);
             }
         }
@@ -157,10 +154,10 @@ public class LubType_c extends ClassType_c implements LubType {
         for (ReferenceType m : mec) {
             List<ReferenceType> inv = new ArrayList<>();
             for (ReferenceType t : st) {
-                if (ts.equals(m, t) || t instanceof JL5SubstClassType
-                        && ((JL5SubstClassType) t).base().equals(m)
-                        || t instanceof RawClass
-                        && ((RawClass) t).erased().base().equals(m)) {
+                if (ts.equals(m, t)
+                        || t instanceof JL5SubstClassType
+                                && ((JL5SubstClassType) t).base().equals(m)
+                        || t instanceof RawClass && ((RawClass) t).erased().base().equals(m)) {
                     inv.add(t);
                 }
             }
@@ -170,8 +167,7 @@ public class LubType_c extends ClassType_c implements LubType {
             if (ts.checkIntersectionBounds(cand, true)) {
                 return ts.intersectionType(this.position, cand);
             }
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
         }
         return ts.Object();
     }
@@ -179,8 +175,7 @@ public class LubType_c extends ClassType_c implements LubType {
     private ReferenceType lci(List<ReferenceType> inv) {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
         ReferenceType first = inv.get(0);
-        if (inv.size() == 1 || first instanceof RawClass
-                || first instanceof JL5ParsedClassType) {
+        if (inv.size() == 1 || first instanceof RawClass || first instanceof JL5ParsedClassType) {
             return first;
         }
         JL5SubstClassType res = (JL5SubstClassType) first;
@@ -197,14 +192,9 @@ public class LubType_c extends ClassType_c implements LubType {
                 lcta_args.add(lcta(a1, a2));
             }
             try {
-                res =
-                        (JL5SubstClassType) ts.instantiate(position,
-                                                           res.base(),
-                                                           lcta_args);
-            }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Unexpected SemanticException",
-                                                e);
+                res = (JL5SubstClassType) ts.instantiate(position, res.base(), lcta_args);
+            } catch (SemanticException e) {
+                throw new InternalCompilerError("Unexpected SemanticException", e);
             }
         }
         return res;
@@ -218,17 +208,14 @@ public class LubType_c extends ClassType_c implements LubType {
                 WildCardType a2wc = (WildCardType) a2;
                 // a1 and a2 are wild cards
                 if (a1wc.hasLowerBound() && a2wc.hasLowerBound()) {
-                    return ts.wildCardType(position,
-                                           null,
-                                           glb(a1wc.lowerBound(),
-                                               a2wc.lowerBound()));
+                    return ts.wildCardType(
+                            position, null, glb(a1wc.lowerBound(), a2wc.lowerBound()));
                 }
                 if (a1wc.hasLowerBound()) {
                     // a1 has lower bound, a2 does not
                     if (a1wc.lowerBound().equals(a2wc.upperBound())) {
                         return a1wc.lowerBound();
-                    }
-                    else {
+                    } else {
                         return ts.wildCardType(position);
                     }
                 }
@@ -236,28 +223,21 @@ public class LubType_c extends ClassType_c implements LubType {
                     // a2 has lower bound, a1 does not
                     if (a2wc.lowerBound().equals(a1wc.upperBound())) {
                         return a2wc.lowerBound();
-                    }
-                    else {
+                    } else {
                         return ts.wildCardType(position);
                     }
                 }
                 // neither a1 nor a2 has a lower bound
-                return ts.wildCardType(position,
-                                       ts.lub(position,
-                                              CollectionUtil.list(a1wc.upperBound(),
-                                                                  a2wc.upperBound())),
-                                       null);
+                return ts.wildCardType(
+                        position,
+                        ts.lub(position, CollectionUtil.list(a1wc.upperBound(), a2wc.upperBound())),
+                        null);
             }
             // a1 is a wildcard, a2 is not
             if (a1wc.hasLowerBound()) {
-                return ts.wildCardType(position,
-                                       null,
-                                       glb(a1wc.lowerBound(), a2));
-            }
-            else {
-                return ts.wildCardType(position,
-                                       lub(a1wc.upperBound(), a2),
-                                       null);
+                return ts.wildCardType(position, null, glb(a1wc.lowerBound(), a2));
+            } else {
+                return ts.wildCardType(position, lub(a1wc.upperBound(), a2), null);
             }
         }
         // a1 is not a wildcard
@@ -265,25 +245,17 @@ public class LubType_c extends ClassType_c implements LubType {
             WildCardType a2wc = (WildCardType) a2;
             // a1 is not a wildcard, a2 is a wildcard
             if (a2wc.hasLowerBound()) {
-                return ts.wildCardType(position,
-                                       null,
-                                       glb(a1, a2wc.lowerBound()));
-            }
-            else {
-                return ts.wildCardType(position,
-                                       lub(a1, a2wc.upperBound()),
-                                       null);
+                return ts.wildCardType(position, null, glb(a1, a2wc.lowerBound()));
+            } else {
+                return ts.wildCardType(position, lub(a1, a2wc.upperBound()), null);
             }
         }
 
         // neither a1 nor a2 is a wildcard.
         if (ts.equals(a1, a2)) {
             return a1;
-        }
-        else {
-            return ts.wildCardType(position,
-                                   ts.lub(position, CollectionUtil.list(a1, a2)),
-                                   null);
+        } else {
+            return ts.wildCardType(position, ts.lub(position, CollectionUtil.list(a1, a2)), null);
         }
     }
 
@@ -293,12 +265,10 @@ public class LubType_c extends ClassType_c implements LubType {
         try {
             if (!ts.checkIntersectionBounds(l, true)) {
                 return ts.Object();
-            }
-            else {
+            } else {
                 return ts.intersectionType(position, l);
             }
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             return ts.Object();
         }
     }
@@ -351,7 +321,7 @@ public class LubType_c extends ClassType_c implements LubType {
 
     @Override
     public List<EnumInstance> enumConstants() {
-        return Collections.<EnumInstance> emptyList();
+        return Collections.<EnumInstance>emptyList();
     }
 
     @Override
@@ -401,12 +371,12 @@ public class LubType_c extends ClassType_c implements LubType {
 
     @Override
     public List<ConstructorInstance> constructors() {
-        return Collections.<ConstructorInstance> emptyList();
+        return Collections.<ConstructorInstance>emptyList();
     }
 
     @Override
     public List<ClassType> memberClasses() {
-        return Collections.<ClassType> emptyList();
+        return Collections.<ClassType>emptyList();
     }
 
     @Override
@@ -431,7 +401,7 @@ public class LubType_c extends ClassType_c implements LubType {
             JL5ClassType ct = (JL5ClassType) lub;
             return ct.superclasses();
         }
-        return Collections.<Type> singleton(superType());
+        return Collections.<Type>singleton(superType());
     }
 
     @Override
@@ -446,12 +416,11 @@ public class LubType_c extends ClassType_c implements LubType {
 
     @Override
     public List<AnnotationTypeElemInstance> annotationElems() {
-        return Collections.<AnnotationTypeElemInstance> emptyList();
+        return Collections.<AnnotationTypeElemInstance>emptyList();
     }
 
     @Override
     public Annotations annotations() {
         return ((JL5TypeSystem) this.typeSystem()).NoAnnotations();
     }
-
 }

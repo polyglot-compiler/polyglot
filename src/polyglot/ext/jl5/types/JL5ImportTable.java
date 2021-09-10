@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -86,12 +86,9 @@ public class JL5ImportTable extends ImportTable {
                     Type t = (Type) nt;
                     try {
                         result = ts.findMemberClass(t.toClass(), name);
+                    } catch (SemanticException e) {
                     }
-                    catch (SemanticException e) {
-                    }
-                    if (result != null
-                            && ((ClassType) result).flags().isStatic())
-                        return result;
+                    if (result != null && ((ClassType) result).flags().isStatic()) return result;
                 }
             }
         }
@@ -103,11 +100,9 @@ public class JL5ImportTable extends ImportTable {
                 Type t = (Type) nt;
                 try {
                     result = ts.findMemberClass(t.toClass(), name);
+                } catch (SemanticException e) {
                 }
-                catch (SemanticException e) {
-                }
-                if (result != null && ((ClassType) result).flags().isStatic())
-                    return result;
+                if (result != null && ((ClassType) result).flags().isStatic()) return result;
             }
         }
 
@@ -125,8 +120,7 @@ public class JL5ImportTable extends ImportTable {
                 Named nt = ts.forName(className);
                 if (nt instanceof ReferenceType) {
                     ReferenceType t = (ReferenceType) nt;
-                    if (hasStatic(t.methodsNamed(name))
-                            || isStatic(t.fieldNamed(name))) {
+                    if (hasStatic(t.methodsNamed(name)) || isStatic(t.fieldNamed(name))) {
                         containingTypes.add(t);
                     }
                 }
@@ -138,8 +132,7 @@ public class JL5ImportTable extends ImportTable {
 
             if (nt instanceof ReferenceType) {
                 ReferenceType t = (ReferenceType) nt;
-                if (hasStatic(t.methodsNamed(name))
-                        || isStatic(t.fieldNamed(name))) {
+                if (hasStatic(t.methodsNamed(name)) || isStatic(t.fieldNamed(name))) {
                     containingTypes.add(t);
                 }
             }
@@ -159,5 +152,4 @@ public class JL5ImportTable extends ImportTable {
     private static boolean isStatic(MemberInstance mi) {
         return mi != null && mi.flags().isStatic();
     }
-
 }

@@ -23,12 +23,7 @@ public class JL5CallToExt_c extends CallToExt_c {
         if (!translateTarget(n)) {
             target = null;
         }
-        Call m =
-                to_nf.Call(n.position(),
-                           target,
-                           ext.typeArgs(),
-                           n.id(),
-                           n.arguments());
+        Call m = to_nf.Call(n.position(), target, ext.typeArgs(), n.id(), n.arguments());
         m = m.targetImplicit(n.isTargetImplicit());
         return m;
     }

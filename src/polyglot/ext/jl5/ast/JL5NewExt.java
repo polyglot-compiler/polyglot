@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -77,8 +77,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     }
 
     @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         New n = (New) superLang().disambiguateOverride(this.node(), parent, ar);
         // now do the type args
         n = typeArgs(n, visitList(typeArgs, ar));
@@ -86,8 +85,8 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
     }
 
     @Override
-    public TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer,
-            TypeNode objectType) throws SemanticException {
+    public TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer, TypeNode objectType)
+            throws SemanticException {
         if (objectType instanceof AmbTypeInstantiation) {
             JL5TypeSystem ts = (JL5TypeSystem) ar.typeSystem();
             JL5NodeFactory nf = (JL5NodeFactory) ar.nodeFactory();
@@ -101,8 +100,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
                 c = c.pushClass(opct, opct);
                 objectType = (TypeNode) objectType.visit(ar.context(c));
                 return objectType;
-            }
-            else if (outer instanceof JL5SubstClassType) {
+            } else if (outer instanceof JL5SubstClassType) {
                 JL5SubstClassType osct = (JL5SubstClassType) outer;
                 c = c.pushClass(osct.base(), osct.base());
                 objectType = (TypeNode) objectType.visit(ar.context(c));
@@ -116,27 +114,24 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
                     substMap.putAll(tsct.subst().substitutions());
                     type = tsct.base();
                 }
-                return nf.CanonicalTypeNode(type.position(),
-                                            ts.subst(type, substMap));
-            }
-            else if (outer instanceof RawClass) {
-                throw new SemanticException("The member type " + outer + "."
-                        + objectType
-                        + " must be qualified with a parameterized type,"
-                        + " since it is not static");
+                return nf.CanonicalTypeNode(type.position(), ts.subst(type, substMap));
+            } else if (outer instanceof RawClass) {
+                throw new SemanticException(
+                        "The member type "
+                                + outer
+                                + "."
+                                + objectType
+                                + " must be qualified with a parameterized type,"
+                                + " since it is not static");
             }
         }
-        return superLang().findQualifiedTypeNode(this.node(),
-                                                 ar,
-                                                 outer,
-                                                 objectType);
+        return superLang().findQualifiedTypeNode(this.node(), ar, outer, objectType);
     }
 
     @Override
-    public Expr findQualifier(AmbiguityRemover ar, ClassType ct)
-            throws SemanticException {
+    public Expr findQualifier(AmbiguityRemover ar, ClassType ct) throws SemanticException {
         // Call super.findQualifier in order to perform its checks, but throw away the
-        // qualifier that it finds. That is, just return this node. Do not attempt to infer 
+        // qualifier that it finds. That is, just return this node. Do not attempt to infer
         // a qualifier if one is missing.
         superLang().findQualifier(this.node(), ar, ct);
         return this.node().qualifier();
@@ -148,8 +143,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
         if (!n.objectType().type().isClass()) {
-            throw new SemanticException("Must have a class for a new expression.",
-                                        n.position());
+            throw new SemanticException("Must have a class for a new expression.", n.position());
         }
 
         List<Type> argTypes = new ArrayList<>(n.arguments().size());
@@ -175,14 +169,12 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
             if (outer instanceof JL5SubstClassType) {
                 JL5SubstClassType sct = (JL5SubstClassType) outer;
                 ct = (ClassType) sct.subst().substType(ct);
-            }
-            else if (n.qualifier() == null
-                    || (n.qualifier() instanceof Special && ((Special) n.qualifier()).kind() == Special.THIS)) {
+            } else if (n.qualifier() == null
+                    || (n.qualifier() instanceof Special
+                            && ((Special) n.qualifier()).kind() == Special.THIS)) {
                 ct = ts5.instantiateInnerClassFromContext(tc.context(), ct);
-            }
-            else if (n.qualifier().type() instanceof JL5SubstClassType) {
-                JL5SubstClassType sct =
-                        (JL5SubstClassType) n.qualifier().type();
+            } else if (n.qualifier().type() instanceof JL5SubstClassType) {
+                JL5SubstClassType sct = (JL5SubstClassType) n.qualifier().type();
                 ct = (ClassType) sct.subst().substType(ct);
             }
         }
@@ -194,13 +186,9 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
                 c = c.pushClass(n.anonType(), n.anonType());
             }
             ci =
-                    ts.findConstructor(ct,
-                                       argTypes,
-                                       actualTypeArgs,
-                                       c.currentClass(),
-                                       n.body() == null);
-        }
-        else {
+                    ts.findConstructor(
+                            ct, argTypes, actualTypeArgs, c.currentClass(), n.body() == null);
+        } else {
             ci = ts.defaultConstructor(n.position(), ct);
         }
 
@@ -229,8 +217,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
         New n = this.node();
         if (n.qualifier() != null && n.objectType().type() != null) {
             ((JLang) tr.lang()).printShortObjectType(this.node(), w, tr);
-        }
-        else {
+        } else {
             print(n.objectType(), w, tr);
         }
 
@@ -243,7 +230,7 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
         New n = this.node();
 
         if (n.anonType() != null) {
-            // we need to find ct, is an anonymous class, and so 
+            // we need to find ct, is an anonymous class, and so
             // the enclosing class is the current class.
             return c.currentClass();
         }
@@ -251,16 +238,15 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
         JL5TypeSystem ts = (JL5TypeSystem) ct.typeSystem();
         ClassType t = findEnclosingClassFrom(c.currentClass(), c, ct);
         if (t == null) {
-            // couldn't find anything suitable using the JL5ParsedClassType. Try using the raw class.
+            // couldn't find anything suitable using the JL5ParsedClassType. Try using the raw
+            // class.
             JL5ParsedClassType curClass = (JL5ParsedClassType) c.currentClass();
-            if (ts.canBeRaw(curClass))
-                t = findEnclosingClassFrom(ts.rawClass(curClass), c, ct);
+            if (ts.canBeRaw(curClass)) t = findEnclosingClassFrom(ts.rawClass(curClass), c, ct);
         }
         return t;
     }
 
-    private ClassType findEnclosingClassFrom(ClassType t, Context c,
-            ClassType ct) {
+    private ClassType findEnclosingClassFrom(ClassType t, Context c, ClassType ct) {
         JL5TypeSystem ts = (JL5TypeSystem) ct.typeSystem();
         String name = ct.name();
         while (t != null) {
@@ -270,19 +256,17 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
                     // get the class directly from t, so that substitution works properly...
                     mt = findMemberClass(name, t);
                     if (mt == null) {
-                        throw new InternalCompilerError("Couldn't find member class "
-                                + name + " in " + t);
+                        throw new InternalCompilerError(
+                                "Couldn't find member class " + name + " in " + t);
                     }
                     if (ts.isImplicitCastValid(mt, ct)) {
                         return t;
                     }
-                    if (ts.isImplicitCastValid(ts.erasureType(mt),
-                                               ts.erasureType(ct))) {
+                    if (ts.isImplicitCastValid(ts.erasureType(mt), ts.erasureType(ct))) {
                         return (ClassType) ts.erasureType(t);
                     }
                 }
-            }
-            catch (SemanticException e) {
+            } catch (SemanticException e) {
             }
 
             t = t.outer();

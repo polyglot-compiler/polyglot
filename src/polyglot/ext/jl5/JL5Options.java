@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -53,54 +53,61 @@ public class JL5Options extends Options {
     protected void populateFlags(Set<OptFlag<?>> flags) {
         super.populateFlags(flags);
 
-        flags.add(new OptFlag<String>(new String[] { "-enumImplClass",
-                                              "--enumImplClass" },
-                                      "<classname>",
-                                      "Runtime class to implement Enums",
-                                      "java.lang.Enum") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
+        flags.add(
+                new OptFlag<String>(
+                        new String[] {"-enumImplClass", "--enumImplClass"},
+                        "<classname>",
+                        "Runtime class to implement Enums",
+                        "java.lang.Enum") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
 
-            @Override
-            public Arg<String> defaultArg() {
-                return createDefault(this.defaultValue);
-            }
-        });
-        flags.add(new OptFlag<String>(new String[] { "-enumSetImplClass",
-                                              "--enumSetImplClass" },
-                                      "<classname>",
-                                      "Runtime class to implement EnumSet",
-                                      "java.util.EnumSet") {
-            @Override
-            public Arg<String> handle(String[] args, int index)
-                    throws UsageError {
-                return createArg(index + 1, args[index]);
-            }
+                    @Override
+                    public Arg<String> defaultArg() {
+                        return createDefault(this.defaultValue);
+                    }
+                });
+        flags.add(
+                new OptFlag<String>(
+                        new String[] {"-enumSetImplClass", "--enumSetImplClass"},
+                        "<classname>",
+                        "Runtime class to implement EnumSet",
+                        "java.util.EnumSet") {
+                    @Override
+                    public Arg<String> handle(String[] args, int index) throws UsageError {
+                        return createArg(index + 1, args[index]);
+                    }
 
-            @Override
-            public Arg<String> defaultArg() {
-                return createDefault(this.defaultValue);
-            }
-        });
-        flags.add(new Switch(new String[] { "-removeJava5isms",
-                                     "--removeJava5isms" },
-                             "Translate Java 5 language features to Java 1.4 features"));
-        flags.add(new Switch(Kind.SECRET,
-                             new String[] { "-skip524checks", "--skip524checks" },
-                             "Don't type check the result of removeJava5isms"));
-        flags.add(new Switch(Kind.SECRET,
-                             new String[] { "-leaveCovariantReturns",
-                                     "--leaveCovariantReturns" },
-                             "With removeJava5isms, does not translate away covariant returns"));
-        flags.add(new Switch(new String[] { "-morepermissiveinference",
-                                     "--morepermissiveinference" },
-                             "Use a more permissive algorithm for type inference. (Experimental)"));
-        flags.add(new Switch(new String[] { "-morepermissivecasts",
-                                     "--morepermissivecasts" },
-                             "Allow allow more permissive casts to and from numeric wrapper types. (Experimental)"));
+                    @Override
+                    public Arg<String> defaultArg() {
+                        return createDefault(this.defaultValue);
+                    }
+                });
+        flags.add(
+                new Switch(
+                        new String[] {"-removeJava5isms", "--removeJava5isms"},
+                        "Translate Java 5 language features to Java 1.4 features"));
+        flags.add(
+                new Switch(
+                        Kind.SECRET,
+                        new String[] {"-skip524checks", "--skip524checks"},
+                        "Don't type check the result of removeJava5isms"));
+        flags.add(
+                new Switch(
+                        Kind.SECRET,
+                        new String[] {"-leaveCovariantReturns", "--leaveCovariantReturns"},
+                        "With removeJava5isms, does not translate away covariant returns"));
+        flags.add(
+                new Switch(
+                        new String[] {"-morepermissiveinference", "--morepermissiveinference"},
+                        "Use a more permissive algorithm for type inference. (Experimental)"));
+        flags.add(
+                new Switch(
+                        new String[] {"-morepermissivecasts", "--morepermissivecasts"},
+                        "Allow allow more permissive casts to and from numeric wrapper types."
+                                + " (Experimental)"));
     }
 
     @Override
@@ -110,25 +117,18 @@ public class JL5Options extends Options {
             // if anything other than java.lang.Enum, we may need to
             // translate Enums to normal Java classes
             translateEnums = enumImplClass.equals("java.lang.Enum");
-        }
-        else if (arg.flag().ids().contains("-enumSetImplClass")) {
+        } else if (arg.flag().ids().contains("-enumSetImplClass")) {
             this.enumSetImplClass = (String) arg.value();
-        }
-        else if (arg.flag().ids().contains("-removeJava5isms")) {
+        } else if (arg.flag().ids().contains("-removeJava5isms")) {
             this.removeJava5isms = (Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-morepermissiveinference")) {
+        } else if (arg.flag().ids().contains("-morepermissiveinference")) {
             this.morePermissiveInference = (Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-morepermissivecasts")) {
+        } else if (arg.flag().ids().contains("-morepermissivecasts")) {
             this.morePermissiveCasts = (Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-skip524checks")) {
+        } else if (arg.flag().ids().contains("-skip524checks")) {
             this.skip524checks = (Boolean) arg.value();
-        }
-        else if (arg.flag().ids().contains("-leaveCovariantReturns")) {
+        } else if (arg.flag().ids().contains("-leaveCovariantReturns")) {
             this.leaveCovariantReturns = (Boolean) arg.value();
-        }
-        else super.handleArg(arg);
+        } else super.handleArg(arg);
     }
 }

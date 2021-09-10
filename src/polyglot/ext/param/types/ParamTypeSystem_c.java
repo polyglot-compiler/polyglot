@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -53,8 +53,9 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
     }
 
     @Override
-    public ClassType instantiate(Position pos, PClass<Formal, Actual> base,
-            List<? extends Actual> actuals) throws SemanticException {
+    public ClassType instantiate(
+            Position pos, PClass<Formal, Actual> base, List<? extends Actual> actuals)
+            throws SemanticException {
         checkInstantiation(pos, base, actuals);
         return uncheckedInstantiate(pos, base, actuals);
     }
@@ -69,12 +70,16 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
      *
      * @throws SemanticException when the actuals do not agree with the formals
      */
-    protected void checkInstantiation(Position pos,
-            PClass<Formal, Actual> base, List<? extends Actual> actuals)
+    protected void checkInstantiation(
+            Position pos, PClass<Formal, Actual> base, List<? extends Actual> actuals)
             throws SemanticException {
         if (base.formals().size() != actuals.size()) {
-            throw new SemanticException("Wrong number of actual parameters "
-                    + "for instantiation of \"" + base.clazz() + "\".", pos);
+            throw new SemanticException(
+                    "Wrong number of actual parameters "
+                            + "for instantiation of \""
+                            + base.clazz()
+                            + "\".",
+                    pos);
         }
     }
 
@@ -86,8 +91,8 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
      * @param base The parameterized type
      * @param actuals The list of actuals
      */
-    protected ClassType uncheckedInstantiate(Position pos,
-            PClass<Formal, Actual> base, List<? extends Actual> actuals) {
+    protected ClassType uncheckedInstantiate(
+            Position pos, PClass<Formal, Actual> base, List<? extends Actual> actuals) {
         Map<Formal, Actual> substMap = new HashMap<>();
         Iterator<Formal> i = base.formals().iterator();
         Iterator<? extends Actual> j = actuals.iterator();
@@ -99,16 +104,19 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
         }
 
         if (i.hasNext() || j.hasNext()) {
-            throw new InternalCompilerError("Wrong number of actual "
-                                                    + "parameters for instantiation "
-                                                    + "of \"" + base + "\".",
-                                            pos);
+            throw new InternalCompilerError(
+                    "Wrong number of actual "
+                            + "parameters for instantiation "
+                            + "of \""
+                            + base
+                            + "\".",
+                    pos);
         }
 
         Type inst = subst(base.clazz(), substMap);
         if (!inst.isClass()) {
-            throw new InternalCompilerError("Instantiating a PClass "
-                    + "produced something other than a ClassType.", pos);
+            throw new InternalCompilerError(
+                    "Instantiating a PClass " + "produced something other than a ClassType.", pos);
         }
 
         return inst.toClass();
@@ -120,8 +128,7 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
     }
 
     @Override
-    public final Subst<Formal, Actual> subst(
-            Map<Formal, ? extends Actual> substMap) {
+    public final Subst<Formal, Actual> subst(Map<Formal, ? extends Actual> substMap) {
         Subst<Formal, Actual> subst = substCache.get(substMap);
         if (subst == null) {
             subst = substImpl(substMap);
@@ -130,8 +137,7 @@ public abstract class ParamTypeSystem_c<Formal extends Param, Actual extends Typ
         return subst;
     }
 
-    protected Subst<Formal, Actual> substImpl(
-            Map<Formal, ? extends Actual> substMap) {
+    protected Subst<Formal, Actual> substImpl(Map<Formal, ? extends Actual> substMap) {
         return new Subst_c<>(this, substMap);
     }
 }

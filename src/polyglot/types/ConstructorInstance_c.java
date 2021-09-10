@@ -36,16 +36,18 @@ import polyglot.util.SerialVersionUID;
  * A {@code ConstructorInstance} contains type information for a
  * constructor.
  */
-public class ConstructorInstance_c extends ProcedureInstance_c implements
-        ConstructorInstance {
+public class ConstructorInstance_c extends ProcedureInstance_c implements ConstructorInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     /** Used for deserializing types. */
-    protected ConstructorInstance_c() {
-    }
+    protected ConstructorInstance_c() {}
 
-    public ConstructorInstance_c(TypeSystem ts, Position pos,
-            ClassType container, Flags flags, List<? extends Type> formalTypes,
+    public ConstructorInstance_c(
+            TypeSystem ts,
+            Position pos,
+            ClassType container,
+            Flags flags,
+            List<? extends Type> formalTypes,
             List<? extends Type> excTypes) {
         super(ts, pos, container, flags, formalTypes, excTypes);
         decl = this;
@@ -130,8 +132,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c implements
 
     @Override
     public boolean isSameConstructorImpl(ConstructorInstance ci) {
-        return this.container().equals(ci.container())
-                && hasFormals(ci.formalTypes());
+        return this.container().equals(ci.container()) && hasFormals(ci.formalTypes());
     }
 
     @Override
@@ -146,7 +147,8 @@ public class ConstructorInstance_c extends ProcedureInstance_c implements
 
     @Override
     public boolean isCanonical() {
-        return container.isCanonical() && listIsCanonical(formalTypes)
+        return container.isCanonical()
+                && listIsCanonical(formalTypes)
                 && listIsCanonical(throwTypes);
     }
 }

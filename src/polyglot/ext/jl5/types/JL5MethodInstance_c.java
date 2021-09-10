@@ -47,16 +47,21 @@ import polyglot.util.ListUtil;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 
-public class JL5MethodInstance_c extends MethodInstance_c implements
-        JL5MethodInstance {
+public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<TypeVariable> typeParams;
     protected Annotations annotations;
 
-    public JL5MethodInstance_c(JL5TypeSystem ts, Position pos,
-            ReferenceType container, Flags flags, Type returnType, String name,
-            List<? extends Type> argTypes, List<? extends Type> excTypes,
+    public JL5MethodInstance_c(
+            JL5TypeSystem ts,
+            Position pos,
+            ReferenceType container,
+            Flags flags,
+            Type returnType,
+            String name,
+            List<? extends Type> argTypes,
+            List<? extends Type> excTypes,
             List<? extends TypeVariable> typeParams) {
         super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
         this.typeParams = ListUtil.copy(typeParams, true);
@@ -64,7 +69,6 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
         for (TypeVariable tv : typeParams) {
             tv.setDeclaringProcedure((JL5ProcedureInstance) declaration());
         }
-
     }
 
     @Override
@@ -100,7 +104,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     @Override
     protected List<MethodInstance> implementedImplAux(ReferenceType rt) {
         if (rt == null) {
-            return Collections.<MethodInstance> emptyList();
+            return Collections.<MethodInstance>emptyList();
         }
 
         JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
@@ -137,8 +141,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     }
 
     @Override
-    public boolean canOverrideImpl(MethodInstance mj_, boolean quiet)
-            throws SemanticException {
+    public boolean canOverrideImpl(MethodInstance mj_, boolean quiet) throws SemanticException {
         JL5MethodInstance mi = this;
         String overridOrHid = mi.flags().isStatic() ? "hid" : "overrid";
         if (!(mj_ instanceof JL5MethodInstance)) {
@@ -149,21 +152,38 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
         JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
         if (!ts.isSubSignature(mi, mj)) {
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot " + overridOrHid + "e "
-                    + mj.signature() + " in " + mj.container()
-                    + "; incompatible parameter types", mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; incompatible parameter types",
+                    mi.position());
         }
 
         if (mi != mj && !mi.equals(mj) && mj.flags().isFinal()) {
             // mi can "override" a final method mj if mi and mj are the same method instance.
-            if (Report.should_report(Report.types, 3))
-                Report.report(3, mj.flags() + " final");
+            if (Report.should_report(Report.types, 3)) Report.report(3, mj.flags() + " final");
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in "
-                    + mi.container() + " cannot " + overridOrHid + "e "
-                    + mj.signature() + " in " + mj.container() + "; "
-                    + overridOrHid + "den method is final", mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; "
+                            + overridOrHid
+                            + "den method is final",
+                    mi.position());
         }
 
         // replace the type variables of mj with the type variables of mi
@@ -183,84 +203,98 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             if (Report.should_report(Report.types, 3))
                 Report.report(3, "return type " + miRet + " != " + mjRet);
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot "
-                                                + overridOrHid
-                                                + "e "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; attempting to use incompatible "
-                                                + "return type\n" + "found: "
-                                                + miRet + "\n" + "required: "
-                                                + mjRet,
-                                        mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; attempting to use incompatible "
+                            + "return type\n"
+                            + "found: "
+                            + miRet
+                            + "\n"
+                            + "required: "
+                            + mjRet,
+                    mi.position());
         }
 
         if (!ts.throwsSubset(mi, mj)) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3,
-                              mi.throwTypes() + " not subset of "
-                                      + mj.throwTypes());
+                Report.report(3, mi.throwTypes() + " not subset of " + mj.throwTypes());
             if (quiet) return false;
-            throw new SemanticException(mi.signature() + " in "
-                                                + mi.container() + " cannot "
-                                                + overridOrHid + "e "
-                                                + mj.signature() + " in "
-                                                + mj.container()
-                                                + "; the throw set "
-                                                + mi.throwTypes()
-                                                + " is not a subset of the "
-                                                + overridOrHid
-                                                + "den method's throw set "
-                                                + mj.throwTypes() + ".",
-                                        mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; the throw set "
+                            + mi.throwTypes()
+                            + " is not a subset of the "
+                            + overridOrHid
+                            + "den method's throw set "
+                            + mj.throwTypes()
+                            + ".",
+                    mi.position());
         }
 
         if (mi.flags().moreRestrictiveThan(mj.flags())) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3,
-                              mi.flags() + " more restrictive than "
-                                      + mj.flags());
+                Report.report(3, mi.flags() + " more restrictive than " + mj.flags());
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot "
-                                                + overridOrHid
-                                                + "e "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; attempting to assign weaker "
-                                                + "access privileges",
-                                        mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; attempting to assign weaker "
+                            + "access privileges",
+                    mi.position());
         }
 
         if (mi.flags().isStatic() != mj.flags().isStatic()) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, mi.signature() + " is "
-                        + (mi.flags().isStatic() ? "" : "not") + " static but "
-                        + mj.signature() + " is "
-                        + (mj.flags().isStatic() ? "" : "not") + " static");
+                Report.report(
+                        3,
+                        mi.signature()
+                                + " is "
+                                + (mi.flags().isStatic() ? "" : "not")
+                                + " static but "
+                                + mj.signature()
+                                + " is "
+                                + (mj.flags().isStatic() ? "" : "not")
+                                + " static");
             if (quiet) return false;
-            throw new SemanticException(mi.signature()
-                                                + " in "
-                                                + mi.container()
-                                                + " cannot "
-                                                + overridOrHid
-                                                + "e "
-                                                + mj.signature()
-                                                + " in "
-                                                + mj.container()
-                                                + "; "
-                                                + overridOrHid
-                                                + "den method is "
-                                                + (mj.flags().isStatic()
-                                                        ? "" : "not ")
-                                                + "static", mi.position());
+            throw new SemanticException(
+                    mi.signature()
+                            + " in "
+                            + mi.container()
+                            + " cannot "
+                            + overridOrHid
+                            + "e "
+                            + mj.signature()
+                            + " in "
+                            + mj.container()
+                            + "; "
+                            + overridOrHid
+                            + "den method is "
+                            + (mj.flags().isStatic() ? "" : "not ")
+                            + "static",
+                    mi.position());
         }
 
         return true;
@@ -270,7 +304,8 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
     public boolean callValidImpl(List<? extends Type> argTypes) {
         List<Type> myFormalTypes = formalTypes;
 
-        //         System.err.println("JL5MethodInstance_c callValid Impl " + this +" called with " +argTypes);
+        //         System.err.println("JL5MethodInstance_c callValid Impl " + this +" called with "
+        // +argTypes);
         // now compare myFormalTypes to argTypes
         if (!isVariableArity() && argTypes.size() != myFormalTypes.size()) {
             //            System.err.println("     1");
@@ -293,8 +328,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             }
             if (!formalTypes.hasNext() && isVariableArity()) {
                 // varible arity method, and this is the last arg.
-                ArrayType arr =
-                        (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
+                ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 formal = arr.base();
             }
 
@@ -304,7 +338,8 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
             }
             // the actual can't be cast to the formal.
             // HOWEVER: there is still hope.
-            if (isVariableArity() && myFormalTypes.size() == argTypes.size()
+            if (isVariableArity()
+                    && myFormalTypes.size() == argTypes.size()
                     && !formalTypes.hasNext()) {
                 // This is a variable arity method (e.g., m(int x,
                 // String[])) and there
@@ -312,15 +347,15 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
                 // arguments.
                 // The last actual can be either the base type of the array,
                 // or the array type.
-                ArrayType arr =
-                        (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
+                ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 if (!ts.isImplicitCastValid(actual, arr)) {
-                    //                         System.err.println("     3: failed " + actual + " to " +formal + " and " + actual + " to " + arr);
+                    //                         System.err.println("     3: failed " + actual + " to
+                    // " +formal + " and " + actual + " to " + arr);
                     return false;
                 }
-            }
-            else {
-                //                     System.err.println("     4: failed " + actual + " to " +formal);
+            } else {
+                //                     System.err.println("     4: failed " + actual + " to "
+                // +formal);
                 return false;
             }
         }
@@ -337,7 +372,6 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
         JL5MethodInstance p2 = (JL5MethodInstance) p;
 
         return ts.callValid(p2, p1.formalTypes());
-
     }
 
     @Override
@@ -390,7 +424,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements
 
         if (!throwTypes.isEmpty()) {
             sb.append(" throws ");
-            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext();) {
+            for (Iterator<Type> i = throwTypes.iterator(); i.hasNext(); ) {
                 Object o = i.next();
                 sb.append(o.toString());
 

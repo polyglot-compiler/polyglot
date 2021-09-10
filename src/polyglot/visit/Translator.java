@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -65,13 +65,13 @@ import polyglot.util.InternalCompilerError;
  * file name (e.g., "X.jl") with the suffix replaced with ".java" (thus,
  * "X.java").
  * </ul>
- * 
+ *
  * To use:
- * 
+ *
  * <pre>
  * new Translator(job, ts, nf, tf).translate(ast);
  * </pre>
- * 
+ *
  * The {@code ast} must be either a SourceFile or a SourceCollection.
  */
 public class Translator extends PrettyPrinter implements Copy<Translator> {
@@ -111,8 +111,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
     public Translator copy() {
         try {
             return (Translator) super.clone();
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");
         }
     }
@@ -160,16 +159,13 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
                 if (parent == null) {
                     Context c = lang().enterScope(child, context);
                     tr = this.context(c);
-                }
-                else if (parent.isDisambiguated() && parent.isTypeChecked()) {
+                } else if (parent.isDisambiguated() && parent.isTypeChecked()) {
                     Context c = lang().enterChildScope(parent, child, context);
                     tr = this.context(c);
-                }
-                else {
+                } else {
                     tr = this.context(null);
                 }
-            }
-            else {
+            } else {
                 tr = this.context(null);
             }
         }
@@ -188,8 +184,7 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
         if (ast instanceof SourceFile) {
             SourceFile sfn = (SourceFile) ast;
             return translateSource(sfn);
-        }
-        else if (ast instanceof SourceCollection) {
+        } else if (ast instanceof SourceCollection) {
             SourceCollection sc = (SourceCollection) ast;
 
             boolean okay = true;
@@ -199,10 +194,9 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
             }
 
             return okay;
-        }
-        else {
-            throw new InternalCompilerError("AST root must be a SourceFile; "
-                    + "found a " + ast.getClass().getName());
+        } else {
+            throw new InternalCompilerError(
+                    "AST root must be a SourceFile; " + "found a " + ast.getClass().getName());
         }
     }
 
@@ -228,26 +222,25 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
             if (filename == null) {
                 // Use the source name to derive a default output file name.
                 of = tf.outputFileObject(pkg, sf.source());
-            }
-            else of = tf.outputFileObject(pkg, filename, sf.source());
+            } else of = tf.outputFileObject(pkg, filename, sf.source());
 
             String opfPath = of.getName();
             if (!opfPath.endsWith("$")) outputFiles.add(of);
             try (CodeWriter w = tf.outputCodeWriter(of, outputWidth)) {
                 writeHeader(sf, w);
 
-                for (Iterator<TopLevelDecl> i = decls.iterator(); i.hasNext();) {
+                for (Iterator<TopLevelDecl> i = decls.iterator(); i.hasNext(); ) {
                     TopLevelDecl decl = i.next();
                     translateTopLevelDecl(w, sf, decl);
 
                     if (i.hasNext()) w.newline(0);
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 job.compiler()
-                   .errorQueue()
-                   .enqueue(ErrorInfo.IO_ERROR,
-                            "I/O error while translating: " + e.getMessage());
+                        .errorQueue()
+                        .enqueue(
+                                ErrorInfo.IO_ERROR,
+                                "I/O error while translating: " + e.getMessage());
                 return false;
             }
         }
@@ -257,19 +250,17 @@ public class Translator extends PrettyPrinter implements Copy<Translator> {
     /**
      * Translate a top-level declaration {@code decl} of source file
      * {@code source}.
-     * 
+     *
      * @param w
      * @param source
      * @param decl
      */
-    protected void translateTopLevelDecl(CodeWriter w, SourceFile source,
-            TopLevelDecl decl) {
+    protected void translateTopLevelDecl(CodeWriter w, SourceFile source, TopLevelDecl decl) {
         Translator tr;
         if (source.isDisambiguated() && source.isTypeChecked()) {
             Context c = lang().enterScope(source, context);
             tr = this.context(c);
-        }
-        else {
+        } else {
             tr = this.context(null);
         }
         lang().translate(decl, w, tr);
