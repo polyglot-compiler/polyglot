@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -41,11 +41,15 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance {
     protected ReferenceType container;
 
     /** Used for deserializing types. */
-    protected FieldInstance_c() {
-    }
+    protected FieldInstance_c() {}
 
-    public FieldInstance_c(TypeSystem ts, Position pos,
-            ReferenceType container, Flags flags, Type type, String name) {
+    public FieldInstance_c(
+            TypeSystem ts,
+            Position pos,
+            ReferenceType container,
+            Flags flags,
+            Type type,
+            String name) {
         super(ts, pos, flags, type, name);
         this.container = container;
     }
@@ -67,8 +71,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance {
 
     @Override
     public FieldInstance name(String name) {
-        if ((name != null && !name.equals(this.name))
-                || (name == null && this.name != null)) {
+        if ((name != null && !name.equals(this.name)) || (name == null && this.name != null)) {
             FieldInstance n = (FieldInstance) copy();
             n.setName(name);
             return n;
@@ -131,8 +134,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance {
 
         if (!constantValueSet) {
             if (this.isCanonical()
-                    && (!flags.isFinal() || !type.isPrimitive()
-                            && !type.equals(ts.String()))) {
+                    && (!flags.isFinal() || !type.isPrimitive() && !type.equals(ts.String()))) {
                 // Only primitive-typed or String-typed fields can be constant.
                 setNotConstant();
                 return isConstant;
@@ -174,8 +176,14 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance {
             v = "\"" + s + "\"";
         }
 
-        return "field " + flags.translate() + type + " " + container + "."
-                + name + (isConstant ? (" = " + v) : "");
+        return "field "
+                + flags.translate()
+                + type
+                + " "
+                + container
+                + "."
+                + name
+                + (isConstant ? (" = " + v) : "");
     }
 
     @Override

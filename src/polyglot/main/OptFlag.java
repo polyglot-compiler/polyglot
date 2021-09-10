@@ -55,7 +55,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *        true if the id was found
      */
     public static boolean removeFlag(String id, Set<OptFlag<?>> flags) {
-        for (Iterator<OptFlag<?>> it = flags.iterator(); it.hasNext();) {
+        for (Iterator<OptFlag<?>> it = flags.iterator(); it.hasNext(); ) {
             OptFlag<?> flag = it.next();
             if (flag.ids.contains(id)) {
                 it.remove();
@@ -193,9 +193,8 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            The default value(s) for the flag parameter(s), to be printed
      *            out with help info.
      */
-    public OptFlag(String id, String params, String usage,
-            String defaultValue) {
-        this(new String[] { id }, params, usage, defaultValue);
+    public OptFlag(String id, String params, String usage, String defaultValue) {
+        this(new String[] {id}, params, usage, defaultValue);
     }
 
     /**
@@ -227,8 +226,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            The default value for the flag parameter, to be printed out
      *            with help info.
      */
-    public OptFlag(String[] ids, String params, String usage,
-            int defaultValue) {
+    public OptFlag(String[] ids, String params, String usage, int defaultValue) {
         this(ids, params, usage, Integer.toString(defaultValue));
     }
 
@@ -246,8 +244,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            The default value(s) for the flag parameter(s), to be printed
      *            out with help info.
      */
-    public OptFlag(String[] ids, String params, String usage,
-            String defaultValue) {
+    public OptFlag(String[] ids, String params, String usage, String defaultValue) {
         this(Kind.MAIN, ids, params, usage, defaultValue);
     }
 
@@ -278,8 +275,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            The default value for the flag parameter, to be printed out
      *            with help info.
      */
-    public OptFlag(Kind kind, String id, String params, String usage,
-            int defaultValue) {
+    public OptFlag(Kind kind, String id, String params, String usage, int defaultValue) {
         this(kind, id, params, usage, Integer.toString(defaultValue));
     }
 
@@ -296,9 +292,8 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            The default value(s) for the flag parameter(s), to be printed
      *            out with help info.
      */
-    public OptFlag(Kind kind, String id, String params, String usage,
-            String defaultValue) {
-        this(kind, new String[] { id }, params, usage, defaultValue);
+    public OptFlag(Kind kind, String id, String params, String usage, String defaultValue) {
+        this(kind, new String[] {id}, params, usage, defaultValue);
     }
 
     /**
@@ -330,8 +325,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            The default value for the flag parameter, to be printed out
      *            with help info.
      */
-    public OptFlag(Kind kind, String[] ids, String params, String usage,
-            int defaultValue) {
+    public OptFlag(Kind kind, String[] ids, String params, String usage, int defaultValue) {
         this(kind, ids, params, usage, Integer.toString(defaultValue));
     }
 
@@ -349,13 +343,11 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *            The default value(s) for the flag parameter(s), to be printed
      *            out with help info.
      */
-    public OptFlag(Kind kind, String[] ids, String params, String usage,
-            String defaultValue) {
+    public OptFlag(Kind kind, String[] ids, String params, String usage, String defaultValue) {
         this.kind = kind;
 
         this.ids = new LinkedHashSet<>(ids.length);
-        for (String flag : ids)
-            this.ids.add(flag);
+        for (String flag : ids) this.ids.add(flag);
 
         this.params = params;
         this.defaultValue = defaultValue;
@@ -364,7 +356,12 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     }
 
     public static enum Kind {
-        MAIN, DEBUG, VERSION, HELP, SECRET, SECRET_HELP
+        MAIN,
+        DEBUG,
+        VERSION,
+        HELP,
+        SECRET,
+        SECRET_HELP
     }
 
     public Kind kind() {
@@ -395,8 +392,10 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
 
     public Arg<T> defaultArg() {
         if (defaultValue != null) {
-            throw new UnsupportedOperationException("Usage for " + ids()
-                    + " specifies a default value, but flag does not implement one.");
+            throw new UnsupportedOperationException(
+                    "Usage for "
+                            + ids()
+                            + " specifies a default value, but flag does not implement one.");
         }
         return null;
     }
@@ -460,15 +459,13 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            if (flag == null)
-                sb.append(value());
+            if (flag == null) sb.append(value());
             else {
                 sb.append(flag.ids().toString());
                 if (flag.params != null) {
                     sb.append(" ");
                     sb.append(value());
-                }
-                else {
+                } else {
                     if (!(Boolean) value()) {
                         return "";
                     }
@@ -507,8 +504,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
 
         if (cur < USAGE_FLAG_WIDTH) {
             printSpaces(out, USAGE_FLAG_WIDTH - cur);
-        }
-        else {
+        } else {
             // The flag is long. Get a new line before printing the description.
             out.println();
             printSpaces(out, USAGE_FLAG_WIDTH);
@@ -533,8 +529,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
                     out.println();
                     printSpaces(out, USAGE_FLAG_WIDTH);
                     cur = USAGE_FLAG_WIDTH;
-                }
-                else {
+                } else {
                     out.print(" ");
                     cur++;
                 }
@@ -545,8 +540,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
     }
 
     private static void printSpaces(PrintStream out, int n) {
-        while (n-- > 0)
-            out.print(' ');
+        while (n-- > 0) out.print(' ');
     }
 
     /**
@@ -555,7 +549,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
      *
      * @param <T>
      */
-    public static abstract class PathFlag<T> extends OptFlag<List<T>> {
+    public abstract static class PathFlag<T> extends OptFlag<List<T>> {
         /**
          * Handles an individual entry of a path string
          * @param entry
@@ -572,8 +566,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
         @Override
         public Arg<List<T>> handle(String[] args, int index) {
             List<T> path = new ArrayList<>();
-            StringTokenizer st =
-                    new StringTokenizer(args[index], pathSeparator);
+            StringTokenizer st = new StringTokenizer(args[index], pathSeparator);
             while (st.hasMoreTokens()) {
                 T next = handlePathEntry(st.nextToken());
                 if (next != null) path.add(next);
@@ -581,13 +574,11 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             return createArg(index + 1, path);
         }
 
-        public PathFlag(Kind kind, String id, String params, String usage,
-                int defaultValue) {
+        public PathFlag(Kind kind, String id, String params, String usage, int defaultValue) {
             super(kind, id, params, usage, defaultValue);
         }
 
-        public PathFlag(Kind kind, String id, String params, String usage,
-                String defaultValue) {
+        public PathFlag(Kind kind, String id, String params, String usage, String defaultValue) {
             super(kind, id, params, usage, defaultValue);
         }
 
@@ -595,13 +586,11 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             super(kind, id, params, usage);
         }
 
-        public PathFlag(Kind kind, String[] ids, String params, String usage,
-                int defaultValue) {
+        public PathFlag(Kind kind, String[] ids, String params, String usage, int defaultValue) {
             super(kind, ids, params, usage, defaultValue);
         }
 
-        public PathFlag(Kind kind, String[] ids, String params, String usage,
-                String defaultValue) {
+        public PathFlag(Kind kind, String[] ids, String params, String usage, String defaultValue) {
             super(kind, ids, params, usage, defaultValue);
         }
 
@@ -609,13 +598,11 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             super(kind, ids, params, usage);
         }
 
-        public PathFlag(String id, String params, String usage,
-                int defaultValue) {
+        public PathFlag(String id, String params, String usage, int defaultValue) {
             super(id, params, usage, defaultValue);
         }
 
-        public PathFlag(String id, String params, String usage,
-                String defaultValue) {
+        public PathFlag(String id, String params, String usage, String defaultValue) {
             super(id, params, usage, defaultValue);
         }
 
@@ -623,13 +610,11 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             super(id, params, usage);
         }
 
-        public PathFlag(String[] ids, String params, String usage,
-                int defaultValue) {
+        public PathFlag(String[] ids, String params, String usage, int defaultValue) {
             super(ids, params, usage, defaultValue);
         }
 
-        public PathFlag(String[] ids, String params, String usage,
-                String defaultValue) {
+        public PathFlag(String[] ids, String params, String usage, String defaultValue) {
             super(ids, params, usage, defaultValue);
         }
 
@@ -689,8 +674,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
          *          same</i> as {@code value} if the switch is enabled by
          *          default.
          */
-        public Switch(Kind kind, String id, String usage, boolean value,
-                boolean defaultValue) {
+        public Switch(Kind kind, String id, String usage, boolean value, boolean defaultValue) {
             super(kind, id, null, usage);
             this.value = value;
             this.defaultValue = defaultValue;
@@ -720,8 +704,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
          *          same</i> as {@code value} if the switch is enabled by
          *          default.
          */
-        public Switch(Kind kind, String[] ids, String usage, boolean value,
-                boolean defaultValue) {
+        public Switch(Kind kind, String[] ids, String usage, boolean value, boolean defaultValue) {
             super(kind, ids, null, usage);
             this.value = value;
             this.defaultValue = defaultValue;
@@ -751,8 +734,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
          *          same</i> as {@code value} if the switch is enabled by
          *          default.
          */
-        public Switch(String id, String usage, boolean value,
-                boolean defaultValue) {
+        public Switch(String id, String usage, boolean value, boolean defaultValue) {
             super(id, null, usage);
             this.value = value;
             this.defaultValue = defaultValue;
@@ -782,8 +764,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
          *          same</i> as {@code value} if the switch is enabled by
          *          default.
          */
-        public Switch(String[] ids, String usage, boolean value,
-                boolean defaultValue) {
+        public Switch(String[] ids, String usage, boolean value, boolean defaultValue) {
             super(ids, null, usage);
             this.value = value;
             this.defaultValue = defaultValue;
@@ -811,28 +792,25 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             return createDefault(new Integer(defaultValue));
         }
 
-        public IntFlag(OptFlag.Kind kind, String id, String params,
-                String usage, int defaultValue) {
+        public IntFlag(
+                OptFlag.Kind kind, String id, String params, String usage, int defaultValue) {
             super(kind, id, params, usage, defaultValue);
         }
 
-        public IntFlag(OptFlag.Kind kind, String id, String params,
-                String usage) {
+        public IntFlag(OptFlag.Kind kind, String id, String params, String usage) {
             super(kind, id, params, usage);
         }
 
-        public IntFlag(OptFlag.Kind kind, String[] ids, String params,
-                String usage, int defaultValue) {
+        public IntFlag(
+                OptFlag.Kind kind, String[] ids, String params, String usage, int defaultValue) {
             super(kind, ids, params, usage, defaultValue);
         }
 
-        public IntFlag(OptFlag.Kind kind, String[] ids, String params,
-                String usage) {
+        public IntFlag(OptFlag.Kind kind, String[] ids, String params, String usage) {
             super(kind, ids, params, usage);
         }
 
-        public IntFlag(String id, String params, String usage,
-                int defaultValue) {
+        public IntFlag(String id, String params, String usage, int defaultValue) {
             super(id, params, usage, defaultValue);
         }
 
@@ -840,15 +818,13 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             super(id, params, usage);
         }
 
-        public IntFlag(String[] ids, String params, String usage,
-                int defaultValue) {
+        public IntFlag(String[] ids, String params, String usage, int defaultValue) {
             super(ids, params, usage, defaultValue);
         }
 
         public IntFlag(String[] ids, String params, String usage) {
             super(ids, params, usage);
         }
-
     }
 
     /**
@@ -868,28 +844,25 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             return createDefault(new Double(defaultValue));
         }
 
-        public DoubleFlag(OptFlag.Kind kind, String id, String params,
-                String usage, double defaultValue) {
+        public DoubleFlag(
+                OptFlag.Kind kind, String id, String params, String usage, double defaultValue) {
             super(kind, id, params, usage, Double.toString(defaultValue));
         }
 
-        public DoubleFlag(OptFlag.Kind kind, String id, String params,
-                String usage) {
+        public DoubleFlag(OptFlag.Kind kind, String id, String params, String usage) {
             super(kind, id, params, usage);
         }
 
-        public DoubleFlag(OptFlag.Kind kind, String[] ids, String params,
-                String usage, double defaultValue) {
+        public DoubleFlag(
+                OptFlag.Kind kind, String[] ids, String params, String usage, double defaultValue) {
             super(kind, ids, params, usage, Double.toString(defaultValue));
         }
 
-        public DoubleFlag(OptFlag.Kind kind, String[] ids, String params,
-                String usage) {
+        public DoubleFlag(OptFlag.Kind kind, String[] ids, String params, String usage) {
             super(kind, ids, params, usage);
         }
 
-        public DoubleFlag(String id, String params, String usage,
-                double defaultValue) {
+        public DoubleFlag(String id, String params, String usage, double defaultValue) {
             super(id, params, usage, Double.toString(defaultValue));
         }
 
@@ -897,14 +870,12 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
             super(id, params, usage);
         }
 
-        public DoubleFlag(String[] ids, String params, String usage,
-                double defaultValue) {
+        public DoubleFlag(String[] ids, String params, String usage, double defaultValue) {
             super(ids, params, usage, Double.toString(defaultValue));
         }
 
         public DoubleFlag(String[] ids, String params, String usage) {
             super(ids, params, usage);
         }
-
     }
 }

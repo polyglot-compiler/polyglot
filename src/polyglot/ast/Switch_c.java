@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -52,13 +52,12 @@ public class Switch_c extends Stmt_c implements Switch {
     protected Expr expr;
     protected List<SwitchElement> elements;
 
-//    @Deprecated
+    //    @Deprecated
     public Switch_c(Position pos, Expr expr, List<SwitchElement> elements) {
         this(pos, expr, elements, null);
     }
 
-    public Switch_c(Position pos, Expr expr, List<SwitchElement> elements,
-            Ext ext) {
+    public Switch_c(Position pos, Expr expr, List<SwitchElement> elements, Ext ext) {
         super(pos, ext);
         assert (expr != null && elements != null);
         this.expr = expr;
@@ -100,8 +99,7 @@ public class Switch_c extends Stmt_c implements Switch {
     }
 
     /** Reconstruct the statement. */
-    protected <N extends Switch_c> N reconstruct(N n, Expr expr,
-            List<SwitchElement> elements) {
+    protected <N extends Switch_c> N reconstruct(N n, Expr expr, List<SwitchElement> elements) {
         n = expr(n, expr);
         n = elements(n, elements);
         return n;
@@ -125,8 +123,7 @@ public class Switch_c extends Stmt_c implements Switch {
         Type type = expr.type();
 
         if (!ts.isImplicitCastValid(type, ts.Int())) {
-            throw new SemanticException("Switch index must be an integer.",
-                                        position());
+            throw new SemanticException("Switch index must be an integer.", position());
         }
 
         // Check whether case constant expressions are assignable to the type of
@@ -138,15 +135,11 @@ public class Switch_c extends Stmt_c implements Switch {
                 if (cExpr != null
                         && !ts.isImplicitCastValid(cExpr.type(), type)
                         && !ts.typeEquals(cExpr.type(), type)
-                        && !ts.numericConversionValid(type,
-                                                      tc.lang()
-                                                        .constantValue(cExpr,
-                                                                       tc.lang()))) {
-                    throw new SemanticException("Case constant \""
-                                                        + cExpr
-                                                        + "\" is not assignable to "
-                                                        + type + ".",
-                                                c.position());
+                        && !ts.numericConversionValid(
+                                type, tc.lang().constantValue(cExpr, tc.lang()))) {
+                    throw new SemanticException(
+                            "Case constant \"" + cExpr + "\" is not assignable to " + type + ".",
+                            c.position());
                 }
             }
         }
@@ -169,22 +162,18 @@ public class Switch_c extends Stmt_c implements Switch {
                 if (c.isDefault()) {
                     key = "default";
                     str = "default";
-                }
-                else if (!cc.lang().constantValueSet(expr, cc.lang())) {
+                } else if (!cc.lang().constantValueSet(expr, cc.lang())) {
                     // Constant not known yet; we'll try again later.
                     return this;
-                }
-                else if (cc.lang().isConstant(expr, cc.lang())) {
+                } else if (cc.lang().isConstant(expr, cc.lang())) {
                     key = cc.lang().constantValue(expr, cc.lang());
                     str = expr.toString() + " (" + key + ")";
-                }
-                else {
+                } else {
                     continue;
                 }
 
                 if (labels.contains(key)) {
-                    throw new SemanticException("Duplicate case label: " + str
-                            + ".", c.position());
+                    throw new SemanticException("Duplicate case label: " + str + ".", c.position());
                 }
 
                 labels.add(key);
@@ -223,13 +212,11 @@ public class Switch_c extends Stmt_c implements Switch {
 
         for (SwitchElement s : elements) {
             if (s instanceof Case) {
-                if (lastWasCase)
-                    w.unifiedBreak(0);
+                if (lastWasCase) w.unifiedBreak(0);
                 else if (!first) w.unifiedBreak(0);
                 printBlock(s, w, tr);
                 lastWasCase = true;
-            }
-            else {
+            } else {
                 w.unifiedBreak(4);
                 print(s, w, tr);
                 lastWasCase = false;
@@ -281,5 +268,4 @@ public class Switch_c extends Stmt_c implements Switch {
     public Node copy(NodeFactory nf) {
         return nf.Switch(this.position, this.expr, this.elements);
     }
-
 }

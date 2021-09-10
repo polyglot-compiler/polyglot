@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -55,12 +55,11 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
     protected List<ReferenceType> bounds;
 
-//    protected List<Type> concreteBounds;
+    //    protected List<Type> concreteBounds;
 
     protected TypeVariable boundOf_;
 
-    public IntersectionType_c(TypeSystem ts, Position pos,
-            List<ReferenceType> bounds) {
+    public IntersectionType_c(TypeSystem ts, Position pos, List<ReferenceType> bounds) {
         super(ts, pos);
         this.bounds = bounds;
         checkBounds();
@@ -68,8 +67,8 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
     private void checkBounds() {
         if (this.bounds == null || this.bounds.size() < 2) {
-            throw new InternalCompilerError("Intersection type needs at least two elements: "
-                    + this.bounds);
+            throw new InternalCompilerError(
+                    "Intersection type needs at least two elements: " + this.bounds);
         }
     }
 
@@ -85,44 +84,43 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     @Override
     public boolean isEnclosedImpl(ClassType maybe_outer) {
         for (ReferenceType bound : bounds) {
-            if (!bound.isClass() || !bound.toClass().isEnclosed(maybe_outer))
-                return false;
+            if (!bound.isClass() || !bound.toClass().isEnclosed(maybe_outer)) return false;
         }
         return true;
     }
 
     @Override
     public String translate(Resolver c) {
-        StringBuffer sb = new StringBuffer();//("intersection[ ");
-        for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {
+        StringBuffer sb = new StringBuffer(); // ("intersection[ ");
+        for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext(); ) {
             Type b = iter.next();
             sb.append(b.translate(c));
             if (iter.hasNext()) sb.append(" & ");
         }
-        //sb.append(" ]");
+        // sb.append(" ]");
         return sb.toString();
     }
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();//("intersection[ ");
+        StringBuffer sb = new StringBuffer(); // ("intersection[ ");
         sb.append(" ( ");
-        for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext();) {
+        for (Iterator<ReferenceType> iter = bounds.iterator(); iter.hasNext(); ) {
             Type b = iter.next();
             sb.append(b);
             if (iter.hasNext()) sb.append(" & ");
         }
-        //sb.append(" ]");
+        // sb.append(" ]");
         sb.append(" ) ");
         return sb.toString();
     }
 
-//    protected List<Type> getConcreteBounds() {
-//        if (concreteBounds == null) {
-//            concreteBounds = ((JL5TypeSystem) typeSystem()).concreteBounds(this.bounds());
-//        }
-//        return concreteBounds;
-//    }
+    //    protected List<Type> getConcreteBounds() {
+    //        if (concreteBounds == null) {
+    //            concreteBounds = ((JL5TypeSystem) typeSystem()).concreteBounds(this.bounds());
+    //        }
+    //        return concreteBounds;
+    //    }
 
     @Override
     public Type superType() {
@@ -135,7 +133,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         }
         return ts.Object();
 
-//        return getSyntheticClass().superType();
+        //        return getSyntheticClass().superType();
     }
 
     @Override
@@ -143,46 +141,46 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
         return Collections.emptyList();
     }
 
-//    protected ParsedClassType syntheticClass = null;
-//
-//    protected ClassType getSyntheticClass() {
-//        if (syntheticClass == null) {
-//            syntheticClass = typeSystem().createClassType();
-//            ArrayList<Type> onlyClasses = new ArrayList<Type>();
-//            for (ReferenceType t : getConcreteBounds()) {
-//                if (t.isClass() && ((ClassType)t).flags().isInterface())
-//                    syntheticClass.addInterface(t);
-//                else
-//                    onlyClasses.add(t);
-//            }
-//            if (onlyClasses.size() > 0) {
-//                Collections.sort(onlyClasses, new Comparator<ReferenceType>() {
-//                    public int compare(ReferenceType o1, ReferenceType o2) {
-//                        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
-//                        if (ts.equals(o1, o2))
-//                            return 0;
-//                        if (ts.isSubtype(o1, o2))
-//                            return -1;
-//                        return 1;
-//                    }
-//                });
-//                syntheticClass.superType(onlyClasses.get(0));
-//            }
-//            syntheticClass.package_(this.package_());
-//        }
-//        return syntheticClass;
-//    }
+    //    protected ParsedClassType syntheticClass = null;
+    //
+    //    protected ClassType getSyntheticClass() {
+    //        if (syntheticClass == null) {
+    //            syntheticClass = typeSystem().createClassType();
+    //            ArrayList<Type> onlyClasses = new ArrayList<Type>();
+    //            for (ReferenceType t : getConcreteBounds()) {
+    //                if (t.isClass() && ((ClassType)t).flags().isInterface())
+    //                    syntheticClass.addInterface(t);
+    //                else
+    //                    onlyClasses.add(t);
+    //            }
+    //            if (onlyClasses.size() > 0) {
+    //                Collections.sort(onlyClasses, new Comparator<ReferenceType>() {
+    //                    public int compare(ReferenceType o1, ReferenceType o2) {
+    //                        JL5TypeSystem ts = (JL5TypeSystem) typeSystem();
+    //                        if (ts.equals(o1, o2))
+    //                            return 0;
+    //                        if (ts.isSubtype(o1, o2))
+    //                            return -1;
+    //                        return 1;
+    //                    }
+    //                });
+    //                syntheticClass.superType(onlyClasses.get(0));
+    //            }
+    //            syntheticClass.package_(this.package_());
+    //        }
+    //        return syntheticClass;
+    //    }
 
     @Override
     public List<? extends FieldInstance> fields() {
         return Collections.emptyList();
-//        return getSyntheticClass().fields();
+        //        return getSyntheticClass().fields();
     }
 
     @Override
     public Flags flags() {
         return Flags.PUBLIC.set(Flags.FINAL);
-        //return getSyntheticClass().flags();
+        // return getSyntheticClass().flags();
     }
 
     @Override
@@ -194,7 +192,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
             }
         }
         return interfaces;
-//        return getSyntheticClass().interfaces();
+        //        return getSyntheticClass().interfaces();
     }
 
     @Override
@@ -210,7 +208,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
     @Override
     public List<? extends MethodInstance> methods() {
         return Collections.emptyList();
-//        return getSyntheticClass().methods();
+        //        return getSyntheticClass().methods();
     }
 
     @Override
@@ -225,8 +223,8 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
 
     @Override
     public Package package_() {
-//        if (boundOf() != null) 
-//            return boundOf().package_();
+        //        if (boundOf() != null)
+        //            return boundOf().package_();
         return null;
     }
 
@@ -246,7 +244,7 @@ public class IntersectionType_c extends ClassType_c implements IntersectionType 
                 return chain;
             }
         }
-        //or just isImplicitCastValid(getSyntaticClass(), toType());
+        // or just isImplicitCastValid(getSyntaticClass(), toType());
         return null;
     }
 

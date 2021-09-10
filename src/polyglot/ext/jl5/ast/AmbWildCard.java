@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -51,8 +51,7 @@ public class AmbWildCard extends TypeNode_c implements Ambiguous {
         this(pos, null, true);
     }
 
-    public AmbWildCard(Position pos, TypeNode constraint,
-            boolean isExtendsConstraint) {
+    public AmbWildCard(Position pos, TypeNode constraint, boolean isExtendsConstraint) {
         super(pos);
         this.constraint = constraint;
         this.isExtendsConstraint = isExtendsConstraint;
@@ -86,14 +85,12 @@ public class AmbWildCard extends TypeNode_c implements Ambiguous {
         Type t;
         if (constraint == null) {
             t = ts.wildCardType(this.position());
-        }
-        else {
+        } else {
             ReferenceType upperBound = null;
             ReferenceType lowerBound = null;
             if (isExtendsConstraint) {
                 upperBound = (ReferenceType) constraint.type();
-            }
-            else {
+            } else {
                 lowerBound = (ReferenceType) constraint.type();
             }
             t = ts.wildCardType(this.position(), upperBound, lowerBound);

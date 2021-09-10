@@ -13,8 +13,7 @@ import java.util.List;
 /** See {@link MemberFilterer}. */
 public class MembersFiltered extends VisitorGoal {
 
-    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts,
-                              NodeFactory nf) {
+    public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
         return scheduler.internGoal(new MembersFiltered(job, ts, nf));
     }
 

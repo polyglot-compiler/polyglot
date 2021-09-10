@@ -23,8 +23,8 @@ public class JL5InstanceofExt extends JL5ExprExt {
         // It is a compile-time error if compareType does not denote a
         // reifiable type.
         if (!ts.isReifiable(compareType))
-            throw new SemanticException("The type for instanceof is not reifiable: "
-                    + compareType,
+            throw new SemanticException(
+                    "The type for instanceof is not reifiable: " + compareType,
                     compareTN.position());
         return n;
     }

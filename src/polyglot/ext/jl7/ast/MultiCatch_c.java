@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -49,8 +49,7 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
 
     protected List<TypeNode> alternatives;
 
-    public MultiCatch_c(Position pos, Formal formal,
-            List<TypeNode> alternatives, Block body) {
+    public MultiCatch_c(Position pos, Formal formal, List<TypeNode> alternatives, Block body) {
         super(pos, formal, body);
         this.alternatives = alternatives;
     }
@@ -87,8 +86,13 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
                 types.append('|');
             }
         }
-        return "catch (" + this.formal().flags().translate() + types + " "
-                + formal.name() + ") " + body;
+        return "catch ("
+                + this.formal().flags().translate()
+                + types
+                + " "
+                + formal.name()
+                + ") "
+                + body;
     }
 
     @Override
@@ -97,7 +101,6 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
         Formal f = n.formal();
         f.localInstance().setFlags(f.localInstance().flags().Final()); // formal is implicitly final
         return n;
-
     }
 
     @Override
@@ -109,12 +112,11 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
             for (int j = i + 1; j < this.alternatives.size(); j++) {
                 Type tj = this.alternatives().get(j).type();
                 if (ti.isSubtype(tj) || tj.isSubtype(ti)) {
-                    throw new SemanticException("Alternatives in a multi-catch statement must not be subclasses of each other.",
-                                                this.alternatives()
-                                                    .get(j)
-                                                    .position());
+                    throw new SemanticException(
+                            "Alternatives in a multi-catch statement must not be subclasses of each"
+                                    + " other.",
+                            this.alternatives().get(j).position());
                 }
-
             }
         }
 
@@ -142,5 +144,4 @@ public class MultiCatch_c extends Catch_c implements MultiCatch {
         w.write(")");
         printSubStmt(body, w, tr);
     }
-
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -48,7 +48,7 @@ import polyglot.types.ParsedClassType;
  * have annotations applied to them, such as class declarations, method declarations, etc.)
  * have their setAnnotations(Annotations) method called with an appropriate Annotations object.
  * That is, the AnnotationElems are type checked, and converted into an Annotations object,
- * which is then given to the AnnotatedElement. 
+ * which is then given to the AnnotatedElement.
  */
 public class AnnotationsResolved extends VisitorGoal {
     public static Goal create(Scheduler scheduler, ParsedClassType ct) {
@@ -93,23 +93,20 @@ public class AnnotationsResolved extends VisitorGoal {
         }
 
         protected boolean isGlobal(ClassType ct) {
-            return ct.isTopLevel()
-                    || (ct.isMember() && isGlobal((ClassType) ct.container()));
+            return ct.isTopLevel() || (ct.isMember() && isGlobal((ClassType) ct.container()));
         }
 
         @Override
         public boolean equals(Object o) {
             return o instanceof AnnotationsResolvedCT && super.equals(o);
         }
-
     }
 
     static class ResolveAnnotationsForClass extends ClassFilePass {
         protected Scheduler scheduler;
         protected AnnotationsResolvedCT goal;
 
-        public ResolveAnnotationsForClass(Scheduler scheduler,
-                AnnotationsResolvedCT goal) {
+        public ResolveAnnotationsForClass(Scheduler scheduler, AnnotationsResolvedCT goal) {
             super(goal);
             this.scheduler = scheduler;
             this.goal = goal;
@@ -123,5 +120,4 @@ public class AnnotationsResolved extends VisitorGoal {
             return true;
         }
     }
-
 }

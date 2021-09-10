@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -44,10 +44,10 @@ import polyglot.main.UsageError;
 import polyglot.util.InternalCompilerError;
 
 /**
- * A simple example of the output extension pattern.  This extension 
- * uses a parent extension to set its options and expects all jobs 
+ * A simple example of the output extension pattern.  This extension
+ * uses a parent extension to set its options and expects all jobs
  * to be enqueued directly in its scheduler by an ExtensionRewriter.
- * 
+ *
  * It also provides a subclass of JLScheduler that performs an empty pass
  * for the Parsed goal, since no files are actually parsed.
  */
@@ -63,7 +63,7 @@ public class JL5OutputExtensionInfo extends JL5ExtensionInfo {
         return new JL5OutputScheduler(this);
     }
 
-    static protected class JL5OutputOptions extends JL5Options {
+    protected static class JL5OutputOptions extends JL5Options {
 
         public JL5OutputOptions(ExtensionInfo extension) {
             super(extension);
@@ -73,9 +73,7 @@ public class JL5OutputExtensionInfo extends JL5ExtensionInfo {
          * Skip checks regarding source files.
          */
         @Override
-        protected void validateArgs() throws UsageError {
-        }
-
+        protected void validateArgs() throws UsageError {}
     }
 
     @Override
@@ -85,28 +83,28 @@ public class JL5OutputExtensionInfo extends JL5ExtensionInfo {
         // filter the parent's options by the ones this extension understands
         List<Arg<?>> arguments = parentOpts.filterArgs(opt.flags());
         try {
-            opt.processArguments(arguments, Collections.<String> emptySet());
-        }
-        catch (UsageError e) {
-            throw new InternalCompilerError("Got usage error while configuring output extension",
-                                            e);
+            opt.processArguments(arguments, Collections.<String>emptySet());
+        } catch (UsageError e) {
+            throw new InternalCompilerError(
+                    "Got usage error while configuring output extension", e);
         }
         return opt;
     }
 
-    static protected class JL5OutputScheduler extends JL5Scheduler {
+    protected static class JL5OutputScheduler extends JL5Scheduler {
         public JL5OutputScheduler(JL5ExtensionInfo extInfo) {
             super(extInfo);
         }
 
         @Override
         public Goal Parsed(Job job) {
-            return internGoal(new SourceFileGoal(job) {
-                @Override
-                public Pass createPass(ExtensionInfo extInfo) {
-                    return new EmptyPass(this);
-                }
-            });
+            return internGoal(
+                    new SourceFileGoal(job) {
+                        @Override
+                        public Pass createPass(ExtensionInfo extInfo) {
+                            return new EmptyPass(this);
+                        }
+                    });
         }
     }
 }

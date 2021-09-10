@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -55,16 +55,20 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
 
     protected List<LocalDecl> resources;
 
-    public TryWithResources_c(Position pos, List<LocalDecl> resources,
-            Block tryBlock, List<Catch> catchBlocks, Block finallyBlock) {
+    public TryWithResources_c(
+            Position pos,
+            List<LocalDecl> resources,
+            Block tryBlock,
+            List<Catch> catchBlocks,
+            Block finallyBlock) {
         super(pos, tryBlock, catchBlocks, finallyBlock);
         assert_(pos, tryBlock, catchBlocks, finallyBlock);
         this.resources = ListUtil.copy(resources, true);
     }
 
     @Override
-    protected void assert_(Position pos, Block tryBlock,
-            List<Catch> catchBlocks, Block finallyBlock) {
+    protected void assert_(
+            Position pos, Block tryBlock, List<Catch> catchBlocks, Block finallyBlock) {
         assert (tryBlock != null); // catchBlock and finallyBlock may be null
     }
 
@@ -84,8 +88,7 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
         return c.pushBlock();
     }
 
-    protected <N extends TryWithResources_c> N resources(N n,
-            List<LocalDecl> resources) {
+    protected <N extends TryWithResources_c> N resources(N n, List<LocalDecl> resources) {
         if (CollectionUtil.equals(n.resources, resources)) return n;
         if (n == this) n = Copy.Util.copy(n);
         n.resources = ListUtil.copy(resources, true);
@@ -93,8 +96,11 @@ public class TryWithResources_c extends Try_c implements TryWithResources {
     }
 
     /** Reconstruct the statement. */
-    protected <N extends TryWithResources_c> N reconstruct(N n,
-            List<LocalDecl> resources, Block tryBlock, List<Catch> catchBlocks,
+    protected <N extends TryWithResources_c> N reconstruct(
+            N n,
+            List<LocalDecl> resources,
+            Block tryBlock,
+            List<Catch> catchBlocks,
             Block finallyBlock) {
         n = super.reconstruct(n, tryBlock, catchBlocks, finallyBlock);
         n = resources(n, resources);

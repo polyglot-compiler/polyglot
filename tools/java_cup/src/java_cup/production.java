@@ -21,7 +21,6 @@ import java.util.HashMap;
  * @version last updated: 7/3/96
  * @author  Frank Flannery
  */
-
 public class production {
 
     /*-----------------------------------------------------------*/
@@ -51,18 +50,17 @@ public class production {
      *  all actions at the end where they can be handled as part of a reduce by
      *  the parser.
      */
-    public production(non_terminal lhs_sym, production_part rhs_parts[],
-            int rhs_l, String action_str) throws internal_error {
+    public production(
+            non_terminal lhs_sym, production_part rhs_parts[], int rhs_l, String action_str)
+            throws internal_error {
         int i;
         action_part tail_action;
         String declare_str;
         int rightlen = rhs_l;
 
         /* remember the length */
-        if (rhs_l >= 0)
-            _rhs_length = rhs_l;
-        else if (rhs_parts != null)
-            _rhs_length = rhs_parts.length;
+        if (rhs_l >= 0) _rhs_length = rhs_l;
+        else if (rhs_parts != null) _rhs_length = rhs_parts.length;
         else _rhs_length = 0;
 
         /* make sure we have a valid left-hand-side */
@@ -82,8 +80,7 @@ public class production {
         if (rhs_l > 0) {
             if (rhs_parts[rhs_l - 1].is_action()) {
                 rightlen = rhs_l - 1;
-            }
-            else {
+            } else {
                 rightlen = rhs_l;
             }
         }
@@ -91,8 +88,7 @@ public class production {
         /* get the generated declaration code for the necessary labels. */
         declare_str = declare_labels(rhs_parts, rightlen, action_str);
 
-        if (action_str == null)
-            action_str = declare_str;
+        if (action_str == null) action_str = declare_str;
         else action_str = declare_str + action_str;
 
         /* count use of lhs */
@@ -120,8 +116,7 @@ public class production {
             if (!_rhs[i].is_action()) {
                 ((symbol_part) _rhs[i]).the_symbol().note_use();
                 if (((symbol_part) _rhs[i]).the_symbol() instanceof terminal) {
-                    _rhs_prec =
-                            ((terminal) ((symbol_part) _rhs[i]).the_symbol()).precedence_num();
+                    _rhs_prec = ((terminal) ((symbol_part) _rhs[i]).the_symbol()).precedence_num();
                     _rhs_assoc =
                             ((terminal) ((symbol_part) _rhs[i]).the_symbol()).precedence_side();
                 }
@@ -132,8 +127,7 @@ public class production {
         6/14/96 frankf */
         if (action_str == null) action_str = "";
         if (tail_action != null && tail_action.code_string() != null)
-            action_str =
-            action_str + "                " + tail_action.code_string();
+            action_str = action_str + "                " + tail_action.code_string();
 
         /* stash the action */
         _action = new action_part(action_str);
@@ -154,18 +148,23 @@ public class production {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Constructor with no action string. */
-    public production(non_terminal lhs_sym, production_part rhs_parts[],
-            int rhs_l) throws internal_error {
+    public production(non_terminal lhs_sym, production_part rhs_parts[], int rhs_l)
+            throws internal_error {
         this(lhs_sym, rhs_parts, rhs_l, null);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /* Constructor with precedence and associativity of production
-       contextually define */
-    public production(non_terminal lhs_sym, production_part rhs_parts[],
-            int rhs_l, String action_str, int prec_num, int prec_side)
-                    throws internal_error {
+    contextually define */
+    public production(
+            non_terminal lhs_sym,
+            production_part rhs_parts[],
+            int rhs_l,
+            String action_str,
+            int prec_num,
+            int prec_side)
+            throws internal_error {
         this(lhs_sym, rhs_parts, rhs_l, action_str);
 
         /* set the precedence */
@@ -176,9 +175,14 @@ public class production {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /* Constructor w/ no action string and contextual precedence
-       defined */
-    public production(non_terminal lhs_sym, production_part rhs_parts[],
-            int rhs_l, int prec_num, int prec_side) throws internal_error {
+    defined */
+    public production(
+            non_terminal lhs_sym,
+            production_part rhs_parts[],
+            int rhs_l,
+            int prec_num,
+            int prec_side)
+            throws internal_error {
         this(lhs_sym, rhs_parts, rhs_l, null);
         /* set the precedence */
         set_precedence_num(prec_num);
@@ -206,7 +210,7 @@ public class production {
         return _all.get(new Integer(indx));
     }
 
-    //Hm Added clear  to clear all static fields
+    // Hm Added clear  to clear all static fields
     public static void clear() {
         _all.clear();
         next_index = 0;
@@ -236,6 +240,7 @@ public class production {
 
     /** The precedence of the rule */
     protected int _rhs_prec = -1;
+
     protected int _rhs_assoc = -1;
 
     /** Access to the precedence of the rule */
@@ -263,8 +268,7 @@ public class production {
 
     /** Access to the collection of parts for the right hand side. */
     public production_part rhs(int indx) throws internal_error {
-        if (indx >= 0 && indx < _rhs_length)
-            return _rhs[indx];
+        if (indx >= 0 && indx < _rhs_length) return _rhs[indx];
         else throw new internal_error("Index out of range for right hand side of production");
     }
 
@@ -361,7 +365,7 @@ public class production {
     protected static boolean is_id_start(char c) {
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_';
 
-        //later need to handle non-8-bit chars here
+        // later need to handle non-8-bit chars here
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -382,23 +386,23 @@ public class production {
      * @param stack_type   the stack type of label?
      * @author frankf
      */
-    protected String make_declaration(String labelname, String stack_type,
-            int offset) {
+    protected String make_declaration(String labelname, String stack_type, int offset) {
         String ret;
 
         /* Put in the left/right value labels */
         if (emit.lr_values()) {
             if (!emit.locations())
                 ret =
-                "                "
-                        + "int "
-                        + labelname
-                        + "left = "
-                        + emit.pre("stack")
-                        +
-                        // TUM 20050917
-                        (offset == 0 ? ".peek()" : ".elementAt("
-                                + emit.pre("top") + "-" + offset + ")")
+                        "                "
+                                + "int "
+                                + labelname
+                                + "left = "
+                                + emit.pre("stack")
+                                +
+                                // TUM 20050917
+                                (offset == 0
+                                        ? ".peek()"
+                                        : ".elementAt(" + emit.pre("top") + "-" + offset + ")")
                                 + ".left;\n"
                                 + "                "
                                 + "int "
@@ -407,32 +411,35 @@ public class production {
                                 + emit.pre("stack")
                                 +
                                 // TUM 20050917
-                                (offset == 0 ? ".peek()" : ".elementAt("
-                                        + emit.pre("top") + "-" + offset + ")")
-                                        + ".right;\n";
-            else ret =
-                    "                "
-                            + "Location "
-                            + labelname
-                            + "xleft = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
-                            + emit.pre("stack")
-                            +
-                            // TUM 20050917
-                            (offset == 0 ? ".peek()" : ".elementAt("
-                                    + emit.pre("top") + "-" + offset + ")")
-                                    + ").xleft;\n"
-                                    + "                "
-                                    + "Location "
-                                    + labelname
-                                    + "xright = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
-                                    + emit.pre("stack")
-                                    +
-                                    // TUM 20050917
-                                    (offset == 0 ? ".peek()" : ".elementAt("
-                                            + emit.pre("top") + "-" + offset + ")")
-                                            + ").xright;\n";
-        }
-        else ret = "";
+                                (offset == 0
+                                        ? ".peek()"
+                                        : ".elementAt(" + emit.pre("top") + "-" + offset + ")")
+                                + ".right;\n";
+            else
+                ret =
+                        "                "
+                                + "Location "
+                                + labelname
+                                + "xleft = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
+                                + emit.pre("stack")
+                                +
+                                // TUM 20050917
+                                (offset == 0
+                                        ? ".peek()"
+                                        : ".elementAt(" + emit.pre("top") + "-" + offset + ")")
+                                + ").xleft;\n"
+                                + "                "
+                                + "Location "
+                                + labelname
+                                + "xright = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
+                                + emit.pre("stack")
+                                +
+                                // TUM 20050917
+                                (offset == 0
+                                        ? ".peek()"
+                                        : ".elementAt(" + emit.pre("top") + "-" + offset + ")")
+                                + ").xright;\n";
+        } else ret = "";
 
         /* otherwise, just declare label. */
         return ret
@@ -444,10 +451,10 @@ public class production {
                 + emit.pre("stack")
                 +
                 // TUM 20050917
-                (offset == 0 ? ".peek()" : ".elementAt(" + emit.pre("top")
-                        + "-" + offset + ")") + ".<" + stack_type
-                        + "> value();\n";
-
+                (offset == 0 ? ".peek()" : ".elementAt(" + emit.pre("top") + "-" + offset + ")")
+                + ".<"
+                + stack_type
+                + "> value();\n";
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -458,8 +465,7 @@ public class production {
      * @param final_action the final action string of the production.
      * @param lhs_type     the object type associated with the LHS symbol.
      */
-    protected String declare_labels(production_part rhs[], int rhs_len,
-            String final_action) {
+    protected String declare_labels(production_part rhs[], int rhs_len, String final_action) {
         String declaration = "";
 
         symbol_part part;
@@ -476,10 +482,10 @@ public class production {
                     if (label == null) label = part.the_symbol().name() + pos;
                     declaration =
                             declaration
-                                    + make_declaration(label,
-                                                       part.the_symbol()
-                                                           .stack_type(),
-                                                       rhs_len - pos - 1);
+                                    + make_declaration(
+                                            label,
+                                            part.the_symbol().stack_type(),
+                                            rhs_len - pos - 1);
                 }
             }
         }
@@ -503,8 +509,7 @@ public class production {
         to_loc = -1;
         for (from_loc = 0; from_loc < len; from_loc++) {
             /* do we go in the current position or one further */
-            if (to_loc < 0 || !rhs_parts[to_loc].is_action()
-                    || !rhs_parts[from_loc].is_action()) {
+            if (to_loc < 0 || !rhs_parts[to_loc].is_action() || !rhs_parts[from_loc].is_action()) {
                 /* next one */
                 to_loc++;
 
@@ -515,15 +520,16 @@ public class production {
             /* if this is not trivial? */
             if (to_loc != from_loc) {
                 /* do we merge or copy? */
-                if (rhs_parts[to_loc] != null && rhs_parts[to_loc].is_action()
+                if (rhs_parts[to_loc] != null
+                        && rhs_parts[to_loc].is_action()
                         && rhs_parts[from_loc].is_action()) {
                     /* merge */
                     rhs_parts[to_loc] =
-                            new action_part(((action_part) rhs_parts[to_loc]).code_string()
+                            new action_part(
+                                    ((action_part) rhs_parts[to_loc]).code_string()
                                             + ((action_part) rhs_parts[from_loc]).code_string());
                     merge_cnt++;
-                }
-                else {
+                } else {
                     /* copy */
                     rhs_parts[to_loc] = rhs_parts[from_loc];
                 }
@@ -541,8 +547,7 @@ public class production {
      * @param len       how many of those are valid.
      * @return          the removed action part.
      */
-    protected action_part strip_trailing_action(production_part rhs_parts[],
-            int len) {
+    protected action_part strip_trailing_action(production_part rhs_parts[], int len) {
         action_part result;
 
         /* bail out early if we have nothing to do */
@@ -554,8 +559,7 @@ public class production {
             result = (action_part) rhs_parts[len - 1];
             rhs_parts[len - 1] = null;
             return result;
-        }
-        else return null;
+        } else return null;
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -574,12 +578,11 @@ public class production {
      */
 
     /* the declarations added to the parent production are also passed along,
-       as they should be perfectly valid in this code string, since it
-       was originally a code string in the parent, not on its own.
-       frank 6/20/96 */
-    protected void remove_embedded_actions(
+    as they should be perfectly valid in this code string, since it
+    was originally a code string in the parent, not on its own.
+    frank 6/20/96 */
+    protected void remove_embedded_actions() throws internal_error {
 
-            ) throws internal_error {
         non_terminal new_nt;
         String declare_str;
         int lastLocation = -1;
@@ -590,19 +593,20 @@ public class production {
                 declare_str = declare_labels(_rhs, act_loc, "");
                 /* create a new non terminal for the action production */
                 new_nt =
-                        non_terminal.create_new(null, lhs().the_symbol()
-                                                .stack_type()); // TUM 20060608 embedded actions patch
+                        non_terminal.create_new(
+                                null,
+                                lhs().the_symbol()
+                                        .stack_type()); // TUM 20060608 embedded actions patch
                 new_nt.is_embedded_action = true; /* 24-Mar-1998, CSA */
 
                 /* create a new production with just the action */
-                new action_production(this,
-                                      new_nt,
-                                      null,
-                                      0,
-                                      declare_str
-                                      + ((action_part) rhs(act_loc)).code_string(),
-                                      lastLocation == -1 ? -1 : act_loc
-                                              - lastLocation);
+                new action_production(
+                        this,
+                        new_nt,
+                        null,
+                        0,
+                        declare_str + ((action_part) rhs(act_loc)).code_string(),
+                        lastLocation == -1 ? -1 : act_loc - lastLocation);
 
                 /* replace the action with the generated non terminal */
                 _rhs[act_loc] = new symbol_part(new_nt);
@@ -640,8 +644,7 @@ public class production {
                 sym = ((symbol_part) part).the_symbol();
 
                 /* if its a terminal we are definitely not nullable */
-                if (!sym.is_non_term())
-                    return set_nullable(false);
+                if (!sym.is_non_term()) return set_nullable(false);
                 /* its a non-term, is it marked nullable */
                 else if (!((non_terminal) sym).nullable())
                     /* this one not (yet) nullable, so we aren't */
@@ -683,8 +686,7 @@ public class production {
 
                     /* if its not nullable, we are done */
                     if (!((non_terminal) sym).nullable()) break;
-                }
-                else {
+                } else {
                     /* its a terminal -- add that to the set */
                     _first_set.add((terminal) sym);
 
@@ -711,8 +713,7 @@ public class production {
     /** Generic equality comparison. */
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof production))
-            return false;
+        if (!(other instanceof production)) return false;
         else return equals((production) other);
     }
 
@@ -737,19 +738,17 @@ public class production {
             result = "production [" + index() + "]: ";
             result += lhs() != null ? lhs().toString() : "$$NULL-LHS$$";
             result += " ::= ";
-            for (int i = 0; i < rhs_length(); i++)
-                result += rhs(i) + " ";
+            for (int i = 0; i < rhs_length(); i++) result += rhs(i) + " ";
             result += ";";
             if (action() != null && action().code_string() != null)
                 result += " {" + action().code_string() + "}";
 
-            if (nullable_known()) if (nullable())
-                result += "[NULLABLE]";
-            else result += "[NOT NULLABLE]";
-        }
-        catch (internal_error e) {
+            if (nullable_known())
+                if (nullable()) result += "[NULLABLE]";
+                else result += "[NOT NULLABLE]";
+        } catch (internal_error e) {
             /* crash on internal error since we can't throw it from here (because
-               superclass does not throw anything. */
+            superclass does not throw anything. */
             e.crash();
             result = null;
         }
@@ -766,8 +765,7 @@ public class production {
         result = lhs() != null ? lhs().the_symbol().name() : "NULL_LHS";
         result += " ::= ";
         for (int i = 0; i < rhs_length(); i++)
-            if (!rhs(i).is_action())
-                result += ((symbol_part) rhs(i)).the_symbol().name() + " ";
+            if (!rhs(i).is_action()) result += ((symbol_part) rhs(i)).the_symbol().name() + " ";
 
         return result;
     }

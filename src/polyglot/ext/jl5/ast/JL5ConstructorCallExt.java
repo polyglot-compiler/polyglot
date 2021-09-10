@@ -62,8 +62,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
         this(null, false);
     }
 
-    public JL5ConstructorCallExt(List<TypeNode> typeArgs,
-            boolean isEnumConstructorCall) {
+    public JL5ConstructorCallExt(List<TypeNode> typeArgs, boolean isEnumConstructorCall) {
         super(typeArgs);
         this.isEnumConstructorCall = isEnumConstructorCall;
     }
@@ -96,11 +95,11 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             if (cc.arguments().isEmpty()) {
                 // this is an enum decl, so we need to replace a call to the default
                 // constructor with a call to java.lang.Enum.Enum(String, int)
-                List<Expr> args = new ArrayList<>(2);// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
+                List<Expr> args =
+                        new ArrayList<>(2); // XXX the right thing to do is change the type of
+                // java.lang.Enum instead of adding these dummy params
                 args.add(ar.nodeFactory().NullLit(Position.compilerGenerated()));
-                args.add(ar.nodeFactory().IntLit(Position.compilerGenerated(),
-                                                 IntLit.INT,
-                                                 0));
+                args.add(ar.nodeFactory().IntLit(Position.compilerGenerated(), IntLit.INT, 0));
                 cc = (ConstructorCall) cc.arguments(args);
                 ext = (JL5ConstructorCallExt) JL5Ext.ext(cc);
                 ext.isEnumConstructorCall = true;
@@ -144,39 +143,42 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             }
 
             if (kind != SUPER) {
-                throw new SemanticException("Can only qualify a \"super\""
-                        + "constructor invocation.", n.position());
+                throw new SemanticException(
+                        "Can only qualify a \"super\"" + "constructor invocation.", n.position());
             }
 
-            if (!superType.isClass() || !superType.toClass().isInnerClass()
+            if (!superType.isClass()
+                    || !superType.toClass().isInnerClass()
                     || superType.toClass().inStaticContext()) {
-                throw new SemanticException("The class \""
-                                                    + superType
-                                                    + "\""
-                                                    + " is not an inner class, or was declared in a static "
-                                                    + "context; a qualified constructor invocation cannot "
-                                                    + "be used.",
-                                            n.position());
+                throw new SemanticException(
+                        "The class \""
+                                + superType
+                                + "\""
+                                + " is not an inner class, or was declared in a static "
+                                + "context; a qualified constructor invocation cannot "
+                                + "be used.",
+                        n.position());
             }
 
             Type qt = qualifier.type();
 
             if (!qt.isClass() || !qt.isSubtype(superType.toClass().outer())) {
-                throw new SemanticException("The type of the qualifier "
-                                                    + "\""
-                                                    + qt
-                                                    + "\" does not match the immediately enclosing "
-                                                    + "class  of the super class \""
-                                                    + superType.toClass()
-                                                               .outer() + "\".",
-                                            qualifier.position());
+                throw new SemanticException(
+                        "The type of the qualifier "
+                                + "\""
+                                + qt
+                                + "\" does not match the immediately enclosing "
+                                + "class  of the super class \""
+                                + superType.toClass().outer()
+                                + "\".",
+                        qualifier.position());
             }
         }
 
         if (kind == SUPER) {
             if (!superType.isClass()) {
-                throw new SemanticException("Super type of " + ct
-                        + " is not a class.", n.position());
+                throw new SemanticException(
+                        "Super type of " + ct + " is not a class.", n.position());
             }
 
             Expr q = qualifier;
@@ -185,7 +187,8 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             // instance of its container class), then either a qualifier
             // must be provided, or ct must have an enclosing instance of the
             // super class's container class, or a subclass thereof.
-            if (q == null && superType.isClass()
+            if (q == null
+                    && superType.isClass()
                     && superType.toClass().isInnerClass()
                     && !superType.toClass().inStaticContext()) {
                 ClassType superContainer = superType.toClass().outer();
@@ -194,24 +197,26 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
                 ClassType e = ct.outer();
 
                 while (e != null) {
-                    // use isImplicitCastValid instead of isSubtype in order to allow unchecked conversion.
-                    if (e.isImplicitCastValid(superContainer)
-                            && ct.hasEnclosingInstance(e)) {
+                    // use isImplicitCastValid instead of isSubtype in order to allow unchecked
+                    // conversion.
+                    if (e.isImplicitCastValid(superContainer) && ct.hasEnclosingInstance(e)) {
                         break;
                     }
                     e = e.outer();
                 }
 
                 if (e == null) {
-                    throw new SemanticException(ct
-                                                        + " must have an enclosing instance"
-                                                        + " that is a subtype of "
-                                                        + superContainer,
-                                                n.position());
+                    throw new SemanticException(
+                            ct
+                                    + " must have an enclosing instance"
+                                    + " that is a subtype of "
+                                    + superContainer,
+                            n.position());
                 }
             }
 
-            // we differ here from the implementation in ConstructorCall_c in that we do not modify the qualifier
+            // we differ here from the implementation in ConstructorCall_c in that we do not modify
+            // the qualifier
         }
 
         List<Type> argTypes = new LinkedList<>();
@@ -228,11 +233,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
         }
 
         ConstructorInstance ci =
-                ts.findConstructor(ct,
-                                   argTypes,
-                                   actualTypeArgs,
-                                   c.currentClass(),
-                                   false);
+                ts.findConstructor(ct, argTypes, actualTypeArgs, c.currentClass(), false);
         return n.constructorInstance(ci);
     }
 
@@ -244,15 +245,19 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
         // are we a super call within an enum const decl?
         if (ext.isEnumConstructorCall() && cc.constructorInstance() != null) {
             boolean translateEnums =
-                    ((JL5Options) cc.constructorInstance()
-                                    .typeSystem()
-                                    .extensionInfo()
-                                    .getOptions()).translateEnums;
+                    ((JL5Options)
+                                    cc.constructorInstance()
+                                            .typeSystem()
+                                            .extensionInfo()
+                                            .getOptions())
+                            .translateEnums;
             boolean removeJava5isms =
-                    ((JL5Options) cc.constructorInstance()
-                                    .typeSystem()
-                                    .extensionInfo()
-                                    .getOptions()).removeJava5isms;
+                    ((JL5Options)
+                                    cc.constructorInstance()
+                                            .typeSystem()
+                                            .extensionInfo()
+                                            .getOptions())
+                            .removeJava5isms;
             if (!removeJava5isms && translateEnums) {
                 // we don't print an explicit call to super
                 return;
@@ -275,8 +280,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             w.write("(");
             printBlock(expr, w, pp);
             w.write(")");
-        }
-        else {
+        } else {
             print(expr, w, pp);
         }
     }

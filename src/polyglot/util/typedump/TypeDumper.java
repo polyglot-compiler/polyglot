@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -51,13 +51,21 @@ import polyglot.util.Position;
 
 public class TypeDumper {
     static Set<Class<?>> dontExpand;
+
     static {
-        Class<?>[] primitiveLike =
-                { Void.class, Boolean.class, Short.class, Integer.class,
-                        Long.class, Float.class, Double.class, Class.class,
-                        String.class, Character.class };
-        dontExpand =
-                new java.util.HashSet<>(java.util.Arrays.asList(primitiveLike));
+        Class<?>[] primitiveLike = {
+            Void.class,
+            Boolean.class,
+            Short.class,
+            Integer.class,
+            Long.class,
+            Float.class,
+            Double.class,
+            Class.class,
+            String.class,
+            Character.class
+        };
+        dontExpand = new java.util.HashSet<>(java.util.Arrays.asList(primitiveLike));
 
         dontExpand.add(Position.class);
         dontExpand.add(Compiler.class);
@@ -68,15 +76,13 @@ public class TypeDumper {
     String compilerVersion;
     Date timestamp;
 
-    public TypeDumper(String rawName, TypeObject t, String compilerVersion,
-            Long timestamp) {
+    public TypeDumper(String rawName, TypeObject t, String compilerVersion, Long timestamp) {
         theType = t;
         this.rawName = rawName;
         this.compilerVersion = compilerVersion;
         if (timestamp != null) {
             this.timestamp = new Date(timestamp.longValue());
-        }
-        else {
+        } else {
             this.timestamp = null;
         }
         initializeType(theType);
@@ -100,25 +106,23 @@ public class TypeDumper {
     }
 
     public static TypeDumper load(String name, TypeSystem ts, Version ver)
-            throws ClassNotFoundException, NoSuchFieldException,
-            SecurityException, IllegalArgumentException, SemanticException {
+            throws ClassNotFoundException, NoSuchFieldException, SecurityException,
+                    IllegalArgumentException, SemanticException {
         Class<?> c = Class.forName(name);
         try {
             String suffix = ver.name();
-            Field jlcVersion =
-                    c.getDeclaredField("jlc$CompilerVersion$" + suffix);
-            Field jlcTimestamp =
-                    c.getDeclaredField("jlc$SourceLastModified$" + suffix);
+            Field jlcVersion = c.getDeclaredField("jlc$CompilerVersion$" + suffix);
+            Field jlcTimestamp = c.getDeclaredField("jlc$SourceLastModified$" + suffix);
             Field jlcType = c.getDeclaredField("jlc$ClassType$" + suffix);
             jlcVersion.setAccessible(true);
             jlcTimestamp.setAccessible(true);
             jlcType.setAccessible(true);
-            return new TypeDumper(name,
-                                  ts.typeForName(name),
-                                  (String) jlcVersion.get(null),
-                                  (Long) jlcTimestamp.get(null));
-        }
-        catch (IllegalAccessException exn) {
+            return new TypeDumper(
+                    name,
+                    ts.typeForName(name),
+                    (String) jlcVersion.get(null),
+                    (Long) jlcTimestamp.get(null));
+        } catch (IllegalAccessException exn) {
             exn.printStackTrace();
             throw new SecurityException("illegal access: " + exn.getMessage());
         }
@@ -148,8 +152,7 @@ public class TypeDumper {
         w.newline(0);
     }
 
-    protected void dumpObject(CodeWriter w, Object o, TypeCache cache,
-            Field declaredField) {
+    protected void dumpObject(CodeWriter w, Object o, TypeCache cache, Field declaredField) {
         if (o instanceof TypeObject) {
             initializeType((TypeObject) o);
         }
@@ -163,8 +166,8 @@ public class TypeDumper {
                 && !(o instanceof ExtensionInfo)
                 && !(o instanceof ClassFile)
                 && !dontDump(rtType)
-                && !(dontDump(rtType.getName(), (declaredField == null
-                        ? null : declaredField.getName())))
+                && !(dontDump(
+                        rtType.getName(), (declaredField == null ? null : declaredField.getName())))
                 && !rtType.isArray()
                 && !(cache.containsKey(o) && cache.get(o) == o)) {
             w.allowBreak(2);
@@ -176,8 +179,7 @@ public class TypeDumper {
                     dumpObject(w, elem, cache, null);
                     w.newline();
                 }
-            }
-            else if (o instanceof Map) {
+            } else if (o instanceof Map) {
                 @SuppressWarnings("unchecked")
                 Map<Object, Object> map = (Map<Object, Object>) o;
                 for (Object key : map.keySet()) {
@@ -187,8 +189,7 @@ public class TypeDumper {
                     w.allowBreak(0);
                     dumpObject(w, map.get(key), cache, null);
                 }
-            }
-            else {
+            } else {
                 dumpObjectFields(w, o, cache);
             }
         }
@@ -205,12 +206,12 @@ public class TypeDumper {
             Class<?> objClass = obj.getClass();
             while (objClass != null) {
                 allFields.addAll(Arrays.asList(objClass.getDeclaredFields()));
-                java.lang.reflect.AccessibleObject.setAccessible(objClass.getDeclaredFields(),
-                                                                 true);
+                java.lang.reflect.AccessibleObject.setAccessible(
+                        objClass.getDeclaredFields(), true);
                 objClass = objClass.getSuperclass();
             }
-            java.lang.reflect.AccessibleObject.setAccessible(allFields.toArray(new AccessibleObject[0]),
-                                                             true);
+            java.lang.reflect.AccessibleObject.setAccessible(
+                    allFields.toArray(new AccessibleObject[0]), true);
             for (Field declaredField : allFields) {
                 if (Modifier.isStatic(declaredField.getModifiers())) continue;
                 w.begin(2);
@@ -219,21 +220,17 @@ public class TypeDumper {
                     Object o = declaredField.get(obj);
                     if (o != null) {
                         dumpObject(w, o, cache, declaredField);
-                    }
-                    else {
+                    } else {
                         w.write("null");
                     }
-                }
-                catch (IllegalAccessException exn) {
+                } catch (IllegalAccessException exn) {
                     w.write("##[" + exn.getMessage() + "]");
                 }
                 w.end();
                 w.newline();
             }
-        }
-        catch (SecurityException exn) {
-        }
-        finally {
+        } catch (SecurityException exn) {
+        } finally {
             w.end();
             w.allowBreak(0);
             w.write("}");
@@ -289,7 +286,5 @@ public class TypeDumper {
             }
             return false;
         }
-
     }
-
 }

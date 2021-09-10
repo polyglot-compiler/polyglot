@@ -24,8 +24,8 @@ package java_cup.runtime;
 
 public class Symbol {
 
-//  TUM 20060327: Added new Constructor to provide more flexible way
-//   for location handling
+    //  TUM 20060327: Added new Constructor to provide more flexible way
+    //   for location handling
     /*******************************
      *******************************/
     public Symbol(int id, Symbol left, Symbol right, Object o) {
@@ -41,7 +41,7 @@ public class Symbol {
     }
 
     /*******************************
-      Constructor for l,r values
+     * Constructor for l,r values
      *******************************/
 
     public Symbol(int id, int l, int r, Object o) {
@@ -52,24 +52,24 @@ public class Symbol {
     }
 
     /*******************************
-      Constructor for no l,r values
-    ********************************/
+     * Constructor for no l,r values
+     ********************************/
 
     public Symbol(int id, Object o) {
         this(id, -1, -1, o);
     }
 
     /*****************************
-      Constructor for no value
-      ***************************/
+     * Constructor for no value
+     ***************************/
 
     public Symbol(int id, int l, int r) {
         this(id, l, r, null);
     }
 
     /***********************************
-      Constructor for no value or l,r
-    ***********************************/
+     * Constructor for no value or l,r
+     ***********************************/
 
     public Symbol(int sym_num) {
         this(sym_num, -1);
@@ -78,8 +78,8 @@ public class Symbol {
     }
 
     /***********************************
-      Constructor to give a start state
-    ***********************************/
+     * Constructor to give a start state
+     ***********************************/
     Symbol(int sym_num, int state) {
         sym = sym_num;
         parse_state = state;
@@ -102,10 +102,11 @@ public class Symbol {
     boolean used_by_parser = false;
 
     /*******************************
-      The data passed to parser
+     * The data passed to parser
      *******************************/
 
     public int left, right;
+
     public Object value;
 
     @SuppressWarnings("unchecked")
@@ -114,8 +115,8 @@ public class Symbol {
     }
 
     /*****************************
-      Printing this token out. (Override for pretty-print).
-      ****************************/
+     * Printing this token out. (Override for pretty-print).
+     ****************************/
     @Override
     public String toString() {
         return "#" + sym;

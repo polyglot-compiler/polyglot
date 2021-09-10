@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -57,7 +57,9 @@ public class AutoBoxer extends AscriptionVisitor {
     public Expr ascribe(Expr e, Type toType) throws SemanticException {
         Type fromType = e.type();
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-        if (toType.isPrimitive() && !toType.isVoid() && !fromType.isPrimitive()
+        if (toType.isPrimitive()
+                && !toType.isVoid()
+                && !fromType.isPrimitive()
                 && !fromType.isSubtype(ts.toRawType(ts.Enum()))) {
             // going from a wrapper object to a primitive type
             // translate e to e.XXXvalue() where XXX is int, long, double, etc.
@@ -66,25 +68,24 @@ public class AutoBoxer extends AscriptionVisitor {
                 // Optional support for widening conversion after unboxing for compatibility
                 // with "javac -source 1.5"
                 if (ts.isPrimitiveWrapper(fromType)) {
-                    return fromWrapToPrim(fromType,
-                                          ts.primitiveTypeOfWrapper(fromType),
-                                          e);
+                    return fromWrapToPrim(fromType, ts.primitiveTypeOfWrapper(fromType), e);
                 }
             }
             return fromWrapToPrim(fromType, toType.toPrimitive(), e);
-        }
-        else if (!toType.isPrimitive() && fromType.isPrimitive()
-                && !fromType.isVoid() && !ts.String().equals(toType)) {
+        } else if (!toType.isPrimitive()
+                && fromType.isPrimitive()
+                && !fromType.isVoid()
+                && !ts.String().equals(toType)) {
             // going from a primitive value to a wrapper type.
-            // translate e to XXX.valueOf(e), where XXX is the java.lang.Integer, java.lang.Double, etc.
+            // translate e to XXX.valueOf(e), where XXX is the java.lang.Integer, java.lang.Double,
+            // etc.
 
             if (((JL5Options) ts.extensionInfo().getOptions()).morePermissiveCasts) {
                 // Optional support for allowing a boxing conversion when using a literal
                 // in an initializer for compatibility with with "javac -source 1.5"
                 if (ts.isPrimitiveWrapper(toType)) {
-                    return fromPrimToWrapWithWidening(fromType.toPrimitive(),
-                                                      (ReferenceType) toType,
-                                                      e);
+                    return fromPrimToWrapWithWidening(
+                            fromType.toPrimitive(), (ReferenceType) toType, e);
                 }
             }
             return fromPrimToWrap(fromType.toPrimitive(), toType, e);
@@ -93,8 +94,8 @@ public class AutoBoxer extends AscriptionVisitor {
         return super.ascribe(e, toType);
     }
 
-    private Expr fromPrimToWrapWithWidening(PrimitiveType fromType,
-            ReferenceType toType, Expr e) throws SemanticException {
+    private Expr fromPrimToWrapWithWidening(PrimitiveType fromType, ReferenceType toType, Expr e)
+            throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
 
         PrimitiveType toTypePrim = ts.primitiveTypeOfWrapper(toType);
@@ -108,11 +109,13 @@ public class AutoBoxer extends AscriptionVisitor {
         Call call = nf.Call(e.position(), tn, id, cast);
         call = (Call) call.type(toType);
         call =
-                call.methodInstance(ts.findMethod(toType,
-                                                  methodName,
-                                                  CollectionUtil.list((Type) toTypePrim),
-                                                  this.context().currentClass(),
-                                                  true));
+                call.methodInstance(
+                        ts.findMethod(
+                                toType,
+                                methodName,
+                                CollectionUtil.list((Type) toTypePrim),
+                                this.context().currentClass(),
+                                true));
         return call;
     }
 
@@ -126,11 +129,13 @@ public class AutoBoxer extends AscriptionVisitor {
         Call call = nf.Call(e.position(), tn, id, e);
         call = (Call) call.type(wrapperType);
         call =
-                call.methodInstance(ts.findMethod(wrapperType,
-                                                  methodName,
-                                                  CollectionUtil.list((Type) fromType),
-                                                  this.context().currentClass(),
-                                                  true));
+                call.methodInstance(
+                        ts.findMethod(
+                                wrapperType,
+                                methodName,
+                                CollectionUtil.list((Type) fromType),
+                                this.context().currentClass(),
+                                true));
         return call;
     }
 
@@ -140,8 +145,7 @@ public class AutoBoxer extends AscriptionVisitor {
         ClassType wrapperType;
         if (ts.primitiveTypeOfWrapper(fromType) != null) {
             wrapperType = fromType.toClass();
-        }
-        else {
+        } else {
             wrapperType = ts.wrapperClassOfPrimitive(toType.toPrimitive());
         }
 
@@ -150,12 +154,13 @@ public class AutoBoxer extends AscriptionVisitor {
         Call call = nf.Call(e.position(), e, id);
         call = (Call) call.type(toType);
         call =
-                call.methodInstance(ts.findMethod(wrapperType,
-                                                  methodName,
-                                                  Collections.<Type> emptyList(),
-                                                  this.context().currentClass(),
-                                                  true));
+                call.methodInstance(
+                        ts.findMethod(
+                                wrapperType,
+                                methodName,
+                                Collections.<Type>emptyList(),
+                                this.context().currentClass(),
+                                true));
         return call;
     }
-
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -64,22 +64,22 @@ public class JL5UnaryExt extends JL5ExprExt {
         if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {
 
             if (!expr.type().isNumeric()) {
-                if (!(ts.isPrimitiveWrapper(expr.type()) && (ts.primitiveTypeOfWrapper(expr.type()).isNumeric()))) {
-                    throw new SemanticException("Operand of " + op
-                            + " operator must be numeric.", expr.position());
+                if (!(ts.isPrimitiveWrapper(expr.type())
+                        && (ts.primitiveTypeOfWrapper(expr.type()).isNumeric()))) {
+                    throw new SemanticException(
+                            "Operand of " + op + " operator must be numeric.", expr.position());
                 }
             }
 
             if (!(expr instanceof Variable)) {
-                throw new SemanticException("Operand of " + op
-                        + " operator must be a variable.", expr.position());
+                throw new SemanticException(
+                        "Operand of " + op + " operator must be a variable.", expr.position());
             }
 
             if (((Variable) expr).flags().isFinal()) {
-                throw new SemanticException("Operand of "
-                                                    + op
-                                                    + " operator must be a non-final variable.",
-                                            expr.position());
+                throw new SemanticException(
+                        "Operand of " + op + " operator must be a non-final variable.",
+                        expr.position());
             }
 
             return u.type(expr.type());
@@ -87,39 +87,39 @@ public class JL5UnaryExt extends JL5ExprExt {
 
         if (op == BIT_NOT) {
             if (!ts.isImplicitCastValid(expr.type(), ts.Long())) {
-                throw new SemanticException("Operand of " + op
-                        + " operator must be numeric.", expr.position());
+                throw new SemanticException(
+                        "Operand of " + op + " operator must be numeric.", expr.position());
             }
 
             if (ts.isPrimitiveWrapper(expr.type())) {
                 return u.type(ts.promote(ts.primitiveTypeOfWrapper(expr.type())));
-            }
-            else {
+            } else {
                 return u.type(ts.promote(expr.type()));
             }
         }
 
         if (op == NEG || op == POS) {
             if (!expr.type().isNumeric()) {
-                if (!(ts.isPrimitiveWrapper(expr.type()) && (ts.primitiveTypeOfWrapper(expr.type()).isNumeric()))) {
-                    throw new SemanticException("Operand of " + op
-                            + " operator must be numeric.", expr.position());
+                if (!(ts.isPrimitiveWrapper(expr.type())
+                        && (ts.primitiveTypeOfWrapper(expr.type()).isNumeric()))) {
+                    throw new SemanticException(
+                            "Operand of " + op + " operator must be numeric.", expr.position());
                 }
             }
 
             if (ts.isPrimitiveWrapper(expr.type())) {
                 return u.type(ts.promote(ts.primitiveTypeOfWrapper(expr.type())));
-            }
-            else {
+            } else {
                 return u.type(ts.promote(expr.type()));
             }
         }
 
         if (op == NOT) {
             if (!expr.type().isBoolean()) {
-                if (!(ts.isPrimitiveWrapper(expr.type()) && (ts.primitiveTypeOfWrapper(expr.type()).isBoolean()))) {
-                    throw new SemanticException("Operand of " + op
-                            + " operator must be boolean.", expr.position());
+                if (!(ts.isPrimitiveWrapper(expr.type())
+                        && (ts.primitiveTypeOfWrapper(expr.type()).isBoolean()))) {
+                    throw new SemanticException(
+                            "Operand of " + op + " operator must be boolean.", expr.position());
                 }
             }
 
@@ -142,40 +142,31 @@ public class JL5UnaryExt extends JL5ExprExt {
                 Type childType = child.type();
                 if (ts.isPrimitiveWrapper(childType))
                     childType = ts.primitiveTypeOfWrapper(childType);
-                if (op == POST_INC || op == POST_DEC || op == PRE_INC
-                        || op == PRE_DEC) {
+                if (op == POST_INC || op == POST_DEC || op == PRE_INC || op == PRE_DEC) {
                     if (ts.isImplicitCastValid(childType, av.toType())) {
                         return ts.promote(childType);
-                    }
-                    else {
+                    } else {
                         return av.toType();
                     }
-                }
-                else if (op == NEG || op == POS) {
+                } else if (op == NEG || op == POS) {
                     if (ts.isImplicitCastValid(childType, av.toType())) {
                         return ts.promote(childType);
-                    }
-                    else {
+                    } else {
                         return av.toType();
                     }
-                }
-                else if (op == BIT_NOT) {
+                } else if (op == BIT_NOT) {
                     if (ts.isImplicitCastValid(childType, av.toType())) {
                         return ts.promote(childType);
-                    }
-                    else {
+                    } else {
                         return av.toType();
                     }
-                }
-                else if (op == NOT) {
+                } else if (op == NOT) {
                     return ts.Boolean();
                 }
             }
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
         }
 
         return child.type();
     }
-
 }

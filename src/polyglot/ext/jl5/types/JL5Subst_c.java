@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -41,16 +41,16 @@ import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.SerialVersionUID;
 
-public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
-        JL5Subst {
+public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements JL5Subst {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public JL5Subst_c(ParamTypeSystem<TypeVariable, ReferenceType> ts,
+    public JL5Subst_c(
+            ParamTypeSystem<TypeVariable, ReferenceType> ts,
             Map<TypeVariable, ? extends ReferenceType> subst) {
         super(ts, subst);
-//        if (subst.isEmpty()) {
-//            Thread.dumpStack();
-//        }
+        //        if (subst.isEmpty()) {
+        //            Thread.dumpStack();
+        //        }
     }
 
     @Override
@@ -68,8 +68,8 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
         return super.substType(t);
     }
 
-    // when substituting type variables that aren't in the subst map, 
-    // keep track of which ones we have seen already, so that we don't go into 
+    // when substituting type variables that aren't in the subst map,
+    // keep track of which ones we have seen already, so that we don't go into
     // an infinite loop as we subst on their upper bounds.
     private LinkedList<TypeVariable> visitedTypeVars = new LinkedList<>();
 
@@ -133,9 +133,9 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
         if (t instanceof JL5ParsedClassType) {
             JL5ParsedClassType pct = (JL5ParsedClassType) t;
             JL5TypeSystem ts = (JL5TypeSystem) this.ts;
-            List<TypeVariable> typeVars =
-                    ts.classAndEnclosingTypeVariables(pct);
-            // are the type variables of pct actually relevant to this subst? If not, then return the pct.
+            List<TypeVariable> typeVars = ts.classAndEnclosingTypeVariables(pct);
+            // are the type variables of pct actually relevant to this subst? If not, then return
+            // the pct.
             boolean typeVarsRelevant = false;
             for (TypeVariable tv : typeVars) {
                 if (this.substitutions().containsKey(tv)) {
@@ -151,8 +151,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
             return new JL5SubstClassType_c(ts, t.position(), pct, this);
         }
 
-        throw new InternalCompilerError("Don't know how to handle class type "
-                + t.getClass());
+        throw new InternalCompilerError("Don't know how to handle class type " + t.getClass());
     }
 
     @Override
@@ -165,7 +164,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
             mj.setTypeParams(l);
         }
         // subst the type params
-        mj.setTypeParams(this.<TypeVariable> substTypeList(mj.typeParams()));
+        mj.setTypeParams(this.<TypeVariable>substTypeList(mj.typeParams()));
 
         @SuppressWarnings("unchecked")
         T result = (T) mj;
@@ -174,8 +173,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
 
     @Override
     public <T extends ConstructorInstance> T substConstructor(T ci) {
-        JL5ConstructorInstance cj =
-                (JL5ConstructorInstance) super.substConstructor(ci);
+        JL5ConstructorInstance cj = (JL5ConstructorInstance) super.substConstructor(ci);
         if (cj.typeParams() != null && !cj.typeParams().isEmpty()) {
             // remove any type params we have replaced.
             List<TypeVariable> l = new ArrayList<>(cj.typeParams());
@@ -184,7 +182,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
         }
 
         // subst the type params
-        cj.setTypeParams(this.<TypeVariable> substTypeList(cj.typeParams()));
+        cj.setTypeParams(this.<TypeVariable>substTypeList(cj.typeParams()));
 
         @SuppressWarnings("unchecked")
         T result = (T) cj;
@@ -201,8 +199,7 @@ public class JL5Subst_c extends Subst_c<TypeVariable, ReferenceType> implements
     public JL5ProcedureInstance substProcedure(JL5ProcedureInstance mi) {
         if (mi instanceof MethodInstance) {
             return (JL5ProcedureInstance) substMethod((MethodInstance) mi);
-        }
-        else {
+        } else {
             return (JL5ProcedureInstance) substConstructor((ConstructorInstance) mi);
         }
     }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -57,8 +57,7 @@ public class JL5ImportExt extends JL5Ext {
 
         if (im.kind() == JL5Import.SINGLE_STATIC_MEMBER) {
             it.addSingleStaticImport(im.name(), im.position());
-        }
-        else if (im.kind() == JL5Import.STATIC_ON_DEMAND) {
+        } else if (im.kind() == JL5Import.STATIC_ON_DEMAND) {
             it.addStaticOnDemandImport(im.name(), im.position());
         }
         return superLang().buildTypes(im, tb);
@@ -69,26 +68,21 @@ public class JL5ImportExt extends JL5Ext {
         Import n = (Import) this.node();
         // check class is exists and is accessible
         if (n.kind() == JL5Import.SINGLE_STATIC_MEMBER) {
-            Type nt =
-                    (Type) tc.typeSystem()
-                             .forName(StringUtil.getPackageComponent(n.name()));
+            Type nt = (Type) tc.typeSystem().forName(StringUtil.getPackageComponent(n.name()));
             String id = StringUtil.getShortNameComponent(n.name());
-            if (!isIdStaticMember(nt.toClass(),
-                                  id,
-                                  (JL5TypeSystem) tc.typeSystem(),
-                                  tc.context().package_())) {
-                throw new SemanticException("Cannot find static member " + id
-                        + " in class: " + nt, n.position());
+            if (!isIdStaticMember(
+                    nt.toClass(), id, (JL5TypeSystem) tc.typeSystem(), tc.context().package_())) {
+                throw new SemanticException(
+                        "Cannot find static member " + id + " in class: " + nt, n.position());
             }
             return n;
-        }
-        else {
+        } else {
             return superLang().typeCheck(this.node(), tc);
         }
     }
 
-    private static boolean isIdStaticMember(ClassType t, String id,
-            JL5TypeSystem ts, Package package_) {
+    private static boolean isIdStaticMember(
+            ClassType t, String id, JL5TypeSystem ts, Package package_) {
         if (!ts.classAccessibleFromPackage(t.toClass(), package_)) {
             return false;
         }
@@ -97,13 +91,10 @@ public class JL5ImportExt extends JL5Ext {
             FieldInstance fi = ts.findField(t, id, t.toClass(), true);
             if (fi != null
                     && fi.flags().isStatic()
-                    && ts.accessibleFromPackage(fi.flags(),
-                                                t.package_(),
-                                                package_)) {
+                    && ts.accessibleFromPackage(fi.flags(), t.package_(), package_)) {
                 return true;
             }
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
         }
 
         if (ts.hasMethodNamed(t, id)) {
@@ -111,9 +102,7 @@ public class JL5ImportExt extends JL5Ext {
             boolean anyAccessible = false;
             for (MethodInstance mi : meths) {
                 if (mi.flags().isStatic()
-                        && ts.accessibleFromPackage(mi.flags(),
-                                                    t.package_(),
-                                                    package_)) {
+                        && ts.accessibleFromPackage(mi.flags(), t.package_(), package_)) {
                     anyAccessible = true;
                     break;
                 }
@@ -125,13 +114,10 @@ public class JL5ImportExt extends JL5Ext {
             ClassType ct = ts.findMemberClass(t, id);
             if (ct != null
                     && ct.flags().isStatic()
-                    && ts.accessibleFromPackage(ct.flags(),
-                                                t.package_(),
-                                                package_)) {
+                    && ts.accessibleFromPackage(ct.flags(), t.package_(), package_)) {
                 return true;
             }
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
         }
 
         return false;
@@ -150,8 +136,6 @@ public class JL5ImportExt extends JL5Ext {
 
             w.write(";");
             w.newline(0);
-        }
-        else superLang().prettyPrint(this.node(), w, tr);
-
+        } else superLang().prettyPrint(this.node(), w, tr);
     }
 }

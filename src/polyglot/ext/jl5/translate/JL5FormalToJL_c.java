@@ -15,8 +15,7 @@ public class JL5FormalToJL_c extends FormalToExt_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override
-    public NodeVisitor toExtEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor toExtEnter(ExtensionRewriter rw) throws SemanticException {
         // Skip annotations
         JL5FormalExt fext = (JL5FormalExt) JL5Ext.ext(node());
         return rw.bypass(fext.annotationElems());

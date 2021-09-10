@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -70,7 +70,7 @@ public class Main {
     /** Source files specified on the command line */
     private Set<String> source;
 
-    public final static String verbose = "verbose";
+    public static final String verbose = "verbose";
     private static final JavaCompiler javaCompiler = javaCompiler();
 
     private List<Job> jobs;
@@ -82,17 +82,17 @@ public class Main {
     public static JavaCompiler javaCompiler() {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (compiler == null)
-            throw new InternalCompilerError("Java compiler not found.  "
-                    + "Does java that runs Polyglot have javac along with it?");
+            throw new InternalCompilerError(
+                    "Java compiler not found.  "
+                            + "Does java that runs Polyglot have javac along with it?");
         return compiler;
     }
 
     /* modifies args */
-    protected ExtensionInfo getExtensionInfo(List<String> args)
-            throws TerminationException {
+    protected ExtensionInfo getExtensionInfo(List<String> args) throws TerminationException {
         ExtensionInfo ext = null;
 
-        for (Iterator<String> i = args.iterator(); i.hasNext();) {
+        for (Iterator<String> i = args.iterator(); i.hasNext(); ) {
             String s = i.next();
             if (s.equals("-ext") || s.equals("-extension")) {
                 if (ext != null) {
@@ -105,11 +105,8 @@ public class Main {
                 }
                 String extName = i.next();
                 i.remove();
-                ext =
-                        loadExtension("polyglot.ext." + extName
-                                + ".ExtensionInfo");
-            }
-            else if (s.equals("-extclass")) {
+                ext = loadExtension("polyglot.ext." + extName + ".ExtensionInfo");
+            } else if (s.equals("-extclass")) {
                 if (ext != null) {
                     throw new TerminationException("only one extension can be specified");
                 }
@@ -133,8 +130,7 @@ public class Main {
         start(argv, null, null);
     }
 
-    public void start(String[] argv, ExtensionInfo ext)
-            throws TerminationException {
+    public void start(String[] argv, ExtensionInfo ext) throws TerminationException {
         start(argv, ext, null);
     }
 
@@ -142,8 +138,7 @@ public class Main {
         start(argv, null, eq);
     }
 
-    public void start(String[] argv, ExtensionInfo ext, ErrorQueue eq)
-            throws TerminationException {
+    public void start(String[] argv, ExtensionInfo ext, ErrorQueue eq) throws TerminationException {
         source = new LinkedHashSet<>();
         List<String> args = explodeOptions(argv);
         if (ext == null) {
@@ -158,8 +153,7 @@ public class Main {
         try {
             argv = args.toArray(new String[0]);
             options.parseCommandLine(argv, source);
-        }
-        catch (UsageError ue) {
+        } catch (UsageError ue) {
             PrintStream out = (ue.exitCode == 0 ? System.out : System.err);
             if (ue.getMessage() != null && ue.getMessage().length() > 0) {
                 out.println(ext.compilerName() + ": " + ue.getMessage());
@@ -169,10 +163,7 @@ public class Main {
         }
 
         if (eq == null) {
-            eq =
-                    new StdErrorQueue(System.err,
-                                      options.error_count,
-                                      ext.compilerName());
+            eq = new StdErrorQueue(System.err, options.error_count, ext.compilerName());
         }
 
         Compiler compiler = new Compiler(ext, eq);
@@ -199,9 +190,10 @@ public class Main {
         }
 
         if (Report.should_report(verbose, 1)) {
-            reportTime("Finished compiling Java output files. time="
-                               + (System.currentTimeMillis() - start_time),
-                       1);
+            reportTime(
+                    "Finished compiling Java output files. time="
+                            + (System.currentTimeMillis() - start_time),
+                    1);
 
             reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
         }
@@ -213,47 +205,39 @@ public class Main {
     protected List<String> getSystemJavacArgs(Options options) {
         List<String> postCompilerArgs;
         if (options.post_compiler_opts != null) {
-            QuotedStringTokenizer st =
-                    new QuotedStringTokenizer(options.post_compiler_opts);
+            QuotedStringTokenizer st = new QuotedStringTokenizer(options.post_compiler_opts);
             int pc_size = st.countTokens();
             postCompilerArgs = new ArrayList<>(pc_size + 1);
-            while (st.hasMoreTokens())
-                postCompilerArgs.add(st.nextToken());
-        }
-        else postCompilerArgs = new ArrayList<>(1);
+            while (st.hasMoreTokens()) postCompilerArgs.add(st.nextToken());
+        } else postCompilerArgs = new ArrayList<>(1);
         if (options.generate_debugging_info) postCompilerArgs.add("-g");
         return postCompilerArgs;
     }
 
-    protected boolean invokePostCompiler(Options options, Compiler compiler,
-            ErrorQueue eq) {
+    protected boolean invokePostCompiler(Options options, Compiler compiler, ErrorQueue eq) {
         if (!options.output_source_only && !options.output_stdout) {
             try {
                 if (options.post_compiler == null) {
                     List<String> postCompilerArgs = getSystemJavacArgs(options);
                     ByteArrayOutputStream err = new ByteArrayOutputStream();
                     Writer javac_err = new OutputStreamWriter(err);
-                    compiler.sourceExtension()
-                            .configureFileManagerForPostCompiler();
-                    FileManager fileManager =
-                            compiler.sourceExtension().extFileManager();
+                    compiler.sourceExtension().configureFileManagerForPostCompiler();
+                    FileManager fileManager = compiler.sourceExtension().extFileManager();
                     CompilationTask task =
-                            javaCompiler.getTask(javac_err,
-                                                 fileManager,
-                                                 null,
-                                                 postCompilerArgs,
-                                                 null,
-                                                 compiler.outputFiles());
+                            javaCompiler.getTask(
+                                    javac_err,
+                                    fileManager,
+                                    null,
+                                    postCompilerArgs,
+                                    null,
+                                    compiler.outputFiles());
 
                     task.call();
                     String error = err.toString();
-                    if (!error.isEmpty())
-                        eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, error);
-                }
-                else {
+                    if (!error.isEmpty()) eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, error);
+                } else {
                     int options_size = 3;
-                    if (options.classOutputLocation() != null)
-                        options_size += 2;
+                    if (options.classOutputLocation() != null) options_size += 2;
                     if (options.generate_debugging_info) options_size++;
 
                     String[] javacCmd;
@@ -262,75 +246,66 @@ public class Main {
                         QuotedStringTokenizer st =
                                 new QuotedStringTokenizer(options.post_compiler_opts);
                         javacCmd =
-                                new String[st.countTokens() + options_size
-                                        + compiler.outputFiles().size()];
+                                new String
+                                        [st.countTokens()
+                                                + options_size
+                                                + compiler.outputFiles().size()];
                         javacCmd[j++] = options.post_compiler;
-                        while (st.hasMoreTokens())
-                            javacCmd[j++] = st.nextToken();
-                    }
-                    else {
-                        javacCmd =
-                                new String[options_size
-                                        + compiler.outputFiles().size()];
+                        while (st.hasMoreTokens()) javacCmd[j++] = st.nextToken();
+                    } else {
+                        javacCmd = new String[options_size + compiler.outputFiles().size()];
                         javacCmd[j++] = options.post_compiler;
                     }
                     javacCmd[j++] = "-classpath";
                     javacCmd[j++] = options.constructPostCompilerClasspath();
                     if (options.classOutputLocation() != null) {
                         javacCmd[j++] = "-d";
-                        javacCmd[j++] =
-                                options.classOutputDirectory().getPath();
+                        javacCmd[j++] = options.classOutputDirectory().getPath();
                     }
                     if (options.generate_debugging_info) javacCmd[j++] = "-g";
 
                     for (JavaFileObject jfo : compiler.outputFiles()) {
                         URI jfoURI = jfo.toUri();
-                        // XXX: the JavaCompiler API spec says toURI() must be absolute, 
+                        // XXX: the JavaCompiler API spec says toURI() must be absolute,
                         //      but OSX does not put a scheme component on files.
                         File outfile;
-                        if (!jfoURI.isAbsolute())
-                            outfile = new File(jfoURI.getPath());
+                        if (!jfoURI.isAbsolute()) outfile = new File(jfoURI.getPath());
                         else outfile = new File(jfoURI);
                         javacCmd[j++] = outfile.getAbsolutePath();
                     }
                     if (Report.should_report(verbose, 1)) {
                         StringBuffer cmdStr = new StringBuffer();
-                        for (String element : javacCmd)
-                            cmdStr.append(element + " ");
+                        for (String element : javacCmd) cmdStr.append(element + " ");
                         Report.report(1, "Executing post-compiler " + cmdStr);
                     }
 
                     Runtime runtime = Runtime.getRuntime();
                     Process proc = runtime.exec(javacCmd);
 
-                    try (InputStreamReader err =
-                            new InputStreamReader(proc.getErrorStream())) {
+                    try (InputStreamReader err = new InputStreamReader(proc.getErrorStream())) {
                         char[] c = new char[72];
                         int len;
                         StringBuffer sb = new StringBuffer();
-                        while ((len = err.read(c)) > 0)
-                            sb.append(String.valueOf(c, 0, len));
+                        while ((len = err.read(c)) > 0) sb.append(String.valueOf(c, 0, len));
 
                         if (sb.length() != 0)
-                            eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
-                                       sb.toString());
+                            eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, sb.toString());
                     }
 
                     proc.waitFor();
 
                     if (!options.keep_output_files) {
-                        for (FileObject fo : compiler.outputFiles())
-                            fo.delete();
+                        for (FileObject fo : compiler.outputFiles()) fo.delete();
                     }
 
                     if (proc.exitValue() > 0) {
-                        eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
-                                   "Non-zero return code: " + proc.exitValue());
+                        eq.enqueue(
+                                ErrorInfo.POST_COMPILER_ERROR,
+                                "Non-zero return code: " + proc.exitValue());
                         return false;
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, e.getMessage());
                 return false;
             }
@@ -338,8 +313,7 @@ public class Main {
         return true;
     }
 
-    private static List<String> explodeOptions(String[] args)
-            throws TerminationException {
+    private static List<String> explodeOptions(String[] args) throws TerminationException {
         LinkedList<String> ll = new LinkedList<>();
 
         for (String arg : args) {
@@ -354,15 +328,12 @@ public class Main {
                         if (l == null) break;
 
                         StringTokenizer st = new StringTokenizer(l, " ");
-                        while (st.hasMoreTokens())
-                            newArgs.add(st.nextToken());
+                        while (st.hasMoreTokens()) newArgs.add(st.nextToken());
                     }
 
                     ll.addAll(newArgs);
-                }
-                catch (java.io.IOException e) {
-                    throw new TerminationException("cmdline parser: couldn't read args file "
-                            + fn);
+                } catch (java.io.IOException e) {
+                    throw new TerminationException("cmdline parser: couldn't read args file " + fn);
                 }
                 continue;
             }
@@ -376,8 +347,7 @@ public class Main {
     public static void main(String args[]) {
         try {
             new Main().start(args);
-        }
-        catch (TerminationException te) {
+        } catch (TerminationException te) {
             if (te.getMessage() != null)
                 (te.exitCode == 0 ? System.out : System.err).println(te.getMessage());
             System.exit(te.exitCode);
@@ -390,35 +360,38 @@ public class Main {
 
             try {
                 extClass = Class.forName(ext);
-            }
-            catch (ClassNotFoundException e) {
-                throw new TerminationException("Extension " + ext
-                        + " not found: could not find class " + ext + ".");
+            } catch (ClassNotFoundException e) {
+                throw new TerminationException(
+                        "Extension " + ext + " not found: could not find class " + ext + ".");
             }
 
             Object extobj;
             try {
                 extobj = extClass.newInstance();
-            }
-            catch (Exception e) {
-                throw new InternalCompilerError("Extension " + ext
-                        + " could not be loaded: could not instantiate " + ext
-                        + ".", e);
+            } catch (Exception e) {
+                throw new InternalCompilerError(
+                        "Extension "
+                                + ext
+                                + " could not be loaded: could not instantiate "
+                                + ext
+                                + ".",
+                        e);
             }
             try {
                 return (ExtensionInfo) extobj;
-            }
-            catch (ClassCastException e) {
-                throw new TerminationException(ext
-                        + " is not a valid Polyglot extension:"
-                        + " extension class " + ext
-                        + " exists but is not a subclass of ExtensionInfo.");
+            } catch (ClassCastException e) {
+                throw new TerminationException(
+                        ext
+                                + " is not a valid Polyglot extension:"
+                                + " extension class "
+                                + ext
+                                + " exists but is not a subclass of ExtensionInfo.");
             }
         }
         return null;
     }
 
-    static private void reportTime(String msg, int level) {
+    private static void reportTime(String msg, int level) {
         Report.report(level, msg);
     }
 
@@ -429,10 +402,9 @@ public class Main {
      * framework.
      */
     public static class TerminationException extends RuntimeException {
-        private static final long serialVersionUID =
-                SerialVersionUID.generate();
+        private static final long serialVersionUID = SerialVersionUID.generate();
 
-        final public int exitCode;
+        public final int exitCode;
 
         public TerminationException(String msg) {
             this(msg, 1);

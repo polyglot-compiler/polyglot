@@ -6,6 +6,20 @@ on:
   pull_request:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '2'
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Checkout HEAD
+        run: git checkout HEAD
+      - name: Check Format
+        run: ./tools/format-check
   build:
     runs-on: ubuntu-latest
     steps:

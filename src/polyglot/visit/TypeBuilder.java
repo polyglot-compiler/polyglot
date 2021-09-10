@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -102,8 +102,7 @@ public class TypeBuilder extends NodeVisitor {
     public NodeVisitor enter(Node n) {
         try {
             return lang().buildTypesEnter(n, this);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             Position position = e.position();
 
             if (position == null) {
@@ -111,9 +110,7 @@ public class TypeBuilder extends NodeVisitor {
             }
 
             if (e.getMessage() != null) {
-                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                     e.getMessage(),
-                                     position);
+                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
             }
 
             return this;
@@ -124,8 +121,7 @@ public class TypeBuilder extends NodeVisitor {
     public Node leave(Node old, Node n, NodeVisitor v) {
         try {
             return lang().buildTypes(n, (TypeBuilder) v);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             Position position = e.position();
 
             if (position == null) {
@@ -133,9 +129,7 @@ public class TypeBuilder extends NodeVisitor {
             }
 
             if (e.getMessage() != null) {
-                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                     e.getMessage(),
-                                     position);
+                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
             }
 
             return n;
@@ -158,13 +152,13 @@ public class TypeBuilder extends NodeVisitor {
                     inCode = true;
                     tb = tb.pushCode();
                 }
-            }
-            else {
+            } else {
                 if (ctx.importTable() != null && tb.importTable() == null) {
                     // entering class file
                     tb.setImportTable(ctx.importTable());
                 }
-                if (ctx.importTable() != null && ctx.package_() != null
+                if (ctx.importTable() != null
+                        && ctx.package_() != null
                         && tb.currentPackage() == null) {
                     // entering package context in source
                     tb = tb.pushPackage(ctx.package_());
@@ -198,10 +192,9 @@ public class TypeBuilder extends NodeVisitor {
     }
 
     /**
-     * @throws SemanticException  
+     * @throws SemanticException
      */
-    protected TypeBuilder pushClass(ParsedClassType type)
-            throws SemanticException {
+    protected TypeBuilder pushClass(ParsedClassType type) throws SemanticException {
         if (Report.should_report(Report.visit, 4))
             Report.report(4, "TB pushing class " + type + ": " + context());
 
@@ -227,7 +220,7 @@ public class TypeBuilder extends NodeVisitor {
         ct.flags(flags);
         ct.name(name);
         ct.setJob(job());
-//        ct.superType(ts.unknownType(pos));
+        //        ct.superType(ts.unknownType(pos));
 
         if (inCode) {
             ct.kind(ClassType.LOCAL);
@@ -238,8 +231,7 @@ public class TypeBuilder extends NodeVisitor {
             }
 
             return ct;
-        }
-        else if (currentClass() != null) {
+        } else if (currentClass() != null) {
             ct.kind(ClassType.MEMBER);
             ct.outer(currentClass());
 
@@ -253,13 +245,10 @@ public class TypeBuilder extends NodeVisitor {
             // classes or top level classes, then add this class to the
             // parsed resolver.
             ClassType container = ct.outer();
-            boolean allMembers =
-                    (container.isMember() || container.isTopLevel());
+            boolean allMembers = (container.isMember() || container.isTopLevel());
             while (container.isMember()) {
                 container = container.outer();
-                allMembers =
-                        allMembers
-                                && (container.isMember() || container.isTopLevel());
+                allMembers = allMembers && (container.isMember() || container.isTopLevel());
             }
 
             if (allMembers) {
@@ -271,8 +260,7 @@ public class TypeBuilder extends NodeVisitor {
             }
 
             return ct;
-        }
-        else {
+        } else {
             ct.kind(ClassType.TOP_LEVEL);
 
             if (currentPackage() != null) {
@@ -282,15 +270,13 @@ public class TypeBuilder extends NodeVisitor {
             Named dup = typeSystem().systemResolver().check(ct.fullName());
 
             if (dup != null && dup.fullName().equals(ct.fullName())) {
-                throw new SemanticException("Duplicate class \""
-                        + ct.fullName() + "\".", pos);
+                throw new SemanticException("Duplicate class \"" + ct.fullName() + "\".", pos);
             }
 
             typeSystem().systemResolver().addNamed(ct.fullName(), ct);
 
             return ct;
         }
-
     }
 
     public TypeBuilder pushAnonClass(Position pos) throws SemanticException {
@@ -313,7 +299,7 @@ public class TypeBuilder extends NodeVisitor {
             ct.package_(currentPackage());
         }
 
-//        ct.superType(ts.unknownType(pos));
+        //        ct.superType(ts.unknownType(pos));
 
         TypeBuilder tb = push();
         tb.anon = tb.pushClass(ct);
@@ -325,8 +311,7 @@ public class TypeBuilder extends NodeVisitor {
         return this;
     }
 
-    public TypeBuilder pushClass(Position pos, Flags flags, String name)
-            throws SemanticException {
+    public TypeBuilder pushClass(Position pos, Flags flags, String name) throws SemanticException {
 
         ParsedClassType t = newClass(pos, flags, name);
         return pushClass(t);
@@ -353,7 +338,9 @@ public class TypeBuilder extends NodeVisitor {
     }
 
     public String context() {
-        return "(TB " + type + (inCode ? " inCode" : "")
+        return "(TB "
+                + type
+                + (inCode ? " inCode" : "")
                 + (global ? " global" : "")
                 + (outer == null ? ")" : " " + outer.context() + ")");
     }

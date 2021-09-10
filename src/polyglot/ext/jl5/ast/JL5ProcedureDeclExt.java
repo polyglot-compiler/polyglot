@@ -69,8 +69,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
 
     protected List<ParamTypeNode> typeParams;
 
-    public JL5ProcedureDeclExt(List<ParamTypeNode> typeParams,
-            List<AnnotationElem> annotations) {
+    public JL5ProcedureDeclExt(List<ParamTypeNode> typeParams, List<AnnotationElem> annotations) {
         super(annotations);
         this.typeParams = ListUtil.copy(typeParams, true);
     }
@@ -159,17 +158,16 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             flags = JL5Flags.setVarArgs(flags);
         }
 
-        return buildTypesFinish(ts,
-                                ct,
-                                flags,
-                                formalTypes,
-                                throwTypes,
-                                typeParams);
+        return buildTypesFinish(ts, ct, flags, formalTypes, throwTypes, typeParams);
     }
 
-    protected abstract Node buildTypesFinish(JL5TypeSystem ts,
-            ParsedClassType ct, Flags flags, List<? extends Type> formalTypes,
-            List<? extends Type> throwTypes, List<TypeVariable> typeParams);
+    protected abstract Node buildTypesFinish(
+            JL5TypeSystem ts,
+            ParsedClassType ct,
+            Flags flags,
+            List<? extends Type> formalTypes,
+            List<? extends Type> throwTypes,
+            List<TypeVariable> typeParams);
 
     @Override
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -183,7 +181,6 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             }
             TypeVariable tv = (TypeVariable) tn.type();
             typeParams.add(tv);
-
         }
         // now type nodes are disambiguated
         JL5ProcedureInstance pi = (JL5ProcedureInstance) n.procedureInstance();
@@ -199,8 +196,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         JL5ProcedureInstance pi = (JL5ProcedureInstance) pd.procedureInstance();
         // check no duplicate annotations used
         ts.checkDuplicateAnnotations(annotations);
-        for (TypeNode typeParam : typeParams)
-            ts.checkCycles(typeParam.type().toReference());
+        for (TypeNode typeParam : typeParams) ts.checkCycles(typeParam.type().toReference());
 
         // mark the formals as being procedure formals (since they are)
         for (Formal f : pd.formals()) {
@@ -214,10 +210,10 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             JL5FormalExt fext = (JL5FormalExt) JL5Ext.ext(f);
             if (fext.isVarArg()) {
                 if (i != pd.formals().size() - 1) {
-                    throw new SemanticException("Only last formal can be variable in method declaration.",
-                                                f.position());
-                }
-                else {
+                    throw new SemanticException(
+                            "Only last formal can be variable in method declaration.",
+                            f.position());
+                } else {
                     pi.setFlags(JL5Flags.setVarArgs(pi.flags()));
                     pd = pd.flags(JL5Flags.setVarArgs(pd.flags()));
                 }
@@ -246,8 +242,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         for (TypeNode tn : typeParams) {
             String name = tn.name();
             if (typeParamNames.contains(name))
-                throw new SemanticException("Duplicate type variable declaration.",
-                                            tn.position());
+                throw new SemanticException("Duplicate type variable declaration.", tn.position());
             typeParamNames.add(name);
         }
 
@@ -277,7 +272,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         }
         if (printTypeVars && !typeParams.isEmpty()) {
             w.write("<");
-            for (Iterator<ParamTypeNode> iter = typeParams.iterator(); iter.hasNext();) {
+            for (Iterator<ParamTypeNode> iter = typeParams.iterator(); iter.hasNext(); ) {
                 TypeNode ptn = iter.next();
                 tr.lang().prettyPrint(ptn, w, tr);
                 if (iter.hasNext()) {
@@ -294,7 +289,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
         w.write("(");
         w.begin(0);
 
-        for (Iterator<Formal> i = n.formals().iterator(); i.hasNext();) {
+        for (Iterator<Formal> i = n.formals().iterator(); i.hasNext(); ) {
             Formal f = i.next();
             tr.print(n, f, w);
 
@@ -311,7 +306,7 @@ public abstract class JL5ProcedureDeclExt extends JL5AnnotatedElementExt
             w.allowBreak(6);
             w.write("throws ");
 
-            for (Iterator<TypeNode> i = n.throwTypes().iterator(); i.hasNext();) {
+            for (Iterator<TypeNode> i = n.throwTypes().iterator(); i.hasNext(); ) {
                 TypeNode tn = i.next();
                 tr.print(n, tn, w);
 

@@ -35,7 +35,7 @@ public abstract class symbol {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Constructor with default type. 
+    /** Constructor with default type.
      * @param nm the name of the symbol.
      */
     public symbol(String nm) {
@@ -83,13 +83,13 @@ public abstract class symbol {
 
     /** Index of this symbol (terminal or non terminal) in the parse tables.
      *  Note: indexes are unique among terminals and unique among non terminals,
-     *  however, a terminal may have the same index as a non-terminal, etc. 
+     *  however, a terminal may have the same index as a non-terminal, etc.
      */
     protected int _index;
 
     /** Index of this symbol (terminal or non terminal) in the parse tables.
      *  Note: indexes are unique among terminals and unique among non terminals,
-     *  however, a terminal may have the same index as a non-terminal, etc. 
+     *  however, a terminal may have the same index as a non-terminal, etc.
      */
     public int index() {
         return _index;
@@ -98,7 +98,7 @@ public abstract class symbol {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Indicate if this is a non-terminal.  Here in the base class we
-     *  don't know, so this is abstract.  
+     *  don't know, so this is abstract.
      */
     public abstract boolean is_non_term();
 

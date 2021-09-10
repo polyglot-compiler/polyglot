@@ -54,8 +54,7 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
     }
 
     @Override
-    public Case resolveCaseLabel(TypeChecker tc, Type switchType)
-            throws SemanticException {
+    public Case resolveCaseLabel(TypeChecker tc, Type switchType) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         JL5NodeFactory nf = (JL5NodeFactory) tc.nodeFactory();
 
@@ -64,37 +63,29 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
 
         if (expr == null) {
             return c;
-        }
-        else if (switchType.isClass() && !isNumericSwitchType(switchType, ts)) {
+        } else if (switchType.isClass() && !isNumericSwitchType(switchType, ts)) {
             // must be an enum...
             if (expr.type().isCanonical()) {
                 // we have already resolved the expression
                 EnumConstant ec = (EnumConstant) expr;
                 return c.value(ec.enumInstance().ordinal());
-            }
-            else if (expr instanceof EnumConstant) {
+            } else if (expr instanceof EnumConstant) {
                 Field ec = (Field) expr;
                 EnumConstant ext = (EnumConstant) ec;
-                EnumInstance ei = ts.findEnumConstant(switchType.toReference(),
-                                                      ec.name());
+                EnumInstance ei = ts.findEnumConstant(switchType.toReference(), ec.name());
                 ec = (Field) ext.enumInstance(ei);
                 ec = (Field) ec.type(ei.type());
                 return c.expr(ec).value(ei.ordinal());
-            }
-            else if (expr instanceof AmbExpr) {
+            } else if (expr instanceof AmbExpr) {
                 AmbExpr amb = (AmbExpr) expr;
-                EnumInstance ei = ts.findEnumConstant(switchType.toReference(),
-                                                      amb.name());
-                Receiver r = nf.CanonicalTypeNode(Position.compilerGenerated(),
-                                                  switchType);
+                EnumInstance ei = ts.findEnumConstant(switchType.toReference(), amb.name());
+                Receiver r = nf.CanonicalTypeNode(Position.compilerGenerated(), switchType);
                 Field e = nf.EnumConstant(expr.position(), r, amb.id());
                 e = (Field) ((EnumConstant) e).enumInstance(ei);
                 e = (Field) e.type(ei.type());
                 return c.expr(e).value(ei.ordinal());
-            }
-            else {
-                throw new InternalCompilerError("Unexpected case label "
-                        + expr);
+            } else {
+                throw new InternalCompilerError("Unexpected case label " + expr);
             }
         }
 
@@ -103,19 +94,17 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
 
         if (expr.isTypeChecked()) {
             // all good, nothing to do.
-        }
-        else if (expr instanceof AmbExpr) {
+        } else if (expr instanceof AmbExpr) {
             AmbExpr amb = (AmbExpr) expr;
-            //Disambiguate and typecheck
-            Expr e = (Expr) tc.nodeFactory().disamb().disambiguate(amb,
-                                                                   tc,
-                                                                   expr.position(),
-                                                                   null,
-                                                                   amb.id());
+            // Disambiguate and typecheck
+            Expr e =
+                    (Expr)
+                            tc.nodeFactory()
+                                    .disamb()
+                                    .disambiguate(amb, tc, expr.position(), null, amb.id());
             e = (Expr) e.visit(tc.rethrowMissingDependencies(true));
             n = n.expr(e);
-        }
-        else {
+        } else {
             // try type checking it
             n = c.expr((Expr) c.expr().visit(tc.rethrowMissingDependencies(true)));
         }
@@ -126,16 +115,18 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
         }
         if (tc.lang().isConstant(n.expr(), tc.lang())) {
             Object o = tc.lang().constantValue(n.expr(), tc.lang());
-            if (o instanceof Number && !(o instanceof Long)
-                    && !(o instanceof Float) && !(o instanceof Double)) {
+            if (o instanceof Number
+                    && !(o instanceof Long)
+                    && !(o instanceof Float)
+                    && !(o instanceof Double)) {
                 return n.value(((Number) o).longValue());
-            }
-            else if (o instanceof Character) {
+            } else if (o instanceof Character) {
                 return n.value(((Character) o).charValue());
             }
         }
-        throw new SemanticException("Case label must be an integral constant or an unqualified enum value.",
-                                    node().position());
+        throw new SemanticException(
+                "Case label must be an integral constant or an unqualified enum value.",
+                node().position());
     }
 
     public boolean isNumericSwitchType(Type switchType, JL5TypeSystem ts) {
@@ -159,23 +150,20 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
     }
 
     @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         Case c = node();
         Expr expr = c.expr();
         // We can't disambiguate unqualified names until the switch expression
         // is typed.
         if (expr instanceof AmbExpr) {
             return c;
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
         Case c = node();
         Expr expr = c.expr();
         if (expr == null || expr instanceof Lit) {
@@ -191,7 +179,8 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
         Expr expr = c.expr();
         if (expr == null) return c; // default case
 
-        if (!cc.lang().constantValueSet(expr, cc.lang())) return c; // Not ready yet; pass will be rerun.
+        if (!cc.lang().constantValueSet(expr, cc.lang()))
+            return c; // Not ready yet; pass will be rerun.
 
         if (expr instanceof EnumConstant) return c;
 
@@ -204,18 +193,17 @@ public class JL5CaseExt extends JL5TermExt implements JL5CaseOps {
         Expr expr = c.expr();
         if (expr == null) {
             w.write("default:");
-        }
-        else {
+        } else {
             w.write("case ");
-            JL5TypeSystem ts = expr.type() == null
-                    ? null : (JL5TypeSystem) expr.type().typeSystem();
-            if (ts != null && expr.type().isReference()
+            JL5TypeSystem ts =
+                    expr.type() == null ? null : (JL5TypeSystem) expr.type().typeSystem();
+            if (ts != null
+                    && expr.type().isReference()
                     && expr.type().isSubtype(ts.toRawType(ts.Enum()))) {
                 // this is an enum
                 Field f = (Field) expr;
                 w.write(f.name());
-            }
-            else {
+            } else {
                 print(expr, w, tr);
             }
             w.write(":");

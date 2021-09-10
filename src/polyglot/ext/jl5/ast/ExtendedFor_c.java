@@ -42,7 +42,6 @@ import polyglot.ast.Term;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
-import polyglot.ext.jl5.types.RawClass;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -62,6 +61,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 
     /** Loop body */
     protected LocalDecl decl;
+
     protected Expr expr;
 
     public ExtendedFor_c(Position pos, LocalDecl decl, Expr expr, Stmt body) {
@@ -114,8 +114,7 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     }
 
     /** Reconstruct the statement. */
-    protected <N extends ExtendedFor_c> N reconstruct(N n, LocalDecl decl,
-            Expr expr) {
+    protected <N extends ExtendedFor_c> N reconstruct(N n, LocalDecl decl, Expr expr) {
         n = decl(n, decl);
         n = expr(n, expr);
         return n;
@@ -143,14 +142,15 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         Position position = n.position();
         // Check that the expr is an array or of type Iterable
         Type t = expr.type();
-//        System.err.println(" t is a " + t.getClass());
-//        System.err.println("    t is a " + ts.allAncestorsOf((ReferenceType) t));
-//        System.err.println("    erasure(t) is " + ts.erasureType(t));
-//        System.err.println("    iterable is a " + ts.Iterable().getClass());
+        //        System.err.println(" t is a " + t.getClass());
+        //        System.err.println("    t is a " + ts.allAncestorsOf((ReferenceType) t));
+        //        System.err.println("    erasure(t) is " + ts.erasureType(t));
+        //        System.err.println("    iterable is a " + ts.Iterable().getClass());
         if (!expr.type().isArray()
                 && !t.isSubtype(ts.rawClass((JL5ParsedClassType) ts.Iterable()))) {
-            throw new SemanticException("Can only iterate over an array or an instance of java.util.Iterable",
-                                        expr.position());
+            throw new SemanticException(
+                    "Can only iterate over an array or an instance of java.util.Iterable",
+                    expr.position());
         }
 
         // Check that type is the same as elements in expr
@@ -158,35 +158,32 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         Type elementType;
         if (expr.type().isArray()) {
             elementType = expr.type().toArray().base();
-        }
-        else {
+        } else {
             JL5SubstClassType iterableType =
-                    ts.findGenericSupertype((JL5ParsedClassType) ts.Iterable(),
-                                            t.toReference());
-            elementType = iterableType != null
-                    ? iterableType.actuals().get(0)
-                    : ts.Object(); // Raw Iterable.
+                    ts.findGenericSupertype((JL5ParsedClassType) ts.Iterable(), t.toReference());
+            elementType =
+                    iterableType != null
+                            ? iterableType.actuals().get(0)
+                            : ts.Object(); // Raw Iterable.
         }
         if (!elementType.isImplicitCastValid(declType)) {
-            throw new SemanticException("Incompatible types: required "
-                    + declType + " but found " + elementType, position);
+            throw new SemanticException(
+                    "Incompatible types: required " + declType + " but found " + elementType,
+                    position);
         }
 
-        if (expr instanceof Local
-                && decl.localInstance()
-                       .equals(((Local) expr).localInstance())) {
-            throw new SemanticException("Variable: " + expr
-                    + " may not have been initialized", expr.position());
+        if (expr instanceof Local && decl.localInstance().equals(((Local) expr).localInstance())) {
+            throw new SemanticException(
+                    "Variable: " + expr + " may not have been initialized", expr.position());
         }
         if (expr instanceof NewArray) {
             if (((NewArray) expr).init() != null) {
                 for (Expr next : ((NewArray) expr).init().elements()) {
                     if (next instanceof Local
-                            && decl.localInstance()
-                                   .equals(((Local) next).localInstance())) {
-                        throw new SemanticException("Variable: " + next
-                                + " may not have been initialized",
-                                                    next.position());
+                            && decl.localInstance().equals(((Local) next).localInstance())) {
+                        throw new SemanticException(
+                                "Variable: " + next + " may not have been initialized",
+                                next.position());
                     }
                 }
             }
@@ -197,25 +194,17 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         Position pos = Position.compilerGenerated();
         if (type.isReference()) {
             lit = (Lit) nf.NullLit(pos).type(type.typeSystem().Null());
-        }
-        else if (type.isBoolean()) {
+        } else if (type.isBoolean()) {
             lit = (Lit) nf.BooleanLit(pos, false).type(type);
-        }
-        else if (type.isInt() || type.isShort() || type.isChar()
-                || type.isByte()) {
+        } else if (type.isInt() || type.isShort() || type.isChar() || type.isByte()) {
             lit = (Lit) nf.IntLit(pos, IntLit.INT, 0).type(type);
-        }
-        else if (type.isLong()) {
+        } else if (type.isLong()) {
             lit = (Lit) nf.IntLit(pos, IntLit.LONG, 0).type(type);
-        }
-        else if (type.isFloat()) {
+        } else if (type.isFloat()) {
             lit = (Lit) nf.FloatLit(pos, FloatLit.FLOAT, 0.0).type(type);
-        }
-        else if (type.isDouble()) {
+        } else if (type.isDouble()) {
             lit = (Lit) nf.FloatLit(pos, FloatLit.DOUBLE, 0.0).type(type);
-        }
-        else throw new InternalCompilerError("Don't know default value for type "
-                + type);
+        } else throw new InternalCompilerError("Don't know default value for type " + type);
         return decl(decl.init(lit));
     }
 
@@ -227,13 +216,14 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
         ExtendedFor n = this;
-        v.visitCFG(expr,
-                   FlowGraph.EDGE_KEY_TRUE,
-                   decl,
-                   Term.ENTRY,
-                   FlowGraph.EDGE_KEY_FALSE,
-                   n,
-                   Term.EXIT);
+        v.visitCFG(
+                expr,
+                FlowGraph.EDGE_KEY_TRUE,
+                decl,
+                Term.ENTRY,
+                FlowGraph.EDGE_KEY_FALSE,
+                n,
+                Term.EXIT);
         v.visitCFG(decl, n.body(), Term.ENTRY);
         v.push(n).visitCFG(n.body(), continueTarget(), Term.ENTRY);
         return succs;
@@ -265,5 +255,4 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         ExtendedFor n = this;
         printSubStmt(n.body(), w, tr);
     }
-
 }

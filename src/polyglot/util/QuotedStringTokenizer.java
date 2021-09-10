@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -65,8 +65,8 @@ public class QuotedStringTokenizer extends StringTokenizer {
      * Quotes cannot be delimiters, and the escape character can be neither a
      * quote nor a delimiter.
      */
-    public QuotedStringTokenizer(String str, String delim, String quotes,
-            char escape, boolean returnDelims) {
+    public QuotedStringTokenizer(
+            String str, String delim, String quotes, char escape, boolean returnDelims) {
         super(str, delim, returnDelims);
         this.str = str;
         this.len = str.length();
@@ -74,15 +74,13 @@ public class QuotedStringTokenizer extends StringTokenizer {
         this.quotes = quotes;
         for (int i = 0; i < quotes.length(); i++)
             if (delim.indexOf(quotes.charAt(i)) >= 0)
-                throw new IllegalArgumentException("Invalid quote character '"
-                        + quotes.charAt(i) + "'");
+                throw new IllegalArgumentException(
+                        "Invalid quote character '" + quotes.charAt(i) + "'");
         this.escape = escape;
         if (delim.indexOf(escape) >= 0)
-            throw new IllegalArgumentException("Invalid escape character '"
-                    + escape + "'");
+            throw new IllegalArgumentException("Invalid escape character '" + escape + "'");
         if (quotes.indexOf(escape) >= 0)
-            throw new IllegalArgumentException("Invalid escape character '"
-                    + escape + "'");
+            throw new IllegalArgumentException("Invalid escape character '" + escape + "'");
         this.returnDelims = returnDelims;
     }
 
@@ -91,8 +89,7 @@ public class QuotedStringTokenizer extends StringTokenizer {
      * Pre-condition: not inside a quoted string (token).
      */
     private int skipDelim(int pos) {
-        while (pos < len && delim.indexOf(str.charAt(pos)) >= 0)
-            pos++;
+        while (pos < len && delim.indexOf(str.charAt(pos)) >= 0) pos++;
         return pos;
     }
 
@@ -123,8 +120,7 @@ public class QuotedStringTokenizer extends StringTokenizer {
                 if (curr == quote) { // closing quote
                     quoted = false;
                     quote = '\000';
-                }
-                else if (collect) token.append(curr);
+                } else if (collect) token.append(curr);
                 continue;
             }
             if (quotes.indexOf(curr) >= 0) { // opening quote
@@ -133,11 +129,10 @@ public class QuotedStringTokenizer extends StringTokenizer {
                 continue;
             }
             if (delim.indexOf(str.charAt(pos)) >= 0) // unquoted delimiter
-                break;
+            break;
             if (collect) token.append(curr);
         }
-        if (escaped || quoted)
-            throw new IllegalArgumentException("Unterminated quoted string");
+        if (escaped || quoted) throw new IllegalArgumentException("Unterminated quoted string");
         return pos;
     }
 
@@ -160,12 +155,11 @@ public class QuotedStringTokenizer extends StringTokenizer {
     public String nextToken() {
         if (!returnDelims) pos = skipDelim(pos);
         if (pos >= len) throw new NoSuchElementException();
-        if (returnDelims && delim.indexOf(str.charAt(pos)) >= 0)
-            return str.substring(pos, ++pos);
-        //int start = pos;
+        if (returnDelims && delim.indexOf(str.charAt(pos)) >= 0) return str.substring(pos, ++pos);
+        // int start = pos;
         pos = skipToken(pos, true);
         return token.toString();
-        //return str.substring(start, pos);
+        // return str.substring(start, pos);
     }
 
     /**
@@ -190,8 +184,7 @@ public class QuotedStringTokenizer extends StringTokenizer {
             if (delim.indexOf(str.charAt(curr)) >= 0) {
                 curr++;
                 dcount++;
-            }
-            else {
+            } else {
                 curr = skipToken(curr, false);
                 count++;
             }

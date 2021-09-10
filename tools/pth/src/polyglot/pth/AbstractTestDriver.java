@@ -22,14 +22,12 @@ public abstract class AbstractTestDriver implements TestDriver {
     }
 
     @Override
-    public void getSummary(StringBuffer sb) {
-    }
+    public void getSummary(StringBuffer sb) {}
 
     protected boolean isSameDirectory(File dir1, File dir2) {
         try {
             return dir1.getCanonicalPath().equals(dir2.getCanonicalPath());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return true;

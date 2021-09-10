@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -32,8 +32,7 @@ import java.util.List;
  * A {@code MethodInstance} represents the type information for a Java
  * method.
  */
-public interface MethodInstance extends FunctionInstance, MemberInstance,
-        Declaration {
+public interface MethodInstance extends FunctionInstance, MemberInstance, Declaration {
     /**
      * The method's name.
      */
@@ -84,7 +83,7 @@ public interface MethodInstance extends FunctionInstance, MemberInstance,
     /**
      * Get the set of methods this method implements.  No ordering is
      * specified since the superinterfaces need not form a linear list
-     * (i.e., they can form a tree).  
+     * (i.e., they can form a tree).
      * @return List[MethodInstance]
      */
     List<? extends MethodInstance> implemented();
@@ -119,15 +118,14 @@ public interface MethodInstance extends FunctionInstance, MemberInstance,
      * This method should not be called except by {@code TypeSystem}
      * and by subclasses.
      * If quiet is true and this method cannot override {@code mi}, then
-     * false is returned; otherwise, if quiet is false and this method cannot 
+     * false is returned; otherwise, if quiet is false and this method cannot
      * override {@code mi}, then a SemanticException is thrown.
      * @param quiet If true, then no Semantic Exceptions will be thrown, and the
      *              return value will be true or false. Otherwise, if the method
      *              cannot override, then a SemanticException will be thrown, else
      *              the method will return true.
      */
-    boolean canOverrideImpl(MethodInstance mi, boolean quiet)
-            throws SemanticException;
+    boolean canOverrideImpl(MethodInstance mi, boolean quiet) throws SemanticException;
 
     /**
      * Get the set of methods in rt and its superinterfaces that

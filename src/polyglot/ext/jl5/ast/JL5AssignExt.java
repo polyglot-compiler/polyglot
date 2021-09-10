@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -62,33 +62,34 @@ public class JL5AssignExt extends JL5ExprExt {
                 return child.type();
             }
         }
-        if (op == Assign.ADD_ASSIGN || op == Assign.SUB_ASSIGN
-                || op == Assign.MUL_ASSIGN || op == Assign.DIV_ASSIGN
-                || op == Assign.MOD_ASSIGN || op == Assign.SHL_ASSIGN
-                || op == Assign.SHR_ASSIGN || op == Assign.USHR_ASSIGN) {
+        if (op == Assign.ADD_ASSIGN
+                || op == Assign.SUB_ASSIGN
+                || op == Assign.MUL_ASSIGN
+                || op == Assign.DIV_ASSIGN
+                || op == Assign.MOD_ASSIGN
+                || op == Assign.SHL_ASSIGN
+                || op == Assign.SHR_ASSIGN
+                || op == Assign.USHR_ASSIGN) {
             if (isNumeric(left.type()) && isNumeric(right.type())) {
                 try {
-                    return ts.promote(numericType(left.type()),
-                                      numericType(child.type()));
-                }
-                catch (SemanticException e) {
+                    return ts.promote(numericType(left.type()), numericType(child.type()));
+                } catch (SemanticException e) {
                     throw new InternalCompilerError(e);
                 }
             }
             // Assume the typechecker knew what it was doing
             return child.type();
         }
-        if (op == Assign.BIT_AND_ASSIGN || op == Assign.BIT_OR_ASSIGN
+        if (op == Assign.BIT_AND_ASSIGN
+                || op == Assign.BIT_OR_ASSIGN
                 || op == Assign.BIT_XOR_ASSIGN) {
             if (left.type().isBoolean()) {
                 return ts.Boolean();
             }
             if (isNumeric(left.type()) && isNumeric(right.type())) {
                 try {
-                    return ts.promote(numericType(left.type()),
-                                      numericType(child.type()));
-                }
-                catch (SemanticException e) {
+                    return ts.promote(numericType(left.type()), numericType(child.type()));
+                } catch (SemanticException e) {
                     throw new InternalCompilerError(e);
                 }
             }
@@ -96,8 +97,7 @@ public class JL5AssignExt extends JL5ExprExt {
             return child.type();
         }
 
-        throw new InternalCompilerError("Unrecognized assignment operator "
-                + op + ".");
+        throw new InternalCompilerError("Unrecognized assignment operator " + op + ".");
     }
 
     @Override
@@ -109,20 +109,16 @@ public class JL5AssignExt extends JL5ExprExt {
         TypeSystem ts = tc.typeSystem();
 
         if (!(a.left() instanceof Variable)) {
-            throw new SemanticException("Target of assignment must be a variable.",
-                                        a.position());
+            throw new SemanticException("Target of assignment must be a variable.", a.position());
         }
 
         if (a.operator() == Assign.ASSIGN) {
             if (!ts.isImplicitCastValid(s, t)
                     && !ts.typeEquals(s, t)
-                    && !ts.numericConversionValid(t,
-                                                  tc.lang()
-                                                    .constantValue(a.right(),
-                                                                   tc.lang()))) {
+                    && !ts.numericConversionValid(
+                            t, tc.lang().constantValue(a.right(), tc.lang()))) {
 
-                throw new SemanticException("Cannot assign " + s + " to " + t
-                        + ".", a.position());
+                throw new SemanticException("Cannot assign " + s + " to " + t + ".", a.position());
             }
 
             return a.type(t);
@@ -130,8 +126,7 @@ public class JL5AssignExt extends JL5ExprExt {
 
         if (a.operator() == Assign.ADD_ASSIGN) {
             // t += s
-            if (ts.typeEquals(t, ts.String())
-                    && ts.canCoerceToString(s, tc.context())) {
+            if (ts.typeEquals(t, ts.String()) && ts.canCoerceToString(s, tc.context())) {
                 return a.type(ts.String());
             }
 
@@ -139,10 +134,9 @@ public class JL5AssignExt extends JL5ExprExt {
                 return a.type(ts.promote(numericType(t), numericType(s)));
             }
 
-            throw new SemanticException("The " + a.operator()
-                                                + " operator must have "
-                                                + "numeric or String operands.",
-                                        a.position());
+            throw new SemanticException(
+                    "The " + a.operator() + " operator must have " + "numeric or String operands.",
+                    a.position());
         }
 
         if (a.operator() == Assign.SUB_ASSIGN
@@ -153,10 +147,9 @@ public class JL5AssignExt extends JL5ExprExt {
                 return a.type(ts.promote(numericType(t), numericType(s)));
             }
 
-            throw new SemanticException("The " + a.operator()
-                                                + " operator must have "
-                                                + "numeric operands.",
-                                        a.position());
+            throw new SemanticException(
+                    "The " + a.operator() + " operator must have " + "numeric operands.",
+                    a.position());
         }
 
         if (a.operator() == Assign.BIT_AND_ASSIGN
@@ -166,35 +159,32 @@ public class JL5AssignExt extends JL5ExprExt {
                 return a.type(ts.Boolean());
             }
 
-            if (ts.isImplicitCastValid(t, ts.Long())
-                    && ts.isImplicitCastValid(s, ts.Long())) {
+            if (ts.isImplicitCastValid(t, ts.Long()) && ts.isImplicitCastValid(s, ts.Long())) {
                 return a.type(ts.promote(numericType(t), numericType(s)));
             }
 
-            throw new SemanticException("The "
-                                                + a.operator()
-                                                + " operator must have "
-                                                + "integral or boolean operands.",
-                                        a.position());
+            throw new SemanticException(
+                    "The "
+                            + a.operator()
+                            + " operator must have "
+                            + "integral or boolean operands.",
+                    a.position());
         }
 
         if (a.operator() == Assign.SHL_ASSIGN
                 || a.operator() == Assign.SHR_ASSIGN
                 || a.operator() == Assign.USHR_ASSIGN) {
-            if (ts.isImplicitCastValid(t, ts.Long())
-                    && ts.isImplicitCastValid(s, ts.Long())) {
+            if (ts.isImplicitCastValid(t, ts.Long()) && ts.isImplicitCastValid(s, ts.Long())) {
                 // Only promote the left of a shift.
                 return a.type(ts.promote(numericType(t)));
             }
 
-            throw new SemanticException("The " + a.operator()
-                                                + " operator must have "
-                                                + "integral operands.",
-                                        a.position());
+            throw new SemanticException(
+                    "The " + a.operator() + " operator must have " + "integral operands.",
+                    a.position());
         }
 
-        throw new InternalCompilerError("Unrecognized assignment operator "
-                + a.operator() + ".");
+        throw new InternalCompilerError("Unrecognized assignment operator " + a.operator() + ".");
     }
 
     public boolean isNumeric(Type t) {
@@ -226,5 +216,4 @@ public class JL5AssignExt extends JL5ExprExt {
         }
         return t;
     }
-
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -27,7 +27,6 @@
  * CodeWriter -- Andrew C. Myers, April 2001
  * For use in Cornell University Computer Science CS 412/413
  */
-
 package ppg.util;
 
 import java.io.IOException;
@@ -37,7 +36,7 @@ import java.io.Writer;
 
 import polyglot.util.SerialVersionUID;
 
-/** 
+/**
  * A {@code CodeWriter} is a pretty-printing engine.
  * It formats structured text onto an output stream {@code o} in the
  * minimum number of lines, while keeping the width of the output
@@ -48,7 +47,6 @@ public class CodeWriter {
      * Create a CodeWriter object with output stream {@code o}
      * and width {@code width_}.
      */
-
     public CodeWriter(OutputStream o, int width_) {
         output = new OutputStreamWriter(o);
         width = width_;
@@ -91,7 +89,7 @@ public class CodeWriter {
      * is printed at the current cursor position {@code pos},
      * all the following lines are printed at the position
      * {@code pos+n}.
-     * 
+     *
      * @param n the number of characters increased on indentation (relative
      * to the current position) for all lines in the block.
      */
@@ -101,8 +99,8 @@ public class CodeWriter {
         current = b;
     }
 
-    /** 
-     * Terminate the most recent outstanding {@code begin}. 
+    /**
+     * Terminate the most recent outstanding {@code begin}.
      */
     public void end() {
         current = current.parent;
@@ -126,7 +124,7 @@ public class CodeWriter {
      * @param n the amount of increase in indentation if
      *  the newline is inserted.
      * @param alt if no newline is inserted, the string {@code alt} is
-     *  output instead.   
+     *  output instead.
      */
     public void allowBreak(int n, String alt) {
         current.add(new AllowBreak(n, alt));
@@ -154,8 +152,7 @@ public class CodeWriter {
         boolean success = true;
         try {
             Item.format(input, 0, 0, width, width, true, true);
-        }
-        catch (Overrun o) {
+        } catch (Overrun o) {
             success = false;
         }
         input.sendOutput(output, 0, 0);
@@ -169,8 +166,8 @@ public class CodeWriter {
      * Return a readable representation of all the structured input
      * given to the CodeWriter since the last flush.
      */
-
     Block input;
+
     Block current;
 
     Writer output;
@@ -201,7 +198,7 @@ abstract class Item {
         next = null;
     }
 
-    /** 
+    /**
      * Try to format this item and subsequent items. The current cursor
      * position is {@code pos}, left and right margins are as
      * specified. Returns the final position, which must be {@code < fin}.
@@ -217,9 +214,9 @@ abstract class Item {
      *
      * Requires: rmargin &lt; lmargin, pos &lt;= rmargin.
      */
-
-    abstract int formatN(int lmargin, int pos, int rmargin, int fin,
-            boolean can_break, boolean nofail) throws Overrun;
+    abstract int formatN(
+            int lmargin, int pos, int rmargin, int fin, boolean can_break, boolean nofail)
+            throws Overrun;
 
     /**
      * Send the output associated with this item to {@code o}, using the
@@ -228,7 +225,7 @@ abstract class Item {
     abstract int sendOutput(Writer o, int lmargin, int pos) throws IOException;
 
     /** Make the garbage collector's job easy: free references to any
-        other items. */
+     * other items. */
     void free() {
         if (next != null) {
             next.free();
@@ -242,8 +239,9 @@ abstract class Item {
      * that overruns are checked!) {@code it} may be also null,
      * signifying an empty list.
      */
-    static int format(Item it, int lmargin, int pos, int rmargin, int fin,
-            boolean can_break, boolean nofail) throws Overrun {
+    static int format(
+            Item it, int lmargin, int pos, int rmargin, int fin, boolean can_break, boolean nofail)
+            throws Overrun {
         if (!nofail && pos > rmargin) { // overrun
             throw new Overrun(pos - rmargin);
         }
@@ -279,14 +277,12 @@ class Block extends Item {
     void add(Item it) {
         if (first == null) {
             first = it;
-        }
-        else {
+        } else {
             if (it instanceof StringItem && last instanceof StringItem) {
                 StringItem lasts = (StringItem) last;
                 lasts.appendString(((StringItem) it).s);
                 return;
-            }
-            else {
+            } else {
                 last.next = it;
             }
         }
@@ -294,8 +290,8 @@ class Block extends Item {
     }
 
     @Override
-    int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
-            boolean nofail) throws Overrun {
+    int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break, boolean nofail)
+            throws Overrun {
         // "this_fin" is a final-position bound for the formatting of
         // the contained list, cranked in from the right margin
         // when subsequent items overrun.
@@ -310,15 +306,15 @@ class Block extends Item {
             int next_pos;
             try {
                 next_pos =
-                        format(first,
-                               pos + indent,
-                               pos,
-                               rmargin,
-                               this_fin,
-                               this_break,
-                               this_nofail && this_break);
-            }
-            catch (Overrun o) {
+                        format(
+                                first,
+                                pos + indent,
+                                pos,
+                                rmargin,
+                                this_fin,
+                                this_break,
+                                this_nofail && this_break);
+            } catch (Overrun o) {
                 if (!can_break) throw o;
                 if (!this_break) {
                     this_break = true;
@@ -331,15 +327,8 @@ class Block extends Item {
                 throw o;
             }
             try {
-                return format(next,
-                              lmargin,
-                              next_pos,
-                              rmargin,
-                              fin,
-                              can_break,
-                              nofail);
-            }
-            catch (Overrun o) {
+                return format(next, lmargin, next_pos, rmargin, fin, can_break, nofail);
+            } catch (Overrun o) {
                 if (!can_break) throw o; // no way to fix it
                 if (next instanceof AllowBreak) throw o; // not our fault
                 this_break = true;
@@ -380,15 +369,9 @@ class StringItem extends Item {
     }
 
     @Override
-    int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
-            boolean nofail) throws Overrun {
-        return format(next,
-                      lmargin,
-                      pos + s.length(),
-                      rmargin,
-                      fin,
-                      can_break,
-                      nofail);
+    int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break, boolean nofail)
+            throws Overrun {
+        return format(next, lmargin, pos + s.length(), rmargin, fin, can_break, nofail);
     }
 
     @Override
@@ -413,13 +396,12 @@ class AllowBreak extends Item {
     }
 
     @Override
-    int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
-            boolean nofail) throws Overrun {
+    int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break, boolean nofail)
+            throws Overrun {
         if (can_break) {
             pos = lmargin + indent;
             broken = true;
-        }
-        else {
+        } else {
             pos += alt.length();
             broken = false;
         }
@@ -430,11 +412,9 @@ class AllowBreak extends Item {
     int sendOutput(Writer o, int lmargin, int pos) throws IOException {
         if (broken) {
             o.write("\r\n");
-            for (int i = 0; i < lmargin + indent; i++)
-                o.write(" ");
+            for (int i = 0; i < lmargin + indent; i++) o.write(" ");
             return lmargin + indent;
-        }
-        else {
+        } else {
             o.write(alt);
             return pos + alt.length();
         }
@@ -447,24 +427,17 @@ class Newline extends AllowBreak {
     }
 
     @Override
-    int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
-            boolean nofail) throws Overrun {
+    int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break, boolean nofail)
+            throws Overrun {
         broken = true;
         if (!can_break) throw new Overrun(1);
-        return format(next,
-                      lmargin,
-                      lmargin + indent,
-                      rmargin,
-                      fin,
-                      can_break,
-                      nofail);
+        return format(next, lmargin, lmargin + indent, rmargin, fin, can_break, nofail);
     }
 
     @Override
     int sendOutput(Writer o, int lmargin, int pos) throws IOException {
         o.write("\r\n");
-        for (int i = 0; i < lmargin + indent; i++)
-            o.write(" ");
+        for (int i = 0; i < lmargin + indent; i++) o.write(" ");
         return lmargin + indent;
     }
 }

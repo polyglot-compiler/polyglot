@@ -51,8 +51,7 @@ public class terminal_set {
      * @param obj the object we are testing.
      */
     protected void not_null(Object obj) throws internal_error {
-        if (obj == null)
-            throw new internal_error("Null object used in set operation");
+        if (obj == null) throw new internal_error("Null object used in set operation");
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -174,8 +173,7 @@ public class terminal_set {
 
     /** Equality comparison. */
     public boolean equals(terminal_set other) {
-        if (other == null)
-            return false;
+        if (other == null) return false;
         else return _elements.equals(other._elements);
     }
 
@@ -184,8 +182,7 @@ public class terminal_set {
     /** Generic equality comparison. */
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof terminal_set))
-            return false;
+        if (!(other instanceof terminal_set)) return false;
         else return equals((terminal_set) other);
     }
 
@@ -206,8 +203,7 @@ public class terminal_set {
         comma_flag = false;
         for (int t = 0; t < terminal.number(); t++) {
             if (_elements.get(t)) {
-                if (comma_flag)
-                    result += ", ";
+                if (comma_flag) result += ", ";
                 else comma_flag = true;
 
                 result += terminal.find(t).name();

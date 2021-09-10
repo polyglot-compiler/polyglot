@@ -66,5 +66,4 @@ public interface Test {
     int getSuccessfulTestCount();
 
     int[] displayTestResult(OutputController outCtrl);
-
 }

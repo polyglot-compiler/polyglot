@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -70,8 +70,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
         return statements(this, statements);
     }
 
-    protected <N extends AbstractBlock_c> N statements(N n,
-            List<Stmt> statements) {
+    protected <N extends AbstractBlock_c> N statements(N n, List<Stmt> statements) {
         if (CollectionUtil.equals(n.statements, statements)) return n;
         n = copyIfNeeded(n);
         n.statements = ListUtil.copy(statements, true);
@@ -95,8 +94,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
     }
 
     /** Reconstruct the block. */
-    protected <N extends AbstractBlock_c> N reconstruct(N n,
-            List<Stmt> statements) {
+    protected <N extends AbstractBlock_c> N reconstruct(N n, List<Stmt> statements) {
         n = statements(n, statements);
         return n;
     }
@@ -116,7 +114,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block {
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
 
-        for (Iterator<Stmt> i = statements.iterator(); i.hasNext();) {
+        for (Iterator<Stmt> i = statements.iterator(); i.hasNext(); ) {
             Stmt n = i.next();
             printBlock(n, w, tr);
 

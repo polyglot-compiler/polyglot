@@ -9,10 +9,10 @@ package java_cup.runtime;
  */
 
 /* *************************************************
-  class DefaultSymbolFactory
+ class DefaultSymbolFactory
 
-  interface for creating new symbols
- ***************************************************/
+ interface for creating new symbols
+***************************************************/
 public class DefaultSymbolFactory implements SymbolFactory {
     // Factory methods
     /**
@@ -26,12 +26,10 @@ public class DefaultSymbolFactory implements SymbolFactory {
      * replaced by the new java_cup.runtime.ComplexSymbolFactory
      */
     @Deprecated
-    public DefaultSymbolFactory() {
-    }
+    public DefaultSymbolFactory() {}
 
     @Override
-    public Symbol newSymbol(String name, int id, Symbol left, Symbol right,
-            Object value) {
+    public Symbol newSymbol(String name, int id, Symbol left, Symbol right, Object value) {
         return new Symbol(id, left, right, value);
     }
 
@@ -45,8 +43,7 @@ public class DefaultSymbolFactory implements SymbolFactory {
         return new Symbol(id, left, right);
     }
 
-    public Symbol newSymbol(String name, int id, int left, int right,
-            Object value) {
+    public Symbol newSymbol(String name, int id, int left, int right, Object value) {
         return new Symbol(id, left, right, value);
     }
 

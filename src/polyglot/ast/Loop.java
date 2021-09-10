@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -54,8 +54,7 @@ public interface Loop extends CompoundStmt {
     Loop body(Stmt body);
 
     class Instance extends Loop_c {
-        private static final long serialVersionUID =
-                SerialVersionUID.generate();
+        private static final long serialVersionUID = SerialVersionUID.generate();
 
         public Instance(Position pos, Expr cond, Stmt body, Ext ext) {
             super(pos, cond, body, ext);
@@ -63,28 +62,26 @@ public interface Loop extends CompoundStmt {
         }
 
         @Override
-        public final Node extRewrite(ExtensionRewriter rw)
-                throws SemanticException {
-            throw new InternalCompilerError("This loop cannot be represented in the "
-                    + "target language and should have been rewritten: " + this);
+        public final Node extRewrite(ExtensionRewriter rw) throws SemanticException {
+            throw new InternalCompilerError(
+                    "This loop cannot be represented in the "
+                            + "target language and should have been rewritten: "
+                            + this);
         }
 
         @Override
         public final Term firstChild() {
-            throw new InternalCompilerError("Unexpected invocation from extension object: "
-                    + this);
+            throw new InternalCompilerError("Unexpected invocation from extension object: " + this);
         }
 
         @Override
         public final <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-            throw new InternalCompilerError("Unexpected invocation from extension object: "
-                    + this);
+            throw new InternalCompilerError("Unexpected invocation from extension object: " + this);
         }
 
         @Override
         public final Term continueTarget() {
-            throw new InternalCompilerError("Unexpected invocation from extension object: "
-                    + this);
+            throw new InternalCompilerError("Unexpected invocation from extension object: " + this);
         }
     }
 }

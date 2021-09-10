@@ -55,14 +55,13 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     protected List<Catch> catchBlocks;
     protected Block finallyBlock;
 
-//    @Deprecated
-    public Try_c(Position pos, Block tryBlock, List<Catch> catchBlocks,
-            Block finallyBlock) {
+    //    @Deprecated
+    public Try_c(Position pos, Block tryBlock, List<Catch> catchBlocks, Block finallyBlock) {
         this(pos, tryBlock, catchBlocks, finallyBlock, null);
     }
 
-    public Try_c(Position pos, Block tryBlock, List<Catch> catchBlocks,
-            Block finallyBlock, Ext ext) {
+    public Try_c(
+            Position pos, Block tryBlock, List<Catch> catchBlocks, Block finallyBlock, Ext ext) {
         super(pos, ext);
         assert_(pos, tryBlock, catchBlocks, finallyBlock);
         this.tryBlock = tryBlock;
@@ -70,10 +69,12 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         this.finallyBlock = finallyBlock;
     }
 
-    protected void assert_(Position pos, Block tryBlock,
-            List<Catch> catchBlocks, Block finallyBlock) {
-        assert tryBlock != null && catchBlocks != null; // finallyBlock may be null, catchBlocks empty
-        assert !catchBlocks.isEmpty() || finallyBlock != null; // must be either try-catch or try(-catch)-finally
+    protected void assert_(
+            Position pos, Block tryBlock, List<Catch> catchBlocks, Block finallyBlock) {
+        assert tryBlock != null
+                && catchBlocks != null; // finallyBlock may be null, catchBlocks empty
+        assert !catchBlocks.isEmpty()
+                || finallyBlock != null; // must be either try-catch or try(-catch)-finally
     }
 
     @Override
@@ -128,8 +129,8 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     }
 
     /** Reconstruct the statement. */
-    protected <N extends Try_c> N reconstruct(N n, Block tryBlock,
-            List<Catch> catchBlocks, Block finallyBlock) {
+    protected <N extends Try_c> N reconstruct(
+            N n, Block tryBlock, List<Catch> catchBlocks, Block finallyBlock) {
         n = tryBlock(n, tryBlock);
         n = catchBlocks(n, catchBlocks);
         n = finallyBlock(n, finallyBlock);
@@ -150,8 +151,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
      * will handle visiting children.
      */
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException {
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
         ec = (ExceptionChecker) super.exceptionCheckEnter(ec);
         return ec.bypassChildren(this);
     }
@@ -179,16 +179,14 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         }
 
         ExceptionChecker ecTryBlock =
-                ec.lang().constructTryBlockExceptionChecker(this,
-                                                            ecTryBlockEntry);
+                ec.lang().constructTryBlockExceptionChecker(this, ecTryBlockEntry);
 
         Try_c n = this;
         // Visit the try block.
         Block tryBlock = ec.lang().exceptionCheckTryBlock(n, ecTryBlock);
         n = tryBlock(n, tryBlock);
 
-        List<Catch> catchBlocks =
-                ec.lang().exceptionCheckCatchBlocks(n, ecTryBlockEntry);
+        List<Catch> catchBlocks = ec.lang().exceptionCheckCatchBlocks(n, ecTryBlockEntry);
         n = catchBlocks(n, catchBlocks);
 
         Block finallyBlock = ec.lang().exceptionCheckFinallyBlock(n, ec);
@@ -204,22 +202,19 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
     @Override
     public Block exceptionCheckTryBlock(ExceptionChecker ec) {
-        return this.visitChild(tryBlock,
-                               ec.lang().constructTryBlockExceptionChecker(this,
-                                                                           ec));
+        return this.visitChild(tryBlock, ec.lang().constructTryBlockExceptionChecker(this, ec));
     }
 
     @Override
-    public ExceptionChecker constructTryBlockExceptionChecker(
-            ExceptionChecker ec) {
+    public ExceptionChecker constructTryBlockExceptionChecker(ExceptionChecker ec) {
 
         ExceptionChecker newec = ec.push();
 
         // go through the catch blocks, from the end to the beginning, and push
         // an ExceptionChecker indicating that they catch exceptions of the appropriate
         // type.
-        for (ListIterator<Catch> i =
-                catchBlocks.listIterator(catchBlocks.size()); i.hasPrevious();) {
+        for (ListIterator<Catch> i = catchBlocks.listIterator(catchBlocks.size());
+                i.hasPrevious(); ) {
             Catch cb = i.previous();
             Type catchType = cb.catchType();
 
@@ -229,8 +224,7 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     }
 
     @Override
-    public List<Catch> exceptionCheckCatchBlocks(ExceptionChecker ec)
-            throws SemanticException {
+    public List<Catch> exceptionCheckCatchBlocks(ExceptionChecker ec) throws SemanticException {
         // Walk through our catch blocks, making sure that they each can
         // catch something.
         SubtypeSet caught = new SubtypeSet(ec.typeSystem().Throwable());
@@ -239,9 +233,11 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
             // Check if the exception has already been caught.
             if (caught.contains(catchType)) {
-                throw new SemanticException("The exception \"" + catchType
-                        + "\" has been caught by an earlier catch block.",
-                                            cb.position());
+                throw new SemanticException(
+                        "The exception \""
+                                + catchType
+                                + "\" has been caught by an earlier catch block.",
+                        cb.position());
             }
 
             caught.add(catchType);
@@ -267,10 +263,10 @@ public class Try_c extends Stmt_c implements Try, TryOps {
 
         if (!finallyBlock.reachable()) {
             // warn the user
-//              ###Don't warn, some versions of javac don't.
-//              ec.errorQueue().enqueue(ErrorInfo.WARNING,
-//              "The finally block cannot complete normally",
-//              finallyBlock.position());
+            //              ###Don't warn, some versions of javac don't.
+            //              ec.errorQueue().enqueue(ErrorInfo.WARNING,
+            //              "The finally block cannot complete normally",
+            //              finallyBlock.position());
         }
 
         return fb;
@@ -346,16 +342,14 @@ public class Try_c extends Stmt_c implements Try, TryOps {
         if (finallyBlock != null) {
             v1.visitCFG(tryBlock, finallyBlock, ENTRY);
             v.visitCFG(finallyBlock, this, EXIT);
-        }
-        else {
+        } else {
             v1.visitCFG(tryBlock, this, EXIT);
         }
 
         for (Catch cb : catchBlocks) {
             if (finallyBlock != null) {
                 v2.visitCFG(cb, finallyBlock, ENTRY);
-            }
-            else {
+            } else {
                 v2.visitCFG(cb, this, EXIT);
             }
         }
@@ -367,5 +361,4 @@ public class Try_c extends Stmt_c implements Try, TryOps {
     public Node copy(NodeFactory nf) {
         return nf.Try(position, tryBlock, catchBlocks, finallyBlock);
     }
-
 }

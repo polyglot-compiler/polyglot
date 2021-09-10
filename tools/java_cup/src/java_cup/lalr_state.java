@@ -52,7 +52,6 @@ import parser.UnifiedExample;
  * @author  Frank Flannery
  *
  */
-
 public class lalr_state {
     /*-----------------------------------------------------------*/
     /*--- Constructor(s) ----------------------------------------*/
@@ -91,7 +90,7 @@ public class lalr_state {
         return _all.values();
     }
 
-    //Hm Added clear  to clear all static fields
+    // Hm Added clear  to clear all static fields
     public static void clear() {
         _all.clear();
         _all_kernels.clear();
@@ -112,8 +111,7 @@ public class lalr_state {
      *  unclosed, set of items -- which uniquely define the state).  This table
      *  stores state objects using (a copy of) their kernel item sets as keys.
      */
-    protected static HashMap<lalr_item_set, lalr_state> _all_kernels =
-            new HashMap<>();
+    protected static HashMap<lalr_item_set, lalr_state> _all_kernels = new HashMap<>();
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -125,8 +123,7 @@ public class lalr_state {
      * @param itms the kernel set of the state we are looking for.
      */
     public static lalr_state find_state(lalr_item_set itms) {
-        if (itms == null)
-            return null;
+        if (itms == null) return null;
         else return _all.get(itms);
     }
 
@@ -192,10 +189,8 @@ public class lalr_state {
             for (int i = 0; i < itm.the_production().rhs_length(); i++) {
                 if (i == itm.dot_pos()) System.out.print("• ");
                 part = itm.the_production().rhs(i);
-                if (part.is_action())
-                    System.out.print("{action} ");
-                else System.out.print(((symbol_part) part).the_symbol().name()
-                        + " ");
+                if (part.is_action()) System.out.print("{action} ");
+                else System.out.print(((symbol_part) part).the_symbol().name() + " ");
             }
             if (itm.dot_at_end()) System.out.print("• ");
             System.out.println("]");
@@ -207,10 +202,10 @@ public class lalr_state {
 
     /** Propagate lookahead sets through the constructed viable prefix
      *  recognizer.  When the machine is constructed, each item that results
-        in the creation of another such that its lookahead is included in the
-        other's will have a propagate link set up for it.  This allows additions
-        to the lookahead of one item to be included in other items that it
-        was used to directly or indirectly create.
+     * in the creation of another such that its lookahead is included in the
+     * other's will have a propagate link set up for it.  This allows additions
+     * to the lookahead of one item to be included in other items that it
+     * was used to directly or indirectly create.
      */
     protected static void propagate_all_lookaheads() throws internal_error {
         /* iterate across all states */
@@ -228,8 +223,7 @@ public class lalr_state {
      * @param on_sym the symbol the transition is under.
      * @param to_st  the state the transition goes to.
      */
-    public void add_transition(symbol on_sym, lalr_state to_st)
-            throws internal_error {
+    public void add_transition(symbol on_sym, lalr_state to_st) throws internal_error {
         lalr_transition trans;
 
         /* create a new transition object and put it in our list */
@@ -276,8 +270,8 @@ public class lalr_state {
      * @see   java_cup.lalr_item_set#compute_closure
      * @see   java_cup.lalr_state#propagate_all_lookaheads
      */
-
     private static lalr_state start_state;
+
     private static lalr_item start_itm;
 
     public static lalr_state startState() {
@@ -288,8 +282,7 @@ public class lalr_state {
         return start_itm;
     }
 
-    public static lalr_state build_machine(production start_prod)
-            throws internal_error {
+    public static lalr_state build_machine(production start_prod) throws internal_error {
         /* lalr_state    start_state; // CupEx extension -- made static */
         lalr_item_set start_items;
         lalr_item_set new_items;
@@ -303,7 +296,8 @@ public class lalr_state {
 
         /* sanity check */
         if (start_prod == null)
-            throw new internal_error("Attempt to build viable prefix recognizer using a null production");
+            throw new internal_error(
+                    "Attempt to build viable prefix recognizer using a null production");
 
         /* build item with dot at front of start production and EOF lookahead */
         start_items = new lalr_item_set();
@@ -397,8 +391,7 @@ public class lalr_state {
 
                             /* fix up the item so it points to the existing set */
                             if (existing != null)
-                                fix_itm.propagate_items()
-                                       .setElementAt(existing, l);
+                                fix_itm.propagate_items().setElementAt(existing, l);
                         }
                     }
                 }
@@ -424,8 +417,7 @@ public class lalr_state {
      */
     protected void propagate_lookaheads() throws internal_error {
         /* recursively propagate out from each item in the state */
-        for (lalr_item itm : items())
-            itm.propagate_lookaheads(null);
+        for (lalr_item itm : items()) itm.propagate_lookaheads(null);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -451,8 +443,8 @@ public class lalr_state {
      * @param act_table    the action table to put entries in.
      * @param reduce_table the reduce-goto table to put entries in.
      */
-    public void build_table_entries(parse_action_table act_table,
-            parse_reduce_table reduce_table) throws internal_error {
+    public void build_table_entries(parse_action_table act_table, parse_reduce_table reduce_table)
+            throws internal_error {
         parse_action_row our_act_row;
         parse_reduce_row our_red_row;
         parse_action act, other_act;
@@ -478,8 +470,7 @@ public class lalr_state {
                     /* if we don't already have an action put this one in */
                     if (our_act_row.under_term[t].kind() == parse_action.ERROR) {
                         our_act_row.under_term[t] = act;
-                    }
-                    else {
+                    } else {
                         /* we now have at least one conflict */
                         terminal term = terminal.find(t);
                         other_act = our_act_row.under_term[t];
@@ -488,18 +479,14 @@ public class lalr_state {
                         if (other_act.kind() != parse_action.SHIFT
                                 && other_act.kind() != parse_action.NONASSOC) {
                             /* if we have lower index hence priority, replace it*/
-                            if (itm.the_production().index() < ((reduce_action) other_act).reduce_with()
-                                                                                          .index()) {
+                            if (itm.the_production().index()
+                                    < ((reduce_action) other_act).reduce_with().index()) {
                                 /* replace the action */
                                 our_act_row.under_term[t] = act;
                             }
-                        }
-                        else {
+                        } else {
                             /*  Check precedences,see if problem is correctable */
-                            if (fix_with_precedence(itm.the_production(),
-                                                    t,
-                                                    our_act_row,
-                                                    act)) {
+                            if (fix_with_precedence(itm.the_production(), t, our_act_row, act)) {
                                 term = null;
                             }
                         }
@@ -513,8 +500,7 @@ public class lalr_state {
         }
 
         /* consider each outgoing transition */
-        for (lalr_transition trans = transitions(); trans != null; trans =
-                trans.next()) {
+        for (lalr_transition trans = transitions(); trans != null; trans = trans.next()) {
             /* if its on an terminal add a shift entry */
             sym = trans.on_symbol();
             if (!sym.is_non_term()) {
@@ -523,8 +509,7 @@ public class lalr_state {
                 /* if we don't already have an action put this one in */
                 if (our_act_row.under_term[sym.index()].kind() == parse_action.ERROR) {
                     our_act_row.under_term[sym.index()] = act;
-                }
-                else {
+                } else {
                     /* we now have at least one conflict */
                     production p =
                             ((reduce_action) our_act_row.under_term[sym.index()]).reduce_with();
@@ -535,8 +520,7 @@ public class lalr_state {
                         conflict_set.add(terminal.find(sym.index()));
                     }
                 }
-            }
-            else {
+            } else {
                 /* for non terminals add an entry to the reduce-goto table */
                 our_red_row.under_non_term[sym.index()] = trans.to_state();
             }
@@ -566,11 +550,9 @@ public class lalr_state {
      *  @param parse_action_row  a row of the action table
      *  @param act         the rule in conflict with the table entry
      */
-
-    protected boolean fix_with_precedence(production p, int term_index,
-            parse_action_row table_row, parse_action act)
-
-    throws internal_error {
+    protected boolean fix_with_precedence(
+            production p, int term_index, parse_action_row table_row, parse_action act)
+            throws internal_error {
 
         terminal term = terminal.find(term_index);
 
@@ -589,11 +571,11 @@ public class lalr_state {
                 table_row.under_term[term_index] =
                         insert_shift(table_row.under_term[term_index], act);
                 return true;
-            }
-            else { /* they are == precedence */
+            } else {
+                /* they are == precedence */
 
                 /* equal precedences have equal sides, so only need to
-                   look at one: if it is right, put shift in table */
+                look at one: if it is right, put shift in table */
                 if (term.precedence_side() == assoc.right) {
                     table_row.under_term[term_index] =
                             insert_shift(table_row.under_term[term_index], act);
@@ -608,12 +590,11 @@ public class lalr_state {
                 }
 
                 /* if it is nonassoc, we're not allowed to have two nonassocs
-                   of equal precedence in a row, so put in NONASSOC */
+                of equal precedence in a row, so put in NONASSOC */
                 else if (term.precedence_side() == assoc.nonassoc) {
                     table_row.under_term[term_index] = new nonassoc_action();
                     return true;
-                }
-                else {
+                } else {
                     /* something really went wrong */
                     throw new internal_error("Unable to resolve conflict correctly");
                 }
@@ -622,8 +603,7 @@ public class lalr_state {
         /* check if terminal has precedence, if so, shift, since
         rule does not have precedence */
         else if (term.precedence_num() > assoc.no_prec) {
-            table_row.under_term[term_index] =
-                    insert_shift(table_row.under_term[term_index], act);
+            table_row.under_term[term_index] = insert_shift(table_row.under_term[term_index], act);
             return true;
         }
 
@@ -635,44 +615,38 @@ public class lalr_state {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /*  given two actions, and an action type, return the
-        action of that action type.  give an error if they are of
-        the same action, because that should never have tried
-        to be fixed
+       action of that action type.  give an error if they are of
+       the same action, because that should never have tried
+       to be fixed
 
-     */
-    protected parse_action insert_action(parse_action a1, parse_action a2,
-            int act_type) throws internal_error {
+    */
+    protected parse_action insert_action(parse_action a1, parse_action a2, int act_type)
+            throws internal_error {
         if (a1.kind() == act_type && a2.kind() == act_type) {
             throw new internal_error("Conflict resolution of bogus actions");
-        }
-        else if (a1.kind() == act_type) {
+        } else if (a1.kind() == act_type) {
             return a1;
-        }
-        else if (a2.kind() == act_type) {
+        } else if (a2.kind() == act_type) {
             return a2;
-        }
-        else {
+        } else {
             throw new internal_error("Conflict resolution of bogus actions");
         }
     }
 
     /* find the shift in the two actions */
-    protected parse_action insert_shift(parse_action a1, parse_action a2)
-            throws internal_error {
+    protected parse_action insert_shift(parse_action a1, parse_action a2) throws internal_error {
         return insert_action(a1, a2, parse_action.SHIFT);
     }
 
     /* find the reduce in the two actions */
-    protected parse_action insert_reduce(parse_action a1, parse_action a2)
-            throws internal_error {
+    protected parse_action insert_reduce(parse_action a1, parse_action a2) throws internal_error {
         return insert_action(a1, a2, parse_action.REDUCE);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Produce warning messages for all conflicts found in this state.  */
-    protected void report_conflicts(terminal_set conflict_set)
-            throws internal_error {
+    protected void report_conflicts(terminal_set conflict_set) throws internal_error {
 
         boolean after_itm;
         Set<Integer> shift_reduce_conflict_set = new TreeSet<>();
@@ -703,13 +677,12 @@ public class lalr_state {
                     if (compare.dot_at_end()) {
                         /* only look at reduces after itm */
                         if (after_itm)
-                        /* does the comparison item conflict? */
-                        if (compare.lookahead().intersects(lookahead)) {
-                            /* report a reduce/reduce conflict */
-                            report_reduce_reduce(itm, compare);
-                        }
-                    }
-                    else {
+                            /* does the comparison item conflict? */
+                            if (compare.lookahead().intersects(lookahead)) {
+                                /* report a reduce/reduce conflict */
+                                report_reduce_reduce(itm, compare);
+                            }
+                    } else {
                         /* is it a shift on our conflicting terminal */
                         symbol shift_sym = compare.symbol_after_dot();
                         int t;
@@ -722,8 +695,7 @@ public class lalr_state {
                     }
                 }
                 /* report S/R conflicts under all the symbols we conflict under */
-                for (int t : shift_reduce_conflict_set)
-                    report_shift_reduce(itm, t);
+                for (int t : shift_reduce_conflict_set) report_shift_reduce(itm, t);
             }
         }
     }
@@ -735,12 +707,10 @@ public class lalr_state {
      * @param itm1 first item in conflict.
      * @param itm2 second item in conflict.
      */
-    protected void report_reduce_reduce(lalr_item itm1, lalr_item itm2)
-            throws internal_error {
+    protected void report_reduce_reduce(lalr_item itm1, lalr_item itm2) throws internal_error {
         boolean comma_flag = false;
 
-        StringBuilder message =
-                new StringBuilder("*** Reduce/Reduce conflict found in state #");
+        StringBuilder message = new StringBuilder("*** Reduce/Reduce conflict found in state #");
         message.append(index());
         message.append("\n  between ");
         message.append(itm1.to_simple_string());
@@ -761,8 +731,7 @@ public class lalr_state {
         message.append("  under symbols: {");
         for (int t = 0; t < terminal.number(); t++) {
             if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
-                if (comma_flag)
-                    message.append(", ");
+                if (comma_flag) message.append(", ");
                 else comma_flag = true;
                 message.append(terminal.find(t).name());
             }
@@ -773,8 +742,7 @@ public class lalr_state {
             start = System.nanoTime();
             UnifiedExample ue = new UnifiedExample(this, itm1, itm2, cs);
             boolean tle = cexTimeLimit();
-            Counterexample cex =
-                    tle ? ue.exampleFromShortestPath(true) : ue.find();
+            Counterexample cex = tle ? ue.exampleFromShortestPath(true) : ue.find();
             if (cex.unifying()) {
                 message.append("  Ambiguity detected for nonterminal ");
                 message.append(cex.cexNonterminal());
@@ -786,8 +754,7 @@ public class lalr_state {
                 message.append(cex.example2());
                 message.append("\n");
                 numUnif++;
-            }
-            else {
+            } else {
                 message.append("  First example    : ");
                 message.append(cex.prettyExample1());
                 message.append("\n  First derivation : ");
@@ -798,11 +765,9 @@ public class lalr_state {
                 message.append(cex.example2());
                 message.append("\n");
                 if (!tle) {
-                    if (cex.timeout())
-                        numTimeOut++;
+                    if (cex.timeout()) numTimeOut++;
                     else numNonUnif++;
-                }
-                else numTle++;
+                } else numTle++;
             }
             reportCexStats(cex, System.nanoTime() - start);
         }
@@ -824,17 +789,15 @@ public class lalr_state {
      * @param red_itm      the item with the reduce.
      * @param conflict_sym the index of the symbol conflict occurs under.
      */
-    protected void report_shift_reduce(lalr_item red_itm, int conflict_sym)
-            throws internal_error {
+    protected void report_shift_reduce(lalr_item red_itm, int conflict_sym) throws internal_error {
         symbol shift_sym;
 
         /* emit top part of message including the reduce item */
-        StringBuilder message =
-                new StringBuilder("*** Shift/Reduce conflict found in state #");
+        StringBuilder message = new StringBuilder("*** Shift/Reduce conflict found in state #");
         message.append(index());
-//        message.append("\n  between reduction on ");
-//        message.append(red_itm.to_simple_string());
-//        message.append("\n");
+        //        message.append("\n  between reduction on ");
+        //        message.append(red_itm.to_simple_string());
+        //        message.append("\n");
         /* CupEx extension */
         long start;
         terminal cs = terminal.find(conflict_sym);
@@ -849,8 +812,7 @@ public class lalr_state {
 
                 /* is it a shift on our conflicting terminal */
                 shift_sym = itm.symbol_after_dot();
-                if (!shift_sym.is_non_term()
-                        && shift_sym.index() == conflict_sym) {
+                if (!shift_sym.is_non_term() && shift_sym.index() == conflict_sym) {
                     relevancecounter++;
                     /* yes, report on it */
                     message.append("\n  between reduction on ");
@@ -865,13 +827,9 @@ public class lalr_state {
                     /* CupEx extension */
                     if (Main.report_counterexamples) {
                         start = System.nanoTime();
-                        UnifiedExample ue =
-                                new UnifiedExample(this, red_itm, itm, cs);
+                        UnifiedExample ue = new UnifiedExample(this, red_itm, itm, cs);
                         boolean tle = cexTimeLimit();
-                        Counterexample cex =
-                                tle
-                                        ? ue.exampleFromShortestPath(true)
-                                        : ue.find();
+                        Counterexample cex = tle ? ue.exampleFromShortestPath(true) : ue.find();
                         if (cex.unifying()) {
                             message.append("  Ambiguity detected for nonterminal ");
                             message.append(cex.cexNonterminal());
@@ -883,8 +841,7 @@ public class lalr_state {
                             message.append(cex.example2());
                             message.append("\n");
                             numUnif++;
-                        }
-                        else {
+                        } else {
                             message.append("  Example using reduction   : ");
                             message.append(cex.prettyExample1());
                             message.append("\n  Derivation using reduction: ");
@@ -895,11 +852,9 @@ public class lalr_state {
                             message.append(cex.example2());
                             message.append("\n");
                             if (!tle) {
-                                if (cex.timeout())
-                                    numTimeOut++;
+                                if (cex.timeout()) numTimeOut++;
                                 else numNonUnif++;
-                            }
-                            else numTle++;
+                            } else numTle++;
                         }
                         reportCexStats(cex, System.nanoTime() - start);
                     }
@@ -920,16 +875,12 @@ public class lalr_state {
             if (Main.report_cex_stats_to_out) {
                 boolean tle = cexTimeLimit();
                 System.out.print("stage4");
-                if (cex.unifying())
-                    System.out.print(" unif");
-                else if (tle)
-                    System.out.print(" tle");
-                else if (cex.timeout())
-                    System.out.print(" t/o");
+                if (cex.unifying()) System.out.print(" unif");
+                else if (tle) System.out.print(" tle");
+                else if (cex.timeout()) System.out.print(" t/o");
                 else System.out.print(" nonunif");
                 System.out.println(":\n" + duration);
-            }
-            else System.err.println("stage4: " + duration);
+            } else System.err.println("stage4: " + duration);
         }
         cumulativeCexTime += duration;
     }
@@ -969,8 +920,7 @@ public class lalr_state {
     /** Generic equality comparison. */
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof lalr_state))
-            return false;
+        if (!(other instanceof lalr_state)) return false;
         else return equals((lalr_state) other);
     }
 

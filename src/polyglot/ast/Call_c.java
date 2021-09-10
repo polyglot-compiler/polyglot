@@ -71,14 +71,12 @@ public class Call_c extends Expr_c implements Call, CallOps {
     protected MethodInstance mi;
     protected boolean targetImplicit;
 
-//    @Deprecated
-    public Call_c(Position pos, Receiver target, Id name,
-            List<Expr> arguments) {
+    //    @Deprecated
+    public Call_c(Position pos, Receiver target, Id name, List<Expr> arguments) {
         this(pos, target, name, arguments, null);
     }
 
-    public Call_c(Position pos, Receiver target, Id name, List<Expr> arguments,
-            Ext ext) {
+    public Call_c(Position pos, Receiver target, Id name, List<Expr> arguments, Ext ext) {
         super(pos, ext);
         assert name != null && arguments != null; // target may be null
         this.target = target;
@@ -193,8 +191,8 @@ public class Call_c extends Expr_c implements Call, CallOps {
     }
 
     /** Reconstruct the call. */
-    protected <N extends Call_c> N reconstruct(N n, Receiver target, Id name,
-            List<Expr> arguments) {
+    protected <N extends Call_c> N reconstruct(
+            N n, Receiver target, Id name, List<Expr> arguments) {
         n = target(n, target);
         n = id(n, name);
         n = arguments(n, arguments);
@@ -221,19 +219,19 @@ public class Call_c extends Expr_c implements Call, CallOps {
         }
 
         MethodInstance mi =
-                ts.methodInstance(position(),
-                                  tb.currentClass(),
-                                  Flags.NONE,
-                                  ts.unknownType(position()),
-                                  name.id(),
-                                  l,
-                                  Collections.<Type> emptyList());
+                ts.methodInstance(
+                        position(),
+                        tb.currentClass(),
+                        Flags.NONE,
+                        ts.unknownType(position()),
+                        name.id(),
+                        l,
+                        Collections.<Type>emptyList());
         return methodInstance(n, mi);
     }
 
     @Override
-    public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
-            throws SemanticException {
+    public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         NodeFactory nf = tc.nodeFactory();
         Context c = tc.context();
@@ -247,10 +245,8 @@ public class Call_c extends Expr_c implements Call, CallOps {
         Receiver r;
         if (mi.flags().isStatic()) {
             Type container = tc.lang().findContainer(this, ts, mi);
-            r = nf.CanonicalTypeNode(position().startOf(), container)
-                  .type(container);
-        }
-        else {
+            r = nf.CanonicalTypeNode(position().startOf(), container).type(container);
+        } else {
             // The method is non-static, so we must prepend with "this", but we
             // need to determine if the "this" should be qualified.  Get the
             // enclosing class which brought the method into scope.  This is
@@ -259,11 +255,12 @@ public class Call_c extends Expr_c implements Call, CallOps {
             ClassType scope = c.findMethodScope(name.id());
 
             if (!ts.equals(scope, c.currentClass())) {
-                r = nf.This(position().startOf(),
-                            nf.CanonicalTypeNode(position().startOf(), scope))
-                      .type(scope);
-            }
-            else {
+                r =
+                        nf.This(
+                                        position().startOf(),
+                                        nf.CanonicalTypeNode(position().startOf(), scope))
+                                .type(scope);
+            } else {
                 r = nf.This(position().startOf()).type(scope);
             }
         }
@@ -304,11 +301,12 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
         ReferenceType targetType = tc.lang().findTargetType(this);
         MethodInstance mi =
-                ts.findMethod(targetType,
-                              name.id(),
-                              argTypes,
-                              c.currentClass(),
-                              !(target instanceof Special));
+                ts.findMethod(
+                        targetType,
+                        name.id(),
+                        argTypes,
+                        c.currentClass(),
+                        !(target instanceof Special));
 
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.
@@ -316,17 +314,22 @@ public class Call_c extends Expr_c implements Call, CallOps {
         boolean staticContext = target instanceof TypeNode;
 
         if (staticContext && !mi.flags().isStatic()) {
-            throw new SemanticException("Cannot call non-static method "
-                    + name.id() + " of " + target.type() + " in static "
-                    + "context.", this.position());
+            throw new SemanticException(
+                    "Cannot call non-static method "
+                            + name.id()
+                            + " of "
+                            + target.type()
+                            + " in static "
+                            + "context.",
+                    this.position());
         }
 
         // If the target is super, but the method is abstract, then complain.
         if (target instanceof Special
                 && ((Special) target).kind() == Special.SUPER
                 && mi.flags().isAbstract()) {
-            throw new SemanticException("Cannot call an abstract method "
-                    + "of the super class", this.position());
+            throw new SemanticException(
+                    "Cannot call an abstract method " + "of the super class", this.position());
         }
 
         Call_c call = this;
@@ -340,22 +343,30 @@ public class Call_c extends Expr_c implements Call, CallOps {
         Type t = target.type();
         if (t.isReference()) {
             return t.toReference();
-        }
-        else {
+        } else {
             // trying to invoke a method on a non-reference type.
             // let's pull out an appropriate error message.
             if (target instanceof Expr) {
-                throw new SemanticException("Cannot invoke method \"" + name
-                        + "\" on " + "an expression of non-reference type " + t
-                        + ".", target.position());
+                throw new SemanticException(
+                        "Cannot invoke method \""
+                                + name
+                                + "\" on "
+                                + "an expression of non-reference type "
+                                + t
+                                + ".",
+                        target.position());
+            } else if (target instanceof TypeNode) {
+                throw new SemanticException(
+                        "Cannot invoke static method \""
+                                + name
+                                + "\" on non-reference type "
+                                + t
+                                + ".",
+                        target.position());
             }
-            else if (target instanceof TypeNode) {
-                throw new SemanticException("Cannot invoke static method \""
-                        + name + "\" on non-reference type " + t + ".",
-                                            target.position());
-            }
-            throw new SemanticException("Cannot invoke method \"" + name
-                    + "\" on non-reference type " + t + ".", target.position());
+            throw new SemanticException(
+                    "Cannot invoke method \"" + name + "\" on non-reference type " + t + ".",
+                    target.position());
         }
     }
 
@@ -389,7 +400,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
 
         int count = 0;
 
-        for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
+        for (Iterator<Expr> i = arguments.iterator(); i.hasNext(); ) {
             if (count++ > 2) {
                 sb.append("...");
                 break;
@@ -412,8 +423,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
         if (!targetImplicit) {
             if (target instanceof Expr) {
                 printSubExpr((Expr) target, w, tr);
-            }
-            else if (target != null) {
+            } else if (target != null) {
                 print(target, w, tr);
             }
             w.write(".");
@@ -432,7 +442,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
         w.allowBreak(2, 2, "", 0);
         w.begin(0);
 
-        for (Iterator<Expr> i = arguments.iterator(); i.hasNext();) {
+        for (Iterator<Expr> i = arguments.iterator(); i.hasNext(); ) {
             Expr e = i.next();
 
             w.begin(2);
@@ -492,12 +502,10 @@ public class Call_c extends Expr_c implements Call, CallOps {
             if (!arguments.isEmpty()) {
                 v.visitCFG(t, listChild(arguments, (Expr) null), ENTRY);
                 v.visitCFGList(arguments, this, EXIT);
-            }
-            else {
+            } else {
                 v.visitCFG(t, this, EXIT);
             }
-        }
-        else {
+        } else {
             v.visitCFGList(arguments, this, EXIT);
         }
 
@@ -507,9 +515,8 @@ public class Call_c extends Expr_c implements Call, CallOps {
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
         if (mi == null) {
-            throw new InternalCompilerError(position(),
-                                            "Null method instance after type "
-                                                    + "check.");
+            throw new InternalCompilerError(
+                    position(), "Null method instance after type " + "check.");
         }
 
         return super.exceptionCheck(ec);
@@ -530,8 +537,7 @@ public class Call_c extends Expr_c implements Call, CallOps {
     }
 
     @Override
-    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw) throws SemanticException {
         if (isTargetImplicit()) {
             // don't translate the target
             return rw.bypass(target());
@@ -553,5 +559,4 @@ public class Call_c extends Expr_c implements Call, CallOps {
     public Node copy(NodeFactory nf) {
         return nf.Call(position, target, name, arguments);
     }
-
 }

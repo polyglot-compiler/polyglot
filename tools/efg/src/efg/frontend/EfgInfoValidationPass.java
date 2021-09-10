@@ -19,5 +19,4 @@ public class EfgInfoValidationPass extends AbstractPass {
         int nErrorsAfter = eq.errorCount();
         return nErrorsBefore == nErrorsAfter;
     }
-
 }

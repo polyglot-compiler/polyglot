@@ -42,11 +42,10 @@ import polyglot.visit.TypeChecker;
 /**
  * A {@code CanonicalTypeNode} is a type node for a canonical type.
  */
-public class CanonicalTypeNode_c extends TypeNode_c
-        implements CanonicalTypeNode {
+public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-//    @Deprecated
+    //    @Deprecated
     public CanonicalTypeNode_c(Position pos, Type type) {
         this(pos, type, null);
     }
@@ -69,10 +68,13 @@ public class CanonicalTypeNode_c extends TypeNode_c
                 ClassType ct = type.toClass();
                 if (ct.isTopLevel() || ct.isMember()) {
                     if (!ts.classAccessible(ct, tc.context())) {
-                        throw new SemanticException("Cannot access class \""
-                                + ct + "\" from the body of \""
-                                + tc.context().currentClass() + "\".",
-                                                    position());
+                        throw new SemanticException(
+                                "Cannot access class \""
+                                        + ct
+                                        + "\" from the body of \""
+                                        + tc.context().currentClass()
+                                        + "\".",
+                                position());
                     }
                 }
             }
@@ -90,8 +92,7 @@ public class CanonicalTypeNode_c extends TypeNode_c
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (type == null) {
             w.write("<unknown-type>");
-        }
-        else {
+        } else {
             type.print(w);
         }
     }
@@ -131,10 +132,7 @@ public class CanonicalTypeNode_c extends TypeNode_c
 
     @Override
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
-        TypeNode tn =
-                (TypeNode) extInfo.nodeFactory()
-                                  .lang()
-                                  .copy(this, extInfo.nodeFactory());
+        TypeNode tn = (TypeNode) extInfo.nodeFactory().lang().copy(this, extInfo.nodeFactory());
         Type t = tn.type();
         if (t != null) {
             // try to copy over type information
@@ -143,35 +141,25 @@ public class CanonicalTypeNode_c extends TypeNode_c
             TypeSystem ts = extInfo.typeSystem();
             if (t.isVoid()) {
                 t = ts.Void();
-            }
-            else if (t.isBoolean()) {
+            } else if (t.isBoolean()) {
                 t = ts.Boolean();
-            }
-            else if (t.isByte()) {
+            } else if (t.isByte()) {
                 t = ts.Byte();
-            }
-            else if (t.isChar()) {
+            } else if (t.isChar()) {
                 t = ts.Char();
-            }
-            else if (t.isDouble()) {
+            } else if (t.isDouble()) {
                 t = ts.Double();
-            }
-            else if (t.isFloat()) {
+            } else if (t.isFloat()) {
                 t = ts.Float();
-            }
-            else if (t.isInt()) {
+            } else if (t.isInt()) {
                 t = ts.Int();
-            }
-            else if (t.isLong()) {
+            } else if (t.isLong()) {
                 t = ts.Long();
-            }
-            else if (t.isNull()) {
+            } else if (t.isNull()) {
                 t = ts.Null();
-            }
-            else if (t.isShort()) {
+            } else if (t.isShort()) {
                 t = ts.Short();
-            }
-            else {
+            } else {
                 // Should do something here.
                 // return an amb type node?
             }
@@ -181,5 +169,4 @@ public class CanonicalTypeNode_c extends TypeNode_c
 
         return tn;
     }
-
 }

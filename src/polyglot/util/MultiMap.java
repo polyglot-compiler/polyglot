@@ -79,9 +79,8 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
     public Set<V> getValues(Object key) {
         Set<V> s = map.get(key);
         if (s == null) {
-            return Collections.<V> emptySet();
-        }
-        else {
+            return Collections.<V>emptySet();
+        } else {
             return Collections.unmodifiableSet(s);
         }
     }
@@ -125,8 +124,7 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
         Set<V> values = map.get(key);
         if (values == null) {
             return false;
-        }
-        else {
+        } else {
             return values.remove(value);
         }
     }
@@ -144,8 +142,7 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
         for (K key : map.keySet()) {
             if (first) {
                 first = false;
-            }
-            else {
+            } else {
                 sb.append(", ");
             }
             Set<V> values = map.get(key);

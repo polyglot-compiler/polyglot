@@ -36,7 +36,7 @@ import java.util.Set;
 public interface Lexer {
 
     /** This character denotes the end of file */
-    final public static int YYEOF = -1;
+    public static final int YYEOF = -1;
 
     /**
      * The file being scanned, for use in constructing diagnostic

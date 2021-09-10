@@ -49,28 +49,35 @@ public class Config {
 
     public final List<FactoryMapping> factoryMappings;
 
-    public Config(Name lang, Pair<Name, Name> extendsNames, Name packageName,
+    public Config(
+            Name lang,
+            Pair<Name, Name> extendsNames,
+            Name packageName,
             List<FactoryMapping> factoryMappings) {
-        this(lang,
-             extendsNames == null ? null : extendsNames.part1(),
-             extendsNames == null ? null : extendsNames.part2(),
-             packageName,
-             factoryMappings);
+        this(
+                lang,
+                extendsNames == null ? null : extendsNames.part1(),
+                extendsNames == null ? null : extendsNames.part2(),
+                packageName,
+                factoryMappings);
     }
 
-    public Config(Name lang, Name superInterface, Name superClass,
-            Name packageName, List<FactoryMapping> factoryMappings) {
-        this(lang,
-             superInterface,
-             null,
-             superClass,
-             null,
-             packageName,
-             factoryMappings);
+    public Config(
+            Name lang,
+            Name superInterface,
+            Name superClass,
+            Name packageName,
+            List<FactoryMapping> factoryMappings) {
+        this(lang, superInterface, null, superClass, null, packageName, factoryMappings);
     }
 
-    private Config(Name lang, Name superInterface, ClassType superInterfaceCT,
-            Name superClass, ClassType superClassCT, Name packageName,
+    private Config(
+            Name lang,
+            Name superInterface,
+            ClassType superInterfaceCT,
+            Name superClass,
+            ClassType superClassCT,
+            Name packageName,
             List<FactoryMapping> factoryMappings) {
         this.lang = lang;
         this.superInterface = superInterface;
@@ -78,16 +85,16 @@ public class Config {
         this.superClass = superClass;
         this.superClassCT = superClassCT;
         this.packageName = packageName;
-        this.factoryMappings =
-                Collections.unmodifiableList(new ArrayList<>(factoryMappings));
+        this.factoryMappings = Collections.unmodifiableList(new ArrayList<>(factoryMappings));
     }
 
     public static Config dummy() {
-        return new Config(new Name(Position.compilerGenerated(), ""),
-                          null,
-                          null,
-                          new Name(Position.compilerGenerated(), ""),
-                          Collections.<FactoryMapping> emptyList());
+        return new Config(
+                new Name(Position.compilerGenerated(), ""),
+                null,
+                null,
+                new Name(Position.compilerGenerated(), ""),
+                Collections.<FactoryMapping>emptyList());
     }
 
     public Config validate(EfgTypeSystem ts) throws SemanticException {
@@ -105,10 +112,8 @@ public class Config {
         if (this.superInterface == null) {
             // Use default.
             superInterfaceCT = v.ts.ExtFactory();
-            superInterface = new Name(Position.compilerGenerated(),
-                                      superInterfaceCT.fullName());
-        }
-        else {
+            superInterface = new Name(Position.compilerGenerated(), superInterfaceCT.fullName());
+        } else {
             superInterface = this.superInterface;
             superInterfaceCT = v.validateClass(superInterface);
         }
@@ -118,36 +123,34 @@ public class Config {
         if (this.superClass == null) {
             // Use default.
             superClassCT = v.ts.AbstractExtFactory();
-            superClass = new Name(Position.compilerGenerated(),
-                                  superClassCT.fullName());
-        }
-        else {
+            superClass = new Name(Position.compilerGenerated(), superClassCT.fullName());
+        } else {
             superClass = this.superClass;
             superClassCT = v.validateClass(superClass);
         }
 
         // Construct a map from class names to their corresponding
         // FactoryMappings.
-        Map<String, FactoryMapping> factoryMap =
-                new HashMap<>(factoryMappings.size());
+        Map<String, FactoryMapping> factoryMap = new HashMap<>(factoryMappings.size());
         for (FactoryMapping fm : factoryMappings) {
             fm = fm.qualifyClass(packageName);
 
             String className = fm.className.name;
             if (factoryMap.containsKey(className)) {
-                throw new SemanticException("Duplicate factory declaration for "
-                        + "class " + className, fm.pos);
+                throw new SemanticException(
+                        "Duplicate factory declaration for " + "class " + className, fm.pos);
             }
 
             factoryMap.put(className, fm.validate(v));
         }
 
-        return new Config(lang,
-                          superInterface,
-                          superInterfaceCT,
-                          superClass,
-                          superClassCT,
-                          packageName,
-                          new ArrayList<>(factoryMap.values()));
+        return new Config(
+                lang,
+                superInterface,
+                superInterfaceCT,
+                superClass,
+                superClassCT,
+                packageName,
+                new ArrayList<>(factoryMap.values()));
     }
 }

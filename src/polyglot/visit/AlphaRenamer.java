@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -70,7 +70,7 @@ public class AlphaRenamer extends NodeVisitor {
     protected boolean renameCatchFormals;
 
     /**
-     * Should we create new local instances? (If not, we will imperatively update the old ones). 
+     * Should we create new local instances? (If not, we will imperatively update the old ones).
      */
     protected boolean createNewLocalInstances;
 
@@ -87,8 +87,8 @@ public class AlphaRenamer extends NodeVisitor {
         this(nf, renameCatchFormals, false);
     }
 
-    public AlphaRenamer(NodeFactory nf, boolean renameCatchFormals,
-            boolean createNewLocalInstances) {
+    public AlphaRenamer(
+            NodeFactory nf, boolean renameCatchFormals, boolean createNewLocalInstances) {
         super(nf.lang());
         this.nf = nf;
 
@@ -175,8 +175,8 @@ public class AlphaRenamer extends NodeVisitor {
             }
 
             if (!renamingMap.containsKey(name)) {
-                throw new InternalCompilerError("Unexpected error encountered while "
-                        + "alpha-renaming.");
+                throw new InternalCompilerError(
+                        "Unexpected error encountered while " + "alpha-renaming.");
             }
 
             // Update the local instance as necessary.
@@ -200,8 +200,8 @@ public class AlphaRenamer extends NodeVisitor {
             }
 
             if (!renamingMap.containsKey(name)) {
-                throw new InternalCompilerError("Unexpected error encountered while "
-                        + "alpha-renaming.");
+                throw new InternalCompilerError(
+                        "Unexpected error encountered while " + "alpha-renaming.");
             }
 
             // Update the local instance as necessary.
@@ -220,20 +220,18 @@ public class AlphaRenamer extends NodeVisitor {
 
     /**
      * Memoization for getting local instances for newly generated names
-     * 
+     *
      * @param newName name of new local instance
      * @param liOld the local instance before renaming
      * @return A local instance with the new name
      */
-    private LocalInstance getNewLocalInstance(String newName,
-            LocalInstance liOld) {
+    private LocalInstance getNewLocalInstance(String newName, LocalInstance liOld) {
         LocalInstance liNew = localInstanceMemo.get(newName);
         if (liNew == null) {
             if (createNewLocalInstances) {
                 // create a new local instance.
                 liNew = liOld.name(newName);
-            }
-            else {
+            } else {
                 // imperatively update the existing local instance.
                 liNew = liOld;
                 liNew.setName(newName);

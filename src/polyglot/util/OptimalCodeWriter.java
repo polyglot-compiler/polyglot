@@ -141,8 +141,7 @@ public class OptimalCodeWriter extends CodeWriter {
             decIndent();
             trace("end");
         }
-        if (blockStack.isEmpty())
-            throw new InternalCompilerError("Mismatched blocks");
+        if (blockStack.isEmpty()) throw new InternalCompilerError("Mismatched blocks");
         current = blockStack.remove(0);
     }
 
@@ -197,14 +196,12 @@ public class OptimalCodeWriter extends CodeWriter {
         if (OptimalCodeWriter.showInput) {
             trace("flush");
         }
-        if (!blockStack.isEmpty())
-            throw new InternalCompilerError("Mismatched blocks");
+        if (!blockStack.isEmpty()) throw new InternalCompilerError("Mismatched blocks");
         boolean success = true;
         format_calls = 0;
 
         Map<AllowBreak, Boolean> brkAssignment;
-        if (format)
-            brkAssignment = OCItem.format(input, width);
+        if (format) brkAssignment = OCItem.format(input, width);
         else brkAssignment = Collections.emptyMap();
         input.sendOutput(output, 0, 0, brkAssignment);
 
@@ -265,11 +262,9 @@ public class OptimalCodeWriter extends CodeWriter {
 
     /** Print a debug message. */
     void trace(String s) {
-        for (int i = 0; i < trace_indent; i++)
-            System.out.print(" ");
+        for (int i = 0; i < trace_indent; i++) System.out.print(" ");
         System.out.println(s);
     }
-
 }
 
 class ConsList<T> {
@@ -284,8 +279,7 @@ class ConsList<T> {
     T elem;
     ConsList<T> next;
 
-    private ConsList() {
-    }
+    private ConsList() {}
 
     private ConsList(T elem, ConsList<T> next) {
         this.elem = elem;
@@ -320,8 +314,7 @@ class ConsList<T> {
             if (length() != l.length()) return false;
             if (elem == null || l.elem == null) {
                 if (elem != l.elem) return false;
-            }
-            else if (!elem.equals(l.elem)) return false;
+            } else if (!elem.equals(l.elem)) return false;
             if (next == null || l.next == null) return next == l.next;
             return next.equals(l.next);
         }
@@ -354,8 +347,15 @@ class SearchState implements Cloneable {
     AllowBreak it;
     SearchState prevBreak;
 
-    SearchState(int lmargin, int rmargin, int pos, int minbr, int minbu,
-            int minbo, int maxbr, int maxbi) {
+    SearchState(
+            int lmargin,
+            int rmargin,
+            int pos,
+            int minbr,
+            int minbu,
+            int minbo,
+            int maxbr,
+            int maxbi) {
         this.lmargin = lmargin;
         this.rmargin = rmargin;
         this.pos = pos;
@@ -419,8 +419,7 @@ class SearchState implements Cloneable {
         try {
             SearchState s = (SearchState) clone();
             return s;
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone weirdness", e);
         }
     }
@@ -449,32 +448,32 @@ abstract class OCItem {
      */
     static Map<AllowBreak, Boolean> format(OCItem it, int rmargin) {
         SearchState s =
-                new SearchState(0,
-                                rmargin,
-                                0,
-                                0,
-                                0,
-                                0,
-                                Integer.MAX_VALUE,
-                                Integer.MAX_VALUE);
-        for (OCItem cur = it; cur != null;) {
+                new SearchState(0, rmargin, 0, 0, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        for (OCItem cur = it; cur != null; ) {
             OptimalCodeWriter.format_calls++;
             if (OptimalCodeWriter.debug) {
                 if (cur != OptimalCodeWriter.top) {
                     System.err.println("SNAPSHOT:");
-                    PrintWriter w =
-                            new PrintWriter(new OutputStreamWriter(System.err));
-                    cur.sendOutput(w,
-                                   0,
-                                   0,
-                                   Collections.<AllowBreak, Boolean> emptyMap());
+                    PrintWriter w = new PrintWriter(new OutputStreamWriter(System.err));
+                    cur.sendOutput(w, 0, 0, Collections.<AllowBreak, Boolean>emptyMap());
                     w.write("<END>\n");
                     w.flush();
                 }
-                System.err.println("Format: " + cur + "\n  lmargin = "
-                        + s.lmargin + " pos = " + s.pos + " max break levels: "
-                        + s.maxbr + "/" + s.maxbi + " min break levels: "
-                        + s.minbr + "/" + s.minbu);
+                System.err.println(
+                        "Format: "
+                                + cur
+                                + "\n  lmargin = "
+                                + s.lmargin
+                                + " pos = "
+                                + s.pos
+                                + " max break levels: "
+                                + s.maxbr
+                                + "/"
+                                + s.maxbi
+                                + " min break levels: "
+                                + s.minbr
+                                + "/"
+                                + s.minbu);
 
                 System.err.flush();
             }
@@ -483,14 +482,12 @@ abstract class OCItem {
                 if (cur instanceof BlockItem) {
                     BlockItem bi = (BlockItem) cur;
                     cur = bi.first;
-                }
-                else cur = cur.next;
+                } else cur = cur.next;
                 while (cur == null && !s.blks.isEmpty()) {
                     // Retrieve next item in the outer block.
                     cur = s.popBlock().next;
                 }
-            }
-            else {
+            } else {
                 SearchState prev = s.prevBreak;
                 cur = prev.it;
                 // Restore search parameters.
@@ -601,8 +598,8 @@ abstract class OCItem {
      *
      * @param success
      */
-    abstract int sendOutput(PrintWriter out, int lmargin, int pos,
-            Map<AllowBreak, Boolean> brkAssignment);
+    abstract int sendOutput(
+            PrintWriter out, int lmargin, int pos, Map<AllowBreak, Boolean> brkAssignment);
 
     public String summarize(String s) {
         if (s.length() <= 79) return s;
@@ -631,7 +628,7 @@ abstract class OCItem {
 
 /** A simple string. */
 class TextItem extends OCItem {
-    String s; //@ invariant s != null
+    String s; // @ invariant s != null
     int length;
 
     TextItem(String s_, int length_) {
@@ -647,8 +644,7 @@ class TextItem extends OCItem {
             // and this item overflows, backtrack.
             s.forward = false;
             s.minovf = rpos - s.rmargin;
-        }
-        else {
+        } else {
             // Otherwise, all preceding break assignments have done their best jobs,
             // so move forward.
             s.pos = rpos;
@@ -656,13 +652,12 @@ class TextItem extends OCItem {
     }
 
     @Override
-    int sendOutput(PrintWriter o, int lmargin, int pos,
-            Map<AllowBreak, Boolean> brkAssignment) {
+    int sendOutput(PrintWriter o, int lmargin, int pos, Map<AllowBreak, Boolean> brkAssignment) {
         o.write(s);
         return pos + length;
     }
 
-    int[] minBreakLevels = { 0, 0, 0 };
+    int[] minBreakLevels = {0, 0, 0};
 
     @Override
     int[] minBreakLevels() {
@@ -674,8 +669,7 @@ class TextItem extends OCItem {
         java.io.StringWriter sw = new java.io.StringWriter();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c == ' ')
-                sw.write("\\ ");
+            if (c == ' ') sw.write("\\ ");
             else sw.write(c);
         }
         return sw.toString();
@@ -697,11 +691,11 @@ class AllowBreak extends OCItem {
     final String alt;
     final int altlen;
 
-    //@ invariant indent >= 0
-    //@ invariant alt != null
+    // @ invariant indent >= 0
+    // @ invariant alt != null
 
-    //@ requires n_ >= 0
-    //@ requires alt_ != null
+    // @ requires n_ >= 0
+    // @ requires alt_ != null
     AllowBreak(int n_, int level_, String alt_, int altlen_, boolean u) {
         indent = n_;
         alt = alt_;
@@ -709,7 +703,6 @@ class AllowBreak extends OCItem {
         level = level_;
         unified = u;
     }
-
 
     int minovf;
     ConsList<Boolean> afterBrkAssignment;
@@ -724,11 +717,9 @@ class AllowBreak extends OCItem {
             Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache =
                     cache.get(s.maxbr);
             if (brCache.containsKey(s.maxbi)) {
-                Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache =
-                        brCache.get(s.maxbi);
+                Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache = brCache.get(s.maxbi);
                 if (biCache.containsKey(s.pos)) {
-                    Pair<Integer, ConsList<Boolean>> result =
-                            biCache.get(s.pos);
+                    Pair<Integer, ConsList<Boolean>> result = biCache.get(s.pos);
                     return result;
                 }
             }
@@ -740,21 +731,18 @@ class AllowBreak extends OCItem {
     void cachePut(SearchState s) {
         // Memoize overflow results before backtracking.
         Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache;
-        if (cache.containsKey(s.maxbr))
-            brCache = cache.get(s.maxbr);
+        if (cache.containsKey(s.maxbr)) brCache = cache.get(s.maxbr);
         else {
             brCache = new HashMap<>();
             cache.put(s.maxbr, brCache);
         }
         Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache;
-        if (brCache.containsKey(s.maxbi))
-            biCache = brCache.get(s.maxbi);
+        if (brCache.containsKey(s.maxbi)) biCache = brCache.get(s.maxbi);
         else {
             biCache = new HashMap<>();
             brCache.put(s.maxbi, biCache);
         }
-        Pair<Integer, ConsList<Boolean>> result =
-                new Pair<>(s.minovf, s.afterBrkAssignment);
+        Pair<Integer, ConsList<Boolean>> result = new Pair<>(s.minovf, s.afterBrkAssignment);
         biCache.put(s.pos, result);
     }
 
@@ -782,20 +770,17 @@ class AllowBreak extends OCItem {
                 // Just take the specified assignment.
                 assignment = s.afterBrkAssignment.elem;
                 s.afterBrkAssignment = s.afterBrkAssignment.next;
-            }
-            else if (canLeaveUnbroken(s.minbr, s.minbu) && rpos <= s.rmargin) {
+            } else if (canLeaveUnbroken(s.minbr, s.minbu) && rpos <= s.rmargin) {
                 // This break can be left unbroken without causing immediate overflow.
                 assignment = false;
                 findminovf = true;
-            }
-            else if (canBreak(s.maxbr)) {
+            } else if (canBreak(s.maxbr)) {
                 // This break must be broken.
                 // If not breaking causes immediate overflow, it is better to
                 // break now and possibly overflow later.
                 assignment = true;
                 findminovf = s.findminovf;
-            }
-            else if (canLeaveUnbroken(s.minbr, s.minbu)) {
+            } else if (canLeaveUnbroken(s.minbr, s.minbu)) {
                 // Overflow always happens, and we could not break.
                 assignment = false;
                 if (s.findminovf) {
@@ -804,11 +789,8 @@ class AllowBreak extends OCItem {
                     // Since we could not break, the amount of minimal overflow is by not breaking.
                     s.minovf = rpos - s.rmargin;
                 }
-            }
-            else throw new InternalCompilerError("Could not either break or not break."
-                    + this);
-        }
-        else {
+            } else throw new InternalCompilerError("Could not either break or not break." + this);
+        } else {
             // Later item failed to stay within width limit
             if (!s.brkAssignment.get(this) && canBreak(s.maxbr)) {
                 // We tried not breaking and did not work.
@@ -818,8 +800,7 @@ class AllowBreak extends OCItem {
                 s.afterBrkAssignment = ConsList.empty();
                 // Now we try breaking.
                 assignment = true;
-            }
-            else {
+            } else {
                 // We tried all options, and overflow always happens.
                 if (afterBrkAssignment != null) {
                     // We tried both breaking and not breaking.
@@ -834,12 +815,10 @@ class AllowBreak extends OCItem {
                         // Restore saved assignments.
                         s.minovf = minovf;
                         s.afterBrkAssignment = afterBrkAssignment;
-                    }
-                    else assignment = true;
+                    } else assignment = true;
                     minovf = Integer.MAX_VALUE;
                     afterBrkAssignment = null;
-                }
-                else {
+                } else {
                     // We did not save assignments.
                     // If we can break, then we could not break, so we must break.
                     // Otherwise, we must not break.
@@ -850,8 +829,7 @@ class AllowBreak extends OCItem {
                 if (prev.findminovf) {
                     // If an earlier break is finding minimal overflow, punt to that break.
                     backtrack = true;
-                }
-                else {
+                } else {
                     // All earlier breaks have tried their best job,
                     // so we continue on with our best break assignment.
                     s.findminovf = false;
@@ -862,13 +840,11 @@ class AllowBreak extends OCItem {
             s.forward = false;
             // Prepare best assignment causing minimal overflow for earlier break.
             s.brkAssignment.remove(this);
-            s.afterBrkAssignment =
-                    ConsList.cons(assignment, s.afterBrkAssignment);
+            s.afterBrkAssignment = ConsList.cons(assignment, s.afterBrkAssignment);
 
             // Memoize overflow results before backtracking.
             cachePut(s);
-        }
-        else {
+        } else {
             s.forward = true;
             if (findminovf) {
                 // Set backtracking point to this break.
@@ -888,17 +864,16 @@ class AllowBreak extends OCItem {
                 if (unified && s.minbu < level) s.minbu = level;
                 // The min break level of outer block must be at least this level.
                 if (s.minbo < level) s.minbo = level;
-            }
-            else {
+            } else {
                 // Break is not broken.
                 s.pos += altlen;
                 // Since we are not breaking, the max break level must be adjusted.
                 if (s.maxbr >= level) {
                     if (unified) {
-                        // If this is a unified break, the max break level must be less than our level.
+                        // If this is a unified break, the max break level must be less than our
+                        // level.
                         s.maxbr = level - 1;
-                    }
-                    else {
+                    } else {
                         // Otherwise, the max break level must be at most our level.
                         s.maxbr = level;
                     }
@@ -910,18 +885,15 @@ class AllowBreak extends OCItem {
     }
 
     @Override
-    int sendOutput(PrintWriter o, int lmargin, int pos,
-            Map<AllowBreak, Boolean> brkAssignment) {
+    int sendOutput(PrintWriter o, int lmargin, int pos, Map<AllowBreak, Boolean> brkAssignment) {
         if (brkAssignment.containsKey(this) && !brkAssignment.get(this)) {
             // Do not break.
             o.print(alt);
             return pos + altlen;
-        }
-        else {
+        } else {
             // Break.
             o.println();
-            for (int i = 0; i < lmargin + indent; i++)
-                o.print(" ");
+            for (int i = 0; i < lmargin + indent; i++) o.print(" ");
             return lmargin + indent;
         }
     }
@@ -934,7 +906,7 @@ class AllowBreak extends OCItem {
         return level > minLevelUnified || !unified && level > minLevel;
     }
 
-    int[] minBreakLevels = { 0, 0, 0 };
+    int[] minBreakLevels = {0, 0, 0};
 
     @Override
     int[] minBreakLevels() {
@@ -960,8 +932,7 @@ class Newline extends AllowBreak {
 
     @Override
     void selfFormat(SearchState s) {
-        if (!canBreak(s.maxbr))
-            throw new InternalCompilerError("Newline cannot be broken.");
+        if (!canBreak(s.maxbr)) throw new InternalCompilerError("Newline cannot be broken.");
         // Break is broken.
         s.pos = s.lmargin + indent;
         // Since we are breaking, all breaks of lower levels must also be broken.
@@ -979,12 +950,11 @@ class Newline extends AllowBreak {
 
     @Override
     String selfToString() {
-        if (indent == 0)
-            return "\\n";
+        if (indent == 0) return "\\n";
         else return "\\n[" + indent + "]";
     }
 
-    int[] minBreakLevels = { level, level > 0 ? level - 1 : 0, level };
+    int[] minBreakLevels = {level, level > 0 ? level - 1 : 0, level};
 
     @Override
     int[] minBreakLevels() {
@@ -999,7 +969,7 @@ class Newline extends AllowBreak {
 class BlockItem extends OCItem {
     OCItem first;
     OCItem last;
-    int indent; //@ invariant indent >= 0
+    int indent; // @ invariant indent >= 0
 
     BlockItem(int indent_) {
         first = last = null;
@@ -1013,14 +983,12 @@ class BlockItem extends OCItem {
     void add(OCItem it) {
         if (first == null) {
             first = it;
-        }
-        else {
+        } else {
             if (it instanceof TextItem && last instanceof TextItem) {
                 TextItem lasts = (TextItem) last;
                 lasts.appendTextItem((TextItem) it);
                 return;
-            }
-            else {
+            } else {
                 last.next = it;
             }
         }
@@ -1044,8 +1012,7 @@ class BlockItem extends OCItem {
     }
 
     @Override
-    int sendOutput(PrintWriter o, int lmargin, int pos,
-            Map<AllowBreak, Boolean> brkAssignment) {
+    int sendOutput(PrintWriter o, int lmargin, int pos, Map<AllowBreak, Boolean> brkAssignment) {
         lmargin = pos + indent;
         for (OCItem it = first; it != null; it = it.next)
             pos = it.sendOutput(o, lmargin, pos, brkAssignment);
@@ -1069,7 +1036,7 @@ class BlockItem extends OCItem {
     @Override
     int[] minBreakLevels() {
         if (minBreakLevels == null) {
-            minBreakLevels = new int[] { 0, 0, 0, 0, 0 };
+            minBreakLevels = new int[] {0, 0, 0, 0, 0};
             for (OCItem it = first; it != null; it = it.next) {
                 int[] mbls = it.minBreakLevels();
                 if (minBreakLevels[2] < mbls[0]) minBreakLevels[2] = mbls[0];
@@ -1083,8 +1050,7 @@ class BlockItem extends OCItem {
 
     @Override
     String selfToString() {
-        if (indent == 0)
-            return "[" + first + "]";
+        if (indent == 0) return "[" + first + "]";
         else return "[" + indent + first + "]";
     }
 }

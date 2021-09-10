@@ -47,7 +47,7 @@ public class StringLit_c extends Lit_c implements StringLit {
 
     protected String value;
 
-//    @Deprecated
+    //    @Deprecated
     public StringLit_c(Position pos, String value) {
         this(pos, value, null);
     }
@@ -83,8 +83,7 @@ public class StringLit_c extends Lit_c implements StringLit {
     @Override
     public String toString() {
         if (StringUtil.unicodeEscape(value).length() > 11) {
-            return "\"" + StringUtil.unicodeEscape(value).substring(0, 8)
-                    + "...\"";
+            return "\"" + StringUtil.unicodeEscape(value).substring(0, 8) + "...\"";
         }
 
         return "\"" + StringUtil.unicodeEscape(value) + "\"";
@@ -149,5 +148,4 @@ public class StringLit_c extends Lit_c implements StringLit {
     public Node copy(NodeFactory nf) {
         return nf.StringLit(position, value);
     }
-
 }

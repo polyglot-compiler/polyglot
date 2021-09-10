@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -75,8 +75,8 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     protected long ordinal;
     protected Javadoc javadoc;
 
-    public EnumConstantDecl_c(Position pos, Flags flags, Id name,
-            List<Expr> args, ClassBody body, Javadoc javadoc) {
+    public EnumConstantDecl_c(
+            Position pos, Flags flags, Id name, List<Expr> args, ClassBody body, Javadoc javadoc) {
         super(pos);
         this.name = name;
         this.args = args;
@@ -89,8 +89,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public EnumConstantDecl_c(Position pos, Flags flags, Id name,
-            List<Expr> args, ClassBody body) {
+    public EnumConstantDecl_c(Position pos, Flags flags, Id name, List<Expr> args, ClassBody body) {
         this(pos, flags, name, args, body, null);
     }
 
@@ -216,8 +215,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         return constructorInstance(this, ci);
     }
 
-    protected <N extends EnumConstantDecl_c> N constructorInstance(N n,
-            ConstructorInstance ci) {
+    protected <N extends EnumConstantDecl_c> N constructorInstance(N n, ConstructorInstance ci) {
         if (n.constructorInstance == ci) return n;
         if (n == this) n = Copy.Util.copy(n);
         n.constructorInstance = ci;
@@ -253,8 +251,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
 
     @Override
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        if (body() != null)
-            return tb.pushCode().pushAnonClass(position()).enterAnonClass();
+        if (body() != null) return tb.pushCode().pushAnonClass(position()).enterAnonClass();
         else return tb.pushCode();
     }
 
@@ -268,11 +265,8 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         }
 
         ConstructorInstance ci =
-                ts.constructorInstance(position(),
-                                       ts.Object(),
-                                       Flags.NONE,
-                                       l,
-                                       Collections.<Type> emptyList());
+                ts.constructorInstance(
+                        position(), ts.Object(), Flags.NONE, l, Collections.<Type>emptyList());
 
         EnumConstantDecl_c n = this;
         n = constructorInstance(n, ci);
@@ -288,8 +282,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
                 type.setSupertypesResolved(true);
             }
 
-        }
-        else {
+        } else {
             // this is not an anonymous class extending the enum
             enumType = (JL5ParsedClassType) tb.currentClass();
             n = type(n, enumType);
@@ -299,12 +292,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
         if (enumType == null) {
             return n;
         }
-        EnumInstance ei =
-                ts.enumInstance(position(),
-                                enumType,
-                                Flags.NONE,
-                                name.id(),
-                                ordinal);
+        EnumInstance ei = ts.enumInstance(position(), enumType, Flags.NONE, name.id(), ordinal);
         enumType.addEnumConstant(ei);
         n = enumInstance(n, ei);
 
@@ -322,13 +310,13 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
             argTypes.add(e.type());
         }
 
-        ConstructorInstance ci =
-                ts.findConstructor(ct, argTypes, c.currentClass(), false);
+        ConstructorInstance ci = ts.findConstructor(ct, argTypes, c.currentClass(), false);
         EnumConstantDecl_c n = constructorInstance(this, ci);
 
         if (!n.flags().isEmpty()) {
-            throw new SemanticException("Cannot have modifier(s): " + flags
-                    + " on enum constant declaration", this.position());
+            throw new SemanticException(
+                    "Cannot have modifier(s): " + flags + " on enum constant declaration",
+                    this.position());
         }
 
         if (this.body != null) {
@@ -351,8 +339,7 @@ public class EnumConstantDecl_c extends Term_c implements EnumConstantDecl {
     @Override
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         Iterator<Expr> i = this.args().iterator();
-        Iterator<? extends Type> j =
-                constructorInstance().formalTypes().iterator();
+        Iterator<? extends Type> j = constructorInstance().formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
             Expr e = i.next();

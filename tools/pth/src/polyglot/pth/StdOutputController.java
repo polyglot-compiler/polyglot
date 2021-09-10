@@ -47,29 +47,30 @@ public class StdOutputController extends OutputController {
         String notice = sts.getNotice();
         if (notice != null) println(notice);
 
-        if (!sts.success() && sts.getFailureMessage() != null)
-            println(sts.getFailureMessage());
+        if (!sts.success() && sts.getFailureMessage() != null) println(sts.getFailureMessage());
 
-        println(sts.getName() + ": " + sts.getSuccessfulTestCount() + " out of "
-                + sts.getExecutedTestCount() + " tests succeeded.");
+        println(
+                sts.getName()
+                        + ": "
+                        + sts.getSuccessfulTestCount()
+                        + " out of "
+                        + sts.getExecutedTestCount()
+                        + " tests succeeded.");
     }
 
     @Override
-    protected void startSourceFileTestCollection(
-            SourceFileTestCollection sftc) {
+    protected void startSourceFileTestCollection(SourceFileTestCollection sftc) {
         println("Test collection: " + sftc.getName());
         beginBlock();
     }
 
     @Override
-    protected void finishSourceFileTestCollection(
-            SourceFileTestCollection sftc) {
+    protected void finishSourceFileTestCollection(SourceFileTestCollection sftc) {
         endBlock();
         String notice = sftc.getNotice();
         if (notice != null) println(notice);
 
-        if (!sftc.success() && sftc.getFailureMessage() != null)
-            println(sftc.getFailureMessage());
+        if (!sftc.success() && sftc.getFailureMessage() != null) println(sftc.getFailureMessage());
 
         println(sftc.getSummary());
     }
@@ -86,12 +87,10 @@ public class StdOutputController extends OutputController {
         String notice = sft.getNotice();
         if (notice != null) print("[" + notice + "] ");
 
-        if (sft.success())
-            println("OK");
+        if (sft.success()) println("OK");
         else {
             String msg = sft.getFailureMessage();
-            if (msg != null)
-                println(msg);
+            if (msg != null) println(msg);
             else println("Failed (no message)");
         }
         if (!Main.options.suppressCompilerOutputs) {
@@ -122,10 +121,8 @@ public class StdOutputController extends OutputController {
         String notice = b.getNotice();
         if (notice != null) println(notice);
 
-        if (b.success())
-            println("OK");
-        else if (b.getFailureMessage() != null)
-            println(b.getFailureMessage());
+        if (b.success()) println("OK");
+        else if (b.getFailureMessage() != null) println(b.getFailureMessage());
         else println("Failed (no message)");
     }
 
@@ -143,12 +140,11 @@ public class StdOutputController extends OutputController {
     }
 
     @Override
-    public void printTestSuiteFooter(int total, int grandTotal, int lastSuccess,
-            int neverRun, int neverSuccess) {
+    public void printTestSuiteFooter(
+            int total, int grandTotal, int lastSuccess, int neverRun, int neverSuccess) {
         endBlock();
         print("Total tests displayed: " + total);
-        if (total != grandTotal)
-            print(" (out of " + grandTotal + " in script)");
+        if (total != grandTotal) print(" (out of " + grandTotal + " in script)");
         println();
         println("   Succeeded last run: " + lastSuccess);
         println("   Never run         : " + neverRun);
@@ -161,8 +157,7 @@ public class StdOutputController extends OutputController {
     public void displayTestResults(TestResult tr, String testName) {
         StringBuffer sb = new StringBuffer();
         sb.append(testName);
-        while (sb.length() < TEST_NAME_COLUMN_WIDTH)
-            sb.append(' ');
+        while (sb.length() < TEST_NAME_COLUMN_WIDTH) sb.append(' ');
         sb.append(" run ");
         sb.append(getDateDisplay(tr == null ? null : tr.dateTestRun));
         sb.append("; success ");

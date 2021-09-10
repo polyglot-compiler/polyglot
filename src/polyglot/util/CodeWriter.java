@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -35,7 +35,7 @@ import java.io.IOException;
  * characters if possible. Newlines occur in the output only at places where a
  * line break is permitted by the use of {@code allowBreak} and
  * {@code unifiedBreak}.
- * 
+ *
  * Line breaks can have different levels, which is useful for implementing
  * things like "miser mode" layout.
  */
@@ -51,7 +51,7 @@ public abstract class CodeWriter implements AutoCloseable {
      * has width {@code length} even if it has a different number of
      * characters. This is useful when the string contains escape sequences,
      * HTML character entity references, etc.
-     * 
+     *
      * @param s
      * @param length
      */
@@ -94,7 +94,7 @@ public abstract class CodeWriter implements AutoCloseable {
      * not necessarily break in this case. That is, unified breaks act as if
      * they were slightly lower level than other breaks of the same level
      * (including other unified breaks!).
-     * 
+     *
      * @param n
      *            the relative indentation
      * @param level
@@ -109,8 +109,8 @@ public abstract class CodeWriter implements AutoCloseable {
 
     /**
      * The most common use of "unifiedBreak": level 1, with an alternative of a
-     * single space. 
-     * 
+     * single space.
+     *
      * @param n
      *            the indentation relative to the current block.
      */
@@ -120,8 +120,8 @@ public abstract class CodeWriter implements AutoCloseable {
 
     /**
      * The most common use of "allowBreak": level 1, with an alternative of a
-     * single space. 
-     * 
+     * single space.
+     *
      * @param n
      *            the indentation relative to the current block.
      */

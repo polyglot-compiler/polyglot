@@ -51,8 +51,7 @@ import polyglot.types.Type;
 import polyglot.types.TypeObject;
 import polyglot.util.Position;
 
-public interface JL5TypeSystem extends
-        ParamTypeSystem<TypeVariable, ReferenceType> {
+public interface JL5TypeSystem extends ParamTypeSystem<TypeVariable, ReferenceType> {
     @Override
     ParsedClassType createClassType(LazyClassInitializer init, Source fromSource);
 
@@ -116,8 +115,7 @@ public interface JL5TypeSystem extends
      * They are override equivalent if either mi is a subsignature of mj,
      * or mj is a subsignature of mi.
      */
-    boolean areOverrideEquivalent(JL5ProcedureInstance mi,
-            JL5ProcedureInstance mj);
+    boolean areOverrideEquivalent(JL5ProcedureInstance mi, JL5ProcedureInstance mj);
 
     /**
      * Are types ri and rj return type substitutable?
@@ -126,7 +124,7 @@ public interface JL5TypeSystem extends
      * - if ri is a primitive type, and rj is identical to ri.
      * - if ri is a reference type, and ri is either a subtype of rj or
      *      ri can be converted to a subtype of rj by unchecked conversion (5.1.9), or
-            ri is the erasure of rj.
+     * ri is the erasure of rj.
      * - if ri is void and rj is void.
      */
     boolean areReturnTypeSubstitutable(Type ri, Type rj);
@@ -149,14 +147,15 @@ public interface JL5TypeSystem extends
     /**
      * Instantiate class clazz with actuals.
      */
-    ClassType instantiate(Position pos, JL5ParsedClassType clazz,
-            List<? extends ReferenceType> actuals) throws SemanticException;
+    ClassType instantiate(
+            Position pos, JL5ParsedClassType clazz, List<? extends ReferenceType> actuals)
+            throws SemanticException;
 
     /**
      * Instantiate class clazz with actuals.
      */
-    ClassType instantiate(Position pos, JL5ParsedClassType clazz,
-            ReferenceType... actuals) throws SemanticException;
+    ClassType instantiate(Position pos, JL5ParsedClassType clazz, ReferenceType... actuals)
+            throws SemanticException;
 
     /**
      * Returns the erased type of t.
@@ -176,17 +175,26 @@ public interface JL5TypeSystem extends
      */
     JL5Subst erasureSubst(JL5ParsedClassType base);
 
-    JL5MethodInstance methodInstance(Position pos, ReferenceType container,
-            Flags flags, Type returnType, String name,
-            List<? extends Type> argTypes, List<? extends Type> excTypes,
+    JL5MethodInstance methodInstance(
+            Position pos,
+            ReferenceType container,
+            Flags flags,
+            Type returnType,
+            String name,
+            List<? extends Type> argTypes,
+            List<? extends Type> excTypes,
             List<TypeVariable> typeParams);
 
-    JL5ConstructorInstance constructorInstance(Position pos,
-            ClassType container, Flags flags, List<? extends Type> argTypes,
-            List<? extends Type> excTypes, List<TypeVariable> typeParams);
+    JL5ConstructorInstance constructorInstance(
+            Position pos,
+            ClassType container,
+            Flags flags,
+            List<? extends Type> argTypes,
+            List<? extends Type> excTypes,
+            List<TypeVariable> typeParams);
 
-    JL5ProcedureInstance instantiate(Position pos, JL5ProcedureInstance mi,
-            List<? extends ReferenceType> actuals);
+    JL5ProcedureInstance instantiate(
+            Position pos, JL5ProcedureInstance mi, List<? extends ReferenceType> actuals);
 
     /**
      * Check whether {@code mi} can be called with name {@code name}
@@ -196,7 +204,9 @@ public interface JL5TypeSystem extends
      * Will return null if mi cannot be successfully called. Will return an appropriately
      * instantiated method instance if the call is valid (i.e., the substitution after type inference).
      */
-    JL5MethodInstance methodCallValid(JL5MethodInstance mi, String name,
+    JL5MethodInstance methodCallValid(
+            JL5MethodInstance mi,
+            String name,
             List<? extends Type> argTypes,
             List<? extends ReferenceType> actualTypeArgs,
             Type expectedReturnType);
@@ -209,7 +219,8 @@ public interface JL5TypeSystem extends
      * Will return null if ci cannot be successfully called. Will return an appropriately
      * instantiated instance if the call is valid (i.e., the substitution after type inference).
      */
-    JL5ProcedureInstance callValid(JL5ProcedureInstance mi,
+    JL5ProcedureInstance callValid(
+            JL5ProcedureInstance mi,
             List<? extends Type> argTypes,
             List<? extends ReferenceType> actualTypeArgs);
 
@@ -222,23 +233,21 @@ public interface JL5TypeSystem extends
 
     boolean isPrimitiveWrapper(Type l);
 
-    EnumInstance enumInstance(Position pos, ClassType container, Flags f,
-            String name, long ordinal);
+    EnumInstance enumInstance(
+            Position pos, ClassType container, Flags f, String name, long ordinal);
 
-    EnumInstance findEnumConstant(ReferenceType container, long ordinal)
+    EnumInstance findEnumConstant(ReferenceType container, long ordinal) throws SemanticException;
+
+    EnumInstance findEnumConstant(ReferenceType container, String name, ClassType currClass)
             throws SemanticException;
 
-    EnumInstance findEnumConstant(ReferenceType container, String name,
-            ClassType currClass) throws SemanticException;
-
-    EnumInstance findEnumConstant(ReferenceType container, String name,
-            Context c) throws SemanticException;
-
-    EnumInstance findEnumConstant(ReferenceType container, String name)
+    EnumInstance findEnumConstant(ReferenceType container, String name, Context c)
             throws SemanticException;
 
-    FieldInstance findFieldOrEnum(ReferenceType container, String name,
-            ClassType currClass) throws SemanticException;
+    EnumInstance findEnumConstant(ReferenceType container, String name) throws SemanticException;
+
+    FieldInstance findFieldOrEnum(ReferenceType container, String name, ClassType currClass)
+            throws SemanticException;
 
     boolean numericConversionBaseValid(Type t, Object value);
 
@@ -258,13 +267,12 @@ public interface JL5TypeSystem extends
     @Override
     Flags flagsForBits(int bits);
 
-    TypeVariable typeVariable(Position pos, String name,
-            ReferenceType upperBound);
+    TypeVariable typeVariable(Position pos, String name, ReferenceType upperBound);
 
     WildCardType wildCardType(Position position);
 
-    WildCardType wildCardType(Position position, ReferenceType upperBound,
-            ReferenceType lowerBound);
+    WildCardType wildCardType(
+            Position position, ReferenceType upperBound, ReferenceType lowerBound);
 
     @Override
     boolean equals(TypeObject arg1, TypeObject arg2);
@@ -273,23 +281,29 @@ public interface JL5TypeSystem extends
 
     ArrayType arrayOf(Position position, Type base, boolean isVarargs);
 
-    MethodInstance findMethod(ReferenceType container, String name,
+    MethodInstance findMethod(
+            ReferenceType container,
+            String name,
             List<? extends Type> argTypes,
-            List<? extends ReferenceType> typeArgs, ClassType currClass,
-            Type expectedReturnType, boolean fromClient)
+            List<? extends ReferenceType> typeArgs,
+            ClassType currClass,
+            Type expectedReturnType,
+            boolean fromClient)
             throws SemanticException;
 
-    ConstructorInstance findConstructor(ClassType container,
+    ConstructorInstance findConstructor(
+            ClassType container,
             List<? extends Type> argTypes,
-            List<? extends ReferenceType> typeArgs, ClassType currClass,
-            boolean fromClient) throws SemanticException;
+            List<? extends ReferenceType> typeArgs,
+            ClassType currClass,
+            boolean fromClient)
+            throws SemanticException;
 
     /**
      * Base is a generic supertype (e.g., a class C with uninstantiated parameters).
      * Try to find a supertype of sub that is an instantiation of base.
      */
-    JL5SubstClassType findGenericSupertype(JL5ParsedClassType base,
-            ReferenceType sub);
+    JL5SubstClassType findGenericSupertype(JL5ParsedClassType base, ReferenceType sub);
 
     ReferenceType intersectionType(Position pos, List<ReferenceType> types);
 
@@ -347,16 +361,15 @@ public interface JL5TypeSystem extends
 
     boolean isValidAnnotationValueType(Type t);
 
-    AnnotationTypeElemInstance annotationElemInstance(Position pos,
-            ClassType ct, Flags f, Type type, String name, boolean hasDefault);
+    AnnotationTypeElemInstance annotationElemInstance(
+            Position pos, ClassType ct, Flags f, Type type, String name, boolean hasDefault);
 
     void checkAnnotationValueConstant(Term value) throws SemanticException;
 
-    AnnotationTypeElemInstance findAnnotation(ReferenceType t, String name,
-            ClassType currentClass) throws SemanticException;
-
-    void checkDuplicateAnnotations(List<AnnotationElem> annotations)
+    AnnotationTypeElemInstance findAnnotation(ReferenceType t, String name, ClassType currentClass)
             throws SemanticException;
+
+    void checkDuplicateAnnotations(List<AnnotationElem> annotations) throws SemanticException;
 
     /**
      * Check whether mi's name clashes with some other method accessible in
@@ -365,8 +378,7 @@ public interface JL5TypeSystem extends
      * @param ct
      * @throws SemanticException
      */
-    void checkMethodNameClash(JL5MethodInstance mi, ClassType ct)
-            throws SemanticException;
+    void checkMethodNameClash(JL5MethodInstance mi, ClassType ct) throws SemanticException;
 
     /**
      * Return the class representing Class {@code type}.
@@ -390,8 +402,7 @@ public interface JL5TypeSystem extends
     UnknownTypeVariable unknownTypeVariable(Position position);
 
     Annotations createAnnotations(
-            Map<Type, Map<String, AnnotationElementValue>> annotationElems,
-            Position position);
+            Map<Type, Map<String, AnnotationElementValue>> annotationElems, Position position);
 
     /**
      * Given an annotation of type annotationType, should the annotation
@@ -404,13 +415,11 @@ public interface JL5TypeSystem extends
      */
     Annotations NoAnnotations();
 
-    AnnotationElementValue AnnotationElementValueArray(Position pos,
-            List<AnnotationElementValue> vals);
+    AnnotationElementValue AnnotationElementValueArray(
+            Position pos, List<AnnotationElementValue> vals);
 
-    AnnotationElementValue AnnotationElementValueAnnotation(Position pos,
-            Type type,
-            Map<String, AnnotationElementValue> annotationElementValues);
+    AnnotationElementValue AnnotationElementValueAnnotation(
+            Position pos, Type type, Map<String, AnnotationElementValue> annotationElementValues);
 
-    AnnotationElementValue AnnotationElementValueConstant(Position pos,
-            Type type, Object constVal);
+    AnnotationElementValue AnnotationElementValueConstant(Position pos, Type type, Object constVal);
 }

@@ -28,8 +28,7 @@ public class EfgTypeSystem_c extends JL7TypeSystem_c implements EfgTypeSystem {
     @Override
     public ClassType AbstractExtFactory() {
         if (ABSTRACT_EXT_FACTORY_ != null) return ABSTRACT_EXT_FACTORY_;
-        return ABSTRACT_EXT_FACTORY_ =
-                load(AbstractExtFactory_c.class.getName());
+        return ABSTRACT_EXT_FACTORY_ = load(AbstractExtFactory_c.class.getName());
     }
 
     @Override
@@ -51,9 +50,11 @@ public class EfgTypeSystem_c extends JL7TypeSystem_c implements EfgTypeSystem {
 
     @Override
     public boolean hasBaseFactory(ClassType nodeType) {
-        return !ExtFactory().methods(extensionInfo().defaultFactoryBasename(nodeType),
-                                     Collections.<Type> emptyList())
-                            .isEmpty();
+        return !ExtFactory()
+                .methods(
+                        extensionInfo().defaultFactoryBasename(nodeType),
+                        Collections.<Type>emptyList())
+                .isEmpty();
     }
 
     @Override
@@ -64,9 +65,8 @@ public class EfgTypeSystem_c extends JL7TypeSystem_c implements EfgTypeSystem {
 
         while (!toVisit.isEmpty()) {
             ClassType curCT = toVisit.remove();
-            if (!curCT.methods(extensionInfo().factoryName(basename),
-                               Collections.<Type> emptyList())
-                      .isEmpty()) {
+            if (!curCT.methods(extensionInfo().factoryName(basename), Collections.<Type>emptyList())
+                    .isEmpty()) {
                 return curCT;
             }
 

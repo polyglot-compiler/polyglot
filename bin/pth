@@ -20,7 +20,7 @@ fixclasspath() {
   fi
 
   cp="$1"
-  if [ "$windows" = 1 ]; then 
+  if [ "$windows" = 1 ]; then
     cygpath -pw "$cp"
   else
     echo "$cp"
@@ -33,7 +33,7 @@ unixfilename() {
   fi
 
   cp="$1"
-  if [ "$windows" = 1 ]; then 
+  if [ "$windows" = 1 ]; then
     cygpath -u "$cp"
   else
     echo "$cp"
@@ -46,7 +46,7 @@ unixpath() {
   fi
 
   cp="$1"
-  if [ "$windows" = 1 ]; then 
+  if [ "$windows" = 1 ]; then
     cygpath -pu "$cp"
   else
     echo "$cp"
@@ -79,16 +79,16 @@ while true; do
             shift
             extra_cp_arg=`unixpath "$1"`
             extra_cp="$extra_cp:$extra_cp_arg"
-            
+
             shift
             ;;
         -cp)
             shift
             extra_cp_arg=`unixpath "$1"`
             extra_cp="$extra_cp:$extra_cp_arg"
-            
+
             shift
-            ;;            
+            ;;
         -j)
             shift
             vmargs="$vmargs '$1'"
@@ -110,7 +110,7 @@ while true; do
     esac
 done
 
-classpath="$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar"
+classpath="$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar:$dir/lib/itextpdf.jar"
 classpath="$classpath:$dir/tools/pth/classes:$dir/tools/lib/pth.jar"
 classpath="$classpath:$extra_cp"
 classpath=`fixclasspath "$classpath"`

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -48,7 +48,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     protected QualifierNode qual;
     protected Id name;
 
-//    @Deprecated
+    //    @Deprecated
     public AmbTypeNode_c(Position pos, QualifierNode qual, Id name) {
         this(pos, qual, name, null);
     }
@@ -103,8 +103,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
         return n;
     }
 
-    protected <N extends AmbTypeNode_c> N reconstruct(N n, QualifierNode qual,
-            Id name) {
+    protected <N extends AmbTypeNode_c> N reconstruct(N n, QualifierNode qual, Id name) {
         n = qual(n, qual);
         n = id(n, name);
         return n;
@@ -128,18 +127,17 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
             return this;
         }
 
-        Node n =
-                sc.nodeFactory()
-                  .disamb()
-                  .disambiguate(this, sc, position(), qual, name);
+        Node n = sc.nodeFactory().disamb().disambiguate(this, sc, position(), qual, name);
 
         if (n instanceof TypeNode) {
             return n;
         }
 
-        throw new SemanticException("Could not find type \""
-                + (qual == null ? name.toString() : qual.toString() + "."
-                        + name.toString()) + "\".", position());
+        throw new SemanticException(
+                "Could not find type \""
+                        + (qual == null ? name.toString() : qual.toString() + "." + name.toString())
+                        + "\".",
+                position());
     }
 
     @Override
@@ -150,9 +148,8 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        throw new InternalCompilerError(position(),
-                                        "Cannot exception check ambiguous node "
-                                                + this + ".");
+        throw new InternalCompilerError(
+                position(), "Cannot exception check ambiguous node " + this + ".");
     }
 
     @Override
@@ -168,9 +165,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     @Override
     public String toString() {
-        return (qual == null ? name.toString() : qual.toString() + "."
-                + name.toString())
-                + "{amb}";
+        return (qual == null ? name.toString() : qual.toString() + "." + name.toString()) + "{amb}";
     }
 
     @Override

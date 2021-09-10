@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -30,23 +30,23 @@ package polyglot.ast;
  * This abstract implementation of {@code DelFactory} provides
  * a way of chaining together DelFactories, and default implementations
  * of factory methods for each node.
- * 
+ *
  * <p>
  * For a given type of AST node {@code N}, there are three methods:
- * {@code delN()},  {@code delNImpl()} and {@code postDelN(JL)}. 
+ * {@code delN()},  {@code delNImpl()} and {@code postDelN(JL)}.
  * The method {@code delN()} calls {@code delNImpl()} to create
- * an appropriate delegate object, and if other {@code DelFactory}s are 
- * chained onto this one, it will also call {@code delN()} on the next 
- * {@code DelFactory}. The method {@code delN()} will then 
+ * an appropriate delegate object, and if other {@code DelFactory}s are
+ * chained onto this one, it will also call {@code delN()} on the next
+ * {@code DelFactory}. The method {@code delN()} will then
  * call {@code postDelN}, passing in the newly created extension object.
- * 
+ *
  * <p>
  * The default implementation of {@code delNImpl()} is to simply call
- * {@code delMImpl()}, where {@code M} is the immediate 
+ * {@code delMImpl()}, where {@code M} is the immediate
  * superclass of {@code N}. Similarly, the default implementation of
  * {@code postDelN(JL)} is to call {@code postDelM(JL)}.
- * 
- * @see polyglot.ast.AbstractExtFactory_c has a very similar structure. 
+ *
+ * @see polyglot.ast.AbstractExtFactory_c has a very similar structure.
  */
 @Deprecated
 public abstract class AbstractDelFactory_c implements DelFactory {
@@ -72,10 +72,10 @@ public abstract class AbstractDelFactory_c implements DelFactory {
 
     /**
      * Compose two delegates together. This operation is extension specific,
-     * and so in this class it throws an UnsupportedOperationException. 
+     * and so in this class it throws an UnsupportedOperationException.
      * A typical use of this method would be to add e2 as the "superclass" delegate
      * to e1.
-     * 
+     *
      * @param e1 a {@code JL} object created by this DelFactory.
      * @param e2 a  {@code JL} object created by this.nextDelFactory
      * @return the result of composing e1 and e2.
@@ -85,7 +85,7 @@ public abstract class AbstractDelFactory_c implements DelFactory {
     }
 
     // ******************************************
-    // Final methods that call the Impl methods to construct 
+    // Final methods that call the Impl methods to construct
     // extensions, and then check with nextDelFactory to see if it
     // also has an extension. Finally, call an appropriate post method,
     // to allow subclasses to perform operations on the construction Exts
@@ -1910,5 +1910,4 @@ public abstract class AbstractDelFactory_c implements DelFactory {
     protected JLDel postDelWhile(JLDel del) {
         return postDelLoop(del);
     }
-
 }

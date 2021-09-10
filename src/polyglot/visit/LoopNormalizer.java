@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/** 
+/**
  * Turns all loops into while(true) loops.
  */
 public class LoopNormalizer extends NodeVisitor {
@@ -59,7 +59,7 @@ public class LoopNormalizer extends NodeVisitor {
         this.nf = nf;
         this.dumbDo = dumbDo;
     }
-    
+
     public LoopNormalizer(Job job, TypeSystem ts, NodeFactory nf) {
         this(job, ts, nf, true);
     }
@@ -82,19 +82,16 @@ public class LoopNormalizer extends NodeVisitor {
 
         n = n.visitChildren(this);
 
-        if (n instanceof While)
-            return translateWhile((While) n, label);
-        if (n instanceof Do)
-            return translateDo((Do) n, label);
-        if (n instanceof For)
-            return translateFor((For) n, label);
+        if (n instanceof While) return translateWhile((While) n, label);
+        if (n instanceof Do) return translateDo((Do) n, label);
+        if (n instanceof For) return translateFor((For) n, label);
 
         // Reattach label if its statement was not a loop.
         return label != null ? label : n;
     }
 
     /** Whenever a new node is created, this method is called and should do
-      * additional processing of the node as needed. */
+     * additional processing of the node as needed. */
     protected <N extends Node> N postCreate(N n) {
         return n;
     }
@@ -120,14 +117,14 @@ public class LoopNormalizer extends NodeVisitor {
 
     protected LocalDecl createLoopVar(Loop source, Expr cond) {
         Position pos = source.position();
-        LocalInstance li =
-                ts.localInstance(pos, Flags.NONE, ts.Boolean(), newId());
+        LocalInstance li = ts.localInstance(pos, Flags.NONE, ts.Boolean(), newId());
         LocalDecl var =
-                nf.LocalDecl(pos,
-                             Flags.NONE,
-                             postCreate(nf.CanonicalTypeNode(pos, ts.Boolean())),
-                             postCreate(nf.Id(pos, li.name())),
-                             cond);
+                nf.LocalDecl(
+                        pos,
+                        Flags.NONE,
+                        postCreate(nf.CanonicalTypeNode(pos, ts.Boolean())),
+                        postCreate(nf.Id(pos, li.name())),
+                        cond);
         var = var.localInstance(li);
         var = postCreate(var);
         return var;
@@ -149,9 +146,7 @@ public class LoopNormalizer extends NodeVisitor {
     protected Eval createAssign(LocalDecl var, Expr right) {
         Position pos = var.position();
         Local left = createLocal(var.localInstance(), pos);
-        Eval a =
-                nf.Eval(pos,
-                        postCreate(nf.Assign(pos, left, Assign.ASSIGN, right)));
+        Eval a = nf.Eval(pos, postCreate(nf.Assign(pos, left, Assign.ASSIGN, right)));
         a = postCreate(a);
         return a;
     }
@@ -197,14 +192,13 @@ public class LoopNormalizer extends NodeVisitor {
     }
 
     protected BooleanLit createBool(boolean val) {
-        return (BooleanLit) nf.BooleanLit(Position.compilerGenerated(), val)
-                              .type(ts.Boolean());
+        return (BooleanLit) nf.BooleanLit(Position.compilerGenerated(), val).type(ts.Boolean());
     }
 
     /* while (e) {...}
-     * 
+     *
      * becomes
-     * 
+     *
      * while (true) {
      *   boolean loop = e;
      *   if (loop)
@@ -220,8 +214,7 @@ public class LoopNormalizer extends NodeVisitor {
         if (lang().condIsConstantTrue(s, lang())) {
             // avoid unnecessary translations
             w = cond instanceof BooleanLit ? s : s.cond(createBool(true));
-        }
-        else {
+        } else {
             // new loop
             w = createLoop(s);
             LocalDecl var = createLoopVar(s, cond);
@@ -236,14 +229,14 @@ public class LoopNormalizer extends NodeVisitor {
     }
 
     /* do {...} while (e);
-     * 
+     *
      * becomes
-     * 
+     *
      * {...}
      * while (e) {...} // which gets further translated
-     * 
+     *
      * or
-     * 
+     *
      * boolean loop = false;
      * while (true) {
      *   if (loop)
@@ -255,7 +248,7 @@ public class LoopNormalizer extends NodeVisitor {
      *   else
      *     break;
      * }
-     * // java compiler is not smart enough to tell that the block 
+     * // java compiler is not smart enough to tell that the block
      * // is executed at least once, so the loop after translation
      * // may cause compiler to emit "may not have been initialized"
      * // error
@@ -263,9 +256,8 @@ public class LoopNormalizer extends NodeVisitor {
     protected Stmt translateDo(Do s, Labeled label) {
         if (dumbDo) {
             While w = nf.While(s.position(), s.cond(), s.body());
-            return createBlock(
-                    Arrays.<Stmt> asList(s.body(), translateWhile(w, label)));
-        } else { 
+            return createBlock(Arrays.<Stmt>asList(s.body(), translateWhile(w, label)));
+        } else {
             // new loop
             While w = createLoop(s);
             LocalDecl var = createLoopVar(s);
@@ -278,15 +270,15 @@ public class LoopNormalizer extends NodeVisitor {
             stmts = new ArrayList<>(2);
             stmts.add(var);
             stmts.add(label != null ? label.statement(w) : w);
-    
+
             return createBlock(stmts);
         }
     }
 
     /* for (int i = 0; i < 10; i++) {...}
-     * 
+     *
      * becomes
-     * 
+     *
      * int i = 0;
      * boolean loop = false;
      * while (true) {

@@ -19,12 +19,13 @@ public class JL5ConstructorCallToExt_c extends ConstructorCallToExt_c {
         JL5ConstructorCallExt ext = (JL5ConstructorCallExt) JL5Ext.ext(n);
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
         ConstructorCall m =
-                to_nf.ConstructorCall(n.position(),
-                                      n.kind(),
-                                      ext.typeArgs(),
-                                      n.qualifier(),
-                                      n.arguments(),
-                                      ext.isEnumConstructorCall());
+                to_nf.ConstructorCall(
+                        n.position(),
+                        n.kind(),
+                        ext.typeArgs(),
+                        n.qualifier(),
+                        n.arguments(),
+                        ext.isEnumConstructorCall());
         return m;
     }
 }

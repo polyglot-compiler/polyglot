@@ -42,8 +42,7 @@ public class Main {
         options = new Options();
         try {
             options.parseCommandLine(args);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }
@@ -58,15 +57,13 @@ public class Main {
         // TODO refactor
         TestFactory tf = TestFactory();
         PDFReporter pdfReporter = null;
-        if (options.pdffilename != null)
-            pdfReporter = new PDFReporter(options.pdffilename);
+        if (options.pdffilename != null) pdfReporter = new PDFReporter(options.pdffilename);
         boolean okay = true;
         for (String filename : options.inputFilenames) {
             ScriptTestSuite t = new ScriptTestSuite(tf, filename);
             t.setOutputController(outCtrl);
             t.setPDFReporter(pdfReporter);
-            if (options.showResultsOnly)
-                t.displayTestResult(outCtrl);
+            if (options.showResultsOnly) t.displayTestResult(outCtrl);
             else okay = okay && t.run();
         }
         if (pdfReporter != null) pdfReporter.flush();
@@ -82,39 +79,23 @@ public class Main {
 
     protected OutputController createOutputController(Options options) {
         switch (options.verbosity) {
-        // More output controllers should be written, for varying degrees
-        // of detail.
-        case 0:
-            return new SilentOutputController(System.out);
-        case 1:
-            return new QuietOutputController(System.out,
-                                             false,
-                                             true,
-                                             false,
-                                             false,
-                                             false);
-        case 2:
-            return new QuietOutputController(System.out,
-                                             false,
-                                             true,
-                                             false,
-                                             false,
-                                             true);
-        case 3:
-            return new QuietOutputController(System.out,
-                                             true,
-                                             true,
-                                             false,
-                                             false,
-                                             true);
-//        case 8:
-//            return new VerboseOutputController(System.out, false);
-//        case 9:
-//            return new VerboseOutputController(System.out, true);
+                // More output controllers should be written, for varying degrees
+                // of detail.
+            case 0:
+                return new SilentOutputController(System.out);
+            case 1:
+                return new QuietOutputController(System.out, false, true, false, false, false);
+            case 2:
+                return new QuietOutputController(System.out, false, true, false, false, true);
+            case 3:
+                return new QuietOutputController(System.out, true, true, false, false, true);
+                //        case 8:
+                //            return new VerboseOutputController(System.out, false);
+                //        case 9:
+                //            return new VerboseOutputController(System.out, true);
 
-        default:
-            return new StdOutputController(System.out);
+            default:
+                return new StdOutputController(System.out);
         }
     }
-
 }

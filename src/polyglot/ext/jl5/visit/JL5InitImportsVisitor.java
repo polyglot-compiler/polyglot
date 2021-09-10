@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -48,8 +48,7 @@ public class JL5InitImportsVisitor extends InitImportsVisitor {
     }
 
     @Override
-    public Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
+    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         Node r = super.leaveCall(old, n, v);
         if (r instanceof Import) {
             Import im = (Import) n;
@@ -59,11 +58,9 @@ public class JL5InitImportsVisitor extends InitImportsVisitor {
                 String id = StringUtil.getShortNameComponent(im.name());
                 checkForConflicts(id, it.singleTypeImports(), im.position());
                 it.addSingleStaticImport(im.name(), im.position());
-            }
-            else if (im.kind() == JL5Import.STATIC_ON_DEMAND) {
+            } else if (im.kind() == JL5Import.STATIC_ON_DEMAND) {
                 it.addStaticOnDemandImport(im.name(), im.position());
-            }
-            else if (im.kind() == Import.SINGLE_TYPE) {
+            } else if (im.kind() == Import.SINGLE_TYPE) {
                 // just check for conflicts
                 String id = StringUtil.getShortNameComponent(im.name());
                 checkForConflicts(id, it.singleStaticImports(), im.position());
@@ -73,18 +70,19 @@ public class JL5InitImportsVisitor extends InitImportsVisitor {
         return r;
     }
 
-    private void checkForConflicts(String id, List<String> imports,
-            Position position) throws SemanticException {
+    private void checkForConflicts(String id, List<String> imports, Position position)
+            throws SemanticException {
         for (String other : imports) {
             String name = StringUtil.getShortNameComponent(other);
             if (id.equals(name)) {
-                throw new SemanticException("The import statement "
-                                                    + this
-                                                    + " collides with import statement "
-                                                    + other + " .",
-                                            position);
+                throw new SemanticException(
+                        "The import statement "
+                                + this
+                                + " collides with import statement "
+                                + other
+                                + " .",
+                        position);
             }
         }
-
     }
 }

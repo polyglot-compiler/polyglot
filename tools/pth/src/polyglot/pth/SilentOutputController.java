@@ -36,57 +36,42 @@ public class SilentOutputController extends OutputController {
     }
 
     @Override
-    protected void startScriptTestSuite(ScriptTestSuite sts) {
-    }
+    protected void startScriptTestSuite(ScriptTestSuite sts) {}
 
     @Override
-    protected void finishScriptTestSuite(ScriptTestSuite sts) {
-    }
+    protected void finishScriptTestSuite(ScriptTestSuite sts) {}
 
     @Override
-    protected void startSourceFileTestCollection(
-            SourceFileTestCollection sftc) {
-    }
+    protected void startSourceFileTestCollection(SourceFileTestCollection sftc) {}
 
     @Override
-    protected void finishSourceFileTestCollection(
-            SourceFileTestCollection sftc) {
-    }
+    protected void finishSourceFileTestCollection(SourceFileTestCollection sftc) {}
 
     @Override
-    protected void startSourceFileTest(SourceFileTest sft) {
-    }
+    protected void startSourceFileTest(SourceFileTest sft) {}
 
     @Override
-    protected void finishSourceFileTest(SourceFileTest sft) {
-    }
+    protected void finishSourceFileTest(SourceFileTest sft) {}
 
     @Override
-    protected void startBuildTest(BuildTest b) {
-    }
+    protected void startBuildTest(BuildTest b) {}
 
     @Override
-    protected void finishBuildTest(BuildTest b) {
-    }
+    protected void finishBuildTest(BuildTest b) {}
 
     @Override
-    public void printNoTestResults(String suiteName) {
-    }
+    public void printNoTestResults(String suiteName) {}
 
     @Override
-    public void printTestSuiteHeader(TestSuiteResult tsr) {
-    }
+    public void printTestSuiteHeader(TestSuiteResult tsr) {}
 
     @Override
-    public void printTestSuiteFooter(int total, int grandTotal, int lastSuccess,
-            int neverRun, int neverSuccess) {
-    }
+    public void printTestSuiteFooter(
+            int total, int grandTotal, int lastSuccess, int neverRun, int neverSuccess) {}
 
     @Override
-    public void displayTestResults(TestResult tr, String testName) {
-    }
+    public void displayTestResults(TestResult tr, String testName) {}
 
     @Override
-    public void warning(String w) {
-    }
+    public void warning(String w) {}
 }

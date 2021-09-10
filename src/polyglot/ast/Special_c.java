@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -43,7 +43,7 @@ import polyglot.visit.TypeChecker;
 /**
  * A {@code Special} is an immutable representation of a
  * reference to {@code this} or {@code super} in Java.  This
- * reference can be optionally qualified with a type such as 
+ * reference can be optionally qualified with a type such as
  * {@code Foo.this}.
  */
 public class Special_c extends Expr_c implements Special {
@@ -52,13 +52,12 @@ public class Special_c extends Expr_c implements Special {
     protected Special.Kind kind;
     protected TypeNode qualifier;
 
-//    @Deprecated
+    //    @Deprecated
     public Special_c(Position pos, Special.Kind kind, TypeNode qualifier) {
         this(pos, kind, qualifier, null);
     }
 
-    public Special_c(Position pos, Special.Kind kind, TypeNode qualifier,
-            Ext ext) {
+    public Special_c(Position pos, Special.Kind kind, TypeNode qualifier, Ext ext) {
         super(pos, ext);
         assert (kind != null); // qualifier may be null
         this.kind = kind;
@@ -126,8 +125,7 @@ public class Special_c extends Expr_c implements Special {
         if (qualifier == null) {
             // an unqualified "this" or "super"
             t = c.currentClass();
-        }
-        else {
+        } else {
             if (!qualifier.isDisambiguated()) {
                 return this;
             }
@@ -136,32 +134,33 @@ public class Special_c extends Expr_c implements Special {
                 t = qualifier.type().toClass();
 
                 if (!c.currentClass().hasEnclosingInstance(t)) {
-                    throw new SemanticException("The nested class \""
-                                                        + c.currentClass()
-                                                        + "\" does not have "
-                                                        + "an enclosing instance of type \""
-                                                        + t + "\".",
-                                                qualifier.position());
+                    throw new SemanticException(
+                            "The nested class \""
+                                    + c.currentClass()
+                                    + "\" does not have "
+                                    + "an enclosing instance of type \""
+                                    + t
+                                    + "\".",
+                            qualifier.position());
                 }
-            }
-            else {
-                throw new SemanticException("Invalid qualifier for \"this\" or \"super\".",
-                                            qualifier.position());
+            } else {
+                throw new SemanticException(
+                        "Invalid qualifier for \"this\" or \"super\".", qualifier.position());
             }
         }
 
-        if (t == null
-                || (c.inStaticContext() && ts.equals(t, c.currentClass()))) {
+        if (t == null || (c.inStaticContext() && ts.equals(t, c.currentClass()))) {
             // trying to access "this" or "super" from a static context.
-            throw new SemanticException("Cannot access a non-static "
-                    + "field or method, or refer to \"this\" or \"super\" "
-                    + "from a static context.", this.position());
+            throw new SemanticException(
+                    "Cannot access a non-static "
+                            + "field or method, or refer to \"this\" or \"super\" "
+                            + "from a static context.",
+                    this.position());
         }
 
         if (kind == THIS) {
             return type(t);
-        }
-        else if (kind == SUPER) {
+        } else if (kind == SUPER) {
             return type(t.superType());
         }
 
@@ -190,12 +189,12 @@ public class Special_c extends Expr_c implements Special {
     public String toString() {
         if (qualifier != null) {
             // we have a qualifier for the special
-            // The JLS requires that a qualified this contains just a simple class name, so try and extract it.
+            // The JLS requires that a qualified this contains just a simple class name, so try and
+            // extract it.
             // (JLS 2nd ed 15.8.4)
             if (qualifier.name() != null) {
                 return qualifier.name() + "." + kind;
-            }
-            else {
+            } else {
                 return qualifier + "." + kind;
             }
         }
@@ -207,12 +206,12 @@ public class Special_c extends Expr_c implements Special {
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (qualifier != null) {
             // we have a qualifier for the special
-            // The JLS requires that a qualified this contains just a simple class name, so try and extract it.
+            // The JLS requires that a qualified this contains just a simple class name, so try and
+            // extract it.
             // (JLS 2nd ed 15.8.4)
             if (qualifier.name() != null) {
                 w.write(qualifier.name());
-            }
-            else {
+            } else {
                 tr.lang().prettyPrint(qualifier, w, tr);
             }
             w.write(".");

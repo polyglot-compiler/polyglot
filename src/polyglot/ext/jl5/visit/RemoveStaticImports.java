@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -61,7 +61,7 @@ public class RemoveStaticImports extends ContextVisitor {
             SourceFile sf = (SourceFile) n;
             List<Import> imports = new ArrayList<>(sf.imports());
             boolean changed = false;
-            for (Iterator<Import> iter = imports.iterator(); iter.hasNext();) {
+            for (Iterator<Import> iter = imports.iterator(); iter.hasNext(); ) {
                 Import imp = iter.next();
                 if (imp.kind() == JL5Import.SINGLE_STATIC_MEMBER
                         || imp.kind() == JL5Import.STATIC_ON_DEMAND) {
@@ -81,7 +81,8 @@ public class RemoveStaticImports extends ContextVisitor {
                 // check if we need to make the target explicit
                 FieldInstance fi = f.fieldInstance();
                 ClassType currClass = this.context().currentClass();
-                // just use a reasonable approximation to figure out whether we need an explicit target
+                // just use a reasonable approximation to figure out whether we need an explicit
+                // target
                 if (currClass == null || !currClass.isSubtype(fi.container())) {
                     n = f.targetImplicit(false);
                 }
@@ -93,7 +94,8 @@ public class RemoveStaticImports extends ContextVisitor {
             if (mi.flags().isStatic() && c.isTargetImplicit()) {
                 // check if we need to make the target explicit
                 ClassType currClass = this.context().currentClass();
-                // just use a reasonable approximation to figure out whether we need an explicit target
+                // just use a reasonable approximation to figure out whether we need an explicit
+                // target
                 if (currClass == null || !currClass.isSubtype(mi.container())) {
                     n = c.targetImplicit(false);
                 }

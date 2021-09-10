@@ -32,8 +32,7 @@ import java.util.List;
  * A {@code ConstructorInstance} contains type information for a
  * constructor.
  */
-public interface ConstructorInstance extends ProcedureInstance, MemberInstance,
-        Declaration {
+public interface ConstructorInstance extends ProcedureInstance, MemberInstance, Declaration {
     /** Non-destructive updates. */
     ConstructorInstance flags(Flags flags);
 

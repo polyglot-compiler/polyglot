@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -61,18 +61,24 @@ public class NewArray_c extends Expr_c implements NewArray {
     protected int addDims;
     protected ArrayInit init;
 
-//    @Deprecated
-    public NewArray_c(Position pos, TypeNode baseType, List<Expr> dims,
-            int addDims, ArrayInit init) {
+    //    @Deprecated
+    public NewArray_c(
+            Position pos, TypeNode baseType, List<Expr> dims, int addDims, ArrayInit init) {
         this(pos, baseType, dims, addDims, init, null);
     }
 
-    public NewArray_c(Position pos, TypeNode baseType, List<Expr> dims,
-            int addDims, ArrayInit init, Ext ext) {
+    public NewArray_c(
+            Position pos,
+            TypeNode baseType,
+            List<Expr> dims,
+            int addDims,
+            ArrayInit init,
+            Ext ext) {
         super(pos, ext);
         assert (baseType != null && dims != null); // init may be null
         assert (addDims >= 0);
-        assert (!dims.isEmpty() || init != null); // dims may be empty only if there is an initializer
+        assert (!dims.isEmpty()
+                || init != null); // dims may be empty only if there is an initializer
         assert (addDims > 0 || init == null); // init may be non-null only if addDims > 0
         assert (dims.size() + addDims > 0); // must allocate something
 
@@ -156,8 +162,8 @@ public class NewArray_c extends Expr_c implements NewArray {
     }
 
     /** Reconstruct the expression. */
-    protected <N extends NewArray_c> N reconstruct(N n, TypeNode baseType,
-            List<Expr> dims, ArrayInit init) {
+    protected <N extends NewArray_c> N reconstruct(
+            N n, TypeNode baseType, List<Expr> dims, ArrayInit init) {
         n = baseType(n, baseType);
         n = dims(n, dims);
         n = init(n, init);
@@ -178,8 +184,7 @@ public class NewArray_c extends Expr_c implements NewArray {
 
         for (Expr expr : dims) {
             if (!ts.isImplicitCastValid(expr.type(), ts.Int())) {
-                throw new SemanticException("Array dimension must be an integer.",
-                                            expr.position());
+                throw new SemanticException("Array dimension must be an integer.", expr.position());
             }
         }
 
@@ -246,8 +251,7 @@ public class NewArray_c extends Expr_c implements NewArray {
             v.visitCFG(baseType, listChild(dims, init), ENTRY);
             v.visitCFGList(dims, init, ENTRY);
             v.visitCFG(init, this, EXIT);
-        }
-        else {
+        } else {
             v.visitCFG(baseType, listChild(dims, (Expr) null), ENTRY);
             v.visitCFGList(dims, this, EXIT);
         }
@@ -262,22 +266,16 @@ public class NewArray_c extends Expr_c implements NewArray {
             // a NegativeArraySizeException may be thrown.
             try {
                 return CollectionUtil.list(ts.typeForName("java.lang.NegativeArraySizeException"));
-            }
-            catch (SemanticException e) {
-                throw new InternalCompilerError("Cannot find class java.lang.NegativeArraySizeException",
-                                                e);
+            } catch (SemanticException e) {
+                throw new InternalCompilerError(
+                        "Cannot find class java.lang.NegativeArraySizeException", e);
             }
         }
-        return Collections.<Type> emptyList();
+        return Collections.<Type>emptyList();
     }
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.NewArray(this.position,
-                           this.baseType,
-                           this.dims,
-                           this.addDims,
-                           this.init);
+        return nf.NewArray(this.position, this.baseType, this.dims, this.addDims, this.init);
     }
-
 }

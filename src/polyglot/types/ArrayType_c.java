@@ -46,8 +46,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
     protected List<ClassType> interfaces;
 
     /** Used for deserializing types. */
-    protected ArrayType_c() {
-    }
+    protected ArrayType_c() {}
 
     public ArrayType_c(TypeSystem ts, Position pos, Type base) {
         super(ts, pos);
@@ -81,23 +80,21 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
     }
 
     protected FieldInstance createLengthFieldInstance() {
-        FieldInstance fi = ts.fieldInstance(position(),
-                                            this,
-                                            ts.Public().Final(),
-                                            ts.Int(),
-                                            "length");
+        FieldInstance fi =
+                ts.fieldInstance(position(), this, ts.Public().Final(), ts.Int(), "length");
         fi.setNotConstant();
         return fi;
     }
 
     protected MethodInstance createCloneMethodInstance() {
-        return ts.methodInstance(position(),
-                                 this,
-                                 ts.Public(),
-                                 ts.Object(),
-                                 "clone",
-                                 Collections.<Type> emptyList(),
-                                 Collections.<Type> emptyList());
+        return ts.methodInstance(
+                position(),
+                this,
+                ts.Public(),
+                ts.Object(),
+                "clone",
+                Collections.<Type>emptyList(),
+                Collections.<Type>emptyList());
     }
 
     @Override
@@ -232,8 +229,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType {
         if (toType.isArray()) {
             if (base().isPrimitive() || toType.toArray().base().isPrimitive()) {
                 return ts.typeEquals(base(), toType.toArray().base());
-            }
-            else {
+            } else {
                 return ts.isImplicitCastValid(base(), toType.toArray().base());
             }
         }

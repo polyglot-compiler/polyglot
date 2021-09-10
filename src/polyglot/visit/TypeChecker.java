@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -68,8 +68,7 @@ public class TypeChecker extends DisambiguationDriver {
                 Report.report(2, "<< " + this + "::override " + n + " -> " + m);
 
             return m;
-        }
-        catch (MissingDependencyException e) {
+        } catch (MissingDependencyException e) {
             if (Report.should_report(Report.frontend, 3)) e.printStackTrace();
             Scheduler scheduler = job.extensionInfo().scheduler();
             Goal g = scheduler.currentGoal();
@@ -79,8 +78,7 @@ public class TypeChecker extends DisambiguationDriver {
                 throw e;
             }
             return n;
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             if (e.getMessage() != null) {
                 Position position = e.position();
 
@@ -88,13 +86,10 @@ public class TypeChecker extends DisambiguationDriver {
                     position = n.position();
                 }
 
-                this.errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                          e.getMessage(),
-                                          position);
-            }
-            else {
+                this.errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
+            } else {
                 // silent error; these should be thrown only
-                // when the error has already been reported 
+                // when the error has already been reported
             }
 
             return n;
@@ -103,8 +98,7 @@ public class TypeChecker extends DisambiguationDriver {
 
     @Override
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        if (Report.should_report(Report.visit, 2))
-            Report.report(2, ">> " + this + "::enter " + n);
+        if (Report.should_report(Report.visit, 2)) Report.report(2, ">> " + this + "::enter " + n);
 
         TypeChecker v = (TypeChecker) lang().typeCheckEnter(n, this);
 
@@ -124,9 +118,10 @@ public class TypeChecker extends DisambiguationDriver {
         @Override
         public Node override(Node n) {
             if (!n.isDisambiguated() || !n.isTypeChecked()) {
-//                System.out.println("  !!!!! no type at " + n + " (" + n.getClass().getName() + ")");
-//                if (n instanceof Expr)  
-//                    System.out.println("   !!!! n.type = " + ((Expr) n).type());
+                //                System.out.println("  !!!!! no type at " + n + " (" +
+                // n.getClass().getName() + ")");
+                //                if (n instanceof Expr)
+                //                    System.out.println("   !!!! n.type = " + ((Expr) n).type());
                 amb = true;
             }
             return n;
@@ -134,10 +129,8 @@ public class TypeChecker extends DisambiguationDriver {
     }
 
     @Override
-    protected Node leaveCall(Node old, Node n, NodeVisitor v)
-            throws SemanticException {
-        if (Report.should_report(Report.visit, 2))
-            Report.report(2, ">> " + this + "::leave " + n);
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
+        if (Report.should_report(Report.visit, 2)) Report.report(2, ">> " + this + "::leave " + n);
 
         AmbChecker ac = new AmbChecker(lang());
         lang().visitChildren(n, ac);
@@ -145,7 +138,7 @@ public class TypeChecker extends DisambiguationDriver {
         Node m = n;
 
         if (!ac.amb && m.isDisambiguated()) {
-//          System.out.println("running typeCheck for " + m);
+            //          System.out.println("running typeCheck for " + m);
             TypeChecker childTc = (TypeChecker) v;
             m = lang().typeCheck(m, childTc);
 
@@ -155,12 +148,12 @@ public class TypeChecker extends DisambiguationDriver {
                 m = lang().checkConstants(m, cc);
             }
 
-//            if (! m.isTypeChecked()) {
-//                throw new InternalCompilerError("Type checking failed for " + m + " (" + m.getClass().getName() + ")", m.position());
-//            }
-        }
-        else {
-//                 System.out.println("  no type at " + m);
+            //            if (! m.isTypeChecked()) {
+            //                throw new InternalCompilerError("Type checking failed for " + m + " ("
+            // + m.getClass().getName() + ")", m.position());
+            //            }
+        } else {
+            //                 System.out.println("  no type at " + m);
             Goal g = job.extensionInfo().scheduler().currentGoal();
             g.setUnreachableThisRun();
         }

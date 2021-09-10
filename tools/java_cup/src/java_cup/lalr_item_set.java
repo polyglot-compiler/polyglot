@@ -16,7 +16,6 @@ import java.util.Iterator;
  * @version last updated: 3/6/96
  * @author  Scott Hudson
  */
-
 public class lalr_item_set implements Iterable<lalr_item> {
 
     /*-----------------------------------------------------------*/
@@ -24,8 +23,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
     /*-----------------------------------------------------------*/
 
     /** Constructor for an empty set. */
-    public lalr_item_set() {
-    }
+    public lalr_item_set() {}
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -95,8 +93,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
         not_null(other);
 
         /* walk down our set and make sure every element is in the other */
-        for (lalr_item e : this)
-            if (!other.contains(e)) return false;
+        for (lalr_item e : this) if (!other.contains(e)) return false;
 
         /* they were all there */
         return true;
@@ -167,8 +164,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
         not_null(other);
 
         /* walk down the other set and do the adds individually */
-        for (lalr_item e : other)
-            add(e);
+        for (lalr_item e : other) add(e);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -180,8 +176,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
         not_null(other);
 
         /* walk down the other set and do the removes individually */
-        for (lalr_item e : other)
-            remove(e);
+        for (lalr_item e : other) remove(e);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -206,8 +201,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
      *  @param obj the object we are testing.
      */
     protected void not_null(Object obj) throws internal_error {
-        if (obj == null)
-            throw new internal_error("Null object used in set operation");
+        if (obj == null) throw new internal_error("Null object used in set operation");
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -259,9 +253,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
                 for (production prod : nt.productions()) {
 
                     /* create new item with dot at start and that lookahead */
-                    new_itm =
-                            new lalr_item(prod,
-                                          new terminal_set(new_lookaheads));
+                    new_itm = new lalr_item(prod, new terminal_set(new_lookaheads));
 
                     /* add/merge item into the set */
                     add_itm = add(new_itm);
@@ -287,13 +279,11 @@ public class lalr_item_set implements Iterable<lalr_item> {
         /* once we know they are the same size, then improper subset does test */
         try {
             return is_subset_of(other);
-        }
-        catch (internal_error e) {
+        } catch (internal_error e) {
             /* can't throw error from here (because superclass doesn't) so crash */
             e.crash();
             return false;
         }
-
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -301,8 +291,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
     /** Generic equality comparison. */
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof lalr_item_set))
-            return false;
+        if (!(other instanceof lalr_item_set)) return false;
         else return equals((lalr_item_set) other);
     }
 
@@ -319,8 +308,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
             //   CSA fix! we'd *like* to hash just a few elements, but
             //   that means equal sets will have inequal hashcodes, which
             //   we're not allowed (by contract) to do.  So hash them all.
-            for (lalr_item e : this)
-                result ^= e.hashCode();
+            for (lalr_item e : this) result ^= e.hashCode();
 
             hashcode_cache = new Integer(result);
         }
@@ -336,8 +324,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
         StringBuilder result = new StringBuilder();
 
         result.append("{\n");
-        for (lalr_item e : this)
-            result.append("  " + e + "\n");
+        for (lalr_item e : this) result.append("  " + e + "\n");
         result.append("}");
 
         return result.toString();

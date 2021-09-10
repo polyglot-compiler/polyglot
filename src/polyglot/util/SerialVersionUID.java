@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -52,8 +52,7 @@ public class SerialVersionUID implements Serializable {
         try {
             Class<?> clazz = Class.forName(caller.getClassName());
             return generate(clazz);
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             throw new Error(e);
         }
     }
@@ -83,28 +82,27 @@ public class SerialVersionUID implements Serializable {
             boolean serializable = false;
             boolean externalizable = false;
             for (Class<?> iface : interfaces) {
-                if (!serializable && iface.equals(Serializable.class))
-                    serializable = true;
-                if (!externalizable && iface.equals(Externalizable.class))
-                    externalizable = true;
+                if (!serializable && iface.equals(Serializable.class)) serializable = true;
+                if (!externalizable && iface.equals(Externalizable.class)) externalizable = true;
             }
             md.update((byte) (serializable ? 1 : 0));
             md.update((byte) (externalizable ? 1 : 0));
 
             // Go through fields in alphabetical order.
-            Set<Field> fields = new TreeSet<>(new Comparator<Field>() {
-                @Override
-                public int compare(Field f1, Field f2) {
-                    return f1.getName().compareTo(f2.getName());
-                }
-            });
+            Set<Field> fields =
+                    new TreeSet<>(
+                            new Comparator<Field>() {
+                                @Override
+                                public int compare(Field f1, Field f2) {
+                                    return f1.getName().compareTo(f2.getName());
+                                }
+                            });
             for (Field field : clazz.getDeclaredFields()) {
                 fields.add(field);
             }
             for (Field field : fields) {
                 int modifiers = field.getModifiers();
-                if (Modifier.isStatic(modifiers)
-                        || Modifier.isTransient(modifiers)) continue;
+                if (Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) continue;
 
                 // Add field name to hash.
                 md.update(field.getName().getBytes("UTF-8"));
@@ -121,89 +119,74 @@ public class SerialVersionUID implements Serializable {
             try {
                 clazz.getDeclaredMethod("writeObject", ObjectOutputStream.class);
                 try {
-                    Field writeObjectVersion =
-                            clazz.getDeclaredField("writeObjectVersionUID");
+                    Field writeObjectVersion = clazz.getDeclaredField("writeObjectVersionUID");
                     writeObjectVersion.setAccessible(true);
                     long ver = writeObjectVersion.getLong(clazz);
                     md.update(getBytes(ver));
-                }
-                catch (NoSuchFieldException e) {
-                    throw new Error(clazz
-                            + " defines writeObject(ObjectOutputStream) "
-                            + "but not writeObjectVersionUID");
-                }
-                catch (IllegalAccessException e) {
+                } catch (NoSuchFieldException e) {
+                    throw new Error(
+                            clazz
+                                    + " defines writeObject(ObjectOutputStream) "
+                                    + "but not writeObjectVersionUID");
+                } catch (IllegalAccessException e) {
                     throw new Error(e);
                 }
-            }
-            catch (NoSuchMethodException e) {
+            } catch (NoSuchMethodException e) {
             }
             try {
                 clazz.getDeclaredMethod("readObject", ObjectInputStream.class);
                 try {
-                    Field readObjectVersion =
-                            clazz.getDeclaredField("readObjectVersionUID");
+                    Field readObjectVersion = clazz.getDeclaredField("readObjectVersionUID");
                     readObjectVersion.setAccessible(true);
                     long ver = readObjectVersion.getLong(clazz);
                     md.update(getBytes(ver));
-                }
-                catch (NoSuchFieldException e) {
-                    throw new Error(clazz
-                            + " defines readObject(ObjectInputStream) "
-                            + "but not readObjectVersionUID");
-                }
-                catch (IllegalAccessException e) {
+                } catch (NoSuchFieldException e) {
+                    throw new Error(
+                            clazz
+                                    + " defines readObject(ObjectInputStream) "
+                                    + "but not readObjectVersionUID");
+                } catch (IllegalAccessException e) {
                     throw new Error(e);
                 }
-            }
-            catch (NoSuchMethodException e) {
+            } catch (NoSuchMethodException e) {
             }
             try {
                 clazz.getDeclaredMethod("writeReplace");
                 try {
-                    Field writeReplaceVersion =
-                            clazz.getDeclaredField("writeReplaceVersionUID");
+                    Field writeReplaceVersion = clazz.getDeclaredField("writeReplaceVersionUID");
                     writeReplaceVersion.setAccessible(true);
                     long ver = writeReplaceVersion.getLong(clazz);
                     md.update(getBytes(ver));
-                }
-                catch (NoSuchFieldException e) {
-                    throw new Error(clazz + " defines writeReplace() "
-                            + "but not writeReplaceVersionUID");
-                }
-                catch (IllegalAccessException e) {
+                } catch (NoSuchFieldException e) {
+                    throw new Error(
+                            clazz + " defines writeReplace() " + "but not writeReplaceVersionUID");
+                } catch (IllegalAccessException e) {
                     throw new Error(e);
                 }
-            }
-            catch (NoSuchMethodException e) {
+            } catch (NoSuchMethodException e) {
             }
             try {
                 clazz.getDeclaredMethod("readResolve");
                 try {
-                    Field readResolveVersion =
-                            clazz.getDeclaredField("readResolveVersionUID");
+                    Field readResolveVersion = clazz.getDeclaredField("readResolveVersionUID");
                     readResolveVersion.setAccessible(true);
                     long ver = readResolveVersion.getLong(clazz);
                     md.update(getBytes(ver));
-                }
-                catch (NoSuchFieldException e) {
-                    throw new Error(clazz + " defines readResolve() "
-                            + "but not readResolveVersionUID");
-                }
-                catch (IllegalAccessException e) {
+                } catch (NoSuchFieldException e) {
+                    throw new Error(
+                            clazz + " defines readResolve() " + "but not readResolveVersionUID");
+                } catch (IllegalAccessException e) {
                     throw new Error(e);
                 }
-            }
-            catch (NoSuchMethodException e) {
+            } catch (NoSuchMethodException e) {
             }
 
             byte[] md5 = md.digest();
             return longAt(md5, 0) ^ longAt(md5, 8);
-        }
-        catch (NoSuchAlgorithmException
-               | UnsupportedEncodingException
-               | SecurityException
-               | IllegalArgumentException e) {
+        } catch (NoSuchAlgorithmException
+                | UnsupportedEncodingException
+                | SecurityException
+                | IllegalArgumentException e) {
             throw new Error(e);
         }
     }

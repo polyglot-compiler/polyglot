@@ -68,8 +68,7 @@ public class JLDel_c implements JLDel, Serializable {
 
     /** Create an uninitialized delegate. It must be initialized using the init() method.
      */
-    public JLDel_c() {
-    }
+    public JLDel_c() {}
 
     /** The {@code NodeOps} object we dispatch to, by default, the node
      * itself, but possibly another delegate.
@@ -95,8 +94,7 @@ public class JLDel_c implements JLDel, Serializable {
             JLDel_c copy = (JLDel_c) super.clone();
             copy.node = null; // uninitialize
             return copy;
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Unable to clone a delegate");
         }
     }
@@ -147,14 +145,12 @@ public class JLDel_c implements JLDel, Serializable {
     }
 
     @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         return jl().disambiguateOverride(parent, ar);
     }
 
     @Override
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
-            throws SemanticException {
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         return jl().disambiguateEnter(ar);
     }
 
@@ -164,8 +160,7 @@ public class JLDel_c implements JLDel, Serializable {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
         return jl().typeCheckOverride(parent, tc);
     }
 
@@ -190,8 +185,7 @@ public class JLDel_c implements JLDel, Serializable {
     }
 
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException {
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
         return jl().exceptionCheckEnter(ec);
     }
 
@@ -206,8 +200,7 @@ public class JLDel_c implements JLDel, Serializable {
     }
 
     @Override
-    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw) throws SemanticException {
         ToExt ext = rw.from_ext().getToExt(rw.to_ext(), node());
         return ext.toExtEnter(rw);
     }

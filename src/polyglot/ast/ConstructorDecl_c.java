@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -54,8 +54,7 @@ import polyglot.visit.TypeChecker;
  * A {@code ConstructorDecl} is an immutable representation of a
  * constructor declaration as part of a class body.
  */
-public class ConstructorDecl_c extends ProcedureDecl_c implements
-        ConstructorDecl {
+public class ConstructorDecl_c extends ProcedureDecl_c implements ConstructorDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected ConstructorInstance ci;
@@ -64,14 +63,24 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public ConstructorDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+    public ConstructorDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body) {
         this(pos, flags, name, formals, throwTypes, body, null, null);
     }
 
-//  @Deprecated
-    public ConstructorDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+    //  @Deprecated
+    public ConstructorDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
             Javadoc javadoc) {
         this(pos, flags, name, formals, throwTypes, body, javadoc, null);
     }
@@ -80,14 +89,26 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public ConstructorDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body, Ext ext) {
+    public ConstructorDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
+            Ext ext) {
         this(pos, flags, name, formals, throwTypes, body, null, ext);
     }
 
-    public ConstructorDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body,
-            Javadoc javadoc, Ext ext) {
+    public ConstructorDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
+            Javadoc javadoc,
+            Ext ext) {
         super(pos, flags, name, formals, throwTypes, body, javadoc, ext);
     }
 
@@ -116,8 +137,7 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
         return constructorInstance(this, ci);
     }
 
-    protected <N extends ConstructorDecl_c> N constructorInstance(N n,
-            ConstructorInstance ci) {
+    protected <N extends ConstructorDecl_c> N constructorInstance(N n, ConstructorInstance ci) {
         if (n.ci == ci) return n;
         n = copyIfNeeded(n);
         n.ci = ci;
@@ -154,11 +174,7 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
         }
 
         ConstructorInstance ci =
-                ts.constructorInstance(position(),
-                                       ct,
-                                       flags,
-                                       formalTypes,
-                                       throwTypes);
+                ts.constructorInstance(position(), ct, flags, formalTypes, throwTypes);
         ct.addConstructor(ci);
 
         return constructorInstance(ci);
@@ -177,27 +193,30 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
         ClassType ct = c.currentClass();
 
         if (ct.flags().isInterface()) {
-            throw new SemanticException("Cannot declare a constructor inside an interface.",
-                                        position());
+            throw new SemanticException(
+                    "Cannot declare a constructor inside an interface.", position());
         }
 
         if (ct.isAnonymous()) {
-            throw new SemanticException("Cannot declare a constructor inside an anonymous class.",
-                                        position());
+            throw new SemanticException(
+                    "Cannot declare a constructor inside an anonymous class.", position());
         }
 
         String ctName = ct.name();
 
         if (!ctName.equals(name.id())) {
-            throw new SemanticException("Constructor name \"" + name
-                    + "\" does not match name of containing class \"" + ctName
-                    + "\".", position());
+            throw new SemanticException(
+                    "Constructor name \""
+                            + name
+                            + "\" does not match name of containing class \""
+                            + ctName
+                            + "\".",
+                    position());
         }
 
         try {
             ts.checkConstructorFlags(flags());
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), position());
         }
 
@@ -206,18 +225,15 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
         }
 
         if (body != null && flags().isNative()) {
-            throw new SemanticException("A native constructor cannot have a body.",
-                                        position());
+            throw new SemanticException("A native constructor cannot have a body.", position());
         }
 
         for (TypeNode tn : throwTypes()) {
             Type t = tn.type();
             if (!t.isThrowable()) {
-                throw new SemanticException("Type \""
-                                                    + t
-                                                    + "\" is not a subclass of \""
-                                                    + ts.Throwable() + "\".",
-                                            tn.position());
+                throw new SemanticException(
+                        "Type \"" + t + "\" is not a subclass of \"" + ts.Throwable() + "\".",
+                        tn.position());
             }
         }
 
@@ -246,7 +262,7 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
 
         w.begin(0);
 
-        for (Iterator<Formal> i = formals.iterator(); i.hasNext();) {
+        for (Iterator<Formal> i = formals.iterator(); i.hasNext(); ) {
             Formal f = i.next();
             print(f, w, tr);
 
@@ -263,7 +279,7 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
             w.allowBreak(6);
             w.write("throws ");
 
-            for (Iterator<TypeNode> i = throwTypes().iterator(); i.hasNext();) {
+            for (Iterator<TypeNode> i = throwTypes().iterator(); i.hasNext(); ) {
                 TypeNode tn = i.next();
                 print(tn, w, tr);
 
@@ -287,8 +303,7 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
         if (body() != null) {
             v.visitCFGList(formals(), body(), ENTRY);
             v.visitCFG(body(), this, EXIT);
-        }
-        else {
+        } else {
             v.visitCFGList(formals(), this, EXIT);
         }
 
@@ -297,13 +312,13 @@ public class ConstructorDecl_c extends ProcedureDecl_c implements
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ConstructorDecl(this.position,
-                                  this.flags,
-                                  this.name,
-                                  this.formals,
-                                  this.throwTypes,
-                                  this.body,
-                                  javadoc);
+        return nf.ConstructorDecl(
+                this.position,
+                this.flags,
+                this.name,
+                this.formals,
+                this.throwTypes,
+                this.body,
+                javadoc);
     }
-
 }

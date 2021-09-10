@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -51,16 +51,15 @@ public class TargetFactory {
     protected String outputExtension;
     protected boolean outputStdout;
 
-    public TargetFactory(FileManager fileManager, Location outputLocation,
-            String outExt, boolean so) {
+    public TargetFactory(
+            FileManager fileManager, Location outputLocation, String outExt, boolean so) {
         this.fileManager = fileManager;
         this.outputLocation = outputLocation;
         this.outputExtension = outExt;
         this.outputStdout = so;
     }
 
-    public CodeWriter outputCodeWriter(FileObject f, int width)
-            throws IOException {
+    public CodeWriter outputCodeWriter(FileObject f, int width) throws IOException {
         Writer w = outputWriter(f);
         return Compiler.createCodeWriter(w, width);
     }
@@ -91,8 +90,7 @@ public class TargetFactory {
     }
 
     /** Return a file object for the output of the class in the given package. */
-    public JavaFileObject outputFileObject(String packageName,
-            String className, Source source) {
+    public JavaFileObject outputFileObject(String packageName, String className, Source source) {
         if (outputLocation == null) {
             throw new InternalCompilerError("Output location not set.");
         }
@@ -101,34 +99,29 @@ public class TargetFactory {
             JavaFileObject outputFile;
             if (outputExtension.equals("java")) {
                 outputFile =
-                        fileManager.getJavaFileForOutput(outputLocation,
-                                                         !"".equals(packageName)
-                                                                 ? packageName
-                                                                         + "."
-                                                                         + className
-                                                                 : className,
-                                                         Kind.SOURCE,
-                                                         null);
-            }
-            else {
+                        fileManager.getJavaFileForOutput(
+                                outputLocation,
+                                !"".equals(packageName) ? packageName + "." + className : className,
+                                Kind.SOURCE,
+                                null);
+            } else {
                 outputFile =
-                        (JavaFileObject) fileManager.getFileForOutput(outputLocation,
-                                                                      packageName,
-                                                                      className
-                                                                              + "."
-                                                                              + outputExtension,
-                                                                      null);
+                        (JavaFileObject)
+                                fileManager.getFileForOutput(
+                                        outputLocation,
+                                        packageName,
+                                        className + "." + outputExtension,
+                                        null);
             }
 
-            if (source != null && !source.compilerGenerated()
+            if (source != null
+                    && !source.compilerGenerated()
                     && fileManager.isSameFile(source, outputFile)) {
                 throw new InternalCompilerError("The output file is the same as the source file");
             }
             return outputFile;
-        }
-        catch (IOException e) {
-            throw new InternalCompilerError("Error creating output file for "
-                    + source, e);
+        } catch (IOException e) {
+            throw new InternalCompilerError("Error creating output file for " + source, e);
         }
     }
 }

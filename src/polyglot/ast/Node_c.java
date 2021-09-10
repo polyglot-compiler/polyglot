@@ -66,8 +66,7 @@ public abstract class Node_c implements Node {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Position position;
-    @Deprecated
-    protected JLDel del;
+    @Deprecated protected JLDel del;
     protected Ext ext;
     protected boolean error;
 
@@ -131,7 +130,8 @@ public abstract class Node_c implements Node {
 
         Ext prev = this.ext(n - 1);
         if (prev == null)
-            throw new InternalCompilerError("cannot set the nth extension if there is no (n-1)st extension");
+            throw new InternalCompilerError(
+                    "cannot set the nth extension if there is no (n-1)st extension");
         return this.ext(n - 1, prev.ext(ext));
     }
 
@@ -140,7 +140,7 @@ public abstract class Node_c implements Node {
         return ext;
     }
 
-//    @Deprecated
+    //    @Deprecated
     @Override
     public Node ext(Ext ext) {
         if (this.ext == ext) {
@@ -183,8 +183,7 @@ public abstract class Node_c implements Node {
             }
 
             return n;
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");
         }
     }
@@ -346,8 +345,7 @@ public abstract class Node_c implements Node {
      * visiting later sibling nodes.
      */
     @Override
-    public void addDecls(Context c) {
-    }
+    public void addDecls(Context c) {}
 
     // These methods override the methods in Ext_c.
     // These are the default implementation of these passes.
@@ -363,14 +361,12 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         return null;
     }
 
     @Override
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
-            throws SemanticException {
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         return ar;
     }
 
@@ -381,8 +377,7 @@ public abstract class Node_c implements Node {
 
     /** Type check the AST. */
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
         return null;
     }
 
@@ -407,8 +402,7 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException {
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
         return ec.push();
     }
 
@@ -427,8 +421,7 @@ public abstract class Node_c implements Node {
     }
 
     @Override
-    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw) throws SemanticException {
         return rw;
     }
 
@@ -491,8 +484,7 @@ public abstract class Node_c implements Node {
             CodeWriter cw = Compiler.createCodeWriter(os);
             this.del().prettyPrint(cw, new PrettyPrinter());
             cw.flush();
-        }
-        catch (java.io.IOException e) {
+        } catch (java.io.IOException e) {
         }
     }
 
@@ -502,8 +494,7 @@ public abstract class Node_c implements Node {
             CodeWriter cw = Compiler.createCodeWriter(os);
             lang.prettyPrint(this, cw, new PrettyPrinter(lang));
             cw.flush();
-        }
-        catch (java.io.IOException e) {
+        } catch (java.io.IOException e) {
         }
     }
 
@@ -514,8 +505,7 @@ public abstract class Node_c implements Node {
             CodeWriter cw = Compiler.createCodeWriter(w);
             this.del().prettyPrint(cw, new PrettyPrinter());
             cw.flush();
-        }
-        catch (java.io.IOException e) {
+        } catch (java.io.IOException e) {
         }
     }
 
@@ -525,15 +515,13 @@ public abstract class Node_c implements Node {
             CodeWriter cw = Compiler.createCodeWriter(w);
             lang.prettyPrint(this, cw, new PrettyPrinter(lang));
             cw.flush();
-        }
-        catch (java.io.IOException e) {
+        } catch (java.io.IOException e) {
         }
     }
 
     /** Pretty-print the AST using the given {@code CodeWriter}. */
     @Override
-    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-    }
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) {}
 
     public void printBlock(Node n, CodeWriter w, PrettyPrinter pp) {
         w.begin(0);
@@ -545,8 +533,7 @@ public abstract class Node_c implements Node {
         if (stmt instanceof Block) {
             w.write(" ");
             print(stmt, w, pp);
-        }
-        else {
+        } else {
             w.allowBreak(4, " ");
             printBlock(stmt, w, pp);
         }
@@ -570,8 +557,7 @@ public abstract class Node_c implements Node {
         w.allowBreak(4, " ");
         w.begin(0);
         w.write("(del ");
-        if (del() == this)
-            w.write("*");
+        if (del() == this) w.write("*");
         else w.write(del().toString());
         w.write(")");
         w.end();
@@ -583,8 +569,7 @@ public abstract class Node_c implements Node {
             w.write("(ext ");
             if (ext == null) {
                 w.write("null");
-            }
-            else {
+            } else {
                 ext.dump(w);
             }
             w.write(")");
@@ -597,8 +582,7 @@ public abstract class Node_c implements Node {
 
         w.allowBreak(4, " ");
         w.begin(0);
-        w.write("(position "
-                + (position != null ? position.toString() : "UNKNOWN") + ")");
+        w.write("(position " + (position != null ? position.toString() : "UNKNOWN") + ")");
         w.end();
     }
 
@@ -608,8 +592,7 @@ public abstract class Node_c implements Node {
         // return new StringPrettyPrinter(5).toString(this);
 
         // Not slow anymore.
-        StringBuffer sb =
-                new StringBuffer(StringUtil.getShortNameComponent(getClass().getName()));
+        StringBuffer sb = new StringBuffer(StringUtil.getShortNameComponent(getClass().getName()));
         if (ext != null) {
             sb.append(":");
             sb.append(ext.toString());
@@ -619,12 +602,13 @@ public abstract class Node_c implements Node {
 
     @Override
     public Node copy(NodeFactory nf) {
-        throw new InternalCompilerError("Unimplemented operation. This class "
-                + "("
-                + this.getClass().getName()
-                + ") does "
-                + "not implement copy(NodeFactory). This compiler extension should"
-                + " either implement the method, or not invoke this method.");
+        throw new InternalCompilerError(
+                "Unimplemented operation. This class "
+                        + "("
+                        + this.getClass().getName()
+                        + ") does "
+                        + "not implement copy(NodeFactory). This compiler extension should"
+                        + " either implement the method, or not invoke this method.");
     }
 
     @Override

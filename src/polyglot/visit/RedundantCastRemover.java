@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -53,8 +53,7 @@ public class RedundantCastRemover extends NodeVisitor {
             Cast c = (Cast) n;
             Type castType = c.castType().type();
             Type exprType = c.expr().type();
-            if (exprType.isImplicitCastValid(castType)
-                    && !castType.isPrimitive()) {
+            if (exprType.isImplicitCastValid(castType) && !castType.isPrimitive()) {
                 // Redundant cast.
                 return c.expr();
             }
@@ -76,8 +75,7 @@ public class RedundantCastRemover extends NodeVisitor {
                 if (oldE instanceof Cast) {
                     newArgs.add(oldE);
                     changed = true;
-                }
-                else {
+                } else {
                     newArgs.add(newE);
                 }
             }

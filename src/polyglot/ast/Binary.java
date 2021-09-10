@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -36,8 +36,7 @@ import polyglot.util.SerialVersionUID;
 public interface Binary extends Expr {
     /** Binary expression operator. */
     public static class Operator extends Enum {
-        private static final long serialVersionUID =
-                SerialVersionUID.generate();
+        private static final long serialVersionUID = SerialVersionUID.generate();
 
         protected Precedence prec;
 
@@ -58,20 +57,16 @@ public interface Binary extends Expr {
     public static final Operator LE = new Operator("<=", Precedence.RELATIONAL);
     public static final Operator GE = new Operator(">=", Precedence.RELATIONAL);
     public static final Operator NE = new Operator("!=", Precedence.EQUAL);
-    public static final Operator COND_OR = new Operator("||",
-                                                        Precedence.COND_OR);
-    public static final Operator COND_AND = new Operator("&&",
-                                                         Precedence.COND_AND);
+    public static final Operator COND_OR = new Operator("||", Precedence.COND_OR);
+    public static final Operator COND_AND = new Operator("&&", Precedence.COND_AND);
     public static final Operator ADD = new Operator("+", Precedence.ADD);
     public static final Operator SUB = new Operator("-", Precedence.ADD);
     public static final Operator MUL = new Operator("*", Precedence.MUL);
     public static final Operator DIV = new Operator("/", Precedence.MUL);
     public static final Operator MOD = new Operator("%", Precedence.MUL);
     public static final Operator BIT_OR = new Operator("|", Precedence.BIT_OR);
-    public static final Operator BIT_AND =
-            new Operator("&", Precedence.BIT_AND);
-    public static final Operator BIT_XOR =
-            new Operator("^", Precedence.BIT_XOR);
+    public static final Operator BIT_AND = new Operator("&", Precedence.BIT_AND);
+    public static final Operator BIT_XOR = new Operator("^", Precedence.BIT_XOR);
     public static final Operator SHL = new Operator("<<", Precedence.SHIFT);
     public static final Operator SHR = new Operator(">>", Precedence.SHIFT);
     public static final Operator USHR = new Operator(">>>", Precedence.SHIFT);

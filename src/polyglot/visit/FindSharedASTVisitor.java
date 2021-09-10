@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -35,7 +35,7 @@ import polyglot.ast.JLang;
 import polyglot.ast.Node;
 import polyglot.util.InternalCompilerError;
 
-/** Visitor which finds shared AST nodes in a file. This can be used 
+/** Visitor which finds shared AST nodes in a file. This can be used
  * to find bugs in previous passes that violate non-sharing of AST nodes.
  * */
 public class FindSharedASTVisitor extends NodeVisitor {
@@ -52,8 +52,7 @@ public class FindSharedASTVisitor extends NodeVisitor {
         this.currentStack = new NodeStack(n, this.currentStack);
         if (seenNodes.containsKey(n)) {
             alreadySeenNode(n, seenNodes.get(n), this.currentStack);
-        }
-        else {
+        } else {
             seenNodes.put(n, currentStack);
         }
         return this;
@@ -71,9 +70,16 @@ public class FindSharedASTVisitor extends NodeVisitor {
             lang().prettyPrint(m, lang(), System.err);
         }
 
-        throw new InternalCompilerError("Already seen node " + n + " ("
-                + n.getClass().getSimpleName() + ") at " + stack1 + " and at "
-                + stack2, n.position());
+        throw new InternalCompilerError(
+                "Already seen node "
+                        + n
+                        + " ("
+                        + n.getClass().getSimpleName()
+                        + ") at "
+                        + stack1
+                        + " and at "
+                        + stack2,
+                n.position());
     }
 
     protected Node findCommonParent(NodeStack stack1, NodeStack stack2) {
@@ -131,10 +137,14 @@ public class FindSharedASTVisitor extends NodeVisitor {
         @Override
         public String toString() {
             if (rest == null) return "";
-            return rest.toString() + "\n :: " + n + "(" + n.position() + "; "
-                    + n.getClass().getSimpleName() + ")";
+            return rest.toString()
+                    + "\n :: "
+                    + n
+                    + "("
+                    + n.position()
+                    + "; "
+                    + n.getClass().getSimpleName()
+                    + ")";
         }
-
     }
-
 }

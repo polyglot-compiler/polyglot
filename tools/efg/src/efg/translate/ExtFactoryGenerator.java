@@ -49,8 +49,7 @@ public class ExtFactoryGenerator {
     /**
      * Fully qualified name of {@link AbstractExtFactory_c}.
      */
-    protected static final String ABSTRACT_EXT_FACTORY_NAME =
-            AbstractExtFactory_c.class.getName();
+    protected static final String ABSTRACT_EXT_FACTORY_NAME = AbstractExtFactory_c.class.getName();
 
     protected ExtensionInfo efgExtInfo;
 
@@ -84,8 +83,8 @@ public class ExtFactoryGenerator {
      */
     protected final ClassType superExtFactoryCT;
 
-    public ExtFactoryGenerator(ExtensionInfo efgExtInfo,
-            JL7ExtensionInfo outExtInfo) throws SemanticException {
+    public ExtFactoryGenerator(ExtensionInfo efgExtInfo, JL7ExtensionInfo outExtInfo)
+            throws SemanticException {
         this.efgExtInfo = efgExtInfo;
         nf = (JL7NodeFactory) outExtInfo.nodeFactory();
         qq = new QQ(outExtInfo);
@@ -93,9 +92,7 @@ public class ExtFactoryGenerator {
         baseExtFactoryCT = ts.typeForName(EXT_FACTORY_NAME).toClass();
         nodeCT = efgExtInfo.typeSystem().Node();
         superExtFactoryCT =
-                efgExtInfo.typeSystem()
-                          .typeForName(EFG_INFO.superInterface())
-                          .toClass();
+                efgExtInfo.typeSystem().typeForName(EFG_INFO.superInterface()).toClass();
     }
 
     /**
@@ -126,31 +123,37 @@ public class ExtFactoryGenerator {
     public SourceFile genExtFactory() {
         // Generate methods for the extension factory interface.
         List<ClassMember> decls = new ArrayList<>();
-        for (Map.Entry<ClassType, EfgClassInfo> entry : EFG_INFO.factoryMappings()
-                                                                .entrySet()) {
+        for (Map.Entry<ClassType, EfgClassInfo> entry : EFG_INFO.factoryMappings().entrySet()) {
             // The node implementation for which the method is being generated.
             ClassType ct = entry.getKey();
 
             for (Name basename : entry.getValue().basenames().keySet()) {
                 MethodDecl md =
-                        (MethodDecl) qq.parseMember(EXT_NAME + " %s ();",
-                                                    efgExtInfo.factoryName(basename.name));
+                        (MethodDecl)
+                                qq.parseMember(
+                                        EXT_NAME + " %s ();",
+                                        efgExtInfo.factoryName(basename.name));
 
                 // Create a Javadoc comment for the method decl.
                 StringBuilder comment = new StringBuilder();
                 comment.append("/**\n");
-                comment.append(" * Creates an extension object for {@link "
-                        + ct.fullName() + "}.\n");
+                comment.append(
+                        " * Creates an extension object for {@link " + ct.fullName() + "}.\n");
                 comment.append(" */");
-                md = (MethodDecl) md.javadoc(nf.Javadoc(Position.compilerGenerated(),
-                                                        comment.toString()));
+                md =
+                        (MethodDecl)
+                                md.javadoc(
+                                        nf.Javadoc(
+                                                Position.compilerGenerated(), comment.toString()));
                 decls.add(md);
             }
         }
 
         // Create the interface declaration.
-        ClassDecl cd = qq.parseDecl("public interface %s extends "
-                + EFG_INFO.superInterface() + " {  }", extFactorySimpleName());
+        ClassDecl cd =
+                qq.parseDecl(
+                        "public interface %s extends " + EFG_INFO.superInterface() + " {  }",
+                        extFactorySimpleName());
         cd = cd.body(nf.ClassBody(Position.compilerGenerated(), decls));
 
         StringBuilder sourceCode = new StringBuilder();
@@ -158,7 +161,7 @@ public class ExtFactoryGenerator {
         sourceCode.append("package " + EFG_INFO.packageName() + ";");
 
         SourceFile ast = qq.parseFile(sourceCode.toString(), subst.toArray());
-        return ast.decls(Collections.<TopLevelDecl> singletonList(cd));
+        return ast.decls(Collections.<TopLevelDecl>singletonList(cd));
     }
 
     /**
@@ -176,16 +179,19 @@ public class ExtFactoryGenerator {
         decls.add(qq.parseMember("public %s () { super(); }", className));
 
         // Generate constructor for extending extensions.
-        decls.add(qq.parseMember("public %s (" + EXT_FACTORY_NAME
-                + " nextExtFactory) { super(nextExtFactory); }", className));
+        decls.add(
+                qq.parseMember(
+                        "public %s ("
+                                + EXT_FACTORY_NAME
+                                + " nextExtFactory) { super(nextExtFactory); }",
+                        className));
 
         List<ClassMember> factoryDecls = new ArrayList<>();
         List<ClassMember> implDecls = new ArrayList<>();
         List<ClassMember> postDecls = new ArrayList<>();
 
         // Generate methods for the abstract extension factory.
-        for (Map.Entry<ClassType, EfgClassInfo> entry : EFG_INFO.factoryMappings()
-                                                                .entrySet()) {
+        for (Map.Entry<ClassType, EfgClassInfo> entry : EFG_INFO.factoryMappings().entrySet()) {
             ClassType ct = entry.getKey();
             EfgClassInfo classInfo = entry.getValue();
             ClassType baseCT = classInfo.superType();
@@ -211,9 +217,14 @@ public class ExtFactoryGenerator {
         decls.addAll(postDecls);
 
         // Create the class declaration.
-        ClassDecl cd = qq.parseDecl("public abstract class %s extends "
-                + EFG_INFO.superClass() + " implements " + extFactoryFQName()
-                + " {  }", abstractExtFactorySimpleName());
+        ClassDecl cd =
+                qq.parseDecl(
+                        "public abstract class %s extends "
+                                + EFG_INFO.superClass()
+                                + " implements "
+                                + extFactoryFQName()
+                                + " {  }",
+                        abstractExtFactorySimpleName());
         cd = cd.body(nf.ClassBody(Position.compilerGenerated(), decls));
 
         StringBuilder sourceCode = new StringBuilder();
@@ -221,7 +232,7 @@ public class ExtFactoryGenerator {
         sourceCode.append("package " + EFG_INFO.packageName() + ";");
 
         SourceFile ast = qq.parseFile(sourceCode.toString(), subst.toArray());
-        return ast.decls(Collections.<TopLevelDecl> singletonList(cd));
+        return ast.decls(Collections.<TopLevelDecl>singletonList(cd));
     }
 
     /**
@@ -235,8 +246,7 @@ public class ExtFactoryGenerator {
      *         an ancestor class of ct for which there is an extension factory
      *         method in the Polyglot base language.
      */
-    protected MethodDecl genFactoryMethod(ClassType ct, String basename,
-            ClassType baseCT) {
+    protected MethodDecl genFactoryMethod(ClassType ct, String basename, ClassType baseCT) {
         StringBuilder methodDecl = new StringBuilder();
         List<Object> subst = new ArrayList<>();
 
@@ -252,11 +262,10 @@ public class ExtFactoryGenerator {
             {
                 // Need to do a dynamic type check.
                 methodDecl.append(EXT_NAME + " e2; ");
-                methodDecl.append("if (nextExtFactory() instanceof "
-                        + extFactoryFQName() + ") { ");
+                methodDecl.append("if (nextExtFactory() instanceof " + extFactoryFQName() + ") { ");
                 {
-                    methodDecl.append("e2 = ((" + extFactoryFQName()
-                            + ") nextExtFactory()). %s (); ");
+                    methodDecl.append(
+                            "e2 = ((" + extFactoryFQName() + ") nextExtFactory()). %s (); ");
                     subst.add(efgExtInfo.factoryName(basename));
                 }
                 methodDecl.append("} else { ");
@@ -278,15 +287,13 @@ public class ExtFactoryGenerator {
         methodDecl.append("} ");
 
         // Actual method decl.
-        MethodDecl md = (MethodDecl) qq.parseMember(methodDecl.toString(),
-                                                    subst.toArray());
+        MethodDecl md = (MethodDecl) qq.parseMember(methodDecl.toString(), subst.toArray());
 
         // Annotate with @Override annotation.
         AnnotationElem overrideAnnotation =
-                nf.MarkerAnnotationElem(Position.compilerGenerated(),
-                                        qq.parseType(Override.class.getName()));
-        List<AnnotationElem> annotationElems =
-                Collections.singletonList(overrideAnnotation);
+                nf.MarkerAnnotationElem(
+                        Position.compilerGenerated(), qq.parseType(Override.class.getName()));
+        List<AnnotationElem> annotationElems = Collections.singletonList(overrideAnnotation);
         JL5MethodDeclExt mdExt = (JL5MethodDeclExt) JL5Ext.ext(md);
         return (MethodDecl) mdExt.annotationElems(annotationElems);
     }
@@ -308,8 +315,7 @@ public class ExtFactoryGenerator {
         methodDecl.append("}");
 
         // Actual method decl.
-        return (MethodDecl) qq.parseMember(methodDecl.toString(),
-                                           subst.toArray());
+        return (MethodDecl) qq.parseMember(methodDecl.toString(), subst.toArray());
     }
 
     /**
@@ -319,8 +325,7 @@ public class ExtFactoryGenerator {
         StringBuilder methodDecl = new StringBuilder();
         List<Object> subst = new ArrayList<>();
 
-        methodDecl.append("protected " + EXT_NAME + " %s (" + EXT_NAME
-                + " ext) { ");
+        methodDecl.append("protected " + EXT_NAME + " %s (" + EXT_NAME + " ext) { ");
         subst.add(postName(basename));
         {
             methodDecl.append("return %s (ext); ");
@@ -330,8 +335,7 @@ public class ExtFactoryGenerator {
         methodDecl.append("}");
 
         // Actual method decl.
-        return (MethodDecl) qq.parseMember(methodDecl.toString(),
-                                           subst.toArray());
+        return (MethodDecl) qq.parseMember(methodDecl.toString(), subst.toArray());
     }
 
     /**
@@ -345,7 +349,6 @@ public class ExtFactoryGenerator {
      * @return the name of the post-factory method for the given basename.
      */
     protected String postName(String basename) {
-        return "post"
-                + efgExtInfo.capitalizeFirst(efgExtInfo.factoryName(basename));
+        return "post" + efgExtInfo.capitalizeFirst(efgExtInfo.factoryName(basename));
     }
 }

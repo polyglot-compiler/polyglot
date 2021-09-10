@@ -42,9 +42,13 @@ public class QuietOutputController extends StdOutputController {
     private static final char PROGRESS_FAIL_CHAR = '!';
     private static final int PROGRESS_LIMIT = 60;
 
-    public QuietOutputController(PrintStream out, boolean showStartScript,
-            boolean showFinishScript, boolean showStartFile,
-            boolean showFinishFile, boolean showScriptProgress) {
+    public QuietOutputController(
+            PrintStream out,
+            boolean showStartScript,
+            boolean showFinishScript,
+            boolean showStartFile,
+            boolean showFinishFile,
+            boolean showScriptProgress) {
         super(out);
         this.showStartScript = showStartScript;
         this.showFinishScript = showFinishScript;
@@ -55,47 +59,39 @@ public class QuietOutputController extends StdOutputController {
 
     @Override
     protected void startScriptTestSuite(ScriptTestSuite sts) {
-        if (showStartScript)
-            super.startScriptTestSuite(sts);
+        if (showStartScript) super.startScriptTestSuite(sts);
         else beginBlock();
     }
 
     @Override
     protected void finishScriptTestSuite(ScriptTestSuite sts) {
         if (showScriptProgress && !printIndent) println();
-        if (showFinishScript)
-            super.finishScriptTestSuite(sts);
+        if (showFinishScript) super.finishScriptTestSuite(sts);
         else endBlock();
     }
 
     @Override
-    protected void startSourceFileTestCollection(
-            SourceFileTestCollection sftc) {
-        if (showStartScript)
-            super.startSourceFileTestCollection(sftc);
+    protected void startSourceFileTestCollection(SourceFileTestCollection sftc) {
+        if (showStartScript) super.startSourceFileTestCollection(sftc);
         else beginBlock();
     }
 
     @Override
-    protected void finishSourceFileTestCollection(
-            SourceFileTestCollection sftc) {
+    protected void finishSourceFileTestCollection(SourceFileTestCollection sftc) {
         if (showScriptProgress && !printIndent) println();
-        if (showFinishScript)
-            super.finishSourceFileTestCollection(sftc);
+        if (showFinishScript) super.finishSourceFileTestCollection(sftc);
         else endBlock();
     }
 
     @Override
     protected void startSourceFileTest(SourceFileTest sft) {
-        if (showStartFile)
-            super.startSourceFileTest(sft);
+        if (showStartFile) super.startSourceFileTest(sft);
         else beginBlock();
     }
 
     @Override
     protected void finishSourceFileTest(SourceFileTest sft) {
-        if (showFinishFile)
-            super.finishSourceFileTest(sft);
+        if (showFinishFile) super.finishSourceFileTest(sft);
         else {
             endBlock();
             if (showScriptProgress) {
@@ -110,15 +106,13 @@ public class QuietOutputController extends StdOutputController {
 
     @Override
     protected void startBuildTest(BuildTest b) {
-        if (showStartFile)
-            super.startBuildTest(b);
+        if (showStartFile) super.startBuildTest(b);
         else beginBlock();
     }
 
     @Override
     protected void finishBuildTest(BuildTest b) {
-        if (showFinishFile)
-            super.finishBuildTest(b);
+        if (showFinishFile) super.finishBuildTest(b);
         else endBlock();
     }
 }

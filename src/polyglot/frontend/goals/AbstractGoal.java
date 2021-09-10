@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -53,8 +53,8 @@ public abstract class AbstractGoal implements Goal {
 
     private AbstractGoal() {
         this.state = UNREACHED;
-        this.prerequisites = Collections.<Goal> emptySet();
-        this.corequisites = Collections.<Goal> emptySet();
+        this.prerequisites = Collections.<Goal>emptySet();
+        this.corequisites = Collections.<Goal>emptySet();
     }
 
     protected AbstractGoal(Job job) {
@@ -103,8 +103,7 @@ public abstract class AbstractGoal implements Goal {
     }
 
     @Override
-    public void addPrerequisiteGoal(Goal g, Scheduler scheduler)
-            throws CyclicDependencyException {
+    public void addPrerequisiteGoal(Goal g, Scheduler scheduler) throws CyclicDependencyException {
         // This takes a hell of a long time.  Disable the check for now.
         // checkCycles(g, scheduler);
         if (prerequisites == Collections.EMPTY_SET) {
@@ -113,11 +112,9 @@ public abstract class AbstractGoal implements Goal {
         prerequisites.add(g);
     }
 
-    protected void checkCycles(Goal current, Scheduler scheduler)
-            throws CyclicDependencyException {
+    protected void checkCycles(Goal current, Scheduler scheduler) throws CyclicDependencyException {
         if (this == current) {
-            throw new CyclicDependencyException("Goal " + this
-                    + " cannot depend on itself.");
+            throw new CyclicDependencyException("Goal " + this + " cannot depend on itself.");
         }
 
         for (Goal subgoal : current.prerequisiteGoals(scheduler)) {
@@ -175,8 +172,7 @@ public abstract class AbstractGoal implements Goal {
             Goal g = (Goal) o;
             if (job == null) {
                 return g.job() == null && name.equals(g.name());
-            }
-            else {
+            } else {
                 return job.equals(g.job()) && name.equals(g.name());
             }
         }
@@ -185,25 +181,30 @@ public abstract class AbstractGoal implements Goal {
 
     protected String stateString() {
         switch (state) {
-        case UNREACHABLE:
-            return "unreachable";
-        case UNREACHABLE_THIS_RUN:
-            return "running-but-unreachable-this-run";
-        case UNREACHED:
-            return "unreached";
-        case ATTEMPTED:
-            return "attempted";
-        case REACHED:
-            return "reached";
-        case RUNNING:
-            return "running";
+            case UNREACHABLE:
+                return "unreachable";
+            case UNREACHABLE_THIS_RUN:
+                return "running-but-unreachable-this-run";
+            case UNREACHED:
+                return "unreached";
+            case ATTEMPTED:
+                return "attempted";
+            case REACHED:
+                return "reached";
+            case RUNNING:
+                return "running";
         }
         return "unknown-goal-state";
     }
 
     @Override
     public String toString() {
-        return job + ":" + (job != null ? job.extensionInfo() + ":" : "")
-                + name + " (" + stateString() + ")";
+        return job
+                + ":"
+                + (job != null ? job.extensionInfo() + ":" : "")
+                + name
+                + " ("
+                + stateString()
+                + ")";
     }
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -50,9 +50,9 @@ import polyglot.util.CodeWriter;
  * The {@code NodeScrambler} is test case generator of sorts. Since it
  * is often useful to introduce ``random'' errors into source code, this
  * class provides a way of doing so in a semi-structured manner. The process
- * takes place in two phases. First, a "FirstPass" is made to collect 
- * a list of nodes and their parents. Then a second pass is made to randomly 
- * replace a branch of the tree with another suitable branch. 
+ * takes place in two phases. First, a "FirstPass" is made to collect
+ * a list of nodes and their parents. Then a second pass is made to randomly
+ * replace a branch of the tree with another suitable branch.
  */
 public class NodeScrambler extends NodeVisitor {
     public FirstPass fp;
@@ -124,8 +124,7 @@ public class NodeScrambler extends NodeVisitor {
             if (m == null) {
                 /* No potential replacement. */
                 return null;
-            }
-            else {
+            } else {
                 scrambled = true;
 
                 try {
@@ -133,15 +132,13 @@ public class NodeScrambler extends NodeVisitor {
                     lang().dump(n, lang(), System.err);
                     System.err.println("With:");
                     lang().dump(n, lang(), System.err);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return null;
                 }
                 return m;
             }
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -149,12 +146,10 @@ public class NodeScrambler extends NodeVisitor {
     protected boolean coinFlip() {
         if (scrambled) {
             return false;
-        }
-        else {
+        } else {
             if (ran.nextDouble() > 0.9) {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -168,32 +163,23 @@ public class NodeScrambler extends NodeVisitor {
         }
         if (n instanceof Import) {
             required = Import.class;
-        }
-        else if (n instanceof TypeNode) {
+        } else if (n instanceof TypeNode) {
             required = TypeNode.class;
-        }
-        else if (n instanceof ClassDecl) {
+        } else if (n instanceof ClassDecl) {
             required = ClassDecl.class;
-        }
-        else if (n instanceof ClassMember) {
+        } else if (n instanceof ClassMember) {
             required = ClassMember.class;
-        }
-        else if (n instanceof Formal) {
+        } else if (n instanceof Formal) {
             required = Formal.class;
-        }
-        else if (n instanceof Expr) {
+        } else if (n instanceof Expr) {
             required = Expr.class;
-        }
-        else if (n instanceof Block) {
+        } else if (n instanceof Block) {
             required = Block.class;
-        }
-        else if (n instanceof Catch) {
+        } else if (n instanceof Catch) {
             required = Catch.class;
-        }
-        else if (n instanceof LocalDecl) {
+        } else if (n instanceof LocalDecl) {
             required = LocalDecl.class;
-        }
-        else if (n instanceof Stmt) {
+        } else if (n instanceof Stmt) {
             required = Stmt.class;
         }
 

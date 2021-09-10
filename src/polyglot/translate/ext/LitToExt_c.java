@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -48,31 +48,24 @@ public class LitToExt_c extends ToExt_c {
         if (n instanceof BooleanLit) {
             BooleanLit l = (BooleanLit) n;
             return rw.to_nf().BooleanLit(n.position(), l.value());
-        }
-        else if (n instanceof ClassLit) {
+        } else if (n instanceof ClassLit) {
             ClassLit l = (ClassLit) n;
             return rw.to_nf().ClassLit(n.position(), l.typeNode());
-        }
-        else if (n instanceof FloatLit) {
+        } else if (n instanceof FloatLit) {
             FloatLit l = (FloatLit) n;
             return rw.to_nf().FloatLit(n.position(), l.kind(), l.value());
-        }
-        else if (n instanceof NullLit) {
+        } else if (n instanceof NullLit) {
             return rw.to_nf().NullLit(n.position());
-        }
-        else if (n instanceof CharLit) {
+        } else if (n instanceof CharLit) {
             CharLit l = (CharLit) n;
             return rw.to_nf().CharLit(n.position(), l.value());
-        }
-        else if (n instanceof IntLit) {
+        } else if (n instanceof IntLit) {
             IntLit l = (IntLit) n;
             return rw.to_nf().IntLit(n.position(), l.kind(), l.value());
-        }
-        else if (n instanceof StringLit) {
+        } else if (n instanceof StringLit) {
             StringLit l = (StringLit) n;
             return rw.to_nf().StringLit(n.position(), l.value());
-        }
-        else {
+        } else {
             throw new InternalCompilerError("Unexpected lit");
         }
     }

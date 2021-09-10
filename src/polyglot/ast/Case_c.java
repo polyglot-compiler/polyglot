@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -51,7 +51,7 @@ public class Case_c extends Stmt_c implements Case {
     protected Expr expr;
     protected long value;
 
-//    @Deprecated
+    //    @Deprecated
     public Case_c(Position pos, Expr expr) {
         this(pos, expr, null);
     }
@@ -122,8 +122,8 @@ public class Case_c extends Stmt_c implements Case {
         TypeSystem ts = tc.typeSystem();
 
         if (!ts.isImplicitCastValid(expr.type(), ts.Int())) {
-            throw new SemanticException("Case label must be an byte, char, short, or int.",
-                                        position());
+            throw new SemanticException(
+                    "Case label must be an byte, char, short, or int.", position());
         }
 
         return this;
@@ -143,18 +143,18 @@ public class Case_c extends Stmt_c implements Case {
         if (cc.lang().isConstant(expr, cc.lang())) {
             Object o = cc.lang().constantValue(expr, cc.lang());
 
-            if (o instanceof Number && !(o instanceof Long)
-                    && !(o instanceof Float) && !(o instanceof Double)) {
+            if (o instanceof Number
+                    && !(o instanceof Long)
+                    && !(o instanceof Float)
+                    && !(o instanceof Double)) {
 
                 return value(((Number) o).longValue());
-            }
-            else if (o instanceof Character) {
+            } else if (o instanceof Character) {
                 return value(((Character) o).charValue());
             }
         }
 
-        throw new SemanticException("Case label must be an integral constant.",
-                                    position());
+        throw new SemanticException("Case label must be an integral constant.", position());
     }
 
     @Override
@@ -172,8 +172,7 @@ public class Case_c extends Stmt_c implements Case {
     public String toString() {
         if (expr == null) {
             return "default:";
-        }
-        else {
+        } else {
             return "case " + expr + ":";
         }
     }
@@ -182,8 +181,7 @@ public class Case_c extends Stmt_c implements Case {
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (expr == null) {
             w.write("default:");
-        }
-        else {
+        } else {
             w.write("case ");
             print(expr, w, tr);
             w.write(":");
@@ -209,5 +207,4 @@ public class Case_c extends Stmt_c implements Case {
     public Node copy(NodeFactory nf) {
         return nf.Case(this.position, this.expr).value(value);
     }
-
 }

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -47,8 +47,8 @@ public class JL5RawSubst_c extends JL5Subst_c {
 
     private final JL5ParsedClassType base;
 
-    public JL5RawSubst_c(JL5TypeSystem ts,
-            Map<TypeVariable, ReferenceType> subst, JL5ParsedClassType base) {
+    public JL5RawSubst_c(
+            JL5TypeSystem ts, Map<TypeVariable, ReferenceType> subst, JL5ParsedClassType base) {
         super(ts, subst);
         this.base = base;
     }
@@ -72,13 +72,16 @@ public class JL5RawSubst_c extends JL5Subst_c {
         // mi is a member of the raw class we are substituting.
         if (mi.flags().isStatic()) {
             // static method!
-            // JLS 3rd ed 4.8: "The type of a static member of a raw type C is the same as its type in the generic declaration corresponding to C."
+            // JLS 3rd ed 4.8: "The type of a static member of a raw type C is the same as its type
+            // in the generic declaration corresponding to C."
             @SuppressWarnings("unchecked")
             T result = (T) mi.declaration();
             return result;
         }
-        // The type of a constructor (�8.8), instance method (�8.8, �9.4), or non-static field (�8.3) M 
-        // of a raw type C that is not inherited from its superclasses or super- interfaces is the erasure of 
+        // The type of a constructor (�8.8), instance method (�8.8, �9.4), or non-static field
+        // (�8.3) M
+        // of a raw type C that is not inherited from its superclasses or super- interfaces is the
+        // erasure of
         // its type in the generic declaration corresponding to C.
 
         JL5MethodInstance mj = (JL5MethodInstance) mi.declaration();
@@ -97,10 +100,11 @@ public class JL5RawSubst_c extends JL5Subst_c {
         tmpMi.setThrowTypes(throwTypes);
         tmpMi.setContainer(ts.rawClass(base));
 
-        // subst the type params (that is, the method may have some type params that mention in their bounds 
-        // type params from a containing class, which we will 
+        // subst the type params (that is, the method may have some type params that mention in
+        // their bounds
+        // type params from a containing class, which we will
         // substitute.)
-        tmpMi.setTypeParams(this.<TypeVariable> substTypeList(tmpMi.typeParams()));
+        tmpMi.setTypeParams(this.<TypeVariable>substTypeList(tmpMi.typeParams()));
 
         // now erase the type params, if there are any
         JL5Subst eraseMI = ts.erasureSubst(tmpMi);
@@ -122,8 +126,10 @@ public class JL5RawSubst_c extends JL5Subst_c {
 
         // ci is a member of the raw class we are substituting.
 
-        // The type of a constructor (�8.8), instance method (�8.8, �9.4), or non-static field (�8.3) M 
-        // of a raw type C that is not inherited from its superclasses or super- interfaces is the erasure of 
+        // The type of a constructor (�8.8), instance method (�8.8, �9.4), or non-static field
+        // (�8.3) M
+        // of a raw type C that is not inherited from its superclasses or super- interfaces is the
+        // erasure of
         // its type in the generic declaration corresponding to C.
 
         JL5ConstructorInstance cj = (JL5ConstructorInstance) ci.declaration();
@@ -141,15 +147,22 @@ public class JL5RawSubst_c extends JL5Subst_c {
 
         for (Object o : tmpCi.typeParams()) {
             if (!(o instanceof TypeVariable)) {
-                System.err.println("Pi is " + tmpCi + " and type params is "
-                        + tmpCi.typeParams() + " " + o + " " + o.getClass());
+                System.err.println(
+                        "Pi is "
+                                + tmpCi
+                                + " and type params is "
+                                + tmpCi.typeParams()
+                                + " "
+                                + o
+                                + " "
+                                + o.getClass());
                 System.err.println("Subst is " + this);
                 Thread.dumpStack();
             }
         }
 
         // subst the type params
-        tmpCi.setTypeParams(this.<TypeVariable> substTypeList(tmpCi.typeParams()));
+        tmpCi.setTypeParams(this.<TypeVariable>substTypeList(tmpCi.typeParams()));
 
         // now erase the type params, if there are any
         JL5Subst eraseCI = ts.erasureSubst(tmpCi);
@@ -174,5 +187,4 @@ public class JL5RawSubst_c extends JL5Subst_c {
                     return ((JL5TypeSystem) typeSystem()).erasureType(o);
                 }
             };
-
 }

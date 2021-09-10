@@ -73,8 +73,7 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public Lang lang() {
-        throw new InternalCompilerError("Unexpected invocation from extension object: "
-                + this);
+        throw new InternalCompilerError("Unexpected invocation from extension object: " + this);
     }
 
     protected final JLang superLang() {
@@ -103,16 +102,14 @@ public abstract class Ext_c implements Ext {
 
     @Override
     public void init(Node node) {
-        if (this.node != null)
-            throw new InternalCompilerError("Already initialized.");
+        if (this.node != null) throw new InternalCompilerError("Already initialized.");
         this.node = node;
         if (ext != null) ext.init(node);
     }
 
     @Override
     public void initPred(NodeOps pred) {
-        if (this.pred != null)
-            throw new InternalCompilerError("Already initialized.");
+        if (this.pred != null) throw new InternalCompilerError("Already initialized.");
         this.pred = pred;
         if (ext != null) ext.initPred(this);
     }
@@ -146,16 +143,14 @@ public abstract class Ext_c implements Ext {
             copy.node = null; // uninitialize
             copy.pred = null; // uninitialize
             return copy;
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Unable to clone an extension object.");
         }
     }
 
     @Override
     public String toString() {
-        StringBuffer sb =
-                new StringBuffer(StringUtil.getShortNameComponent(getClass().getName()));
+        StringBuffer sb = new StringBuffer(StringUtil.getShortNameComponent(getClass().getName()));
         if (ext != null) {
             sb.append(":");
             sb.append(ext.toString());
@@ -199,14 +194,12 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         return superLang().disambiguateOverride(node(), parent, ar);
     }
 
     @Override
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
-            throws SemanticException {
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         return superLang().disambiguateEnter(node(), ar);
     }
 
@@ -216,8 +209,7 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
         return superLang().typeCheckOverride(node(), parent, tc);
     }
 
@@ -242,8 +234,7 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException {
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
         return superLang().exceptionCheckEnter(node(), ec);
     }
 
@@ -258,8 +249,7 @@ public abstract class Ext_c implements Ext {
     }
 
     @Override
-    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw) throws SemanticException {
         return superLang().extRewriteEnter(node(), rw);
     }
 
@@ -336,8 +326,7 @@ public abstract class Ext_c implements Ext {
         if (stmt instanceof Block) {
             w.write(" ");
             print(stmt, w, pp);
-        }
-        else {
+        } else {
             w.allowBreak(4, " ");
             printBlock(stmt, w, pp);
         }

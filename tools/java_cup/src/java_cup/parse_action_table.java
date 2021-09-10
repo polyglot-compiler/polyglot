@@ -1,9 +1,9 @@
 package java_cup;
 
-/** This class represents the complete "action" table of the parser. 
+/** This class represents the complete "action" table of the parser.
  *  It has one row for each state in the parse machine, and a column for
  *  each terminal symbol.  Each entry in the table represents a shift,
- *  reduce, or an error.  
+ *  reduce, or an error.
  *
  * @see     java_cup.parse_action
  * @see     java_cup.parse_action_row
@@ -16,7 +16,7 @@ public class parse_action_table {
     /*--- Constructor(s) ----------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Simple constructor.  All terminals, non-terminals, and productions must 
+    /** Simple constructor.  All terminals, non-terminals, and productions must
      *  already have been entered, and the viable prefix recognizer should
      *  have been constructed before this is called.
      */
@@ -26,8 +26,7 @@ public class parse_action_table {
 
         /* allocate the array and fill it in with empty rows */
         under_state = new parse_action_row[_num_states];
-        for (int i = 0; i < _num_states; i++)
-            under_state[i] = new parse_action_row();
+        for (int i = 0; i < _num_states; i++) under_state[i] = new parse_action_row();
     }
 
     /*-----------------------------------------------------------*/
@@ -51,7 +50,7 @@ public class parse_action_table {
     /*--- General Methods ---------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Check the table to ensure that all productions have been reduced. 
+    /** Check the table to ensure that all productions have been reduced.
      *  Issue a warning message (to System.err) for each production that
      *  is never reduced.
      */
@@ -81,8 +80,11 @@ public class parse_action_table {
                 /* give a warning if they haven't been turned off */
                 if (!emit.nowarn) {
 
-                    ErrorManager.getManager().emit_warning("*** Production \""
-                            + prod.to_simple_string() + "\" never reduced");
+                    ErrorManager.getManager()
+                            .emit_warning(
+                                    "*** Production \""
+                                            + prod.to_simple_string()
+                                            + "\" never reduced");
                 }
             }
         }
@@ -103,9 +105,7 @@ public class parse_action_table {
             for (int col = 0; col < parse_action_row.size(); col++) {
                 /* if the action is not an error print it */
                 if (under_state[row].under_term[col].kind() != parse_action.ERROR) {
-                    result +=
-                            " [term " + col + ":"
-                                    + under_state[row].under_term[col] + "]";
+                    result += " [term " + col + ":" + under_state[row].under_term[col] + "]";
 
                     /* end the line after the 2nd one */
                     cnt++;

@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -46,8 +46,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     /** Used for deserializing types. */
-    protected ClassType_c() {
-    }
+    protected ClassType_c() {}
 
     public ClassType_c(TypeSystem ts) {
         this(ts, null);
@@ -63,8 +62,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
     @Override
     public Resolver resolver() {
         if (memberCache == null) {
-            memberCache =
-                    new CachingResolver(ts.createClassContextResolver(this));
+            memberCache = new CachingResolver(ts.createClassContextResolver(this));
         }
         return memberCache;
     }
@@ -104,11 +102,10 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
     @Override
     public ReferenceType container() {
         if (!isMember())
-            throw new InternalCompilerError("Non-member class " + this
-                    + " cannot have container classes.");
+            throw new InternalCompilerError(
+                    "Non-member class " + this + " cannot have container classes.");
         if (outer() == null)
-            throw new InternalCompilerError("Nested class " + this
-                    + " must have an outer class.");
+            throw new InternalCompilerError("Nested class " + this + " must have an outer class.");
         return outer();
     }
 
@@ -127,8 +124,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
 
         ReferenceType container = container();
         if (!(container instanceof Named)) return name;
-        if ((container instanceof ClassType)
-                && ((ClassType) container).isAnonymous()) return name;
+        if ((container instanceof ClassType) && ((ClassType) container).isAnonymous()) return name;
 
         return ((Named) container).fullName() + "." + name;
     }
@@ -154,9 +150,9 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
     }
 
     /**
-    * @deprecated Was incorrectly defined. Use isNested for nested classes, 
-    *          and isInnerClass for inner classes.
-    */
+     * @deprecated Was incorrectly defined. Use isNested for nested classes,
+     *          and isInnerClass for inner classes.
+     */
     @Deprecated
     @Override
     public final boolean isInner() {
@@ -173,7 +169,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
     @Override
     public boolean isInnerClass() {
         // it's an inner class if it is not an interface, it is a nested
-        // class, and it is not explicitly or implicitly static. 
+        // class, and it is not explicitly or implicitly static.
         return !flags().isInterface() && isNested() && !flags().isStatic();
     }
 
@@ -357,8 +353,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
 
             // From is a non-final class, and to is an interface.
             return true;
-        }
-        else {
+        } else {
             // From is an interface
             if (!toInterface && !toFinal) {
                 // To is a non-final class.
@@ -386,8 +381,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
                         if (!ts.typeEquals(mi.returnType(), mj.returnType())) {
                             return false;
                         }
-                    }
-                    else signatureMap.put(signature, mi);
+                    } else signatureMap.put(signature, mi);
                 }
                 typeList.addAll(type.interfaces());
             }
@@ -420,14 +414,12 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
                     if (ts.equals(this, x)) {
                         return name();
                     }
-                }
-                catch (SemanticException e) {
+                } catch (SemanticException e) {
                 }
             }
 
             return package_().translate(c) + "." + name();
-        }
-        else if (isMember()) {
+        } else if (isMember()) {
             // Use only the short name if the outer class is anonymous.
             if (container().toClass().isAnonymous()) {
                 return name();
@@ -441,20 +433,16 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
                     if (ts.equals(this, x)) {
                         return name();
                     }
-                }
-                catch (SemanticException e) {
+                } catch (SemanticException e) {
                 }
             }
 
             return container().translate(c) + "." + name();
-        }
-        else if (isLocal()) {
+        } else if (isLocal()) {
             return name();
-        }
-        else {
-            throw new InternalCompilerError("Cannot translate an anonymous class: "
-                                                    + this,
-                                            this.position());
+        } else {
+            throw new InternalCompilerError(
+                    "Cannot translate an anonymous class: " + this, this.position());
         }
     }
 
@@ -465,17 +453,13 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
                 return package_() + "." + name();
             }
             return name();
-        }
-        else if (isMember()) {
+        } else if (isMember()) {
             return container().toString() + "." + name();
-        }
-        else if (isLocal()) {
+        } else if (isLocal()) {
             return name();
-        }
-        else if (isAnonymous()) {
+        } else if (isAnonymous()) {
             return "<anonymous class>";
-        }
-        else {
+        } else {
             return "<unknown class>";
         }
     }
@@ -491,54 +475,47 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
                 w.allowBreak(2, 3, "", 0);
             }
             w.write(name());
-        }
-        else if (isMember()) {
+        } else if (isMember()) {
             container().print(w);
             w.write(".");
             w.allowBreak(2, 3, "", 0);
             w.write(name());
-        }
-        else if (isLocal()) {
+        } else if (isLocal()) {
             w.write(name());
-        }
-        else if (isAnonymous()) {
+        } else if (isAnonymous()) {
             w.write("<anonymous class>");
-        }
-        else {
+        } else {
             w.write("<unknown class>");
         }
     }
 
     @Override
     public boolean isEnclosedImpl(ClassType maybe_outer) {
-        if (isTopLevel())
-            return false;
+        if (isTopLevel()) return false;
         else if (outer() != null)
-            return outer().equals(maybe_outer)
-                    || outer().isEnclosed(maybe_outer);
-        else throw new InternalCompilerError("Non top-level classes "
-                + "must have outer classes.");
+            return outer().equals(maybe_outer) || outer().isEnclosed(maybe_outer);
+        else throw new InternalCompilerError("Non top-level classes " + "must have outer classes.");
     }
 
-    /** 
+    /**
      * Return true if an object of the class has
-     * an enclosing instance of {@code encl}. 
+     * an enclosing instance of {@code encl}.
      */
     @Override
     public boolean hasEnclosingInstanceImpl(ClassType encl) {
         if (this.equals(encl)) {
-            // object o is the zeroth lexically enclosing instance of itself. 
+            // object o is the zeroth lexically enclosing instance of itself.
             return true;
         }
 
         if (!isInnerClass() || inStaticContext()) {
             // this class is not an inner class, or was declared in a static
             // context; it cannot have an enclosing
-            // instance of anything. 
+            // instance of anything.
             return false;
         }
 
-        // see if the immediately lexically enclosing class has an 
+        // see if the immediately lexically enclosing class has an
         // appropriate enclosing instance
         return this.outer().hasEnclosingInstance(encl);
     }

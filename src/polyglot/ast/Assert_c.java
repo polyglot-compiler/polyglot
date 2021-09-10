@@ -56,7 +56,7 @@ public class Assert_c extends Stmt_c implements Assert {
     protected Expr cond;
     protected Expr errorMessage;
 
-//    @Deprecated
+    //    @Deprecated
     public Assert_c(Position pos, Expr cond, Expr errorMessage) {
         this(pos, cond, errorMessage, null);
     }
@@ -103,8 +103,7 @@ public class Assert_c extends Stmt_c implements Assert {
     }
 
     /** Reconstruct the statement. */
-    protected <N extends Assert_c> N reconstruct(N n, Expr cond,
-            Expr errorMessage) {
+    protected <N extends Assert_c> N reconstruct(N n, Expr cond, Expr errorMessage) {
         n = cond(n, cond);
         n = errorMessage(n, errorMessage);
         return n;
@@ -123,23 +122,24 @@ public class Assert_c extends Stmt_c implements Assert {
 
         if (!Options.global.assertions) {
             ErrorQueue eq = tc.errorQueue();
-            eq.enqueue(ErrorInfo.WARNING,
-                       "assert statements are disabled. Recompile "
-                               + "with -assert and ensure the post compiler supports "
-                               + "assert (e.g., -post \"javac -source 1.4\"). "
-                               + "Removing the statement and continuing.",
-                       cond.position());
+            eq.enqueue(
+                    ErrorInfo.WARNING,
+                    "assert statements are disabled. Recompile "
+                            + "with -assert and ensure the post compiler supports "
+                            + "assert (e.g., -post \"javac -source 1.4\"). "
+                            + "Removing the statement and continuing.",
+                    cond.position());
         }
 
         if (!ts.typeEquals(cond.type(), ts.Boolean())) {
-            throw new SemanticException("Condition of assert statement "
-                    + "must have boolean type.", cond.position());
+            throw new SemanticException(
+                    "Condition of assert statement " + "must have boolean type.", cond.position());
         }
 
-        if (errorMessage != null
-                && ts.typeEquals(errorMessage.type(), ts.Void())) {
-            throw new SemanticException("Error message in assert statement "
-                    + "must have a value.", errorMessage.position());
+        if (errorMessage != null && ts.typeEquals(errorMessage.type(), ts.Void())) {
+            throw new SemanticException(
+                    "Error message in assert statement " + "must have a value.",
+                    errorMessage.position());
         }
 
         return this;
@@ -164,7 +164,8 @@ public class Assert_c extends Stmt_c implements Assert {
 
     @Override
     public String toString() {
-        return "assert " + cond.toString()
+        return "assert "
+                + cond.toString()
                 + (errorMessage != null ? ": " + errorMessage.toString() : "")
                 + ";";
     }
@@ -186,15 +187,14 @@ public class Assert_c extends Stmt_c implements Assert {
     public void translate(CodeWriter w, Translator tr) {
         if (!Options.global.assertions) {
             w.write(";");
-        }
-        else {
+        } else {
             tr.lang().prettyPrint(this, w, tr);
         }
     }
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        return Collections.<Type> singletonList(ts.AssertionError());
+        return Collections.<Type>singletonList(ts.AssertionError());
     }
 
     @Override
@@ -208,35 +208,28 @@ public class Assert_c extends Stmt_c implements Assert {
         if (errorMessage != null) {
             if (v.lang().isConstant(cond, v.lang())) {
                 boolean condConstantValue =
-                        ((Boolean) v.lang()
-                                    .constantValue(cond,
-                                                   v.lang())).booleanValue();
+                        ((Boolean) v.lang().constantValue(cond, v.lang())).booleanValue();
                 if (condConstantValue) {
                     v.visitCFG(cond, this, EXIT);
-                }
-                else {
-                    v.visitCFG(cond,
-                               FlowGraph.EDGE_KEY_FALSE,
-                               errorMessage,
-                               ENTRY);
+                } else {
+                    v.visitCFG(cond, FlowGraph.EDGE_KEY_FALSE, errorMessage, ENTRY);
                     v.visitCFG(errorMessage, this, EXIT);
 
                     // AssertionError edge will be handled by visitor.
-                    return succs;//Collections.<T> emptyList();
+                    return succs; // Collections.<T> emptyList();
                 }
-            }
-            else {
-                v.visitCFG(cond,
-                           FlowGraph.EDGE_KEY_TRUE,
-                           this,
-                           EXIT,
-                           FlowGraph.EDGE_KEY_FALSE,
-                           errorMessage,
-                           ENTRY);
+            } else {
+                v.visitCFG(
+                        cond,
+                        FlowGraph.EDGE_KEY_TRUE,
+                        this,
+                        EXIT,
+                        FlowGraph.EDGE_KEY_FALSE,
+                        errorMessage,
+                        ENTRY);
                 v.visitCFG(errorMessage, this, EXIT);
             }
-        }
-        else {
+        } else {
             v.visitCFG(cond, this, EXIT);
         }
 
@@ -247,5 +240,4 @@ public class Assert_c extends Stmt_c implements Assert {
     public Node copy(NodeFactory nf) {
         return nf.Assert(position, cond, errorMessage);
     }
-
 }

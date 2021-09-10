@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -51,8 +51,8 @@ import polyglot.visit.TypeChecker;
 
 /**
  * A {@code Field} is an immutable representation of a Java field
- * access.  It consists of field name and may also have either a 
- * {@code Type} or an {@code Expr} containing the field being 
+ * access.  It consists of field name and may also have either a
+ * {@code Type} or an {@code Expr} containing the field being
  * accessed.
  */
 public class Field_c extends Expr_c implements Field {
@@ -63,7 +63,7 @@ public class Field_c extends Expr_c implements Field {
     protected FieldInstance fi;
     protected boolean targetImplicit;
 
-//    @Deprecated
+    //    @Deprecated
     public Field_c(Position pos, Receiver target, Id name) {
         this(pos, target, name, null);
     }
@@ -76,9 +76,11 @@ public class Field_c extends Expr_c implements Field {
         targetImplicit = false;
 
         if (target == null) {
-            throw new InternalCompilerError("Cannot create a field with a null "
-                    + "target.  Use AmbExpr or prefix "
-                    + "with the appropriate type node or " + "this.");
+            throw new InternalCompilerError(
+                    "Cannot create a field with a null "
+                            + "target.  Use AmbExpr or prefix "
+                            + "with the appropriate type node or "
+                            + "this.");
         }
     }
 
@@ -196,11 +198,12 @@ public class Field_c extends Expr_c implements Field {
         TypeSystem ts = tb.typeSystem();
 
         FieldInstance fi =
-                ts.fieldInstance(position(),
-                                 tb.currentClass(),
-                                 Flags.NONE,
-                                 ts.unknownType(position()),
-                                 name.id());
+                ts.fieldInstance(
+                        position(),
+                        tb.currentClass(),
+                        Flags.NONE,
+                        ts.unknownType(position()),
+                        name.id());
         n = fieldInstance(n, fi);
         return n;
     }
@@ -212,14 +215,15 @@ public class Field_c extends Expr_c implements Field {
 
         if (target.type().isReference()) {
             FieldInstance fi =
-                    ts.findField(target.type().toReference(),
-                                 name.id(),
-                                 c.currentClass(),
-                                 !(target instanceof Special));
+                    ts.findField(
+                            target.type().toReference(),
+                            name.id(),
+                            c.currentClass(),
+                            !(target instanceof Special));
 
             if (fi == null) {
-                throw new InternalCompilerError("Cannot access field on node of type "
-                        + target.getClass().getName() + ".");
+                throw new InternalCompilerError(
+                        "Cannot access field on node of type " + target.getClass().getName() + ".");
             }
 
             Field_c f = this;
@@ -228,23 +232,26 @@ public class Field_c extends Expr_c implements Field {
             f.checkConsistency(c);
 
             if (!fi.flags().isStatic() && target instanceof TypeNode) {
-                throw new SemanticException("Non-static field " + name.id()
-                                                    + " cannot be referenced "
-                                                    + "from a static context.",
-                                            f.position());
+                throw new SemanticException(
+                        "Non-static field "
+                                + name.id()
+                                + " cannot be referenced "
+                                + "from a static context.",
+                        f.position());
             }
 
             return f;
         }
 
-        throw new SemanticException("Cannot access field \""
-                                            + name.id()
-                                            + "\" "
-                                            + (target instanceof Expr
-                                                    ? "on an expression " : "")
-                                            + "of non-reference type \""
-                                            + target.type() + "\".",
-                                    target.position());
+        throw new SemanticException(
+                "Cannot access field \""
+                        + name.id()
+                        + "\" "
+                        + (target instanceof Expr ? "on an expression " : "")
+                        + "of non-reference type \""
+                        + target.type()
+                        + "\".",
+                target.position());
     }
 
     @Override
@@ -271,9 +278,7 @@ public class Field_c extends Expr_c implements Field {
             // explicit target.
             if (target instanceof Expr) {
                 printSubExpr((Expr) target, w, tr);
-            }
-            else if (target instanceof TypeNode
-                    || target instanceof AmbReceiver) {
+            } else if (target instanceof TypeNode || target instanceof AmbReceiver) {
                 print(target, w, tr);
             }
 
@@ -330,12 +335,11 @@ public class Field_c extends Expr_c implements Field {
             return Collections.singletonList((Type) ts.NullPointerException());
         }
 
-        return Collections.<Type> emptyList();
+        return Collections.<Type>emptyList();
     }
 
     @Override
-    public NodeVisitor extRewriteEnter(ExtensionRewriter rw)
-            throws SemanticException {
+    public NodeVisitor extRewriteEnter(ExtensionRewriter rw) throws SemanticException {
         if (isTargetImplicit()) {
             // don't translate the target
             return rw.bypass(target());
@@ -358,8 +362,7 @@ public class Field_c extends Expr_c implements Field {
     @Override
     public boolean constantValueSet(Lang lang) {
         if (fi != null
-                && (target instanceof TypeNode || target instanceof Special
-                        && targetImplicit)) {
+                && (target instanceof TypeNode || target instanceof Special && targetImplicit)) {
             return fi.constantValueSet();
         }
         return fi != null;
@@ -368,8 +371,7 @@ public class Field_c extends Expr_c implements Field {
     @Override
     public boolean isConstant(Lang lang) {
         if (fi != null
-                && (target instanceof TypeNode || target instanceof Special
-                        && targetImplicit)) {
+                && (target instanceof TypeNode || target instanceof Special && targetImplicit)) {
             return fi.isConstant();
         }
 
@@ -407,14 +409,17 @@ public class Field_c extends Expr_c implements Field {
                 System.out.println("(found) rfi is " + rfi.orig());
                 System.out.println("(actual) fi is " + fi.orig());
             }
-            throw new InternalCompilerError("Field "
-                                                    + this
-                                                    + " has an "
-                                                    + "implicit target, but the name "
-                                                    + name.id()
-                                                    + " resolves to " + vi
-                                                    + " instead of " + target,
-                                            position());
+            throw new InternalCompilerError(
+                    "Field "
+                            + this
+                            + " has an "
+                            + "implicit target, but the name "
+                            + name.id()
+                            + " resolves to "
+                            + vi
+                            + " instead of "
+                            + target,
+                    position());
         }
     }
 
@@ -422,5 +427,4 @@ public class Field_c extends Expr_c implements Field {
     public Node copy(NodeFactory nf) {
         return nf.Field(position, target, name);
     }
-
 }

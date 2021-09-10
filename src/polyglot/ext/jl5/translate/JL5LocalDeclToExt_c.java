@@ -24,19 +24,15 @@ public class JL5LocalDeclToExt_c extends LocalDeclToExt_c {
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
 
         Type type = rw.to_ts().unknownType(n.position());
-        LocalInstance li =
-                rw.to_ts().localInstance(n.position(),
-                                         n.flags(),
-                                         type,
-                                         n.name());
+        LocalInstance li = rw.to_ts().localInstance(n.position(), n.flags(), type, n.name());
         LocalDecl to =
-                to_nf.LocalDecl(n.position(),
-                                n.flags(),
-                                ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
-                                n.type(),
-                                n.id(),
-                                n.init());
+                to_nf.LocalDecl(
+                        n.position(),
+                        n.flags(),
+                        ((AnnotatedElement) JL5Ext.ext(n)).annotationElems(),
+                        n.type(),
+                        n.id(),
+                        n.init());
         return to.localInstance(li);
     }
-
 }

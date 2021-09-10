@@ -12,9 +12,9 @@ import javax.xml.stream.XMLStreamWriter;
  */
 
 /* *************************************************
-  class DefaultSymbolFactory
-  interface for creating new symbols
- ***************************************************/
+ class DefaultSymbolFactory
+ interface for creating new symbols
+***************************************************/
 public class ComplexSymbolFactory implements SymbolFactory {
     public static class Location {
         private String unit = "unknown";
@@ -128,8 +128,7 @@ public class ComplexSymbolFactory implements SymbolFactory {
          */
         @Override
         public String toString() {
-            return getUnit() + ":" + getLine() + "/" + getColumn() + "("
-                    + offset + ")";
+            return getUnit() + ":" + getLine() + "/" + getColumn() + "(" + offset + ")";
         }
 
         /**
@@ -138,8 +137,7 @@ public class ComplexSymbolFactory implements SymbolFactory {
          * @param orientation adds details about the orientation of this location as an attribute; often used with the strings "left" or "right"
          * @throws XMLStreamException
          */
-        public void toXML(XMLStreamWriter writer, String orientation)
-                throws XMLStreamException {
+        public void toXML(XMLStreamWriter writer, String orientation) throws XMLStreamException {
             writer.writeStartElement("location");
             writer.writeAttribute("compilationunit", unit);
             writer.writeAttribute("orientation", orientation);
@@ -197,24 +195,21 @@ public class ComplexSymbolFactory implements SymbolFactory {
             if (right != null) xright = ((ComplexSymbol) right).xright;
         }
 
-        public ComplexSymbol(String name, int id, Location left,
-                Location right) {
+        public ComplexSymbol(String name, int id, Location left, Location right) {
             super(id, left.offset, right.offset);
             this.name = name;
             xleft = left;
             xright = right;
         }
 
-        public ComplexSymbol(String name, int id, Symbol left, Symbol right,
-                Object value) {
+        public ComplexSymbol(String name, int id, Symbol left, Symbol right, Object value) {
             super(id, left.left, right.right, value);
             this.name = name;
             xleft = ((ComplexSymbol) left).xleft;
             xright = ((ComplexSymbol) right).xright;
         }
 
-        public ComplexSymbol(String name, int id, Location left, Location right,
-                Object value) {
+        public ComplexSymbol(String name, int id, Location left, Location right, Object value) {
             super(id, left.offset, right.offset, value);
             this.name = name;
             xleft = left;
@@ -243,8 +238,7 @@ public class ComplexSymbolFactory implements SymbolFactory {
      * creates a complex symbol with Location objects for left and right boundaries;
      * this is used for terminals with values!
      */
-    public Symbol newSymbol(String name, int id, Location left, Location right,
-            Object value) {
+    public Symbol newSymbol(String name, int id, Location left, Location right, Object value) {
         return new ComplexSymbol(name, id, left, right, value);
     }
 
@@ -253,8 +247,7 @@ public class ComplexSymbolFactory implements SymbolFactory {
      * creates a complex symbol with Location objects for left and right boundaries;
      * this is used for terminals without values!
      */
-    public Symbol newSymbol(String name, int id, Location left,
-            Location right) {
+    public Symbol newSymbol(String name, int id, Location left, Location right) {
         return new ComplexSymbol(name, id, left, right);
     }
 
@@ -264,8 +257,7 @@ public class ComplexSymbolFactory implements SymbolFactory {
     }
 
     @Override
-    public Symbol newSymbol(String name, int id, Symbol left, Symbol right,
-            Object value) {
+    public Symbol newSymbol(String name, int id, Symbol left, Symbol right, Object value) {
         return new ComplexSymbol(name, id, left, right, value);
     }
 

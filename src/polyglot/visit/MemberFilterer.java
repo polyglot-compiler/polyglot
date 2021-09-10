@@ -40,8 +40,7 @@ public class MemberFilterer extends NodeVisitor {
         sb.append('(');
         int i = 0;
         for (Formal f : pd.formals()) {
-            if (i++ > 0)
-                sb.append(", ");
+            if (i++ > 0) sb.append(", ");
             sb.append(f.type().name());
         }
         sb.append(')');
@@ -50,8 +49,7 @@ public class MemberFilterer extends NodeVisitor {
 
     protected String signatureFromField(FieldDecl fd) {
         // Format: QualifiedClassName#fieldName.
-        return fd.fieldInstance().container().toClass().fullName() +
-                '#' + fd.name();
+        return fd.fieldInstance().container().toClass().fullName() + '#' + fd.name();
     }
 
     @Override
@@ -68,12 +66,12 @@ public class MemberFilterer extends NodeVisitor {
             System.out.println("Removing the body of filtered method " + signature);
 
             // Raise runtime exception in the body if called at runtime.
-            String msg = String.format(
-                    "%s\nThe method body of %s was removed by Polyglot at " +
-                            "compile time due to the -method-filter flag, " +
-                            "yet here it is being called at runtime.",
-                    pos.toString(),
-                    signature);
+            String msg =
+                    String.format(
+                            "%s\nThe method body of %s was removed by Polyglot at "
+                                    + "compile time due to the -method-filter flag, "
+                                    + "yet here it is being called at runtime.",
+                            pos.toString(), signature);
             StringLit msgLit = nf.StringLit(pos, msg);
             List<Expr> exnArgs = Collections.<Expr>singletonList(msgLit);
             TypeNode exnType = nf.CanonicalTypeNode(pos, ts.RuntimeException());
@@ -90,15 +88,13 @@ public class MemberFilterer extends NodeVisitor {
             if (!filter.matcher(signature).matches())
                 return super.leave(old, n, v); // Not a filtered field.
 
-            if (fd.init() == null)
-                return super.leave(old, n, v); // No initializer.
+            if (fd.init() == null) return super.leave(old, n, v); // No initializer.
 
             System.out.println("Removing the initializer of filtered field " + signature);
 
             // Replace initializer with zero value.
-            Expr init = fd.declType().isReference()
-                    ? nf.NullLit(pos)
-                    : nf.IntLit(pos, IntLit.INT, 0);
+            Expr init =
+                    fd.declType().isReference() ? nf.NullLit(pos) : nf.IntLit(pos, IntLit.INT, 0);
             return fd.init(init);
         }
 

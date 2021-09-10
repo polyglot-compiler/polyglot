@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -69,8 +69,7 @@ public class ClassSerializer extends NodeVisitor {
     protected NodeFactory nf;
     protected Version ver;
 
-    public ClassSerializer(TypeSystem ts, NodeFactory nf, long time,
-            ErrorQueue eq, Version ver) {
+    public ClassSerializer(TypeSystem ts, NodeFactory nf, long time, ErrorQueue eq, Version ver) {
         super(nf.lang());
         this.ts = ts;
         this.nf = nf;
@@ -138,9 +137,9 @@ public class ClassSerializer extends NodeVisitor {
                     || ct.fieldNamed("jlc$SourceLastModified$" + suffix) != null
                     || ct.fieldNamed("jlc$ClassType$" + suffix) != null) {
 
-                eq.enqueue(ErrorInfo.SEMANTIC_ERROR,
-                           "Cannot serialize class information "
-                                   + "more than once.");
+                eq.enqueue(
+                        ErrorInfo.SEMANTIC_ERROR,
+                        "Cannot serialize class information " + "more than once.");
 
                 return Collections.emptyList();
             }
@@ -152,45 +151,35 @@ public class ClassSerializer extends NodeVisitor {
             InitializerInstance ii;
 
             /* Add the compiler version number. */
-            String version =
-                    ver.major() + "." + ver.minor() + "." + ver.patch_level();
+            String version = ver.major() + "." + ver.minor() + "." + ver.patch_level();
 
             Position pos = Position.compilerGenerated();
 
-            fi =
-                    ts.fieldInstance(pos,
-                                     ct,
-                                     flags,
-                                     ts.String(),
-                                     "jlc$CompilerVersion$" + suffix);
+            fi = ts.fieldInstance(pos, ct, flags, ts.String(), "jlc$CompilerVersion$" + suffix);
             fi.setConstantValue(version);
             ii = ts.initializerInstance(pos, ct, Flags.STATIC);
             f =
-                    nf.FieldDecl(fi.position(),
-                                 fi.flags(),
-                                 nf.CanonicalTypeNode(fi.position(), fi.type()),
-                                 nf.Id(fi.position(), fi.name()),
-                                 nf.StringLit(pos, version).type(ts.String()));
+                    nf.FieldDecl(
+                            fi.position(),
+                            fi.flags(),
+                            nf.CanonicalTypeNode(fi.position(), fi.type()),
+                            nf.Id(fi.position(), fi.name()),
+                            nf.StringLit(pos, version).type(ts.String()));
 
             f = f.fieldInstance(fi);
             f = f.initializerInstance(ii);
             newMembers.add(f);
 
-            fi =
-                    ts.fieldInstance(pos,
-                                     ct,
-                                     flags,
-                                     ts.Long(),
-                                     "jlc$SourceLastModified$" + suffix);
+            fi = ts.fieldInstance(pos, ct, flags, ts.Long(), "jlc$SourceLastModified$" + suffix);
             fi.setConstantValue(new Long(time));
             ii = ts.initializerInstance(pos, ct, Flags.STATIC);
             f =
-                    nf.FieldDecl(fi.position(),
-                                 fi.flags(),
-                                 nf.CanonicalTypeNode(fi.position(), fi.type()),
-                                 nf.Id(fi.position(), fi.name()),
-                                 nf.IntLit(pos, IntLit.LONG, time)
-                                   .type(ts.Long()));
+                    nf.FieldDecl(
+                            fi.position(),
+                            fi.flags(),
+                            nf.CanonicalTypeNode(fi.position(), fi.type()),
+                            nf.Id(fi.position(), fi.name()),
+                            nf.IntLit(pos, IntLit.LONG, time).type(ts.Long()));
 
             f = f.fieldInstance(fi);
             f = f.initializerInstance(ii);
@@ -207,27 +196,25 @@ public class ClassSerializer extends NodeVisitor {
                     etiEnd = etiStart + MAX_ENCODED_TYPE_INFO_STRING_LENGTH;
                 }
                 // add an additional suffix to distinguish fields.
-                String additionalFieldSuffix =
-                        numberETIFields == 0 ? "" : ("$" + numberETIFields);
+                String additionalFieldSuffix = numberETIFields == 0 ? "" : ("$" + numberETIFields);
                 String encoded = encodedTypeInfo.substring(etiStart, etiEnd);
                 fi =
-                        ts.fieldInstance(pos,
-                                         ct,
-                                         flags,
-                                         ts.String(),
-                                         "jlc$ClassType$" + suffix
-                                                 + additionalFieldSuffix);
+                        ts.fieldInstance(
+                                pos,
+                                ct,
+                                flags,
+                                ts.String(),
+                                "jlc$ClassType$" + suffix + additionalFieldSuffix);
                 fi.setConstantValue(encoded);
                 ii = ts.initializerInstance(pos, ct, Flags.STATIC);
 
                 f =
-                        nf.FieldDecl(fi.position(),
-                                     fi.flags(),
-                                     nf.CanonicalTypeNode(fi.position(),
-                                                          fi.type()),
-                                     nf.Id(fi.position(), fi.name()),
-                                     nf.StringLit(pos, encoded)
-                                       .type(ts.String()));
+                        nf.FieldDecl(
+                                fi.position(),
+                                fi.flags(),
+                                nf.CanonicalTypeNode(fi.position(), fi.type()),
+                                nf.Id(fi.position(), fi.name()),
+                                nf.StringLit(pos, encoded).type(ts.String()));
 
                 f = f.fieldInstance(fi);
                 f = f.initializerInstance(ii);
@@ -238,12 +225,10 @@ public class ClassSerializer extends NodeVisitor {
             } while (etiEnd != encodedTypeInfo.length());
 
             return newMembers;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             if (Report.should_report(Report.serialize, 1)) e.printStackTrace();
-            eq.enqueue(ErrorInfo.IO_ERROR,
-                       "Unable to serialize class information: "
-                               + e.getMessage());
+            eq.enqueue(
+                    ErrorInfo.IO_ERROR, "Unable to serialize class information: " + e.getMessage());
             return Collections.emptyList();
         }
     }

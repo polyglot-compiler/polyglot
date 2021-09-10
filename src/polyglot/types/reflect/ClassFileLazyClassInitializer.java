@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -51,12 +51,12 @@ import polyglot.util.StringUtil;
  * ClassFile basically represents a Java classfile as it is found on disk. The
  * classfile is modeled according to the Java Virtual Machine Specification.
  * Methods are provided to edit the classfile at a very low level.
- * 
+ *
  * @see polyglot.types.reflect Attribute
  * @see polyglot.types.reflect Constant
  * @see polyglot.types.reflect Field
  * @see polyglot.types.reflect Method
- * 
+ *
  * @author Nate Nystrom
  */
 public class ClassFileLazyClassInitializer implements LazyClassInitializer {
@@ -73,6 +73,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     protected boolean superclassInitialized;
 
     protected static Collection<String> verbose;
+
     static {
         verbose = new HashSet<>();
         verbose.add("loader");
@@ -107,8 +108,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         // The name is of the form "p.q.C$I$J".
         String name = clazz.classNameCP(clazz.getThisClass());
 
-        if (Report.should_report(verbose, 2))
-            Report.report(2, "creating ClassType for " + name);
+        if (Report.should_report(verbose, 2)) Report.report(2, "creating ClassType for " + name);
 
         // Create the ClassType.
         ParsedClassType ct = ts.createClassType(this);
@@ -141,23 +141,19 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
                     if (c.nameIndex == 0) {
                         // anonymous class
                         kind = ClassType.ANONYMOUS;
-                    }
-                    else {
+                    } else {
                         // This will be "p.q.C$I"
                         String outerName = clazz.classNameCP(c.outerClassIndex);
                         // This will be "J"
-                        className =
-                                (String) clazz.getConstants()[c.nameIndex].value();
+                        className = (String) clazz.getConstants()[c.nameIndex].value();
 
                         // Load the outer class.
                         // This will recursively load its outer class, if any.
                         if (Report.should_report(verbose, 2))
-                            Report.report(2, "resolving " + outerName + " for "
-                                    + name);
+                            Report.report(2, "resolving " + outerName + " for " + name);
                         ClassType outer = this.typeForName(outerName);
                         ClassType.Kind outerKind = ct.kind();
-                        if (outerKind == ClassType.ANONYMOUS)
-                            kind = ClassType.LOCAL;
+                        if (outerKind == ClassType.ANONYMOUS) kind = ClassType.LOCAL;
                         else kind = ClassType.MEMBER;
                         ct.outer(outer);
                     }
@@ -167,8 +163,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             }
         }
 
-        if (Report.should_report(verbose, 3))
-            Report.report(3, name + " is " + kind);
+        if (Report.should_report(verbose, 3)) Report.report(3, name + " is " + kind);
 
         ct.name(className);
         ct.kind(kind);
@@ -197,8 +192,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     protected Type arrayOf(Type t, int dims) {
         if (dims == 0) {
             return t;
-        }
-        else {
+        } else {
             return ts.arrayOf(t, dims);
         }
     }
@@ -220,46 +214,47 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             }
 
             switch (str.charAt(i)) {
-            case 'Z':
-                types.add(arrayOf(ts.Boolean(), dims));
-                break;
-            case 'B':
-                types.add(arrayOf(ts.Byte(), dims));
-                break;
-            case 'S':
-                types.add(arrayOf(ts.Short(), dims));
-                break;
-            case 'C':
-                types.add(arrayOf(ts.Char(), dims));
-                break;
-            case 'I':
-                types.add(arrayOf(ts.Int(), dims));
-                break;
-            case 'J':
-                types.add(arrayOf(ts.Long(), dims));
-                break;
-            case 'F':
-                types.add(arrayOf(ts.Float(), dims));
-                break;
-            case 'D':
-                types.add(arrayOf(ts.Double(), dims));
-                break;
-            case 'V':
-                types.add(arrayOf(ts.Void(), dims));
-                break;
-            case 'L': {
-                int start = ++i;
-                while (i < str.length()) {
-                    if (str.charAt(i) == ';') {
-                        String s = str.substring(start, i);
-                        s = s.replace('/', '.');
-                        types.add(arrayOf(this.quietTypeForName(s), dims));
-                        break;
-                    }
+                case 'Z':
+                    types.add(arrayOf(ts.Boolean(), dims));
+                    break;
+                case 'B':
+                    types.add(arrayOf(ts.Byte(), dims));
+                    break;
+                case 'S':
+                    types.add(arrayOf(ts.Short(), dims));
+                    break;
+                case 'C':
+                    types.add(arrayOf(ts.Char(), dims));
+                    break;
+                case 'I':
+                    types.add(arrayOf(ts.Int(), dims));
+                    break;
+                case 'J':
+                    types.add(arrayOf(ts.Long(), dims));
+                    break;
+                case 'F':
+                    types.add(arrayOf(ts.Float(), dims));
+                    break;
+                case 'D':
+                    types.add(arrayOf(ts.Double(), dims));
+                    break;
+                case 'V':
+                    types.add(arrayOf(ts.Void(), dims));
+                    break;
+                case 'L':
+                    {
+                        int start = ++i;
+                        while (i < str.length()) {
+                            if (str.charAt(i) == ';') {
+                                String s = str.substring(start, i);
+                                s = s.replace('/', '.');
+                                types.add(arrayOf(this.quietTypeForName(s), dims));
+                                break;
+                            }
 
-                    i++;
-                }
-            }
+                            i++;
+                        }
+                    }
             }
         }
 
@@ -270,7 +265,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     /**
-     * Return a type based on a JVM type descriptor string. 
+     * Return a type based on a JVM type descriptor string.
      * @param str The type descriptor.
      * @return The corresponding type.
      */
@@ -291,13 +286,11 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @throws InternalCompilerError if the class does not exist.
      */
     protected ClassType quietTypeForName(String name) {
-        if (Report.should_report(verbose, 2))
-            Report.report(2, "resolving " + name);
+        if (Report.should_report(verbose, 2)) Report.report(2, "resolving " + name);
 
         try {
             return (ClassType) ts.systemResolver().find(name);
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new InternalCompilerError("could not load " + name, e);
         }
     }
@@ -309,8 +302,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @throws SemanticException if the class does not exist.
      */
     protected ClassType typeForName(String name) throws SemanticException {
-        if (Report.should_report(verbose, 2))
-            Report.report(2, "resolving " + name);
+        if (Report.should_report(verbose, 2)) Report.report(2, "resolving " + name);
         return (ClassType) ts.systemResolver().find(name);
     }
 
@@ -332,13 +324,10 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
 
         if (ts.equals(ct, ts.Object())) {
             ct.superType(null);
-        }
-        else {
+        } else {
             String superName = clazz.classNameCP(clazz.getSuperClass());
 
-            ClassType superType =
-                    superName == null
-                            ? ts.Object() : quietTypeForName(superName);
+            ClassType superType = superName == null ? ts.Object() : quietTypeForName(superName);
             // For an interface, the value of the super_class item must always
             // be a valid index into the constant_pool table. The constant_pool
             // entry at that index must be a CONSTANT_Class_info structure
@@ -347,8 +336,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             if (ct.flags().isInterface()) {
                 if (!ts.typeEquals(superType, ts.Object()))
                     throw new ClassFormatError("The superclass of an interface is not Object.");
-            }
-            else ct.superType(superType);
+            } else ct.superType(superType);
         }
 
         superclassInitialized = true;
@@ -389,8 +377,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             for (int i = 0; i < innerClasses.getClasses().length; i++) {
                 Info c = innerClasses.getClasses()[i];
 
-                if (c.outerClassIndex == clazz.getThisClass()
-                        && c.classIndex != 0) {
+                if (c.outerClassIndex == clazz.getThisClass() && c.classIndex != 0) {
                     String name = clazz.classNameCP(c.classIndex);
 
                     int index = name.lastIndexOf('$');
@@ -417,10 +404,8 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
                             ParsedClassType pt = (ParsedClassType) t;
                             pt.flags(ts.flagsForBits(c.modifiers));
                         }
-                    }
-                    else {
-                        throw new InternalCompilerError(name
-                                + " should be a member class.");
+                    } else {
+                        throw new InternalCompilerError(name + " should be a member class.");
                     }
                 }
             }
@@ -456,8 +441,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
 
         Field[] fields = clazz.getFields();
         for (int i = 0; i < fields.length; i++) {
-            if (!fields[i].name().startsWith("jlc$")
-                    && !fields[i].isSynthetic()) {
+            if (!fields[i].name().startsWith("jlc$") && !fields[i].isSynthetic()) {
                 FieldInstance fi = this.fieldInstance(fields[i], ct);
                 if (Report.should_report(verbose, 3))
                     Report.report(3, "adding " + fi + " to " + ct);
@@ -500,10 +484,8 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             // to each public instance method declared in Object, unless a
             // method with the same signature, same return type, and a
             // compatible throws clause is explicitly declared by the interface.
-            List<? extends MethodInstance> objectMethods =
-                    ts.Object().methods();
-            List<MethodInstance> implicitlyDeclaredMethods =
-                    new ArrayList<>(objectMethods.size());
+            List<? extends MethodInstance> objectMethods = ts.Object().methods();
+            List<MethodInstance> implicitlyDeclaredMethods = new ArrayList<>(objectMethods.size());
             for (MethodInstance mi : objectMethods) {
                 Flags flags = mi.flags();
                 if (!flags.isPublic()) continue;
@@ -515,12 +497,10 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
                     break;
                 }
                 if (methodNeeded)
-                    implicitlyDeclaredMethods.add(mi.container(ct)
-                                                    .flags(flags.Abstract()
-                                                                .clearFinal()));
+                    implicitlyDeclaredMethods.add(
+                            mi.container(ct).flags(flags.Abstract().clearFinal()));
             }
-            for (MethodInstance mi : implicitlyDeclaredMethods)
-                ct.addMethod(mi);
+            for (MethodInstance mi : implicitlyDeclaredMethods) ct.addMethod(mi);
         }
 
         methodsInitialized = true;
@@ -540,9 +520,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].name().equals("<init>") && !methods[i].isSynthetic()) {
                 ConstructorInstance ci =
-                        this.constructorInstance(methods[i],
-                                                 ct,
-                                                 clazz.getFields());
+                        this.constructorInstance(methods[i], ct, clazz.getFields());
                 if (Report.should_report(verbose, 3))
                     Report.report(3, "adding " + ci + " to " + ct);
                 ct.addConstructor(ci);
@@ -557,9 +535,12 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     protected boolean initialized() {
-        return superclassInitialized && interfacesInitialized
-                && memberClassesInitialized && methodsInitialized
-                && fieldsInitialized && constructorsInitialized;
+        return superclassInitialized
+                && interfacesInitialized
+                && memberClassesInitialized
+                && methodsInitialized
+                && fieldsInitialized
+                && constructorsInitialized;
     }
 
     /**
@@ -591,13 +572,14 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             }
         }
 
-        return ts.methodInstance(ct.position(),
-                                 ct,
-                                 ts.flagsForBits(method.getModifiers()),
-                                 returnType,
-                                 name,
-                                 argTypes,
-                                 excTypes);
+        return ts.methodInstance(
+                ct.position(),
+                ct,
+                ts.flagsForBits(method.getModifiers()),
+                returnType,
+                name,
+                argTypes,
+                excTypes);
     }
 
     /**
@@ -607,8 +589,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param fields The constructor's fields, needed to remove parameters
      * passed to initialize synthetic fields.
      */
-    protected ConstructorInstance constructorInstance(Method method,
-            ClassType ct, Field[] fields) {
+    protected ConstructorInstance constructorInstance(Method method, ClassType ct, Field[] fields) {
         // Get a method instance for the <init> method.
         MethodInstance mi = methodInstance(method, ct);
 
@@ -634,11 +615,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             }
         }
 
-        return ts.constructorInstance(mi.position(),
-                                      ct,
-                                      mi.flags(),
-                                      formals,
-                                      mi.throwTypes());
+        return ts.constructorInstance(mi.position(), ct, mi.flags(), formals, mi.throwTypes());
     }
 
     /**
@@ -652,11 +629,12 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         String type = (String) constants[field.getType()].value();
 
         FieldInstance fi =
-                ts.fieldInstance(ct.position(),
-                                 ct,
-                                 ts.flagsForBits(field.getModifiers()),
-                                 typeForString(type),
-                                 name);
+                ts.fieldInstance(
+                        ct.position(),
+                        ct,
+                        ts.flagsForBits(field.getModifiers()),
+                        typeForString(type),
+                        name);
 
         if (field.isConstant()) {
             Constant c = field.constantValue();
@@ -665,35 +643,32 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
 
             try {
                 switch (c.tag()) {
-                case Constant.STRING:
-                    o = field.getString();
-                    break;
-                case Constant.INTEGER:
-                    o = new Integer(field.getInt());
-                    break;
-                case Constant.LONG:
-                    o = new Long(field.getLong());
-                    break;
-                case Constant.FLOAT:
-                    o = new Float(field.getFloat());
-                    break;
-                case Constant.DOUBLE:
-                    o = new Double(field.getDouble());
-                    break;
+                    case Constant.STRING:
+                        o = field.getString();
+                        break;
+                    case Constant.INTEGER:
+                        o = new Integer(field.getInt());
+                        break;
+                    case Constant.LONG:
+                        o = new Long(field.getLong());
+                        break;
+                    case Constant.FLOAT:
+                        o = new Float(field.getFloat());
+                        break;
+                    case Constant.DOUBLE:
+                        o = new Double(field.getDouble());
+                        break;
                 }
-            }
-            catch (SemanticException e) {
+            } catch (SemanticException e) {
                 throw new ClassFormatError("Unexpected constant pool entry.");
             }
 
             fi.setConstantValue(o);
             return fi;
-        }
-        else {
+        } else {
             fi.setNotConstant();
         }
 
         return fi;
     }
-
 }

@@ -1,10 +1,9 @@
 package java_cup;
 
-
 /** This class represents the complete "reduce-goto" table of the parser.
  *  It has one row for each state in the parse machines, and a column for
  *  each terminal symbol.  Each entry contains a state number to shift to
- *  as the last step of a reduce. 
+ *  as the last step of a reduce.
  *
  * @see     java_cup.parse_reduce_row
  * @version last updated: 11/25/95
@@ -16,7 +15,7 @@ public class parse_reduce_table {
     /*--- Constructor(s) ----------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Simple constructor.  Note: all terminals, non-terminals, and productions 
+    /** Simple constructor.  Note: all terminals, non-terminals, and productions
      *  must already have been entered, and the viable prefix recognizer should
      *  have been constructed before this is called.
      */
@@ -26,8 +25,7 @@ public class parse_reduce_table {
 
         /* allocate the array and fill it in with empty rows */
         under_state = new parse_reduce_row[_num_states];
-        for (int i = 0; i < _num_states; i++)
-            under_state[i] = new parse_reduce_row();
+        for (int i = 0; i < _num_states; i++) under_state[i] = new parse_reduce_row();
     }
 
     /*-----------------------------------------------------------*/

@@ -49,8 +49,7 @@ import polyglot.visit.TypeBuilder;
  * A {@code ProcedureDecl} is an immutable representation of a
  * constructor or method declaration as part of a class body.
  */
-public abstract class ProcedureDecl_c extends Term_c
-        implements ProcedureDecl, ProcedureDeclOps {
+public abstract class ProcedureDecl_c extends Term_c implements ProcedureDecl, ProcedureDeclOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Flags flags;
@@ -64,14 +63,24 @@ public abstract class ProcedureDecl_c extends Term_c
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public ProcedureDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+    public ProcedureDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body) {
         this(pos, flags, name, formals, throwTypes, body, null, null);
     }
 
-//    @Deprecated
-    public ProcedureDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+    //    @Deprecated
+    public ProcedureDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
             Javadoc javadoc) {
         this(pos, flags, name, formals, throwTypes, body, javadoc, null);
     }
@@ -80,17 +89,30 @@ public abstract class ProcedureDecl_c extends Term_c
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public ProcedureDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+    public ProcedureDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
             Ext ext) {
         this(pos, flags, name, formals, throwTypes, body, null, ext);
     }
 
-    public ProcedureDecl_c(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body,
-            Javadoc javadoc, Ext ext) {
+    public ProcedureDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            List<Formal> formals,
+            List<TypeNode> throwTypes,
+            Block body,
+            Javadoc javadoc,
+            Ext ext) {
         super(pos, ext);
-        assert flags != null && name != null && formals != null
+        assert flags != null
+                && name != null
+                && formals != null
                 && throwTypes != null; // body may be null
         this.flags = flags;
         this.name = name;
@@ -171,8 +193,7 @@ public abstract class ProcedureDecl_c extends Term_c
         return throwTypes(this, throwTypes);
     }
 
-    protected <N extends ProcedureDecl_c> N throwTypes(N n,
-            List<TypeNode> throwTypes) {
+    protected <N extends ProcedureDecl_c> N throwTypes(N n, List<TypeNode> throwTypes) {
         if (CollectionUtil.equals(n.throwTypes, throwTypes)) return n;
         n = copyIfNeeded(n);
         n.throwTypes = ListUtil.copy(throwTypes, true);
@@ -210,14 +231,13 @@ public abstract class ProcedureDecl_c extends Term_c
     public abstract ProcedureInstance procedureInstance();
 
     @Override
-    public NodeVisitor buildTypesEnter(TypeBuilder tb)
-            throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         return tb.pushCode();
     }
 
     /** Reconstruct the procedure. */
-    protected <N extends ProcedureDecl_c> N reconstruct(N n, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body) {
+    protected <N extends ProcedureDecl_c> N reconstruct(
+            N n, Id name, List<Formal> formals, List<TypeNode> throwTypes, Block body) {
         n = id(n, name);
         n = formals(n, formals);
         n = throwTypes(n, throwTypes);
@@ -258,8 +278,7 @@ public abstract class ProcedureDecl_c extends Term_c
     }
 
     @Override
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-            throws SemanticException {
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
         return ec.push(procedureInstance().throwTypes());
     }
 
@@ -272,8 +291,7 @@ public abstract class ProcedureDecl_c extends Term_c
 
         if (body != null) {
             printSubStmt(body, w, tr);
-        }
-        else {
+        } else {
             w.write(";");
         }
         w.end();

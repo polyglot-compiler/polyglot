@@ -10,15 +10,15 @@ package java_cup.runtime;
  */
 
 /* *************************************************
-  Interface Scanner
-  
-  Declares the next_token() method that should be
-  implemented by scanners.  This method is typically
-  called by lr_parser.scan().  End-of-file can be
-  indicated either by returning
-  {@code new Symbol(lr_parser.EOF_sym())} or
-  {@code null}.
- ***************************************************/
+ Interface Scanner
+
+ Declares the next_token() method that should be
+ implemented by scanners.  This method is typically
+ called by lr_parser.scan().  End-of-file can be
+ indicated either by returning
+ {@code new Symbol(lr_parser.EOF_sym())} or
+ {@code null}.
+***************************************************/
 public interface Scanner {
     /** Return the next token, or {@code null} on end-of-file. */
     public Symbol next_token() throws java.lang.Exception;

@@ -64,15 +64,13 @@ public class TestSuite<T extends Test> extends AbstractTest {
     @Override
     public void setOutputController(OutputController output) {
         super.setOutputController(output);
-        for (Test t : tests)
-            t.setOutputController(output);
+        for (Test t : tests) t.setOutputController(output);
     }
 
     @Override
     public void setPDFReporter(PDFReporter pdfReporter) {
         super.setPDFReporter(pdfReporter);
-        for (Test t : tests)
-            t.setPDFReporter(pdfReporter);
+        for (Test t : tests) t.setPDFReporter(pdfReporter);
     }
 
     @Override
@@ -98,8 +96,7 @@ public class TestSuite<T extends Test> extends AbstractTest {
                 executedTests += t.getExecutedTestCount();
                 successfulTests += t.getSuccessfulTestCount();
                 postIndividualTest();
-                if (!result && (t.haltOnFailure() || haltOnFirstFailure))
-                    shouldExecute = false;
+                if (!result && (t.haltOnFailure() || haltOnFirstFailure)) shouldExecute = false;
             }
             newResults.put(t.getUniqueId(), tr);
         }
@@ -113,15 +110,13 @@ public class TestSuite<T extends Test> extends AbstractTest {
         return true;
     }
 
-    protected void postIndividualTest() {
-    }
+    protected void postIndividualTest() {}
 
     @Override
     public int getTotalTestCount() {
         if (totalTests == -1) {
             totalTests = 0;
-            for (Test t : tests)
-                totalTests += t.getTotalTestCount();
+            for (Test t : tests) totalTests += t.getTotalTestCount();
         }
         return totalTests;
     }
@@ -151,7 +146,7 @@ public class TestSuite<T extends Test> extends AbstractTest {
 
         if (tsr == null || tsr.testResults.isEmpty()) {
             outCtrl.printNoTestResults(suiteName);
-            return new int[] { 0, 0, 0, 0 };
+            return new int[] {0, 0, 0, 0};
         }
 
         outCtrl.printTestSuiteHeader(tsr);
@@ -175,12 +170,8 @@ public class TestSuite<T extends Test> extends AbstractTest {
             grandTotal += t.getTotalTestCount();
         }
 
-        outCtrl.printTestSuiteFooter(total,
-                                     grandTotal,
-                                     lastSuccess,
-                                     neverRun,
-                                     neverSuccess);
-        return new int[] { total, lastSuccess, neverRun, neverSuccess };
+        outCtrl.printTestSuiteFooter(total, grandTotal, lastSuccess, neverRun, neverSuccess);
+        return new int[] {total, lastSuccess, neverRun, neverSuccess};
     }
 
     public List<T> getTests() {
@@ -192,8 +183,7 @@ public class TestSuite<T extends Test> extends AbstractTest {
         Map<String, TestResult> testResults;
         {
             TestSuiteResult testSuiteResult = getTestSuiteResult();
-            if (testSuiteResult != null)
-                testResults = testSuiteResult.testResults;
+            if (testSuiteResult != null) testResults = testSuiteResult.testResults;
             else testResults = new LinkedHashMap<>();
         }
         Date lastRun = new Date();

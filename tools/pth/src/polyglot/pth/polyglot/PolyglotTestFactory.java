@@ -31,20 +31,18 @@ public class PolyglotTestFactory implements TestFactory {
     }
 
     @Override
-    public SourceFileTestCollection SourceFileTestCollection(String testCommand,
-            String name, String testDir, String args,
+    public SourceFileTestCollection SourceFileTestCollection(
+            String testCommand,
+            String name,
+            String testDir,
+            String args,
             List<SourceFileTest> tests) {
-        return new PolyglotSourceFileTestCollection(testCommand,
-                                                    name,
-                                                    testDir,
-                                                    args,
-                                                    tests);
+        return new PolyglotSourceFileTestCollection(testCommand, name, testDir, args, tests);
     }
 
     @Override
-    public SourceFileTest SourceFileTest(List<List<String>> compilationUnits,
-            List<ExpectedFailure> expectedFailures) {
+    public SourceFileTest SourceFileTest(
+            List<List<String>> compilationUnits, List<ExpectedFailure> expectedFailures) {
         return new PolyglotSourceFileTest(compilationUnits, expectedFailures);
     }
-
 }

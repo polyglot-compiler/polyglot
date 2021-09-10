@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -45,28 +45,27 @@ import polyglot.util.InternalCompilerError;
  */
 public class TypedTranslator extends Translator {
 
-    public TypedTranslator(Job job, TypeSystem ts, NodeFactory nf,
-            TargetFactory tf) {
+    public TypedTranslator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
         super(job, ts, nf, tf);
     }
 
     @Override
     public void print(Node parent, Node child, CodeWriter w) {
         if (context == null) {
-            throw new InternalCompilerError("Null context found during type-directed code generation.",
-                                            child.position());
+            throw new InternalCompilerError(
+                    "Null context found during type-directed code generation.", child.position());
         }
 
-        if (parent != null
-                && (!parent.isDisambiguated() || !parent.isTypeChecked())) {
-            throw new InternalCompilerError("Untyped AST node found during type-directed code generation.",
-                                            parent.position());
+        if (parent != null && (!parent.isDisambiguated() || !parent.isTypeChecked())) {
+            throw new InternalCompilerError(
+                    "Untyped AST node found during type-directed code generation.",
+                    parent.position());
         }
 
-        if (child != null
-                && (!child.isDisambiguated() || !child.isTypeChecked())) {
-            throw new InternalCompilerError("Untyped AST node found during type-directed code generation.",
-                                            child.position());
+        if (child != null && (!child.isDisambiguated() || !child.isTypeChecked())) {
+            throw new InternalCompilerError(
+                    "Untyped AST node found during type-directed code generation.",
+                    child.position());
         }
 
         super.print(parent, child, w); // XXX This won't work -- child is null (Findbugs)

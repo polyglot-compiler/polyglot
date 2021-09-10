@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -96,8 +96,7 @@ public class CachingResolver implements Resolver, Copy<CachingResolver> {
             CachingResolver r = (CachingResolver) super.clone();
             r.cache = new HashMap<>(this.cache);
             return r;
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("clone failed");
         }
     }
@@ -124,28 +123,27 @@ public class CachingResolver implements Resolver, Copy<CachingResolver> {
      */
     @Override
     public Named find(String name) throws SemanticException {
-        if (shouldReport(2))
-            Report.report(2, "CachingResolver: find: " + name);
+        if (shouldReport(2)) Report.report(2, "CachingResolver: find: " + name);
 
         CachedResult cached = cache.get(name);
 
-        if (cached instanceof CachedResult.Error)
-            throw ((CachedResult.Error) cached).exc;
+        if (cached instanceof CachedResult.Error) throw ((CachedResult.Error) cached).exc;
 
         Named q = cached == null ? null : ((CachedResult.Success) cached).named;
 
         if (q == null) {
-            if (shouldReport(3))
-                Report.report(3, "CachingResolver: not cached: " + name);
+            if (shouldReport(3)) Report.report(3, "CachingResolver: not cached: " + name);
 
             try {
                 q = inner.find(name);
-            }
-            catch (NoClassException e) {
+            } catch (NoClassException e) {
                 if (shouldReport(3)) {
                     Report.report(3, "CachingResolver: " + e.getMessage());
-                    Report.report(3, "CachingResolver: installing " + name
-                            + "-> (not found) in resolver cache");
+                    Report.report(
+                            3,
+                            "CachingResolver: installing "
+                                    + name
+                                    + "-> (not found) in resolver cache");
                 }
                 if (cacheNotFound) {
                     cache.put(name, new CachedResult.Error(e));
@@ -155,12 +153,9 @@ public class CachingResolver implements Resolver, Copy<CachingResolver> {
 
             addNamed(name, q);
 
-            if (shouldReport(3))
-                Report.report(3, "CachingResolver: loaded: " + name);
-        }
-        else {
-            if (shouldReport(3))
-                Report.report(3, "CachingResolver: cached: " + name);
+            if (shouldReport(3)) Report.report(3, "CachingResolver: loaded: " + name);
+        } else {
+            if (shouldReport(3)) Report.report(3, "CachingResolver: cached: " + name);
         }
 
         return q;
@@ -183,8 +178,8 @@ public class CachingResolver implements Resolver, Copy<CachingResolver> {
      */
     public void install(String name, Named q) {
         if (shouldReport(3))
-            Report.report(3, "CachingResolver: installing " + name + "->" + q
-                    + " in resolver cache");
+            Report.report(
+                    3, "CachingResolver: installing " + name + "->" + q + " in resolver cache");
         if (shouldReport(5)) new Exception().printStackTrace();
 
         cache.put(name, new CachedResult.Success(q));
@@ -194,7 +189,7 @@ public class CachingResolver implements Resolver, Copy<CachingResolver> {
      * Install a qualifier in the cache.
      * @param name The name of the qualifier to insert.
      * @param q The qualifier to insert.
-     * @throws SemanticException 
+     * @throws SemanticException
      */
     public void addNamed(String name, Named q) throws SemanticException {
         install(name, q);

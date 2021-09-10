@@ -157,8 +157,7 @@ public interface ExtensionInfo {
      * @deprecated Use {@link #createFileSource(FileObject, Kind)} instead.
      */
     @Deprecated
-    FileSource createFileSource(FileObject fo, boolean userSpecified)
-            throws IOException;
+    FileSource createFileSource(FileObject fo, boolean userSpecified) throws IOException;
 
     /** Create file source for a file object. */
     FileSource createFileSource(FileObject fo, Kind kind) throws IOException;
@@ -183,5 +182,4 @@ public interface ExtensionInfo {
      * for code written prior to the FileManager API
      */
     List<Location> defaultLocations();
-
 }

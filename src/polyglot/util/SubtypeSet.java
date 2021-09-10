@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -36,13 +36,13 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 
 /**
- * Class to implement sets containing {@code polyglot.types.Type}.  
- * Set membership is based on the subtype relationships.  Thus, if 
+ * Class to implement sets containing {@code polyglot.types.Type}.
+ * Set membership is based on the subtype relationships.  Thus, if
  * {@code S} is a supertype of {@code A} and {@code B}, then
- * { {@code S} } union { {@code A}, {@code B} } = 
- * { {@code S} }.  Similarly, we remove elements from the set such 
+ * { {@code S} } union { {@code A}, {@code B} } =
+ * { {@code S} }.  Similarly, we remove elements from the set such
  * that if {@code s} is an element of a set {@code S}, then a
- * call to remove {@code r} removes all {@code s} s.t. r is a 
+ * call to remove {@code r} removes all {@code s} s.t. r is a
  * a supertype of s.
  */
 public class SubtypeSet implements java.util.Set<Type> {
@@ -84,9 +84,9 @@ public class SubtypeSet implements java.util.Set<Type> {
 
     /**
      * Add an element of type {@code polyglot.types.Type} to the set
-     * only if it has no supertypes already in the set. If we do add it, 
+     * only if it has no supertypes already in the set. If we do add it,
      * remove any subtypes of {@code o}
-     * 
+     *
      * @param type The element to add.
      */
     @Override
@@ -98,7 +98,7 @@ public class SubtypeSet implements java.util.Set<Type> {
         if (ts.isSubtype(type, topType)) {
             boolean haveToAdd = true;
 
-            for (Iterator<Type> i = v.iterator(); i.hasNext();) {
+            for (Iterator<Type> i = v.iterator(); i.hasNext(); ) {
                 Type t = i.next();
 
                 if (ts.descendsFrom(t, type)) {
@@ -118,8 +118,7 @@ public class SubtypeSet implements java.util.Set<Type> {
             return haveToAdd;
         }
 
-        throw new InternalCompilerError("Can only add " + topType
-                + "s to the set. Got a " + type);
+        throw new InternalCompilerError("Can only add " + topType + "s to the set. Got a " + type);
     }
 
     /**
@@ -149,7 +148,7 @@ public class SubtypeSet implements java.util.Set<Type> {
     }
 
     /**
-     * Check whether object {@code o} is in the set. Because of the 
+     * Check whether object {@code o} is in the set. Because of the
      * semantics of the subtype set, {@code o} is in the set iff
      * it descends from (or is equal to) one of the elements in the set.
      */
@@ -206,7 +205,7 @@ public class SubtypeSet implements java.util.Set<Type> {
     }
 
     /**
-     * Removes all elements {@code s} in the set such that 
+     * Removes all elements {@code s} in the set such that
      * {@code s} decends from {@code o}
      *
      * @return whether or not an element was removed.
@@ -217,7 +216,7 @@ public class SubtypeSet implements java.util.Set<Type> {
 
         boolean removed = false;
 
-        for (Iterator<Type> i = v.iterator(); i.hasNext();) {
+        for (Iterator<Type> i = v.iterator(); i.hasNext(); ) {
             Type t = i.next();
 
             if (ts.isSubtype(t, type)) {
@@ -243,25 +242,23 @@ public class SubtypeSet implements java.util.Set<Type> {
     @Override
     public boolean retainAll(Collection<?> c) {
         boolean changed = false;
-        for (ListIterator<Type> itr = v.listIterator(); itr.hasNext();) {
+        for (ListIterator<Type> itr = v.listIterator(); itr.hasNext(); ) {
             Type t = itr.next();
             Type glb = null;
             for (Object o : c) {
                 if (o instanceof Type) {
                     Type type = (Type) o;
                     if (glb == null) {
-                        if (ts.isSubtype(type, t))
-                            glb = type;
+                        if (ts.isSubtype(type, t)) glb = type;
                         else if (ts.isSubtype(t, type)) glb = t;
-                    }
-                    else if (ts.isSubtype(type, glb)) glb = type;
+                    } else if (ts.isSubtype(type, glb)) glb = type;
                 }
             }
             if (glb != t) {
                 changed = true;
-                if (glb == null)
-                    itr.remove();
-                else itr.set(glb);;
+                if (glb == null) itr.remove();
+                else itr.set(glb);
+                ;
             }
         }
         return changed;

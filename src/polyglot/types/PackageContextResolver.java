@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -66,16 +66,14 @@ public class PackageContextResolver extends AbstractAccessControlResolver {
     @Override
     public Named find(String name, ClassType accessor) throws SemanticException {
         if (!StringUtil.isNameShort(name)) {
-            throw new InternalCompilerError("Cannot lookup qualified name "
-                    + name);
+            throw new InternalCompilerError("Cannot lookup qualified name " + name);
         }
 
         Named n = null;
 
         try {
             n = ts.systemResolver().find(p.fullName() + "." + name);
-        }
-        catch (NoClassException e) {
+        } catch (NoClassException e) {
             // Rethrow if some _other_ class or package was not found.
             if (!e.getClassName().equals(p.fullName() + "." + name)) {
                 throw e;
@@ -87,8 +85,7 @@ public class PackageContextResolver extends AbstractAccessControlResolver {
         }
 
         if (!canAccess(n, accessor)) {
-            throw new SemanticException("Cannot access " + n + " from "
-                    + accessor + ".");
+            throw new SemanticException("Cannot access " + n + " from " + accessor + ".");
         }
 
         return n;
@@ -96,8 +93,7 @@ public class PackageContextResolver extends AbstractAccessControlResolver {
 
     protected boolean canAccess(Named n, ClassType accessor) {
         if (n instanceof ClassType) {
-            return accessor == null
-                    || ts.classAccessible((ClassType) n, accessor);
+            return accessor == null || ts.classAccessible((ClassType) n, accessor);
         }
         return true;
     }

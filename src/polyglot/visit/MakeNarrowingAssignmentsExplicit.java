@@ -24,14 +24,13 @@ public class MakeNarrowingAssignmentsExplicit extends NodeVisitor {
 
     private Expr rewriteRHS(Type toType, Expr r) {
         Type rt = r.type();
-        if (lang().isConstant(r, lang()) && rt.isIntOrLess()
+        if (lang().isConstant(r, lang())
+                && rt.isIntOrLess()
                 && (toType.isByte() || toType.isShort() || toType.isChar())) {
             // Assume that this was the result of a narrowing primitive conversion
             // and make it explicit by adding a cast.
             Position pos = r.position();
-            Cast c =
-                    (Cast) nf.Cast(pos, nf.CanonicalTypeNode(pos, toType), r)
-                             .type(toType);
+            Cast c = (Cast) nf.Cast(pos, nf.CanonicalTypeNode(pos, toType), r).type(toType);
             return c;
         }
         return r;
@@ -47,8 +46,7 @@ public class MakeNarrowingAssignmentsExplicit extends NodeVisitor {
             LocalDecl ld = (LocalDecl) n;
             return ld.init(rewriteRHS(ld.declType(), ld.init()));
         }
-        if (n instanceof Assign
-                && Assign.ASSIGN.equals(((Assign) n).operator())) {
+        if (n instanceof Assign && Assign.ASSIGN.equals(((Assign) n).operator())) {
             Assign a = (Assign) n;
             return a.right(rewriteRHS(a.left().type(), a.right()));
         }

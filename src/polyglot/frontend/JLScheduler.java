@@ -110,8 +110,7 @@ public class JLScheduler extends Scheduler {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
             return MembersFiltered.create(this, job, ts, nf);
-        }
-        else {
+        } else {
             return internGoal(new EmptyGoal(job, "MembersFiltered"));
         }
     }

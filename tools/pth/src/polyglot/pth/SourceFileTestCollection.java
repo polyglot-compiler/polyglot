@@ -12,8 +12,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public abstract class SourceFileTestCollection
-        extends TestSuite<SourceFileTest> {
+public abstract class SourceFileTestCollection extends TestSuite<SourceFileTest> {
     protected String testCommand = null;
     protected String[] extraArgs;
 
@@ -27,8 +26,12 @@ public abstract class SourceFileTestCollection
 
     protected Set<String> undefinedEnvVars = new HashSet<>();
 
-    public SourceFileTestCollection(String testCommand, String name,
-            String testDir, String args, List<SourceFileTest> tests) {
+    public SourceFileTestCollection(
+            String testCommand,
+            String name,
+            String testDir,
+            String args,
+            List<SourceFileTest> tests) {
         super(testCommand + (name == null ? "" : " (" + name + ")"), tests);
         this.testCommand = testCommand;
 
@@ -39,8 +42,7 @@ public abstract class SourceFileTestCollection
             mainExtraArgs = new LinkedList<>();
             for (String element : breakString(Main.options.extraArgs)) {
                 String sas = element;
-                if (pathSep != ':' && sas.indexOf(':') >= 0)
-                    sas = replacePathSep(sas, pathSep);
+                if (pathSep != ':' && sas.indexOf(':') >= 0) sas = replacePathSep(sas, pathSep);
                 mainExtraArgs.add(sas);
             }
         }
@@ -50,10 +52,11 @@ public abstract class SourceFileTestCollection
             sb.append(getName());
             sb.append("::");
             sb.append(testCommand);
-            if (extraArgs != null) for (String extraArg : extraArgs) {
-                sb.append("::");
-                sb.append(extraArg);
-            }
+            if (extraArgs != null)
+                for (String extraArg : extraArgs) {
+                    sb.append("::");
+                    sb.append(extraArg);
+                }
             uniqueId = sb.toString();
         }
 
@@ -63,12 +66,13 @@ public abstract class SourceFileTestCollection
         flagMap = new HashMap<>();
         flagMap.put("compilerpath", Main.options.compilerpath);
         flagMap.put("refpath", Main.options.refpath);
-        flagMap.put("testpath",
-                    Main.options.testpath == null
-                            ? testDir == null ? null : testDir
-                            : testDir == null
-                                    ? Main.options.testpath
-                                    : Main.options.testpath + testDir);
+        flagMap.put(
+                "testpath",
+                Main.options.testpath == null
+                        ? testDir == null ? null : testDir
+                        : testDir == null
+                                ? Main.options.testpath
+                                : Main.options.testpath + testDir);
         flagMap.put("workpath", Main.options.workpath);
 
         cmdLineHdr = buildCmdLine();
@@ -77,8 +81,7 @@ public abstract class SourceFileTestCollection
         td = createTestDriver();
     }
 
-    protected void populatePathFlags() {
-    }
+    protected void populatePathFlags() {}
 
     protected abstract TestDriver createTestDriver();
 
@@ -98,15 +101,13 @@ public abstract class SourceFileTestCollection
                 // a literal character
                 c = s.charAt(++i);
                 token += c;
-            }
-            else if (c == '\"' || c == '\'')
+            } else if (c == '\"' || c == '\'')
                 // a quoted string, treat as a single token
                 endChar = c;
             else if (endChar == 0 && Character.isWhitespace(c)) {
                 if (token.length() > 0) l.add(token);
                 token = "";
-            }
-            else token += c;
+            } else token += c;
             i++;
         }
         if (token.length() > 0) l.add(token);
@@ -123,10 +124,8 @@ public abstract class SourceFileTestCollection
         StringBuffer sb = new StringBuffer();
         for (String key : keys) {
             String path = flagMap.get(key);
-            if (path == null)
-                continue;
-            else if (!path.isEmpty() && !path.endsWith(File.separator))
-                path += File.separator;
+            if (path == null) continue;
+            else if (!path.isEmpty() && !path.endsWith(File.separator)) path += File.separator;
             sb.append(path);
         }
         if (sb.length() == 0) return "." + File.separator;
@@ -182,8 +181,7 @@ public abstract class SourceFileTestCollection
                 executedTests += t.getExecutedTestCount();
                 successfulTests += t.getSuccessfulTestCount();
                 postIndividualTest();
-                if (!result && (t.haltOnFailure() || haltOnFirstFailure))
-                    shouldExecute = false;
+                if (!result && (t.haltOnFailure() || haltOnFirstFailure)) shouldExecute = false;
             }
             newResults.put(t.getUniqueId(), tr);
         }
@@ -220,8 +218,7 @@ public abstract class SourceFileTestCollection
         if (extraArgs != null) {
             String flagName = null;
             for (String element : extraArgs) {
-                if (pathFlags.containsKey(element))
-                    flagName = pathFlags.get(element);
+                if (pathFlags.containsKey(element)) flagName = pathFlags.get(element);
                 else if (flagName != null) {
                     char pathSep = File.pathSeparatorChar;
                     if (pathSep != ':' && element.indexOf(':') >= 0)
@@ -247,14 +244,11 @@ public abstract class SourceFileTestCollection
         // system specific one
         StringBuffer sb = new StringBuffer();
         for (int j = 0; j < sas.length(); j++)
-            if (sas.charAt(j) == '\\' && j + 1 < sas.length()
-                    && sas.charAt(j + 1) == ':') {
+            if (sas.charAt(j) == '\\' && j + 1 < sas.length() && sas.charAt(j + 1) == ':') {
                 // escaped ':'
                 j++;
                 sb.append(':');
-            }
-            else if (sas.charAt(j) == ':')
-                sb.append(pathSep);
+            } else if (sas.charAt(j) == ':') sb.append(pathSep);
             else sb.append(sas.charAt(j));
         return sb.toString();
     }
@@ -264,10 +258,9 @@ public abstract class SourceFileTestCollection
         while ((start = sas.indexOf('$')) >= 0) {
             // we have an environment variable
             int end = start + 1;
-            while (end < sas.length() && (Character
-                                                   .isUnicodeIdentifierStart(sas.charAt(end))
-                    || Character.isUnicodeIdentifierPart(sas.charAt(end))))
-                end++;
+            while (end < sas.length()
+                    && (Character.isUnicodeIdentifierStart(sas.charAt(end))
+                            || Character.isUnicodeIdentifierPart(sas.charAt(end)))) end++;
 
             String var = sas.substring(start + 1, end);
             String v = System.getenv(var);

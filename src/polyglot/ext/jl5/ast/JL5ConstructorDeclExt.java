@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -49,8 +49,7 @@ public class JL5ConstructorDeclExt extends JL5ProcedureDeclExt {
         this(null, null);
     }
 
-    public JL5ConstructorDeclExt(List<ParamTypeNode> typeParams,
-            List<AnnotationElem> annotations) {
+    public JL5ConstructorDeclExt(List<ParamTypeNode> typeParams, List<AnnotationElem> annotations) {
         super(typeParams, annotations);
     }
 
@@ -61,17 +60,17 @@ public class JL5ConstructorDeclExt extends JL5ProcedureDeclExt {
     }
 
     @Override
-    protected Node buildTypesFinish(JL5TypeSystem ts, ParsedClassType ct,
-            Flags flags, List<? extends Type> formalTypes,
-            List<? extends Type> throwTypes, List<TypeVariable> typeParams) {
+    protected Node buildTypesFinish(
+            JL5TypeSystem ts,
+            ParsedClassType ct,
+            Flags flags,
+            List<? extends Type> formalTypes,
+            List<? extends Type> throwTypes,
+            List<TypeVariable> typeParams) {
         ConstructorDecl cd = (ConstructorDecl) this.node();
         ConstructorInstance ci =
-                ts.constructorInstance(cd.position(),
-                                       ct,
-                                       flags,
-                                       formalTypes,
-                                       throwTypes,
-                                       typeParams);
+                ts.constructorInstance(
+                        cd.position(), ct, flags, formalTypes, throwTypes, typeParams);
         ct.addConstructor(ci);
 
         return cd.constructorInstance(ci).flags(flags);

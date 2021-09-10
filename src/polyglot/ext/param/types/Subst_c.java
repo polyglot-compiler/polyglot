@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -69,8 +69,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
 
     protected transient ParamTypeSystem<Formal, Actual> ts;
 
-    public Subst_c(ParamTypeSystem<Formal, Actual> ts,
-            Map<Formal, ? extends Actual> subst) {
+    public Subst_c(ParamTypeSystem<Formal, Actual> ts, Map<Formal, ? extends Actual> subst) {
         this.ts = ts;
         this.subst = new HashMap<>(subst);
         this.cache = new HashMap<>();
@@ -137,12 +136,12 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     }
 
     /**
-     * When adding a new substitution A-&gt;B to the map, we need to check if 
+     * When adding a new substitution A-&gt;B to the map, we need to check if
      * there are already any existing substitutions, say C-&gt;A, and if so,
      * replace them appropriately, in this case with C-&gt;B.
-     * 
+     *
      * This method allows subclasses to perform substitution on a value in
-     * the substitution map (B in the 
+     * the substitution map (B in the
      * example above). Subclasses may need to override this
      * if the keys and values are not the same object.
      */
@@ -168,7 +167,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     @Override
     public Type substType(Type t) {
         if (t == null || t == this) // XXX comparison t == this can't succeed! (Findbugs)
-            return t;
+        return t;
 
         Type cached = cacheGet(t);
 
@@ -177,9 +176,16 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
             cachePut(t, cached);
 
             if (Report.should_report(Topics.subst, 2))
-                Report.report(2, "substType(" + t + ": "
-                        + t.getClass().getName() + ") = " + cached + ": "
-                        + cached.getClass().getName());
+                Report.report(
+                        2,
+                        "substType("
+                                + t
+                                + ": "
+                                + t.getClass().getName()
+                                + ") = "
+                                + cached
+                                + ": "
+                                + cached.getClass().getName());
         }
 
         return cached;
@@ -238,8 +244,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
 
     @Override
     public PClass<Formal, Actual> substPClass(PClass<Formal, Actual> pclazz) {
-        MuPClass<Formal, Actual> newPclazz =
-                ts.mutablePClass(pclazz.position());
+        MuPClass<Formal, Actual> newPclazz = ts.mutablePClass(pclazz.position());
         newPclazz.formals(pclazz.formals());
         newPclazz.clazz((ClassType) substType(pclazz.clazz()));
         return newPclazz;
@@ -312,8 +317,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     }
 
     @Override
-    public <T extends ConstructorInstance> List<T> substConstructorList(
-            List<T> list) {
+    public <T extends ConstructorInstance> List<T> substConstructorList(List<T> list) {
         return new CachingTransformingList<>(list, new ConstructorXform<T>());
     }
 
@@ -336,8 +340,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     }
 
     /** Function object for transforming fields. */
-    public class FieldXform<T extends FieldInstance> implements
-            Transformation<T, T> {
+    public class FieldXform<T extends FieldInstance> implements Transformation<T, T> {
         @Override
         public T transform(T o) {
             return substField(o);
@@ -345,8 +348,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     }
 
     /** Function object for transforming methods. */
-    public class MethodXform<T extends MethodInstance> implements
-            Transformation<T, T> {
+    public class MethodXform<T extends MethodInstance> implements Transformation<T, T> {
         @Override
         public T transform(T o) {
             return substMethod(o);
@@ -354,8 +356,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     }
 
     /** Function object for transforming constructors. */
-    public class ConstructorXform<T extends ConstructorInstance> implements
-            Transformation<T, T> {
+    public class ConstructorXform<T extends ConstructorInstance> implements Transformation<T, T> {
         @Override
         public T transform(T o) {
             return substConstructor(o);
@@ -385,7 +386,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     @Override
     public String toString() {
         String str = "[";
-        for (Iterator<Entry<Formal, Actual>> iter = subst.entrySet().iterator(); iter.hasNext();) {
+        for (Iterator<Entry<Formal, Actual>> iter = subst.entrySet().iterator(); iter.hasNext(); ) {
             Entry<Formal, ? extends Actual> entry = iter.next();
             str += "<" + entry.getKey() + ": " + entry.getValue() + ">";
             if (iter.hasNext()) str += ", ";
@@ -406,8 +407,8 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
     @SuppressWarnings("unused")
     private static final long readObjectVersionUID = 1L;
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
         // If you update this method in an incompatible way, increment
         // readObjectVersionUID.
 

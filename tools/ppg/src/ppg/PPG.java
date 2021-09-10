@@ -57,28 +57,21 @@ public class PPG {
                 // assume all switches begin with a dash '-'
                 if (args[i].charAt(0) == '-') {
                     if (args[i].equals("-symbols")) {
-                        if (i+1 < args.length)
-                            SYMBOL_CLASS_NAME = args[++i];
+                        if (i + 1 < args.length) SYMBOL_CLASS_NAME = args[++i];
                         else throw new Exception("No filename specified after -symbols");
-                    }
-                    else if (args[i].equals("-o")) {
-                        if (i+1 < args.length)
-                            OUTPUT_FILE = args[++i];
+                    } else if (args[i].equals("-o")) {
+                        if (i + 1 < args.length) OUTPUT_FILE = args[++i];
                         else throw new Exception("No filename specified after -o");
-                    }
-                    else // invalid switch
-                        throw new Exception("Invalid switch: " + args[i]);
-                }
-                else {
+                    } else // invalid switch
+                    throw new Exception("Invalid switch: " + args[i]);
+                } else {
                     // not a switch: this must be a filename
                     // but only do the 1st filename on the command line
-                    if (filename == null)
-                        filename = args[i];
+                    if (filename == null) filename = args[i];
                     else throw new Exception("Error: multiple source files specified.");
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println(HEADER + e.getMessage());
             usage();
         }
@@ -94,21 +87,17 @@ public class PPG {
             Parser parser = new Parser(filename, lex);
             try {
                 parser.parse();
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 throw e;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // Used by CUP to indicate an unrecoverable error.
                 System.err.println(HEADER + "Exception: " + e.getMessage());
                 System.exit(1);
             }
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.err.println("Error: " + filename + " is not found.");
             System.exit(1);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.err.println(HEADER + "Exception: " + e.getMessage());
             System.exit(1);
         }
@@ -134,16 +123,13 @@ public class PPG {
             CodeWriter cw = new CodeWriter(out, 80);
             combined.unparse(cw);
             cw.flush();
-        }
-        catch (PPGError e) {
+        } catch (PPGError e) {
             System.err.println(e.getMessage());
             System.exit(1);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.err.println(HEADER + "Exception: " + e.getMessage());
             System.exit(1);
-        }
-        finally {
+        } finally {
             if (out != System.out) {
                 out.close();
             }
@@ -151,9 +137,10 @@ public class PPG {
     }
 
     public static void usage() {
-        System.err.println("Usage: ppg [-symbols ConstClass] <input file>\nwhere:\n"
-                + "\t-c <Class>\tclass prepended to token names to pass to <func>\n"
-                + "\t<input>\ta PPG or CUP source file\n");
+        System.err.println(
+                "Usage: ppg [-symbols ConstClass] <input file>\nwhere:\n"
+                        + "\t-c <Class>\tclass prepended to token names to pass to <func>\n"
+                        + "\t<input>\ta PPG or CUP source file\n");
         System.exit(1);
     }
 }

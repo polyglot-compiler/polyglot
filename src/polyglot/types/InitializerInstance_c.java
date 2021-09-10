@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -33,19 +33,16 @@ import polyglot.util.SerialVersionUID;
  * A {@code InitializerInstance} contains the type information for a
  * static or anonymous initializer.
  */
-public class InitializerInstance_c extends TypeObject_c implements
-        InitializerInstance {
+public class InitializerInstance_c extends TypeObject_c implements InitializerInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected ClassType container;
     protected Flags flags;
 
     /** Used for deserializing types. */
-    protected InitializerInstance_c() {
-    }
+    protected InitializerInstance_c() {}
 
-    public InitializerInstance_c(TypeSystem ts, Position pos,
-            ClassType container, Flags flags) {
+    public InitializerInstance_c(TypeSystem ts, Position pos, ClassType container, Flags flags) {
         super(ts, pos);
         this.container = container;
         this.flags = flags;
@@ -107,8 +104,7 @@ public class InitializerInstance_c extends TypeObject_c implements
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof InitializerInstance) {
             InitializerInstance i = (InitializerInstance) o;
-            return flags.equals(i.flags())
-                    && ts.equals(container, i.container());
+            return flags.equals(i.flags()) && ts.equals(container, i.container());
         }
 
         return false;

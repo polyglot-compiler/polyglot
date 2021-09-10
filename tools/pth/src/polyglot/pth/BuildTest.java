@@ -21,8 +21,7 @@ public abstract class BuildTest extends AbstractTest {
     protected boolean matchFilter() {
         if (!Main.options.testCollectionFilters.isEmpty()) {
             for (String testCollectionFilter : Main.options.testCollectionFilters)
-                if (Pattern.matches(testCollectionFilter, getName()))
-                    return true;
+                if (Pattern.matches(testCollectionFilter, getName())) return true;
             return false;
         }
         return super.matchFilter();
@@ -45,8 +44,7 @@ public abstract class BuildTest extends AbstractTest {
 
         int ret = invokeCompilerBuilder(dir);
         if (ret != 0) {
-            if (ret > 0) appendFailureMessage("Failed to build: " + name
-                    + " exit code " + ret);
+            if (ret > 0) appendFailureMessage("Failed to build: " + name + " exit code " + ret);
             return false;
         }
         return true;
@@ -61,8 +59,7 @@ public abstract class BuildTest extends AbstractTest {
     protected abstract int invokeCompilerBuilder(File dir);
 
     protected String getCompilerDir() {
-        return Main.options.compilerpath == null
-                ? "." : Main.options.compilerpath;
+        return Main.options.compilerpath == null ? "." : Main.options.compilerpath;
     }
 
     protected String prependCompilerPath(String filename) {

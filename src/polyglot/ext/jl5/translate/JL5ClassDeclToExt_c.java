@@ -43,14 +43,15 @@ public class JL5ClassDeclToExt_c extends ClassDeclToExt_c {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         ClassDecl cd = (ClassDecl) node();
         JL5NodeFactory to_nf = (JL5NodeFactory) rw.to_nf();
-        return to_nf.ClassDecl(cd.position(),
-                               cd.flags(),
-                               ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems(),
-                               cd.id(),
-                               cd.superClass(),
-                               cd.interfaces(),
-                               cd.body(),
-                               ((JL5ClassDeclExt) JL5Ext.ext(cd)).paramTypes(),
-                               cd.javadoc());
+        return to_nf.ClassDecl(
+                cd.position(),
+                cd.flags(),
+                ((AnnotatedElement) JL5Ext.ext(cd)).annotationElems(),
+                cd.id(),
+                cd.superClass(),
+                cd.interfaces(),
+                cd.body(),
+                ((JL5ClassDeclExt) JL5Ext.ext(cd)).paramTypes(),
+                cd.javadoc());
     }
 }

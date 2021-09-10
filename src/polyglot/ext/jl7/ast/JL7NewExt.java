@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -69,8 +69,7 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
         if (parent instanceof Return) {
             CodeInstance ci = tc.context().currentCode();
             if (ci instanceof FunctionInstance) {
@@ -135,16 +134,16 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
         JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
         List<TypeNode> typeArgs = ext5.typeArgs();
         if (!typeArgs.isEmpty())
-            throw new SemanticException("Explicit type arguments cannot be used"
-                    + " with '<>' in an allocation expression");
+            throw new SemanticException(
+                    "Explicit type arguments cannot be used"
+                            + " with '<>' in an allocation expression");
         if (n.body() != null)
             throw new SemanticException("'<>' cannot be used with anonymous classes");
 
         JL7TypeSystem ts = (JL7TypeSystem) tc.typeSystem();
 
         if (!objectType.type().isClass()) {
-            throw new SemanticException("Must have a class for a new expression.",
-                                        n.position());
+            throw new SemanticException("Must have a class for a new expression.", n.position());
         }
 
         List<Type> argTypes = new ArrayList<>(n.arguments().size());
@@ -162,12 +161,13 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
         Context c = tc.context();
 
         ConstructorInstance ci =
-                ts.findConstructor(ct,
-                                   argTypes,
-                                   Collections.<ReferenceType> emptyList(),
-                                   c.currentClass(),
-                                   expectedObjectType(),
-                                   n.body() == null);
+                ts.findConstructor(
+                        ct,
+                        argTypes,
+                        Collections.<ReferenceType>emptyList(),
+                        c.currentClass(),
+                        expectedObjectType(),
+                        n.body() == null);
         ct.inferred((JL5SubstClassType) ci.container());
 
         n = n.constructorInstance(ci);
@@ -175,8 +175,8 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
     }
 
     @Override
-    public TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer,
-            TypeNode objectType) throws SemanticException {
+    public TypeNode findQualifiedTypeNode(AmbiguityRemover ar, ClassType outer, TypeNode objectType)
+            throws SemanticException {
         if (objectType instanceof AmbDiamondTypeNode) {
             JL7TypeSystem ts = (JL7TypeSystem) ar.typeSystem();
             Context c = ar.context();
@@ -187,26 +187,20 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
             if (outer instanceof ParsedClassType) {
                 ParsedClassType opct = (ParsedClassType) outer;
                 c = c.pushClass(opct, opct);
-            }
-            else if (outer instanceof JL5SubstClassType) {
+            } else if (outer instanceof JL5SubstClassType) {
                 JL5SubstClassType osct = (JL5SubstClassType) outer;
                 c = c.pushClass(osct.base(), osct.base());
-            }
-            else if (outer instanceof RawClass) {
+            } else if (outer instanceof RawClass) {
                 RawClass orct = (RawClass) outer;
                 c = c.pushClass(orct.base(), orct.base());
             }
             return (TypeNode) objectType.visit(ar.context(c));
         }
-        return superLang().findQualifiedTypeNode(this.node(),
-                                                 ar,
-                                                 outer,
-                                                 objectType);
+        return superLang().findQualifiedTypeNode(this.node(), ar, outer, objectType);
     }
 
     @Override
-    public Expr findQualifier(AmbiguityRemover ar, ClassType ct)
-            throws SemanticException {
+    public Expr findQualifier(AmbiguityRemover ar, ClassType ct) throws SemanticException {
         return superLang().findQualifier(this.node(), ar, ct);
     }
 

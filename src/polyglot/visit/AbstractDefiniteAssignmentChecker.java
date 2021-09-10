@@ -66,10 +66,11 @@ import polyglot.util.Position;
  * This class provides functionality for doing the assignment checking, but
  * leaves abstract the ClassBodyInfo and FlowItem implementations.
  */
-public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssignmentChecker.ClassBodyInfo<CBI>, FI extends AbstractAssignmentChecker.FlowItem>
+public abstract class AbstractDefiniteAssignmentChecker<
+                CBI extends AbstractAssignmentChecker.ClassBodyInfo<CBI>,
+                FI extends AbstractAssignmentChecker.FlowItem>
         extends AbstractAssignmentChecker<CBI, FI> {
-    public AbstractDefiniteAssignmentChecker(Job job, TypeSystem ts,
-            NodeFactory nf) {
+    public AbstractDefiniteAssignmentChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
 
@@ -89,18 +90,18 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
      * @param cb The ClassBody of the class declaring the fields to check.
      * @throws SemanticException
      */
-    protected void checkStaticFinalFieldsInit(ClassBody cb)
-            throws SemanticException {
+    protected void checkStaticFinalFieldsInit(ClassBody cb) throws SemanticException {
         // Checks that all static final fields have been initialized at least
         // once.
-        for (Entry<FieldInstance, AssignmentStatus> e : curCBI.curClassFieldAsgtStatuses.entrySet()) {
+        for (Entry<FieldInstance, AssignmentStatus> e :
+                curCBI.curClassFieldAsgtStatuses.entrySet()) {
             FieldInstance fi = e.getKey();
             if (fi.flags().isStatic() && fi.flags().isFinal()) {
                 AssignmentStatus defAss = e.getValue();
                 if (!defAss.definitelyAssigned) {
-                    throw new SemanticException("Final field \"" + fi.name()
-                            + "\" might not have been initialized",
-                                                fi.position());
+                    throw new SemanticException(
+                            "Final field \"" + fi.name() + "\" might not have been initialized",
+                            fi.position());
                 }
             }
         }
@@ -114,8 +115,7 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
      * @param cb The ClassBody of the class declaring the fields to check.
      * @throws SemanticException
      */
-    protected void checkNonStaticFinalFieldsInit(ClassBody cb)
-            throws SemanticException {
+    protected void checkNonStaticFinalFieldsInit(ClassBody cb) throws SemanticException {
         // For each non-static final field instance, check that all constructors
         // initialize it exactly once, taking into account constructor calls.
         for (FieldInstance fi : curCBI.curClassFieldAsgtStatuses.keySet()) {
@@ -125,23 +125,21 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
                 // navigate up through all of the the constructors
                 // that this constructor calls.
 
-                AssignmentStatus ic =
-                        curCBI.curClassFieldAsgtStatuses.get(fi.orig());
-                boolean fieldInitializedBeforeConstructors =
-                        ic != null && ic.definitelyAssigned;
+                AssignmentStatus ic = curCBI.curClassFieldAsgtStatuses.get(fi.orig());
+                boolean fieldInitializedBeforeConstructors = ic != null && ic.definitelyAssigned;
 
                 for (ConstructorDecl cd : curCBI.allConstructors) {
                     boolean isInitialized = fieldInitializedBeforeConstructors;
 
                     ConstructorInstance ci = cd.constructorInstance();
-                    Set<FieldInstance> s =
-                            curCBI.fieldsConstructorInitializes.get(ci.orig());
+                    Set<FieldInstance> s = curCBI.fieldsConstructorInitializes.get(ci.orig());
                     if (s != null && s.contains(fi)) {
                         if (isInitialized) {
-                            throw new SemanticException("Final field \""
-                                    + fi.name()
-                                    + "\" might have already been initialized",
-                                                        cd.position());
+                            throw new SemanticException(
+                                    "Final field \""
+                                            + fi.name()
+                                            + "\" might have already been initialized",
+                                    cd.position());
                         }
 
                         isInitialized = true;
@@ -150,12 +148,12 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
                     if (!isInitialized) {
                         // check whether this constructor can terminate normally.
                         if (!curCBI.constructorsCannotTerminateNormally.contains(cd)) {
-                            throw new SemanticException("Final field \""
-                                    + fi.name()
-                                    + "\" might not have been initialized",
-                                                        cd.position().endOf());
-                        }
-                        else {
+                            throw new SemanticException(
+                                    "Final field \""
+                                            + fi.name()
+                                            + "\" might not have been initialized",
+                                    cd.position().endOf());
+                        } else {
                             // Even though the final field may not be
                             // initialized, the constructor cannot terminate
                             // normally. For compatibility with javac, we will
@@ -185,28 +183,24 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
      * assigned value when any access of its value occurs.
      */
     @Override
-    protected void checkField(FlowGraph<FI> graph, Field f, FI dfIn)
-            throws SemanticException {
+    protected void checkField(FlowGraph<FI> graph, Field f, FI dfIn) throws SemanticException {
         FieldInstance fi = f.fieldInstance();
         // Use of blank final field only needs to be checked when the use
         // occurs inside the same class as the field's container.
-        if (fi.flags().isFinal()
-                && ts.typeEquals(curCBI.curClass, fi.container())) {
+        if (fi.flags().isFinal() && ts.typeEquals(curCBI.curClass, fi.container())) {
             if (duringObjectInit() && isFieldsTargetAppropriate(graph, f)) {
-                AssignmentStatus initCount =
-                        dfIn.assignmentStatus.get(fi.orig());
+                AssignmentStatus initCount = dfIn.assignmentStatus.get(fi.orig());
                 if (initCount == null || !initCount.definitelyAssigned) {
-                    throw new SemanticException("Final field \"" + f.name()
-                            + "\" might not have been initialized",
-                                                f.position());
+                    throw new SemanticException(
+                            "Final field \"" + f.name() + "\" might not have been initialized",
+                            f.position());
                 }
             }
         }
     }
 
     @Override
-    protected void checkLocal(FlowGraph<FI> graph, Local l, FI dfIn)
-            throws SemanticException {
+    protected void checkLocal(FlowGraph<FI> graph, Local l, FI dfIn) throws SemanticException {
         if (!curCBI.localDeclarations.contains(l.localInstance().orig())) {
             // it's a local variable that has not been declared within
             // this scope. The only way this can arise is from an
@@ -217,45 +211,47 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
             // keep track of it, to ensure that it has been definitely
             // assigned at this point.
             curCBI.outerLocalsUsed.add(l.localInstance().orig());
-        }
-        else {
-            AssignmentStatus initCount =
-                    dfIn.assignmentStatus.get(l.localInstance().orig());
+        } else {
+            AssignmentStatus initCount = dfIn.assignmentStatus.get(l.localInstance().orig());
             if (initCount == null || !initCount.definitelyAssigned) {
                 // the local variable may not have been initialized.
                 // However, we only want to complain if the local is reachable
                 if (l.reachable()) {
-                    throw new SemanticException("Local variable \"" + l.name()
-                            + "\" may not have been initialized", l.position());
+                    throw new SemanticException(
+                            "Local variable \"" + l.name() + "\" may not have been initialized",
+                            l.position());
                 }
             }
         }
     }
 
-    protected void checkLocalInstanceInit(LocalInstance li, FlowItem dfIn,
-            Position pos) throws SemanticException {
+    protected void checkLocalInstanceInit(LocalInstance li, FlowItem dfIn, Position pos)
+            throws SemanticException {
         AssignmentStatus initCount = dfIn.assignmentStatus.get(li.orig());
         if (initCount != null && !initCount.definitelyAssigned) {
             // the local variable may not have been initialized.
-            throw new SemanticException("Local variable \"" + li.name()
-                    + "\" may not have been initialized", pos);
+            throw new SemanticException(
+                    "Local variable \"" + li.name() + "\" may not have been initialized", pos);
         }
     }
 
     @Override
-    protected void checkLocalAssign(FlowGraph<FI> graph, LocalInstance li,
-            Position pos, FI dfIn) throws SemanticException {
+    protected void checkLocalAssign(FlowGraph<FI> graph, LocalInstance li, Position pos, FI dfIn)
+            throws SemanticException {
         if (!curCBI.localDeclarations.contains(li.orig())) {
-            throw new SemanticException("Final local variable \"" + li.name()
-                    + "\" cannot be assigned to in an inner class.", pos);
+            throw new SemanticException(
+                    "Final local variable \""
+                            + li.name()
+                            + "\" cannot be assigned to in an inner class.",
+                    pos);
         }
 
         AssignmentStatus initCount = dfIn.assignmentStatus.get(li.orig());
 
-        if (li.flags().isFinal() && initCount != null
-                && !initCount.definitelyUnassigned) {
-            throw new SemanticException("Final variable \"" + li.name()
-                    + "\" might already have been initialized", pos);
+        if (li.flags().isFinal() && initCount != null && !initCount.definitelyUnassigned) {
+            throw new SemanticException(
+                    "Final variable \"" + li.name() + "\" might already have been initialized",
+                    pos);
         }
     }
 
@@ -266,7 +262,8 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
         Field f = a.left();
         FieldInstance fi = f.fieldInstance();
         if (fi.flags().isFinal()) {
-            if (duringObjectInit() && isFieldsTargetAppropriate(graph, f)
+            if (duringObjectInit()
+                    && isFieldsTargetAppropriate(graph, f)
                     && ts.equals(curCBI.curClass, fi.container())) {
                 // we are in a constructor or initializer block and
                 // if the field is static then the target is the class
@@ -274,41 +271,44 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
                 // target of the field is this.
                 // So a final field in this situation can be
                 // assigned to at most once.
-                AssignmentStatus initCount =
-                        dfIn.assignmentStatus.get(fi.orig());
+                AssignmentStatus initCount = dfIn.assignmentStatus.get(fi.orig());
                 if (initCount == null) {
                     // This should not happen.
-                    throw new InternalCompilerError("Dataflow information not found for field \""
-                            + fi.name() + "\".", a.position());
+                    throw new InternalCompilerError(
+                            "Dataflow information not found for field \"" + fi.name() + "\".",
+                            a.position());
                 }
                 if (!initCount.definitelyUnassigned) {
-                    throw new SemanticException("Final field \"" + fi.name()
-                            + "\" might already have been initialized",
-                                                a.position());
+                    throw new SemanticException(
+                            "Final field \"" + fi.name() + "\" might already have been initialized",
+                            a.position());
                 }
-            }
-            else {
+            } else {
                 // not in a constructor or initializer, or the target is
                 // not appropriate. So we cannot assign
                 // to a final field at all.
-                throw new SemanticException("Cannot assign a value "
-                        + "to final field \"" + fi.name() + "\" of \""
-                        + fi.orig().container() + "\".", a.position());
+                throw new SemanticException(
+                        "Cannot assign a value "
+                                + "to final field \""
+                                + fi.name()
+                                + "\" of \""
+                                + fi.orig().container()
+                                + "\".",
+                        a.position());
             }
         }
     }
 
     @Override
-    protected void checkLocalsUsedByInnerClass(FlowGraph<FI> graph,
-            ClassBody cb, Set<LocalInstance> localsUsed, FI dfIn, FI dfOut)
+    protected void checkLocalsUsedByInnerClass(
+            FlowGraph<FI> graph, ClassBody cb, Set<LocalInstance> localsUsed, FI dfIn, FI dfOut)
             throws SemanticException {
         for (LocalInstance li : localsUsed) {
             AssignmentStatus initCount = dfOut.assignmentStatus.get(li.orig());
             if (!curCBI.localDeclarations.contains(li.orig())) {
                 // the local wasn't defined in this scope.
                 curCBI.outerLocalsUsed.add(li.orig());
-            }
-            else if (initCount == null || !initCount.definitelyAssigned) {
+            } else if (initCount == null || !initCount.definitelyAssigned) {
                 // initCount will in general not be null, as the local variable
                 // li is declared in the current class; however, if the inner
                 // class is declared in the initializer of the local variable
@@ -316,9 +316,12 @@ public abstract class AbstractDefiniteAssignmentChecker<CBI extends AbstractAssi
                 // leave the inner class before we have performed flowLocalDecl
                 // for the local variable declaration.
 
-                throw new SemanticException("Local variable \"" + li.name()
-                        + "\" must be initialized before the class "
-                        + "declaration.", cb.position());
+                throw new SemanticException(
+                        "Local variable \""
+                                + li.name()
+                                + "\" must be initialized before the class "
+                                + "declaration.",
+                        cb.position());
             }
         }
     }

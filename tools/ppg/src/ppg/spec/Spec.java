@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -64,22 +64,19 @@ public abstract class Spec implements Unparse {
                 code = codeParts.elementAt(i);
                 if (code instanceof ActionCode) {
                     actionCode = (ActionCode) code.clone();
-                }
-                else if (code instanceof InitCode) {
+                } else if (code instanceof InitCode) {
                     initCode = (InitCode) code.clone();
-                }
-                else if (code instanceof ParserCode) {
+                } else if (code instanceof ParserCode) {
                     parserCode = (ParserCode) code.clone();
-                }
-                else { // must be ScanCode
+                } else { // must be ScanCode
                     if (code != null) scanCode = (ScanCode) code.clone();
                 }
-            }
-            catch (Exception e) {
-                System.err.println(PPG.HEADER
-                        + " Spec::replaceCode(): not a code segment "
-                        + "found in code Vector: "
-                        + ((code == null) ? "null" : code.toString()));
+            } catch (Exception e) {
+                System.err.println(
+                        PPG.HEADER
+                                + " Spec::replaceCode(): not a code segment "
+                                + "found in code Vector: "
+                                + ((code == null) ? "null" : code.toString()));
                 System.exit(1);
             }
         }
@@ -98,12 +95,10 @@ public abstract class Spec implements Unparse {
     }
 
     // default action is to do nothing: as CUP does
-    public void parseChain(String basePath) {
-    }
+    public void parseChain(String basePath) {}
 
     /**
      * Combine the chain of inheritance into one CUP spec
      */
     public abstract CUPSpec coalesce() throws PPGError;
-
 }

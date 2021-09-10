@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -89,8 +89,7 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc)
-            throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
         JL5CallExt ext = (JL5CallExt) JL5Ext.ext(this.node());
         if (parent instanceof Return) {
             CodeInstance ci = tc.context().currentCode();
@@ -170,41 +169,48 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
         }
 
         JL5MethodInstance mi =
-                (JL5MethodInstance) ts.findMethod(targetType,
-                                                  n.name(),
-                                                  argTypes,
-                                                  actualTypeArgs,
-                                                  c.currentClass(),
-                                                  ext.expectedReturnType(),
-                                                  !(n.target() instanceof Special));
+                (JL5MethodInstance)
+                        ts.findMethod(
+                                targetType,
+                                n.name(),
+                                argTypes,
+                                actualTypeArgs,
+                                c.currentClass(),
+                                ext.expectedReturnType(),
+                                !(n.target() instanceof Special));
 
-//        System.err.println("\nJL5Call_c.typeCheck targettype is " + targetType);
-//        System.err.println("  JL5Call_c.typeCheck target is " + this.target);
-//        System.err.println("  JL5Call_c.typeCheck target type is "
-//                + this.target.type());
-//        if (this.target.type().isClass()) {
-//            System.err.println("  JL5Call_c.typeCheck target type super is "
-//                    + this.target.type().toClass().superType());
-//        }
-//        System.err.println("  JL5Call_c.expectedReturnType is "
-//                + this.expectedReturnType);
-//        System.err.println("  JL5Call_c.typeCheck arg types is " + argTypes);
-//        System.err.println("  JL5Call_c.typeCheck mi is " + mi
-//                + " return type is " + mi.returnType().getClass());
-//        System.err.println("  JL5Call_c.typeCheck mi is " + mi
-//                + " container is " + mi.container().getClass());
+        //        System.err.println("\nJL5Call_c.typeCheck targettype is " + targetType);
+        //        System.err.println("  JL5Call_c.typeCheck target is " + this.target);
+        //        System.err.println("  JL5Call_c.typeCheck target type is "
+        //                + this.target.type());
+        //        if (this.target.type().isClass()) {
+        //            System.err.println("  JL5Call_c.typeCheck target type super is "
+        //                    + this.target.type().toClass().superType());
+        //        }
+        //        System.err.println("  JL5Call_c.expectedReturnType is "
+        //                + this.expectedReturnType);
+        //        System.err.println("  JL5Call_c.typeCheck arg types is " + argTypes);
+        //        System.err.println("  JL5Call_c.typeCheck mi is " + mi
+        //                + " return type is " + mi.returnType().getClass());
+        //        System.err.println("  JL5Call_c.typeCheck mi is " + mi
+        //                + " container is " + mi.container().getClass());
         if (staticContext && !mi.flags().isStatic()) {
-            throw new SemanticException("Cannot call non-static method "
-                    + n.name() + " of " + n.target().type() + " in static "
-                    + "context.", n.position());
+            throw new SemanticException(
+                    "Cannot call non-static method "
+                            + n.name()
+                            + " of "
+                            + n.target().type()
+                            + " in static "
+                            + "context.",
+                    n.position());
         }
 
         // If the target is super, but the method is abstract, then complain.
         if (n.target() instanceof Special
                 && ((Special) n.target()).kind() == Special.SUPER
                 && mi.flags().isAbstract()) {
-            throw new SemanticException("Cannot call an abstract method "
-                    + "of the super class", n.position());
+            throw new SemanticException(
+                    "Cannot call an abstract method " + "of the super class", n.position());
         }
 
         Type returnType = computeReturnType(mi);
@@ -220,9 +226,10 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
             ReferenceType et = (ReferenceType) ts.erasureType(t);
             ReferenceType wt = ts.wildCardType(n.position(), et, null);
             Type instClass =
-                    ts.instantiate(n.position(),
-                                   (JL5ParsedClassType) ts.Class(),
-                                   Collections.singletonList(wt));
+                    ts.instantiate(
+                            n.position(),
+                            (JL5ParsedClassType) ts.Class(),
+                            Collections.singletonList(wt));
             n = (Call) n.type(instClass);
         }
         //        System.err.println("JL5Call_c: " + this + " got mi " + mi);
@@ -230,26 +237,29 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
         return n;
     }
 
-    protected Type computeReturnType(JL5MethodInstance mi)
-            throws SemanticException {
+    protected Type computeReturnType(JL5MethodInstance mi) throws SemanticException {
         // See JLS 3rd ed 15.12.2.6
         JL5TypeSystem ts = (JL5TypeSystem) mi.typeSystem();
-        // If the method being invoked is declared with a return type of void, then the result is void.
+        // If the method being invoked is declared with a return type of void, then the result is
+        // void.
         if (mi.returnType().isVoid()) {
             return ts.Void();
         }
 
-        // Otherwise, if unchecked conversion was necessary for the method to be applicable then the result type is the erasure (�4.6) of the method�s declared return type.
+        // Otherwise, if unchecked conversion was necessary for the method to be applicable then the
+        // result type is the erasure (�4.6) of the method�s declared return type.
         // XXX how to check this? We need to implement it properly.
 
-        // Otherwise, if the method being invoked is generic, then for 1 � i � n , 
-        // let Fi be the formal type parameters of the method, let Ai be the actual type arguments inferred for the method invocation, and 
-        // let R be the declared return type of the method being invoked. The result type is obtained by applying capture conversion (�5.1.10) to R[F1 := A1, ..., Fn := An].
+        // Otherwise, if the method being invoked is generic, then for 1 � i � n ,
+        // let Fi be the formal type parameters of the method, let Ai be the actual type arguments
+        // inferred for the method invocation, and
+        // let R be the declared return type of the method being invoked. The result type is
+        // obtained by applying capture conversion (�5.1.10) to R[F1 := A1, ..., Fn := An].
         // --- mi has already had substitution applied, so it is covered by the following case.
 
-        // Otherwise, the result type is obtained by applying capture conversion (�5.1.10) to the type given in the method declaration.
-        return ts.applyCaptureConversion(mi.returnType(), this.node()
-                                                              .position());
+        // Otherwise, the result type is obtained by applying capture conversion (�5.1.10) to the
+        // type given in the method declaration.
+        return ts.applyCaptureConversion(mi.returnType(), this.node().position());
     }
 
     @Override
@@ -259,13 +269,11 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
         if (!n.isTargetImplicit()) {
             if (n.target() instanceof Expr) {
                 n.printSubExpr((Expr) n.target(), w, tr);
-            }
-            else if (n.target() != null) {
+            } else if (n.target() != null) {
                 if (tr instanceof JL5Translator) {
                     JL5Translator jltr = (JL5Translator) tr;
                     jltr.printReceiver(n.target(), w);
-                }
-                else {
+                } else {
                     print(n.target(), w, tr);
                 }
             }
@@ -293,8 +301,7 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
     }
 
     @Override
-    public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes)
-            throws SemanticException {
+    public Node typeCheckNullTarget(TypeChecker tc, List<Type> argTypes) throws SemanticException {
         return superLang().typeCheckNullTarget(node(), tc, argTypes);
     }
 

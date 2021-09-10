@@ -5,12 +5,11 @@ import java.util.HashMap;
 /** This class represents a non-terminal symbol in the grammar.  Each
  *  non terminal has a textual name, an index, and a string which indicates
  *  the type of object it will be implemented with at runtime (i.e. the class
- *  of object that will be pushed on the parse stack to represent it). 
+ *  of object that will be pushed on the parse stack to represent it).
  *
  * @version last updated: 11/25/95
  * @author  Scott Hudson
  */
-
 public class non_terminal extends symbol {
 
     /*-----------------------------------------------------------*/
@@ -28,10 +27,10 @@ public class non_terminal extends symbol {
         /* add to set of all non terminals and check for duplicates */
         Object conflict = _all.put(nm, this);
         if (conflict != null)
-        // can't throw an exception here because these are used in static
-        // initializers, so we crash instead
-        // was: 
-        // throw new internal_error("Duplicate non-terminal ("+nm+") created");
+            // can't throw an exception here because these are used in static
+            // initializers, so we crash instead
+            // was:
+            // throw new internal_error("Duplicate non-terminal ("+nm+") created");
             new internal_error("Duplicate non-terminal (" + nm + ") created").crash();
 
         /* assign a unique index */
@@ -43,7 +42,7 @@ public class non_terminal extends symbol {
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-    /** Constructor with default type. 
+    /** Constructor with default type.
      * @param nm  the name of the non terminal.
      */
     public non_terminal(String nm) {
@@ -54,12 +53,12 @@ public class non_terminal extends symbol {
     /*--- (Access to) Static (Class) Variables ------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Table of all non-terminals -- elements are stored using name strings 
-     *  as the key 
+    /** Table of all non-terminals -- elements are stored using name strings
+     *  as the key
      */
     protected static HashMap<String, non_terminal> _all = new HashMap<>();
 
-    //Hm Added clear  to clear all static fields
+    // Hm Added clear  to clear all static fields
     public static void clear() {
         _all.clear();
         _all_by_index.clear();
@@ -74,16 +73,14 @@ public class non_terminal extends symbol {
 
     /** lookup a non terminal by name string */
     public static non_terminal find(String with_name) {
-        if (with_name == null)
-            return null;
+        if (with_name == null) return null;
         else return _all.get(with_name);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Table of all non terminals indexed by their index number. */
-    protected static HashMap<Integer, non_terminal> _all_by_index =
-            new HashMap<>();
+    protected static HashMap<Integer, non_terminal> _all_by_index = new HashMap<>();
 
     /** Lookup a non terminal by index. */
     public static non_terminal find(int indx) {
@@ -107,7 +104,7 @@ public class non_terminal extends symbol {
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
     /** Static counter for creating unique non-terminal names */
-    static protected int next_nt = 0;
+    protected static int next_nt = 0;
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -123,9 +120,9 @@ public class non_terminal extends symbol {
     /*--- Static Methods ----------------------------------------*/
     /*-----------------------------------------------------------*/
 
-    /** Method for creating a new uniquely named hidden non-terminal using 
+    /** Method for creating a new uniquely named hidden non-terminal using
      *  the given string as a base for the name (or "NT$" if null is passed).
-     * @param prefix base name to construct unique name from. 
+     * @param prefix base name to construct unique name from.
      */
     static non_terminal create_new(String prefix) {
         return create_new(prefix, null); // TUM 20060608 embedded actions patch
@@ -233,9 +230,9 @@ public class non_terminal extends symbol {
     /** Add a production to our set of productions. */
     public void add_production(production prod) throws internal_error {
         /* catch improper productions */
-        if (prod == null || prod.lhs() == null
-                || prod.lhs().the_symbol() != this)
-            throw new internal_error("Attempt to add invalid production to non terminal production table");
+        if (prod == null || prod.lhs() == null || prod.lhs().the_symbol() != this)
+            throw new internal_error(
+                    "Attempt to add invalid production to non terminal production table");
 
         /* add it to the table, keyed with itself */
         _productions.put(prod, prod);

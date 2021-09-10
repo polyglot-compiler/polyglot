@@ -15,12 +15,14 @@ class Derivation {
     /**
      * A special derivation indicating the dot within the parser state.
      */
-    public static final Derivation dot = new Derivation(new symbol("•") {
-        @Override
-        public boolean is_non_term() {
-            throw new UnsupportedOperationException();
-        }
-    });
+    public static final Derivation dot =
+            new Derivation(
+                    new symbol("•") {
+                        @Override
+                        public boolean is_non_term() {
+                            throw new UnsupportedOperationException();
+                        }
+                    });
 
     protected final symbol sym;
     protected final List<Derivation> deriv;
@@ -50,8 +52,7 @@ class Derivation {
     protected int size() {
         int size = 1;
         if (deriv != null) {
-            for (Derivation d : deriv)
-                size += d.size();
+            for (Derivation d : deriv) size += d.size();
         }
         return size;
     }
@@ -63,8 +64,7 @@ class Derivation {
             sb.append(" ::= [");
             boolean tail = false;
             for (Derivation d : deriv) {
-                if (tail)
-                    sb.append(" ");
+                if (tail) sb.append(" ");
                 else tail = true;
                 sb.append(d);
             }

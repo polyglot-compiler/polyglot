@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -34,7 +34,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-/** 
+/**
  * A {@code FloatLit} represents a literal in java of type
  * {@code float} or {@code double}.
  */
@@ -44,7 +44,7 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     protected FloatLit.Kind kind;
     protected double value;
 
-//    @Deprecated
+    //    @Deprecated
     public FloatLit_c(Position pos, FloatLit.Kind kind, double value) {
         this(pos, kind, value, null);
     }
@@ -94,13 +94,10 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (kind == FLOAT) {
             return type(tc.typeSystem().Float());
-        }
-        else if (kind == DOUBLE) {
+        } else if (kind == DOUBLE) {
             return type(tc.typeSystem().Double());
-        }
-        else {
-            throw new InternalCompilerError("Unrecognized FloatLit kind "
-                    + kind);
+        } else {
+            throw new InternalCompilerError("Unrecognized FloatLit kind " + kind);
         }
     }
 
@@ -113,13 +110,10 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (kind == FLOAT) {
             w.write(Float.toString((float) value) + "F");
-        }
-        else if (kind == DOUBLE) {
+        } else if (kind == DOUBLE) {
             w.write(Double.toString(value));
-        }
-        else {
-            throw new InternalCompilerError("Unrecognized FloatLit kind "
-                    + kind);
+        } else {
+            throw new InternalCompilerError("Unrecognized FloatLit kind " + kind);
         }
     }
 
@@ -127,8 +121,7 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     public Object constantValue(Lang lang) {
         if (kind == FLOAT) {
             return new Float(value);
-        }
-        else {
+        } else {
             return new Double(value);
         }
     }
@@ -137,8 +130,7 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     public Precedence precedence() {
         if (value < 0) {
             return Precedence.UNARY;
-        }
-        else {
+        } else {
             return Precedence.LITERAL;
         }
     }
@@ -147,5 +139,4 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     public Node copy(NodeFactory nf) {
         return nf.FloatLit(this.position, this.kind, this.value);
     }
-
 }

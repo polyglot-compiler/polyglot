@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -40,14 +40,9 @@ public class FormalToExt_c extends ToExt_c {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         Formal n = (Formal) node();
 
-        Formal to =
-                rw.to_nf().Formal(n.position(), n.flags(), n.type(), n.id());
+        Formal to = rw.to_nf().Formal(n.position(), n.flags(), n.type(), n.id());
         Type type = rw.to_ts().unknownType(n.position());
-        LocalInstance li =
-                rw.to_ts().localInstance(n.position(),
-                                         n.flags(),
-                                         type,
-                                         n.name());
+        LocalInstance li = rw.to_ts().localInstance(n.position(), n.flags(), type, n.name());
         return to.localInstance(li);
     }
 }

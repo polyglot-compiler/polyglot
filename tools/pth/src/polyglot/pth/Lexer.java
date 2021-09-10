@@ -5,6 +5,4 @@ import java_cup.runtime.Scanner;
 /**
  * A lexer for reading pth scripts.
  */
-public interface Lexer extends Scanner {
-
-}
+public interface Lexer extends Scanner {}

@@ -116,8 +116,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         compiler.addExtension(this);
 
         // Initialize the output extension if there is one
-        if (outputExtensionInfo() != null)
-            outputExtensionInfo().initCompiler(compiler);
+        if (outputExtensionInfo() != null) outputExtensionInfo().initCompiler(compiler);
 
         // Create the type system and node factory.
         typeSystem();
@@ -148,7 +147,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     @Override
     public String[] defaultFileExtensions() {
         String ext = defaultFileExtension();
-        return new String[] { ext };
+        return new String[] {ext};
     }
 
     @Override
@@ -160,10 +159,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     public TargetFactory targetFactory() {
         if (target_factory == null) {
             target_factory =
-                    new TargetFactory(extFileManager(),
-                                      getOptions().source_output,
-                                      getOptions().output_ext,
-                                      getOptions().output_stdout);
+                    new TargetFactory(
+                            extFileManager(),
+                            getOptions().source_output,
+                            getOptions().output_ext,
+                            getOptions().output_stdout);
         }
 
         return target_factory;
@@ -216,21 +216,18 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
 
     @Override
-    public ClassFile createClassFile(FileObject f, byte[] code)
-            throws IOException {
+    public ClassFile createClassFile(FileObject f, byte[] code) throws IOException {
         return new ClassFile_c(f, code, this);
     }
 
     @Deprecated
     @Override
-    public FileSource createFileSource(FileObject f, boolean user)
-            throws IOException {
+    public FileSource createFileSource(FileObject f, boolean user) throws IOException {
         return createFileSource(f, user ? Kind.USER_SPECIFIED : Kind.DEPENDENCY);
     }
 
     @Override
-    public FileSource createFileSource(FileObject fo, Kind kind)
-            throws IOException {
+    public FileSource createFileSource(FileObject fo, Kind kind) throws IOException {
         return new Source_c(fo, kind);
     }
 
@@ -240,8 +237,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             extFM = createFileManager();
             try {
                 configureFileManager();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new InternalCompilerError(e);
             }
         }
@@ -255,10 +251,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected void configureFileManager() throws IOException {
         Options opt = getOptions();
         extFM.setLocation(opt.source_path, opt.sourcepath_directories);
-        extFM.setLocation(opt.source_output,
-                          Collections.singleton(opt.sourceOutputDirectory()));
-        extFM.setLocation(opt.class_output,
-                          Collections.singleton(opt.classOutputDirectory()));
+        extFM.setLocation(opt.source_output, Collections.singleton(opt.sourceOutputDirectory()));
+        extFM.setLocation(opt.class_output, Collections.singleton(opt.classOutputDirectory()));
         extFM.setLocation(opt.bootclasspath, opt.bootclasspathDirectories());
         extFM.setLocation(opt.classpath, opt.classpathDirectories());
     }
@@ -274,11 +268,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     public void configureFileManagerForPostCompiler() throws IOException {
         Options opt = getOptions();
 
-        extFM.setLocation(StandardLocation.PLATFORM_CLASS_PATH,
-                          opt.defaultPlatformClasspath());
+        extFM.setLocation(StandardLocation.PLATFORM_CLASS_PATH, opt.defaultPlatformClasspath());
 
-        List<File> sourcepath =
-                Collections.singletonList(opt.sourceOutputDirectory());
+        List<File> sourcepath = Collections.singletonList(opt.sourceOutputDirectory());
         extFM.setLocation(StandardLocation.SOURCE_PATH, sourcepath);
 
         List<File> classpath = new ArrayList<>();
@@ -286,8 +278,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         classpath.addAll(opt.classpathDirectories());
         extFM.setLocation(StandardLocation.CLASS_PATH, classpath);
 
-        List<File> classout =
-                Collections.singletonList(opt.classOutputDirectory());
+        List<File> classout = Collections.singletonList(opt.classOutputDirectory());
         extFM.setLocation(StandardLocation.CLASS_OUTPUT, classout);
     }
 
@@ -326,5 +317,4 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         }
         return default_locations;
     }
-
 }

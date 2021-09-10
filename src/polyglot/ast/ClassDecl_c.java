@@ -26,7 +26,6 @@
 
 package polyglot.ast;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -89,14 +88,25 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
-            List<TypeNode> interfaces, ClassBody body) {
+    public ClassDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            TypeNode superClass,
+            List<TypeNode> interfaces,
+            ClassBody body) {
         this(pos, flags, name, superClass, interfaces, body, null, null);
     }
 
-//    @Deprecated
-    public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
-            List<TypeNode> interfaces, ClassBody body, Javadoc javadoc) {
+    //    @Deprecated
+    public ClassDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            TypeNode superClass,
+            List<TypeNode> interfaces,
+            ClassBody body,
+            Javadoc javadoc) {
         this(pos, flags, name, superClass, interfaces, body, javadoc, null);
     }
 
@@ -104,16 +114,30 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
      * @deprecated Use constructor with Javadoc
      */
     @Deprecated
-    public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
-            List<TypeNode> interfaces, ClassBody body, Ext ext) {
+    public ClassDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            TypeNode superClass,
+            List<TypeNode> interfaces,
+            ClassBody body,
+            Ext ext) {
         this(pos, flags, name, superClass, interfaces, body, null, ext);
     }
 
-    public ClassDecl_c(Position pos, Flags flags, Id name, TypeNode superClass,
-            List<TypeNode> interfaces, ClassBody body, Javadoc javadoc,
+    public ClassDecl_c(
+            Position pos,
+            Flags flags,
+            Id name,
+            TypeNode superClass,
+            List<TypeNode> interfaces,
+            ClassBody body,
+            Javadoc javadoc,
             Ext ext) {
         super(pos, ext);
-        assert flags != null && name != null && interfaces != null
+        assert flags != null
+                && name != null
+                && interfaces != null
                 && body != null; // superClass may be null, interfaces may be empty
         this.flags = flags;
         this.name = name;
@@ -125,8 +149,11 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public boolean isDisambiguated() {
-        return super.isDisambiguated() && type != null && type.isCanonical()
-                && type.supertypesResolved() && type.signaturesResolved();
+        return super.isDisambiguated()
+                && type != null
+                && type.isCanonical()
+                && type.supertypesResolved()
+                && type.signaturesResolved();
     }
 
     @Override
@@ -234,8 +261,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         return interfaces(this, interfaces);
     }
 
-    protected <N extends ClassDecl_c> N interfaces(N n,
-            List<TypeNode> interfaces) {
+    protected <N extends ClassDecl_c> N interfaces(N n, List<TypeNode> interfaces) {
         if (CollectionUtil.equals(n.interfaces, interfaces)) return n;
         n = copyIfNeeded(n);
         n.interfaces = ListUtil.copy(interfaces, true);
@@ -259,8 +285,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         return n;
     }
 
-    protected <N extends ClassDecl_c> N reconstruct(N n, Id name,
-            TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
+    protected <N extends ClassDecl_c> N reconstruct(
+            N n, Id name, TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
         n = id(n, name);
         n = superClass(n, superClass);
         n = interfaces(n, interfaces);
@@ -278,8 +304,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     }
 
     @Override
-    public NodeVisitor buildTypesEnter(TypeBuilder tb)
-            throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         tb = tb.pushClass(position(), flags, name.id());
 
         ParsedClassType type = tb.currentClass();
@@ -341,8 +366,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         if (child == body) {
             TypeSystem ts = c.typeSystem();
             c = c.pushClass(type, ts.staticTarget(type).toClass());
-        }
-        else {
+        } else {
             // Add this class to the context, but don't push a class scope.
             // This allows us to detect loops in the inheritance
             // hierarchy, but avoids an infinite loop.
@@ -374,22 +398,19 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         Context ctxt = ar.context();
         type.inStaticContext(ctxt.inStaticContext());
 
-        if (!implicitMembersAdded && flags.isInterface()
-                && interfaces.isEmpty()) {
+        if (!implicitMembersAdded && flags.isInterface() && interfaces.isEmpty()) {
             // See JLS 2nd Ed. | 9.2.
             // If an interface has no direct superinterfaces, then the interface
             // implicitly declares a public abstract member method corresponding
             // to each public instance method declared in Object, unless a
             // method with the same signature, same return type, and a
             // compatible throws clause is explicitly declared by the interface.
-            List<? extends MethodInstance> objectMethods =
-                    ts.Object().methods();
+            List<? extends MethodInstance> objectMethods = ts.Object().methods();
             for (MethodInstance mi : objectMethods) {
                 Flags flags = mi.flags();
                 if (!flags.isPublic()) continue;
                 boolean methodNeeded = true;
-                List<? extends MethodInstance> mjs =
-                        type.methods(mi.name(), mi.formalTypes());
+                List<? extends MethodInstance> mjs = type.methods(mi.name(), mi.formalTypes());
                 for (MethodInstance mj : mjs) {
                     // It follows that it is a compile-time error if the
                     // interface declares a method with the same signature
@@ -399,9 +420,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                     methodNeeded = false;
                 }
                 if (methodNeeded) {
-                    MethodInstance implicitMi = mi
-                            .container(type)
-                            .flags(flags.Abstract().clearFinal());
+                    MethodInstance implicitMi =
+                            mi.container(type).flags(flags.Abstract().clearFinal());
                     implicitMi.setDeclaration(implicitMi);
                     type.addMethod(implicitMi);
                 }
@@ -413,11 +433,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         return addDefaultConstructorIfNeeded(ts, ar.nodeFactory());
     }
 
-    protected ClassDecl_c disambiguateSupertypes(AmbiguityRemover ar)
-            throws SemanticException {
+    protected ClassDecl_c disambiguateSupertypes(AmbiguityRemover ar) throws SemanticException {
         boolean supertypesResolved = true;
 
-//        System.out.println("  " + ar + ".disamsuper: " + this);
+        //        System.out.println("  " + ar + ".disamsuper: " + this);
 
         if (!type.supertypesResolved()) {
             if (superClass != null && !superClass.isDisambiguated()) {
@@ -434,8 +453,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                 Scheduler scheduler = ar.job().extensionInfo().scheduler();
                 Goal g = scheduler.SupertypesResolved(type);
                 throw new MissingDependencyException(g);
-            }
-            else {
+            } else {
                 setSuperClass(ar, superClass);
                 setInterfaces(ar, interfaces);
                 type.setSupertypesResolved(true);
@@ -445,15 +463,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         return this;
     }
 
-    protected void checkSupertypeCycles(TypeSystem ts)
-            throws SemanticException {
+    protected void checkSupertypeCycles(TypeSystem ts) throws SemanticException {
         if (type.superType() != null) {
             if (!type.superType().isReference()) {
-                throw new SemanticException("Cannot extend type "
-                        + type.superType() + ".",
-                                            superClass != null
-                                                    ? superClass.position()
-                                                    : position());
+                throw new SemanticException(
+                        "Cannot extend type " + type.superType() + ".",
+                        superClass != null ? superClass.position() : position());
             }
             ReferenceType t = (ReferenceType) type.superType();
             ts.checkCycles(t);
@@ -462,8 +477,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         for (Type it : type.interfaces()) {
             if (!it.isReference()) {
                 String s = type.flags().isInterface() ? "extend" : "implement";
-                throw new SemanticException("Cannot " + s + " type " + it + ".",
-                                            position());
+                throw new SemanticException("Cannot " + s + " type " + it + ".", position());
             }
             ReferenceType t = (ReferenceType) it;
             ts.checkCycles(t);
@@ -482,25 +496,19 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             if (Report.should_report(Report.types, 3))
                 Report.report(3, "setting superclass of " + type + " to " + t);
             type.superType(t);
-        }
-        else if (type.equals(ts.Object())
+        } else if (type.equals(ts.Object())
                 || type.fullName().equals(ts.Object().fullName())
                 || flags.isInterface()) {
             // the type is an interface or ts.Object(), so it has no superclass.
             if (Report.should_report(Report.types, 3))
-                Report.report(3,
-                              "setting superclass of " + type + " to " + null);
+                Report.report(3, "setting superclass of " + type + " to " + null);
             type.superType(null);
-        }
-        else {
+        } else {
             // the superclass was not specified, and the type is not the same
             // as ts.Object() (which is typically java.lang.Object)
             // As such, the default superclass is ts.Object().
-            if (Report.should_report(Report.types,
-                                     3))
-                Report.report(3,
-                              "setting superclass of " + type + " to "
-                                      + ts.Object());
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, "setting superclass of " + type + " to " + ts.Object());
             type.superType(ts.Object());
         }
     }
@@ -508,8 +516,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     /**
      * @throws SemanticException
      */
-    protected void setInterfaces(AmbiguityRemover ar,
-            List<TypeNode> newInterfaces) throws SemanticException {
+    protected void setInterfaces(AmbiguityRemover ar, List<TypeNode> newInterfaces)
+            throws SemanticException {
         for (TypeNode tn : newInterfaces) {
             ClassType t = (ClassType) tn.type();
 
@@ -549,8 +557,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     }
 
     @Override
-    public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf,
-            ConstructorInstance defaultCI) throws SemanticException {
+    public Node addDefaultConstructor(TypeSystem ts, NodeFactory nf, ConstructorInstance defaultCI)
+            throws SemanticException {
         ConstructorInstance ci = defaultCI;
         if (ci == null) {
             throw new InternalCompilerError("addDefaultConstructor called without defaultCI set");
@@ -559,27 +567,26 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         Block block = null;
         if (type.superType() instanceof ClassType) {
             ConstructorInstance sci =
-                    ts.findConstructor((ClassType) type.superType(),
-                                       Collections.<Type> emptyList(),
-                                       type,
-                                       false);
+                    ts.findConstructor(
+                            (ClassType) type.superType(),
+                            Collections.<Type>emptyList(),
+                            type,
+                            false);
 
-            ConstructorCall cc = nf.SuperCall(position().startOf(),
-                                              Collections.<Expr> emptyList());
+            ConstructorCall cc = nf.SuperCall(position().startOf(), Collections.<Expr>emptyList());
             cc = cc.constructorInstance(sci);
             block = nf.Block(position().startOf(), cc);
-        }
-        else {
+        } else {
             block = nf.Block(position().startOf());
         }
         ConstructorDecl cd =
-                nf.ConstructorDecl(body().position().startOf(),
-                                   Flags.PUBLIC,
-                                   nf.Id(body().position().startOf(),
-                                         name.id()),
-                                   Collections.<Formal> emptyList(),
-                                   Collections.<TypeNode> emptyList(),
-                                   block);
+                nf.ConstructorDecl(
+                        body().position().startOf(),
+                        Flags.PUBLIC,
+                        nf.Id(body().position().startOf(), name.id()),
+                        Collections.<Formal>emptyList(),
+                        Collections.<TypeNode>emptyList(),
+                        block);
         cd = cd.constructorInstance(ci);
         return body(body.addMember(cd));
     }
@@ -595,16 +602,18 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                     String name = ((Named) container).name();
 
                     if (name.equals(this.name.id())) {
-                        throw new SemanticException("Cannot declare member "
-                                + "class \"" + type
-                                + "\" inside class with the " + "same name.",
-                                                    position());
+                        throw new SemanticException(
+                                "Cannot declare member "
+                                        + "class \""
+                                        + type
+                                        + "\" inside class with the "
+                                        + "same name.",
+                                position());
                     }
                 }
                 if (container.isNested()) {
                     container = container.outer();
-                }
-                else {
+                } else {
                     break;
                 }
             }
@@ -621,56 +630,51 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
                         Named nm = ctxt.find(name.id());
                         if (nm instanceof Type) {
                             Type another = (Type) nm;
-                            if (another.isClass()
-                                    && another.toClass().isLocal()) {
-                                throw new SemanticException("Cannot declare local "
-                                        + "class \"" + type
-                                        + "\" within the same "
-                                        + "method, constructor or initializer as another "
-                                        + "local class of the same name.",
-                                                            position());
+                            if (another.isClass() && another.toClass().isLocal()) {
+                                throw new SemanticException(
+                                        "Cannot declare local "
+                                                + "class \""
+                                                + type
+                                                + "\" within the same "
+                                                + "method, constructor or initializer as another "
+                                                + "local class of the same name.",
+                                        position());
                             }
                         }
-                    }
-                    catch (NoClassException e) {
+                    } catch (NoClassException e) {
                     }
                 }
             }
         }
 
         // check that inner classes do not declare member interfaces
-        if (type().isMember() && flags().isInterface()
-                && type().outer().isInnerClass()) {
+        if (type().isMember() && flags().isInterface() && type().outer().isInnerClass()) {
             // it's a member interface in an inner class.
-            throw new SemanticException("Inner classes cannot declare "
-                    + "member interfaces.", this.position());
+            throw new SemanticException(
+                    "Inner classes cannot declare " + "member interfaces.", this.position());
         }
 
         // Make sure that static members are not declared inside inner classes
-        if (type().isMember() && type().flags().isStatic()
-                && type().outer().isInnerClass()) {
-            throw new SemanticException("Inner classes cannot declare static "
-                    + "member classes.", position());
+        if (type().isMember() && type().flags().isStatic() && type().outer().isInnerClass()) {
+            throw new SemanticException(
+                    "Inner classes cannot declare static " + "member classes.", position());
         }
 
         if (type.superType() != null) {
-            if (!type.superType().isClass()
-                    || type.superType().toClass().flags().isInterface()) {
-                throw new SemanticException("Cannot extend non-class \""
-                        + type.superType() + "\".", position());
+            if (!type.superType().isClass() || type.superType().toClass().flags().isInterface()) {
+                throw new SemanticException(
+                        "Cannot extend non-class \"" + type.superType() + "\".", position());
             }
 
             if (type.superType().toClass().flags().isFinal()) {
-                throw new SemanticException("Cannot extend final class \""
-                        + type.superType() + "\".", position());
+                throw new SemanticException(
+                        "Cannot extend final class \"" + type.superType() + "\".", position());
             }
 
             if (type.equals(tc.typeSystem().Object())
-                    || type.fullName()
-                           .equals(tc.typeSystem().Object().fullName())) {
-                throw new SemanticException("Class \"" + type
-                        + "\" cannot have a superclass.",
-                                            superClass.position());
+                    || type.fullName().equals(tc.typeSystem().Object().fullName())) {
+                throw new SemanticException(
+                        "Class \"" + type + "\" cannot have a superclass.", superClass.position());
             }
         }
 
@@ -679,23 +683,22 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             Type t = tn.type();
 
             if (!t.isClass() || !t.toClass().flags().isInterface()) {
-                throw new SemanticException("Superinterface " + t + " of "
-                        + type + " is not an interface.", tn.position());
+                throw new SemanticException(
+                        "Superinterface " + t + " of " + type + " is not an interface.",
+                        tn.position());
             }
 
             if (type.equals(tc.typeSystem().Object())
-                    || type.fullName()
-                           .equals(tc.typeSystem().Object().fullName())) {
-                throw new SemanticException("Class " + type
-                        + " cannot have a superinterface.", tn.position());
+                    || type.fullName().equals(tc.typeSystem().Object().fullName())) {
+                throw new SemanticException(
+                        "Class " + type + " cannot have a superinterface.", tn.position());
             }
 
             if (superInterfaces.contains(t)) {
                 // A compile-time error occurs if the same interface is
                 // mentioned two or more times in a single implements clause.
                 // See JLS 2nd Ed. | 8.1.4
-                throw new SemanticException("Duplicate interface " + t,
-                                            tn.position());
+                throw new SemanticException("Duplicate interface " + t, tn.position());
             }
             superInterfaces.add(t);
         }
@@ -712,8 +715,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             if (type.isLocal()) {
                 ts.checkLocalClassFlags(type.flags());
             }
-        }
-        catch (SemanticException e) {
+        } catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), position());
         }
 
@@ -748,7 +750,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     @Override
     public String toString() {
         return flags.clearInterface().translate()
-                + (flags.isInterface() ? "interface " : "class ") + name + " "
+                + (flags.isInterface() ? "interface " : "class ")
+                + name
+                + " "
                 + body;
     }
 
@@ -759,15 +763,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
         w.begin(0);
         if (flags.isInterface()) {
             w.write(flags.clearInterface().clearAbstract().translate());
-        }
-        else {
+        } else {
             w.write(flags.translate());
         }
 
         if (flags.isInterface()) {
             w.write("interface ");
-        }
-        else {
+        } else {
             w.write("class ");
         }
 
@@ -783,13 +785,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
             w.allowBreak(2);
             if (flags.isInterface()) {
                 w.write("extends ");
-            }
-            else {
+            } else {
                 w.write("implements ");
             }
 
             w.begin(0);
-            for (Iterator<TypeNode> i = interfaces().iterator(); i.hasNext();) {
+            for (Iterator<TypeNode> i = interfaces().iterator(); i.hasNext(); ) {
                 TypeNode tn = i.next();
                 print(tn, w, tr);
 
@@ -843,15 +844,14 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
     }
 
     @Override
-    public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-            throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         /*
         // Don't do anything special for member classes; the disambiguation passes
         // for the container have already been run and visited this class.
         if (type.isMember()) {
             return null;
         }
-        
+
         ClassDecl n = this;
         Node old = n;
 
@@ -884,13 +884,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl, ClassDeclOps {
 
     @Override
     public Node copy(NodeFactory nf) {
-        return nf.ClassDecl(position,
-                            flags,
-                            name,
-                            superClass,
-                            interfaces,
-                            body,
-                            javadoc);
+        return nf.ClassDecl(position, flags, name, superClass, interfaces, body, javadoc);
     }
 
     @Override

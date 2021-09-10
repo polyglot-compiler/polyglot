@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -49,13 +49,10 @@ public class JL5Translator extends Translator {
 
     private final boolean removeJava5isms;
 
-    public JL5Translator(Job job, TypeSystem ts, NodeFactory nf,
-            TargetFactory tf) {
+    public JL5Translator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
         super(job, ts, nf, tf);
-        translateEnums =
-                ((JL5Options) job.extensionInfo().getOptions()).translateEnums;
-        removeJava5isms =
-                ((JL5Options) job.extensionInfo().getOptions()).removeJava5isms;
+        translateEnums = ((JL5Options) job.extensionInfo().getOptions()).translateEnums;
+        removeJava5isms = ((JL5Options) job.extensionInfo().getOptions()).removeJava5isms;
     }
 
     public boolean removeJava5isms() {
@@ -72,11 +69,7 @@ public class JL5Translator extends Translator {
                 ClassDecl cd = (ClassDecl) n;
                 if (cd.superClass() != null
                         && cd.superClass().type().isClass()
-                        && cd.superClass()
-                             .type()
-                             .toClass()
-                             .fullName()
-                             .equals("java.lang.Enum")) {
+                        && cd.superClass().type().toClass().fullName().equals("java.lang.Enum")) {
                     // The super class is Enum, so this is really an enum declaration.
                     RemoveEnums.prettyPrintClassDeclAsEnum(cd, w, this);
                     return;
@@ -95,23 +88,21 @@ public class JL5Translator extends Translator {
                 }
                 w.write(translateType(erastype));
                 return;
-            }
-            else if (!tn.isDisambiguated()) {
+            } else if (!tn.isDisambiguated()) {
                 lang().prettyPrint(tn, w, this);
                 return;
-            }
-            else {
+            } else {
                 w.write(tn.type().translate(this.context()));
                 return;
             }
         }
-//        if (n instanceof TypeNode && ((TypeNode)n).type() instanceof TypeVariable) {
-//            // Don't print out the type variable, print out its superclass.
-//            TypeNode tn = (TypeNode) n;
-//            TypeVariable tv = (TypeVariable) tn.type();
-//            translateNode(tn.type(tv.erasureType()), w);
-//            return;
-//        }
+        //        if (n instanceof TypeNode && ((TypeNode)n).type() instanceof TypeVariable) {
+        //            // Don't print out the type variable, print out its superclass.
+        //            TypeNode tn = (TypeNode) n;
+        //            TypeVariable tv = (TypeVariable) tn.type();
+        //            translateNode(tn.type(tv.erasureType()), w);
+        //            return;
+        //        }
 
         lang().prettyPrint(n, w, this);
     }
@@ -121,12 +112,10 @@ public class JL5Translator extends Translator {
             // For C<T1,...,Tn>, just print C.
             JL5SubstClassType jct = (JL5SubstClassType) t;
             return jct.base().translate(this.context);
-        }
-        else if (t instanceof ArrayType) {
+        } else if (t instanceof ArrayType) {
             ArrayType at = (ArrayType) t;
             return translateType(at.base()) + "[]";
-        }
-        else {
+        } else {
             return t.translate(this.context());
         }
     }

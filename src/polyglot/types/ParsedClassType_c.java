@@ -13,12 +13,12 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
  * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
- * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan 
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
  * Research Fellowship, and an Intel Research Ph.D. Fellowship.
  *
  * See README for contributors.
@@ -45,7 +45,7 @@ import polyglot.util.TypeInputStream;
 /**
  * ParsedClassType
  *
- * Overview: 
+ * Overview:
  * A ParsedClassType represents a information that has been parsed (but not
  * necessarily type checked) from a .java file.
  **/
@@ -87,8 +87,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
         super();
     }
 
-    public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init,
-            Source fromSource) {
+    public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init, Source fromSource) {
         super(ts);
         this.fromSource = fromSource;
 
@@ -146,19 +145,18 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
     public ClassType outer() {
         if (isTopLevel()) return null;
         if (outer == null)
-            throw new InternalCompilerError("Nested class " + this
-                    + " must have outer classes.");
+            throw new InternalCompilerError("Nested class " + this + " must have outer classes.");
 
         return outer;
     }
 
     @Override
     public String name() {
-//        if (isAnonymous())
-//            throw new InternalCompilerError("Anonymous classes cannot have names.");
-//
-//        if (name == null)
-//            throw new InternalCompilerError("Non-anonymous classes must have names.");
+        //        if (isAnonymous())
+        //            throw new InternalCompilerError("Anonymous classes cannot have names.");
+        //
+        //        if (name == null)
+        //            throw new InternalCompilerError("Non-anonymous classes must have names.");
         return name;
     }
 
@@ -208,16 +206,14 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
     public void setContainer(ReferenceType container) {
         if (container instanceof ClassType && isMember()) {
             outer((ClassType) container);
-        }
-        else {
+        } else {
             throw new InternalCompilerError("Only member classes can have containers.");
         }
     }
 
     @Override
     public void name(String name) {
-        if (isAnonymous())
-            throw new InternalCompilerError("Anonymous classes cannot have names.");
+        if (isAnonymous()) throw new InternalCompilerError("Anonymous classes cannot have names.");
         this.name = name;
     }
 
@@ -477,8 +473,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
 
             for (MemberInstance mi : l) {
                 if (!mi.isCanonical()) {
-                    if (Report.should_report("ambcheck", 2))
-                        Report.report(2, mi + " is ambiguous");
+                    if (Report.should_report("ambcheck", 2)) Report.report(2, mi + " is ambiguous");
                     count++;
                 }
             }
@@ -523,8 +518,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
         if (o instanceof PlaceHolder && o != this) {
             out.writeBoolean(true);
             out.writeObject(o);
-        }
-        else {
+        } else {
             out.writeBoolean(false);
         }
         out.defaultWriteObject();
@@ -533,8 +527,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType {
     @SuppressWarnings("unused")
     private static final long readObjectVersionUID = 1L;
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         // If you update this method in an incompatible way, increment
         // readObjectVersionUID.
 
