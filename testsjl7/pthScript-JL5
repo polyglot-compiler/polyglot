@@ -10,8 +10,8 @@ javac ["../testsjl5/"] "-d java-out -cp ." {
 	java-src/Call02B.java;
 	java-src/Call02D.java;
 }
- 
-polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath java-out -assert -noserial -postopts \"-source 1.7 -Xlint\\:-options\" -morepermissiveinference" {
+
+polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
         Assert01.jl5;
         HexFloatingPoint.jl5;
         Generics01.jl5;
@@ -34,7 +34,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath ja
         Generics18.jl5 (Post, "Xlint");
         Generics19.jl5;
         Generics20.jl5 (Semantic);
-        Generics21.jl5 (Semantic); 
+        Generics21.jl5 (Semantic);
         Generics22.jl5 (Semantic);
         Generics23.jl5 (Semantic);
         Generics24.jl5 (Semantic, "Wrong number of type parameters"),
@@ -42,7 +42,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath ja
                        (Semantic, "Cannot instantiate .* because it has no formals");
         Generics25.jl5 (Semantic);
         Generics26.jl5 (Post, "Xlint");
-        Generics27.jl5;        
+        Generics27.jl5;
         Generics28.jl5 (Post, "Xlint");
         Generics29.jl5 (Post, "Xlint");
         Generics30.jl5 (Semantic);
@@ -50,7 +50,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath ja
         Generics32.jl5;
         Generics33.jl5 (Semantic);
         Generics34.jl5;
-        Generics35.jl5 (Semantic); 
+        Generics35.jl5 (Semantic);
         Generics36.jl5;
         Generics37.jl5;
         Generics38.jl5;
@@ -282,24 +282,24 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../testsjl5/"] "-sx jl5 -d out -classpath ja
         wildcard7.jl5 (Semantic), (Semantic), (Semantic);
         wildcard7a.jl5;
         wildcard8.jl5 (Semantic);
-        wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"); 
-        wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match"); 
-        wildcard12a.jl5(Semantic); 
-        wildcard12b.jl5(Semantic); 
-        wildcard12c.jl5(Semantic); 
-        wildcard12d.jl5(Semantic); 
-        wildcard12e.jl5; 
-        wildcard13a.jl5 (Semantic); 
-        wildcard13b.jl5 (Semantic); 
-        wildcard13c.jl5 (Semantic); 
-        wildcard13d.jl5; 
-        wildcard14a.jl5 (Semantic); 
-        wildcard14b.jl5 (Semantic); 
-        wildcard14c.jl5 (Semantic); 
-        wildcard14d.jl5 ; 
-        wildcard15.jl5 (Semantic),(Semantic); 
+        wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match");
+        wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match");
+        wildcard12a.jl5(Semantic);
+        wildcard12b.jl5(Semantic);
+        wildcard12c.jl5(Semantic);
+        wildcard12d.jl5(Semantic);
+        wildcard12e.jl5;
+        wildcard13a.jl5 (Semantic);
+        wildcard13b.jl5 (Semantic);
+        wildcard13c.jl5 (Semantic);
+        wildcard13d.jl5;
+        wildcard14a.jl5 (Semantic);
+        wildcard14b.jl5 (Semantic);
+        wildcard14c.jl5 (Semantic);
+        wildcard14d.jl5 ;
+        wildcard15.jl5 (Semantic),(Semantic);
         wildcard16.jl5 (Semantic, "Cannot assign long to");
-        wildcard17.jl5 (Semantic),(Semantic),(Semantic); 
+        wildcard17.jl5 (Semantic),(Semantic),(Semantic);
         wildcard18.jl5 (Semantic);
         wildcard19.jl5 (Semantic, "not a subtype .* bound") , (Semantic);
         wildcard20.jl5 (Semantic, "cannot be called");

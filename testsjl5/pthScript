@@ -15,16 +15,16 @@
 #                    |  ( ErrorKind, "RegExp" )
 #                    |  ( "RegExp" )
 #                    |  ( )
-#      ErrorKind    :   one of, or a unique prefix of one of the following 
-#                       strings: "Warning", "Internal Error", "I/O Error", 
+#      ErrorKind    :   one of, or a unique prefix of one of the following
+#                       strings: "Warning", "Internal Error", "I/O Error",
 #                       "Lexical Error", "Syntax Error", "Semantic Error"
 #                       or "Post-compiler Error".
-#      Filename     :   the name of a file. Is interpreted from the 
+#      Filename     :   the name of a file. Is interpreted from the
 #                       directory where pth is run.
 #      LitString    :   a literal string, enclosed in quotes.
-#      RegExp       :   a regular expression, as in java.util.regex; 
+#      RegExp       :   a regular expression, as in java.util.regex;
 #                       is always enclosed in quotes.
-#      CmdLineArgs  :   additional command line args for the Polyglot 
+#      CmdLineArgs  :   additional command line args for the Polyglot
 #                       compiler; is always enclosed in quotes.
 
 # Compile some java classes first
@@ -39,8 +39,8 @@ javac "-d java-out -cp ." {
 	java-src/Call02B.java;
 	java-src/Call02D.java;
 }
- 
-polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \"-source 1.5 -Xlint\\:-options\" -morepermissiveinference" {
+
+polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \" -Xlint\\:-options\" -morepermissiveinference" {
         Access01.jl5;
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;
@@ -224,7 +224,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Generics18.jl5 (Post, "Xlint");
         Generics19.jl5;
         Generics20.jl5 (Semantic);
-        Generics21.jl5 (Semantic); 
+        Generics21.jl5 (Semantic);
         Generics22.jl5 (Semantic);
         Generics23.jl5 (Semantic);
         Generics24.jl5 (Semantic, "Wrong number of type parameters"),
@@ -232,7 +232,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
                        (Semantic, "Cannot instantiate .* because it has no formals");
         Generics25.jl5 (Semantic);
         Generics26.jl5 (Post, "Xlint");
-        Generics27.jl5;        
+        Generics27.jl5;
         Generics28.jl5 (Post, "Xlint");
         Generics29.jl5 (Post, "Xlint");
         Generics30.jl5 (Semantic);
@@ -240,7 +240,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Generics32.jl5;
         Generics33.jl5 (Semantic);
         Generics34.jl5;
-        Generics35.jl5 (Semantic); 
+        Generics35.jl5 (Semantic);
         Generics36.jl5;
         Generics37.jl5;
         Generics38.jl5;
@@ -435,24 +435,24 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         wildcard7a.jl5;
         wildcard8.jl5 (Semantic);
         wildcard9.jl5; # TODO
-        wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"); 
-        wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match"); 
-        wildcard12a.jl5(Semantic); 
-        wildcard12b.jl5(Semantic); 
-        wildcard12c.jl5(Semantic); 
-        wildcard12d.jl5(Semantic); 
-        wildcard12e.jl5; 
-        wildcard13a.jl5 (Semantic); 
-        wildcard13b.jl5 (Semantic); 
-        wildcard13c.jl5 (Semantic); 
-        wildcard13d.jl5; 
-        wildcard14a.jl5 (Semantic); 
-        wildcard14b.jl5 (Semantic); 
-        wildcard14c.jl5 (Semantic); 
-        wildcard14d.jl5 ; 
-        wildcard15.jl5 (Semantic),(Semantic); 
+        wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match");
+        wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match");
+        wildcard12a.jl5(Semantic);
+        wildcard12b.jl5(Semantic);
+        wildcard12c.jl5(Semantic);
+        wildcard12d.jl5(Semantic);
+        wildcard12e.jl5;
+        wildcard13a.jl5 (Semantic);
+        wildcard13b.jl5 (Semantic);
+        wildcard13c.jl5 (Semantic);
+        wildcard13d.jl5;
+        wildcard14a.jl5 (Semantic);
+        wildcard14b.jl5 (Semantic);
+        wildcard14c.jl5 (Semantic);
+        wildcard14d.jl5 ;
+        wildcard15.jl5 (Semantic),(Semantic);
         wildcard16.jl5 (Semantic, "Cannot assign long to");
-        wildcard17.jl5 (Semantic),(Semantic),(Semantic); 
+        wildcard17.jl5 (Semantic),(Semantic),(Semantic);
         wildcard18.jl5 (Semantic);
         wildcard19.jl5 (Semantic, "not a subtype .* bound") , (Semantic);
         wildcard20.jl5 (Semantic, "cannot be called");
@@ -464,7 +464,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
 
 # Now run the tests again removing the Java 5-isms.
 # This one uses 1.4 to suppress the warning about raw classes.
-polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -postopts \"-Xlint\\:-options -source 1.4 -target 1.4\" -morepermissiveinference" {
+polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
         Access01.jl5;
         Access02.jl5;
         Access03A.jl5  Access03B.jl5;
@@ -647,7 +647,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Generics18.jl5;
         Generics19.jl5;
         Generics20.jl5 (Semantic);
-        Generics21.jl5 (Semantic); 
+        Generics21.jl5 (Semantic);
         Generics22.jl5 (Semantic);
         Generics23.jl5 (Semantic);
         Generics24.jl5 (Semantic, "Wrong number of type parameters"),
@@ -655,7 +655,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
                        (Semantic, "Cannot instantiate .* because it has no formals");
         Generics25.jl5 (Semantic);
         Generics26.jl5;
-        Generics27.jl5; 
+        Generics27.jl5;
         Generics28.jl5;
         Generics29.jl5;
         Generics30.jl5 (Semantic);
@@ -701,7 +701,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Inherit01.jl5 (Semantic, "Name clash");
         Inherit02.jl5 (Semantic, "Name clash");
         Inherit03.jl5 (Semantic, "Name clash"), (Semantic, "Name clash");
-        InnerClass01.jl5; 
+        InnerClass01.jl5;
         InnerClass02.jl5;
         InnerClass03.jl5;
         InnerClass04.jl5;
@@ -840,7 +840,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         VarArgs11.jl5 (Semantic, "Method .* cannot be called");
         VerySimple.jl5;
         WildCard01.jl5;
-        WildCard02.jl5 (Semantic, "does not match"); 
+        WildCard02.jl5 (Semantic, "does not match");
         WildCard03.jl5;
         WildCard04.jl5;
         WildCard05.jl5;
@@ -859,24 +859,24 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         wildcard7a.jl5;
         wildcard8.jl5 (Semantic);
         wildcard9.jl5; # TODO
-        wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"); 
-        wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match"); 
-        wildcard12a.jl5(Semantic); 
-        wildcard12b.jl5(Semantic); 
-        wildcard12c.jl5(Semantic); 
-        wildcard12d.jl5(Semantic); 
+        wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match");
+        wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match");
+        wildcard12a.jl5(Semantic);
+        wildcard12b.jl5(Semantic);
+        wildcard12c.jl5(Semantic);
+        wildcard12d.jl5(Semantic);
         wildcard12e.jl5;
-        wildcard13a.jl5 (Semantic); 
-        wildcard13b.jl5 (Semantic); 
-        wildcard13c.jl5 (Semantic); 
-        wildcard13d.jl5; 
-        wildcard14a.jl5 (Semantic); 
-        wildcard14b.jl5 (Semantic); 
-        wildcard14c.jl5 (Semantic); 
-        wildcard14d.jl5 ; 
-        wildcard15.jl5 (Semantic),(Semantic); 
+        wildcard13a.jl5 (Semantic);
+        wildcard13b.jl5 (Semantic);
+        wildcard13c.jl5 (Semantic);
+        wildcard13d.jl5;
+        wildcard14a.jl5 (Semantic);
+        wildcard14b.jl5 (Semantic);
+        wildcard14c.jl5 (Semantic);
+        wildcard14d.jl5 ;
+        wildcard15.jl5 (Semantic),(Semantic);
         wildcard16.jl5 (Semantic, "Cannot assign long to");
-        wildcard17.jl5 (Semantic),(Semantic),(Semantic); 
+        wildcard17.jl5 (Semantic),(Semantic),(Semantic);
         wildcard18.jl5 (Semantic);
         wildcard19.jl5 (Semantic, "not a subtype .* bound") , (Semantic);
         wildcard20.jl5 (Semantic, "cannot be called");
@@ -886,14 +886,14 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         wildcard24.jl5;
 }
 
-polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options -source 1.5\" -morepermissivecasts" {
+polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissivecasts" {
         NumericConversion01.jl5;
         PermissiveCasts01.jl5;
         PermissiveCasts02.jl5 (Semantic, "does not match");
         PermissiveCasts03.jl5 (Semantic, "Cannot cast");
 }
 
-polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -postopts \"-Xlint\\:-options -source 1.4\" -morepermissivecasts" {
+polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissivecasts" {
         NumericConversion01.jl5;
         PermissiveCasts01.jl5;
         PermissiveCasts02.jl5 (Semantic, "does not match");
@@ -901,7 +901,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
 }
 
 # Use source/target 1.5 since we're expecting CovariantReturn to be allowed
-polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -leaveCovariantReturns -enumImplClass MyEnum -assert -noserial -postopts \"-Xlint\\:-options -source 1.5 -target 1.5\" -morepermissiveinference" {
+polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -leaveCovariantReturns -enumImplClass MyEnum -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
         CovariantRet01.jl5;
         CovariantRet02.jl5;
         CovariantRet03.jl5;

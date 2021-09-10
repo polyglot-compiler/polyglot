@@ -13,16 +13,16 @@
 #                    |  ( ErrorKind, "RegExp" )
 #                    |  ( "RegExp" )
 #                    |  ( )
-#      ErrorKind    :   one of, or a unique prefix of one of the following 
-#                       strings: "Warning", "Internal Error", "I/O Error", 
+#      ErrorKind    :   one of, or a unique prefix of one of the following
+#                       strings: "Warning", "Internal Error", "I/O Error",
 #                       "Lexical Error", "Syntax Error", "Semantic Error"
 #                       or "Post-compiler Error".
-#      Filename     :   the name of a file. Is interpreted from the 
+#      Filename     :   the name of a file. Is interpreted from the
 #                       directory where pth is run.
 #      LitString    :   a literal string, enclosed in quotes.
-#      RegExp       :   a regular expression, as in java.util.regex; 
+#      RegExp       :   a regular expression, as in java.util.regex;
 #                       is always enclosed in quotes.
-#      CmdLineArgs  :   additional command line args for the Polyglot 
+#      CmdLineArgs  :   additional command line args for the Polyglot
 #                       compiler; is always enclosed in quotes.
 
 # Compile some java classes first
@@ -31,7 +31,7 @@ javac "-d java-out -cp ." {
 	java-src/ClassFile02.java;
 }
 
-polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-source 1.6\"" {
+polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out" {
         AnonymousClass.jl ;
         AnonymousClass02.jl ;
         AnonymousClass03.jl;
@@ -82,20 +82,20 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
         ClassFile01.jl;
         ClassFile02.jl (Semantic, "incompatible return type");
         ClassLit.jl ;
-	CombRule1.jl; 
+	CombRule1.jl;
 	CombRule2.jl (Semantic, "Method.*cannot be called with arguments");
 	CombRule3.jl (Semantic, "Method.*cannot be called with arguments");
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
 	ConformanceCheck2.jl (Semantic, "cannot override.*throw set.*is not a subset");
-        ConformanceCheck3.jl ;        
+        ConformanceCheck3.jl ;
         ConformanceCheck4.jl ConformanceCheck4a.jl (Semantic, "should be declared abstract");
-        ConformanceCheck5.jl ;        
-        ConformanceCheck6.jl ;         
-        ConformanceCheck7.jl (Semantic, "should be declared abstract");        
-        packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
-        ConformanceCheck9.jl ;         
-        ConformanceCheck10.jl packA/ConformanceCheck10a.jl packA/ConformanceCheck10b.jl; 
+        ConformanceCheck5.jl ;
+        ConformanceCheck6.jl ;
+        ConformanceCheck7.jl (Semantic, "should be declared abstract");
+        packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract");
+        ConformanceCheck9.jl ;
+        ConformanceCheck10.jl packA/ConformanceCheck10a.jl packA/ConformanceCheck10b.jl;
         packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Method.*inaccessible");
         package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "Method.*inaccessible");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
@@ -167,9 +167,9 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
         Init6.jl ;
         Init7.jl ; Init8.jl ; Init9.jl ;
-	Init10.jl; 
-	Init11.jl; 
-	Init12.jl; 
+	Init10.jl;
+	Init11.jl;
+	Init12.jl;
 	Init13.jl;
 	Init14.jl;
 	Init15.jl;
@@ -231,8 +231,8 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
                         (Lexical, "Long literal.*out of range"),
                         (Syntax);
         Local.jl ;
-        LocalClass.jl ; 
-#        LocalClass2.jl ; 
+        LocalClass.jl ;
+#        LocalClass2.jl ;
         LocalClass3.jl ; LocalClass4.jl ;
 	LocalClass5.jl ;
 	LocalClass6.jl (Semantic, "Circular inheritance");
@@ -269,7 +269,7 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
         Package01a.jl Package01b.jl Package01c.jl (Semantic, "imported type .* not canonical");
         Package02.jl (Semantic, "imported type .* not visible");
         Prim.jl ;
-        Prec.jl ; 
+        Prec.jl ;
 	Prec2.jl ;
 	Prec3.jl ;
 	Protection.jl (Semantic, "Cannot declare abstract method with flags static"),
@@ -303,7 +303,7 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
         StaticOps.jl ;
         SuperCall01.jl;
         Switch1.jl ; Switch2.jl ; Switch3.jl ; Switch4.jl ; Switch5.jl ;
-        Switch6.jl ; 
+        Switch6.jl ;
 #        Switch7.jl ;
         Switch08.jl (Semantic, "not assignable");
         Synchronized01.jl (Semantic, "Cannot synchronize");
@@ -339,8 +339,8 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
         BadFinalInit11.jl (Semantic, "Final field .* might already have been initialized");
         BadFinalInit12.jl (Semantic, "Cannot assign a value to final field");
         BadFinalInit14.jl (Semantic, "Cannot assign a value to final field");
-        BadFinalInit15.jl (Semantic, "Final variable .* might already have been initialized"); 
-        BadFinalInit16.jl (Semantic, "Local variable .* may not have been initialized"); 
+        BadFinalInit15.jl (Semantic, "Final variable .* might already have been initialized");
+        BadFinalInit16.jl (Semantic, "Local variable .* may not have been initialized");
         BadFinalInit17.jl (Semantic, "Final field .* might not have been initialized");
         BadFinalInit18.jl (Semantic, "Cannot assign a value to final field");
         BadIncrement1.jl (Semantic, "Operand of .* operator must be a variable");
@@ -367,11 +367,11 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
 	BadMultipleVarDef.jl (Semantic, "Local variable .* multiply defined"),
 			     (Semantic, "Local variable .* multiply defined");
 	BadOverride.jl (Semantic, "cannot override.*attempting to assign weaker access privileges");
-	BadPrim.jl (Semantic, "Method.*cannot be called with arguments"); 
+	BadPrim.jl (Semantic, "Method.*cannot be called with arguments");
 	BadProt.jl (Semantic, "Interface methods must be public");
 	BadReferences.jl (Semantic, "Member.*ambiguous");
 	BadReferences2.jl (Semantic, "Field.*ambiguous");
-	BadStaticContext.jl (Semantic); 
+	BadStaticContext.jl (Semantic);
         BadSwitch1.jl (Semantic, "Case label must be an integral constant");
 	BadSwitch2.jl (Semantic, "Duplicate case label");
 	Constants12.jl (Semantic, "Duplicate case label"),
@@ -384,21 +384,21 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
         CircularInheritance2.jl (Semantic, "Circular inheritance");
         CircularInheritance3.jl (Semantic, "Circular inheritance");
 	Errors.jl (Semantic, "Method.*cannot be called with arguments");
-	Errors2.jl (Semantic, "Could not find type"); 
-	LabeledBreak2.jl (Semantic, "Unreachable statement"); 
+	Errors2.jl (Semantic, "Could not find type");
+	LabeledBreak2.jl (Semantic, "Unreachable statement");
         InitCheckerBug.jl ;
-	NoInit1.jl (Semantic, "Local variable .* may not have been initialized"); 
-	NoInit10.jl (Semantic, "Local variable .* may not have been initialized"); 
-	NoInit11.jl (Semantic, "Local variable .* may not have been initialized"); 
-	NoInit12.jl (Semantic, "Local variable .* may not have been initialized"); 
-	NoInit2.jl (Semantic, "Local variable .* may not have been initialized"); 
+	NoInit1.jl (Semantic, "Local variable .* may not have been initialized");
+	NoInit10.jl (Semantic, "Local variable .* may not have been initialized");
+	NoInit11.jl (Semantic, "Local variable .* may not have been initialized");
+	NoInit12.jl (Semantic, "Local variable .* may not have been initialized");
+	NoInit2.jl (Semantic, "Local variable .* may not have been initialized");
 	NoInit3.jl (Semantic, "Unreachable statement");
-	NoInit4.jl (Semantic, "Local variable .* may not have been initialized"); 
-	NoInit5.jl (Semantic, "Local variable .* may not have been initialized"); 
-	NoInit6.jl (Semantic, "Local variable .* may not have been initialized"); 
-	NoInit7.jl (Semantic, "Local variable .* may not have been initialized"); 
-	NoInit8.jl (Semantic, "Local variable .* may not have been initialized"); 
-	NoInit9.jl (Semantic, "Local variable .* may not have been initialized"); 
+	NoInit4.jl (Semantic, "Local variable .* may not have been initialized");
+	NoInit5.jl (Semantic, "Local variable .* may not have been initialized");
+	NoInit6.jl (Semantic, "Local variable .* may not have been initialized");
+	NoInit7.jl (Semantic, "Local variable .* may not have been initialized");
+	NoInit8.jl (Semantic, "Local variable .* may not have been initialized");
+	NoInit9.jl (Semantic, "Local variable .* may not have been initialized");
 	StaticContext2.jl (Semantic, "Inner classes cannot declare static methods");
 	NoReturn1.jl  (Semantic, "Missing return statement");
 	NoReturn2.jl (Semantic, "Missing return statement");
@@ -427,29 +427,29 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out -postopts \"-sour
 	DoubleFlags.jl (Syntax), ();
 
         // on the following file, javac produces an error, but we intentionally do not.
-        //  BadFinalInit13.jl (Post); 
+        //  BadFinalInit13.jl (Post);
 
-	BadForwardRef.jl (Semantic, "Illegal forward ref"); 
-	BadForwardRef2.jl (Semantic, "Illegal forward ref"); 
-	BadForwardRef3.jl (Semantic, "Illegal forward ref"); 
-	BadForwardRef04.jl (Semantic, "Illegal forward ref"); 
+	BadForwardRef.jl (Semantic, "Illegal forward ref");
+	BadForwardRef2.jl (Semantic, "Illegal forward ref");
+	BadForwardRef3.jl (Semantic, "Illegal forward ref");
+	BadForwardRef04.jl (Semantic, "Illegal forward ref");
         Continue1.jl (Semantic, "Target.*not found"), (), (), ();
         Continue2.jl (Semantic, "must be a loop"), (), (), ();
-	ForwardRef4.jl (Semantic, "Illegal forward ref"); 
-	ForwardRef5.jl; 
+	ForwardRef4.jl (Semantic, "Illegal forward ref");
+	ForwardRef5.jl;
 	// the following test has exactly 4 errors in it
-	ForwardRef6.jl (Semantic, "Illegal forward ref"), 
-		       (Semantic, "Illegal forward ref"), 
-		       (Semantic, "Illegal forward ref"), 
-		       (Semantic, "Illegal forward ref"); 
+	ForwardRef6.jl (Semantic, "Illegal forward ref"),
+		       (Semantic, "Illegal forward ref"),
+		       (Semantic, "Illegal forward ref"),
+		       (Semantic, "Illegal forward ref");
 	DefAssign01.jl (Semantic, "Final field \"x\" might not have been initialized");
 }
 
-polyglot.frontend.JLExtensionInfo "-d out -postopts \"-source 1.6\"" {
+polyglot.frontend.JLExtensionInfo "-d out" {
 	package3/name/ClassPackConflict.jl;
 }
 
-polyglot.frontend.JLExtensionInfo "-d insensTest -cp insensTest -postopts \"-source 1.6\"" {
+polyglot.frontend.JLExtensionInfo "-d insensTest -cp insensTest" {
 	Insens.jl;
 	InsensBug.jl;
 }
