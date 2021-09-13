@@ -3,10 +3,10 @@ class Test {
 	<T> T method(T a, T b) {
 	   return null;
 	}
-	
+
 	void test() {
-	   Comparable<? extends Comparable<? extends Comparable<?>>> t = method(new String(), new Integer(5));
+	   Comparable<? extends Comparable<? extends Comparable<?>>> t = method(new String(), Integer.valueOf(5));
 	   String a = method("5",4);
-	   
+
 	}
 }
