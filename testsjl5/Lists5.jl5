@@ -4,6 +4,6 @@ class C {
     void m() {
 	List<Object> l = new LinkedList<Object>();
 	l.add("hello");
-	l.add(new Integer(3));
+	l.add(Integer.valueOf(3));
     }
 }

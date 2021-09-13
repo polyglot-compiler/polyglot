@@ -378,8 +378,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         StringTest.jl5;
         StringTest01.jl5;
         Switch01.jl5;
-        Switch02.jl5 (Semantic, "Case label");
-        Switch03.jl5 (Semantic, "Case label");
+        Switch02.jl5 (Semantic, "Case label"), (Semantic, "Case label");
+        Switch03.jl5 (Semantic, "Case label"), (Semantic, "Case label");
         TC12.jl5;
         TC195.jl5;
         test1.jl5;
@@ -802,8 +802,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         StringTest.jl5;
         StringTest01.jl5;
         Switch01.jl5;
-        Switch02.jl5 (Semantic, "Case label");
-        Switch03.jl5 (Semantic, "Case label");
+        Switch02.jl5 (Semantic, "Case label"), (Semantic, "Case label");
+        Switch03.jl5 (Semantic, "Case label"), (Semantic, "Case label");
         TC12.jl5;
         TC195.jl5;
         test1.jl5;

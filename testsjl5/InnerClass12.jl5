@@ -1,28 +1,28 @@
-class Seq { 
-	Object head; 
-	Seq tail; 
-	Seq() { 
-		this(null, null); 
-	} 
-	boolean isEmpty() { 
-		return tail == null; 
+class Seq {
+	Object head;
+	Seq tail;
+	Seq() {
+		this(null, null);
 	}
-	Seq(Object head, Seq tail) { 
-		this.head = head; 
-		this.tail = tail; 
+	boolean isEmpty() {
+		return tail == null;
 	}
-	class Zipper<S> { 
-		Seq zip(Seq that) { 
+	Seq(Object head, Seq tail) {
+		this.head = head;
+		this.tail = tail;
+	}
+	class Zipper<S> {
+		Seq zip(Seq that) {
 			if (isEmpty() || that.isEmpty())
-				return new Seq(); 
-			else 
-				return new Seq(new Pair<Object,Object>(Seq.this.head, that.head), 
+				return new Seq();
+			else
+				return new Seq(new Pair<Object,Object>(Seq.this.head, that.head),
 						tail.new Zipper<S>().zip(that.tail));
 		}
 	}
 }
 class Pair<T, S> {
-	T fst; 
+	T fst;
 	S snd;
 	Pair(T f, S s) {
 		fst = f; snd = s;
@@ -30,14 +30,14 @@ class Pair<T, S> {
 }
 
 class Client {
-	Seq strs = 
-			new Seq("a", new Seq("b", 
+	Seq strs =
+			new Seq("a", new Seq("b",
 					new Seq()));
-	Seq nums = 
-			new Seq(new Integer(1), 
-					new Seq(new Double(1.5), 
+	Seq nums =
+			new Seq(Integer.valueOf(1),
+					new Seq(Double.valueOf(1.5),
 							new Seq()));
-	Seq.Zipper<Number> zipper = 
+	Seq.Zipper<Number> zipper =
 			strs.new Zipper<Number>();
 	Seq combined = zipper.zip(nums);
 }

@@ -1,5 +1,5 @@
     class Box<T> {
-      private T t; 
+      private T t;
 
       public Box(T t) { this.t = t; }
       public void put( T t) { this.t = t;}
@@ -11,7 +11,7 @@
     class Test {
       public static void main(String[] args) {
         Box<? super Long > box = new Box<Number>(0L);
-        Number number = new Integer(1);
+        Number number = Integer.valueOf(1);
 
         box.put(1L);      // ok
         box.put(null);     // ok
@@ -21,4 +21,4 @@
 
        Object o = box.take(); // ok
       }
-    } 
+    }
