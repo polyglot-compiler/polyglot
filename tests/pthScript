@@ -43,7 +43,6 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out" {
         Assert03.jl (Semantic, "Local variable .* may not have been initialized");
         Assert04.jl (Semantic, "Final variable .* might already have been initialized");
         Assert05.jl;
-        Assert06.jl;
         Assign01.jl
           (Semantic, "Cannot assign"),
           (Semantic, "type .* does not match"),
@@ -199,7 +198,6 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out" {
         InnerSuperConstructor4.jl;
         InnerSuperConstructor5.jl (Semantic, ".*must have an enclosing instance that is a subtype.*");
         InnerSuperConstructor6.jl;
-        InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
         InnerSuperConstructor8.jl;
         Instanceof01.jl (Semantic, "incompatible with type operand");
         InterfaceOverride.jl ;
@@ -251,7 +249,6 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out" {
         MemberClass01.jl (Semantic, "Member class .* not visible");
         MemberClass02.jl (Semantic, "The type of the variable initializer .* does not match that of the declaration");
         MemberClass03.jl;
-        MemberClass04.jl;
        MemberClassFlags.jl ;
         MethodDecl01.jl (Semantic, "native and strictfp");
         MethodDecl02.jl;
@@ -442,7 +439,6 @@ polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out" {
 		       (Semantic, "Illegal forward ref"),
 		       (Semantic, "Illegal forward ref"),
 		       (Semantic, "Illegal forward ref");
-	DefAssign01.jl (Semantic, "Final field \"x\" might not have been initialized");
 }
 
 polyglot.frontend.JLExtensionInfo "-d out" {

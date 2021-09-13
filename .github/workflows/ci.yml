@@ -32,3 +32,6 @@ jobs:
         run: ant
       - name: Build Jar
         run: ant jar
+      - name: Run Base Tests
+        run: ../bin/pth pthScript
+        working-directory: ./tests
