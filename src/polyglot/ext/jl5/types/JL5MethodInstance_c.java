@@ -121,7 +121,7 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
                         : Collections.singleton(rt.superType());
         for (Type superType : supers) {
             if (superType != null && superType.isReference()) {
-                l.addAll(implementedImpl(superType.toReference()));
+                l.addAll(implementedImplAux(superType.toReference()));
             }
         }
 
