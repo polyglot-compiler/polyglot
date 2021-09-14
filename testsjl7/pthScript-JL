@@ -162,6 +162,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         InnerSuperConstructor4.jl;
         InnerSuperConstructor5.jl (Semantic, ".*must have an enclosing instance that is a subtype.*");
         InnerSuperConstructor6.jl;
+        InnerSuperConstructor7.jl;
         InnerSuperConstructor8.jl;
         Instanceof01.jl;
         InterfaceOverride.jl ;
