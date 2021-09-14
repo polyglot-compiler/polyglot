@@ -13,7 +13,6 @@ javac "-d java-out -cp ." {
 
 polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \" -Xlint\\:-options\" -morepermissiveinference" {
         Call02.jl5;
-        error3.jl5 (Semantic, "Name clash");
         GenericMethod17.jl5;
         InnerClass07.jl5;
         Intersect01.jl5;
@@ -24,7 +23,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
 
 # Now run the tests again removing the Java 5-isms.
 polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -enumImplClass MyEnum -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
-        error3.jl5 (Semantic, "Name clash");
         wildcard19.jl5 (Semantic, "not a subtype .* bound") , (Semantic);
         Call02.jl5;
         GenericMethod12.jl5 (Semantic), (Semantic);
@@ -34,11 +32,8 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
 }
 
 polyglot.ext.jl7.JL7ExtensionInfo "-sx jl5 -d out-jl7 -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
-        error3.jl5 (Semantic);
         wildcard19.jl5 (Semantic, "not a subtype .* bound") , (Semantic);
-        Access05.jl5 (Semantic, "Field .* not visible");
         Call02.jl5;
         InnerClass07.jl5;
-        Interface07.jl5;
         Intersect01.jl5;
 }
