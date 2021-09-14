@@ -1932,7 +1932,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
                     (JL5ConstructorInstance) callValid(ci, argTypes, actualTypeArgs);
             if (substCi != null) {
                 ci = substCi;
-                if (isAccessible(ci, currClass)) {
+                if (isAccessible(ci, currClass, fromClient)) {
                     if (Report.should_report(Report.types, 3))
                         Report.report(3, "->acceptable: " + ci);
                     if (varArgsRequired(ci)) phase3methods.add(ci);

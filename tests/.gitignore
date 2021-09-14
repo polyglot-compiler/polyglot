@@ -2,5 +2,5 @@
 pthScript*.results
 pthOutput*
 insensTest
-out
+out*
 /java-out
