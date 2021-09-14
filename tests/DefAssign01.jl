@@ -1,8 +1,7 @@
 class C {
   final int x,y;
 
-  // Only should show an error here about x not being initialized.
-  // Should not show an error about y not being initialized.
+  // Only should show an error here about x, y not being initialized.
   { y = x; }
 
   C() {

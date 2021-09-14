@@ -36,17 +36,12 @@ javac "-d java-out -cp ." {
 
 polyglot.frontend.JLExtensionInfo "-assert -d out -cp java-out" {
     Assert06.jl;
-    InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
-    MemberClass04.jl;
-	DefAssign01.jl (Semantic, "Final field \"x\" might not have been initialized");
 }
 
 polyglot.ext.jl5.JL5ExtensionInfo "-sx jl -d out-jl5 -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
-    InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
     MethodDecl08a.jl MethodDecl08b.jl (Semantic, "hidden method is not static");
 }
 
 polyglot.ext.jl7.JL7ExtensionInfo "-sx jl -d out-jl7 -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
-    InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
     MethodDecl08a.jl MethodDecl08b.jl (Semantic, "hidden method is not static");
 }
