@@ -220,6 +220,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         MethodDecl05.jl (Semantic, "incompatible return type");
         MethodDecl06.jl (Semantic, "throw set .* not a subset of the overridden method");
         MethodDecl07.jl (Semantic, "overridden method is final");
+        MethodDecl08a.jl MethodDecl08b.jl (Semantic, "hidden method is not static");
         MethodDecl09.jl;
         Narrowing.jl ;
         New01a.jl New01b.jl;
