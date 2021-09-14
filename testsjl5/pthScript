@@ -93,7 +93,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Boxing05.jl5;
         C.jl5;
         Call01.jl5 (Post, "Xlint");
-        Call02.jl5;
         CaptureConversion01.jl5;
         Cast01.jl5 (Post, "Xlint");
         Cast02.jl5;
@@ -143,7 +142,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         EnumTest18.jl5;
         EnumTest19.jl5;
         error1.jl5 (Semantic, "should be declared abstract");
-        error3.jl5 (Semantic, "Name clash");
         error3b.jl5;
         error3c.jl5 (Semantic, "Name clash"), (Semantic, "should be declared abstract");
         error3d.jl5;
@@ -194,12 +192,11 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         GenericMethod9b.jl5;
         GenericMethod10.jl5;
         GenericMethod11.jl5;
-        GenericMethod12.jl5 (Semantic), (Semantic);
+        GenericMethod12.jl5 (Semantic);
         GenericMethod13.jl5;
         GenericMethod14.jl5;
         GenericMethod15.jl5;
         GenericMethod16.jl5;
-        GenericMethod17.jl5;
         GenericMethod18.jl5 (Semantic, "Duplicate type variable");
         GenericMethod19.jl5 (Semantic, "incompatible parameter types");
         GenericMethod20.jl5 (Semantic, "Name clash.* same erasure");
@@ -283,7 +280,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         InnerClass04.jl5;
         InnerClass05.jl5 (Semantic);
         InnerClass06.jl5;
-        InnerClass07.jl5;
         InnerClass08.jl5;
         InnerClass09.jl5;
         InnerClass10.jl5;
@@ -301,7 +297,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         Interface05.jl5 (Post, "Xlint");
         Interface06.jl5 (Post, "Xlint");
         Interface07.jl5 (Semantic, "Name clash.* same erasure");
-        Intersect01.jl5;
         Intersect02.jl5;
         Intersect03.jl5 (Semantic, "additional bound");
         Intersect04.jl5 (Post, "Xlint");
@@ -420,7 +415,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         WildCard03.jl5 (Post, "Xlint");
         WildCard04.jl5;
         WildCard05.jl5;
-        WildCard06.jl5; # TODO
         Wildcard1.jl5;
         wildcard2.jl5 (Semantic), (Semantic), (Semantic);
         wildcard2a.jl5;
@@ -434,7 +428,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         wildcard7.jl5 (Semantic), (Semantic), (Semantic);
         wildcard7a.jl5;
         wildcard8.jl5 (Semantic);
-        wildcard9.jl5; # TODO
         wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match");
         wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match");
         wildcard12a.jl5(Semantic);
@@ -454,7 +447,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         wildcard16.jl5 (Semantic, "Cannot assign long to");
         wildcard17.jl5 (Semantic),(Semantic),(Semantic);
         wildcard18.jl5 (Semantic);
-        wildcard19.jl5 (Semantic, "not a subtype .* bound") , (Semantic);
         wildcard20.jl5 (Semantic, "cannot be called");
         wildcard21.jl5 (Semantic, "Unexpected type bound");
         wildcard22.jl5;
@@ -516,7 +508,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Boxing05.jl5;
         C.jl5;
         Call01.jl5;
-        Call02.jl5;
         CaptureConversion01.jl5;
         Cast01.jl5;
         Cast02.jl5;
@@ -565,7 +556,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         EnumTest17.jl5 (Post, "Xlint:unchecked");
         EnumTest18.jl5 (Post, "Xlint:unchecked");
         error1.jl5 (Semantic, "should be declared abstract");
-        error3.jl5 (Semantic, "Name clash");
         error3b.jl5;
         error3c.jl5 (Semantic, "Name clash"), (Semantic, "should be declared abstract");
         error3d.jl5;
@@ -616,12 +606,11 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         GenericMethod9b.jl5;
         GenericMethod10.jl5;
         GenericMethod11.jl5;
-        GenericMethod12.jl5 (Semantic), (Semantic);
+        GenericMethod12.jl5 (Semantic);
         GenericMethod13.jl5;
         GenericMethod14.jl5;
         GenericMethod15.jl5;
         GenericMethod16.jl5;
-        GenericMethod17.jl5;
         GenericMethod18.jl5 (Semantic, "Duplicate type variable");
         GenericMethod19.jl5 (Semantic, "incompatible parameter types");
         GenericMethod20.jl5 (Semantic, "Name clash.* same erasure");
@@ -706,7 +695,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         InnerClass04.jl5;
         InnerClass05.jl5 (Semantic);
         InnerClass06.jl5;
-        InnerClass07.jl5;
         InnerClass08.jl5;
         InnerClass09.jl5;
         InnerClass10.jl5;
@@ -724,7 +712,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         Interface05.jl5;
         Interface06.jl5;
         Interface07.jl5 (Semantic, "Name clash.* same erasure");
-        Intersect01.jl5;
         Intersect02.jl5;
         Intersect03.jl5 (Semantic, "additional bound");
         Intersect04.jl5;
@@ -843,7 +830,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         WildCard03.jl5;
         WildCard04.jl5;
         WildCard05.jl5;
-        WildCard06.jl5; # TODO
+        WildCard06.jl5;
         Wildcard1.jl5 (Post, "Xlint:unchecked");
         wildcard2.jl5 (Semantic), (Semantic), (Semantic);
         wildcard2a.jl5;
@@ -857,7 +844,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         wildcard7.jl5 (Semantic), (Semantic), (Semantic);
         wildcard7a.jl5;
         wildcard8.jl5 (Semantic);
-        wildcard9.jl5; # TODO
+        wildcard9.jl5;
         wildcard10.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match");
         wildcard11.jl5 (Semantic, "capture"), (Semantic, "capture"), (Semantic, "does not match"), (Semantic, "does not match"), (Semantic, "does not match");
         wildcard12a.jl5 (Semantic);
@@ -877,7 +864,6 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         wildcard16.jl5 (Semantic, "Cannot assign long to");
         wildcard17.jl5 (Semantic),(Semantic),(Semantic);
         wildcard18.jl5 (Semantic);
-        wildcard19.jl5 (Semantic, "not a subtype .* bound") , (Semantic);
         wildcard20.jl5 (Semantic, "cannot be called");
         wildcard21.jl5 (Semantic, "Unexpected type bound");
         wildcard22.jl5;
