@@ -76,12 +76,12 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Constants9.jl ;
         Constants11.jl ;
         Constants13.jl ;
-        Constants14A.jl ;
+        Constants14A.jl Constants14B.jl;
         ConstructorCall01.jl;
         ConstructorDecl01.jl (Semantic, "synchronized");
         Ctor.jl ;
         DefaultCtor.jl ;
-        Dep1.jl ;
+        Dep1.jl Dep2.jl Dep3.jl;
         DiamondInh.jl ; DiamondInh2.jl ;
         Empty.jl ;
         Equality.jl ;
@@ -116,7 +116,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         ForwardRef.jl ; ForwardRef2.jl ; ForwardRef3.jl ;
         Import.jl ;
         Import02.jl (Semantic, "import .* conflicts with type .* defined in the same file");
-        Import03.jl (Semantic, "already defined in a single-type import");
+        Import03.jl package1/C.jl package2/C.jl (Semantic, "already defined in a single-type import");
         Import04.jl;
         Import05a.jl Import05b.jl;
         Increment.jl ;
@@ -149,8 +149,8 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
         Inner10.jl ; Inner11.jl ; Inner12.jl ; Inner13.jl ;
         Inner14.jl;
-        Inner15.jl;
-        Inner16.jl
+        Inner15.jl package1/C.jl;
+        Inner16.jl package1/C.jl
           (Semantic, "Constructor .* inaccessible"),
           (Semantic, "Constructor .* inaccessible");
         Inner17.jl (Semantic, "Member class .* not visible");
@@ -162,7 +162,6 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         InnerSuperConstructor4.jl;
         InnerSuperConstructor5.jl (Semantic, ".*must have an enclosing instance that is a subtype.*");
         InnerSuperConstructor6.jl;
-        InnerSuperConstructor7.jl (Semantic, ".*an enclosing instance .* must be specified");
         InnerSuperConstructor8.jl;
         Instanceof01.jl;
         InterfaceOverride.jl ;
@@ -220,7 +219,6 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         MethodDecl05.jl (Semantic, "incompatible return type");
         MethodDecl06.jl (Semantic, "throw set .* not a subset of the overridden method");
         MethodDecl07.jl (Semantic, "overridden method is final");
-        MethodDecl08a.jl MethodDecl08b.jl (Semantic, "hidden method is not static");
         MethodDecl09.jl;
         Narrowing.jl ;
         New01a.jl New01b.jl;
@@ -253,7 +251,7 @@ polyglot.ext.jl7.JL7ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         Semicolon.jl ;
         SemicolonClass.jl ;
         Shadowing.jl ;
-        Statements.jl ;
+        Statements.jl Constants.jl;
         StaticContext.jl ;
         StaticMethod.jl ;
         StaticOps.jl ;

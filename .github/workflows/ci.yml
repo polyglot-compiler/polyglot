@@ -35,6 +35,12 @@ jobs:
       - name: Run Base Tests
         run: ../bin/pth -ec pthScript
         working-directory: ./tests
+      - name: Run Base Tests with JL5
+        run: ../bin/pth -ec pthScript-JL
+        working-directory: ./testsjl5
+      - name: Run Base Tests with JL7
+        run: ../bin/pth -ec pthScript-JL
+        working-directory: ./testsjl7
       - name: Run JL7 Tests
         run: ../bin/pth -ec pthScript
         working-directory: ./testsjl7
