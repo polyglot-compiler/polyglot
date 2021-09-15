@@ -142,6 +142,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -assert -noserial 
         EnumTest18.jl5;
         EnumTest19.jl5;
         error1.jl5 (Semantic, "should be declared abstract");
+        error3.jl5 (Semantic, "Name clash"), (Semantic, "does not match that of the declaration");
         error3b.jl5;
         error3c.jl5 (Semantic, "Name clash"), (Semantic, "should be declared abstract");
         error3d.jl5;
@@ -556,6 +557,7 @@ polyglot.ext.jl5.JL5ExtensionInfo "-d out -classpath java-out -removeJava5isms -
         EnumTest17.jl5 (Post, "Xlint:unchecked");
         EnumTest18.jl5 (Post, "Xlint:unchecked");
         error1.jl5 (Semantic, "should be declared abstract");
+        error3.jl5 (Semantic, "Name clash"), (Semantic, "does not match that of the declaration");
         error3b.jl5;
         error3c.jl5 (Semantic, "Name clash"), (Semantic, "should be declared abstract");
         error3d.jl5;
