@@ -20,7 +20,8 @@ jobs:
         run: git checkout HEAD
       - name: Check Format
         run: ./tools/format-check
-  build:
+
+  build-base:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -32,31 +33,63 @@ jobs:
         run: ant
       - name: Build Jar
         run: ant jar
-      - name: Run Base Tests with Base
+      - name: Run Base Tests
         run: ../bin/pth -ec pthScript
         working-directory: ./tests
-      - name: Run Base Tests with JL5
+
+  build-jl5:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Build the base compiler
+        run: ant
+      - name: Run Base Tests
         run: ../bin/pth -ec pthScript-JL
         working-directory: ./testsjl5
-      - name: Run JL5 Tests with JL5
+      - name: Run JL5 Tests
         run: ../bin/pth -ec pthScript
         working-directory: ./testsjl5
-      - name: Run Base Tests with JL7
+
+  build-jl7:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Build the base compiler
+        run: ant
+      - name: Run Base Tests
         run: ../bin/pth -ec pthScript-JL
         working-directory: ./testsjl7
-      - name: Run JL5 Tests with JL7
+      - name: Run JL5 Tests
         run: ../bin/pth -ec pthScript-JL5
         working-directory: ./testsjl7
       - name: Run JL7 Tests
         run: ../bin/pth -ec pthScript
         working-directory: ./testsjl7
-      - name: Run Base Tests with JL8
+
+  build-jl8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Build the base compiler
+        run: ant
+      - name: Run Base Tests
         run: ../bin/pth -ec pthScript-JL
         working-directory: ./testsjl8
-      - name: Run JL5 Tests with JL8
+      - name: Run JL5 Tests
         run: ../bin/pth -ec pthScript-JL5
         working-directory: ./testsjl8
-      - name: Run JL7 Tests with JL8
-        run: ../bin/pth -ec pthScript-JL8
+      - name: Run JL7 Tests
+        run: ../bin/pth -ec pthScript-JL7
         working-directory: ./testsjl8
-
