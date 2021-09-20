@@ -1,0 +1,42 @@
+polyglot.ext.jl8.JL8ExtensionInfo ["../testsjl7/"] "-sx jl7 -d out -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
+	Diamond01.jl7;
+	Diamond02.jl7 (Semantic, "type arguments cannot be used");
+	Diamond03.jl7 (Semantic, "anonymous class");
+	Diamond04.jl7 (Semantic, "not generic");
+	Diamond05.jl7 (Semantic, "not generic");
+	Diamond06.jl7;
+	Diamond07.jl7;
+	Diamond08.jl7;
+	Diamond09.jl7;
+	Diamond10.jl7;
+	FloatLit01.jl7;
+	IntLit01.jl7;
+	IntLit02.jl7 (Syntax), (Syntax),(Syntax),(Syntax);
+	IntLit02a.jl7 (Syntax);
+	IntLit02b.jl7 ("Could not find") , ("Could not find"); // 2 errors
+	IntLit02c.jl7 (Syntax);
+	IntLit03.jl7;
+	IntLit04.jl7 ("out of range"),("unexpected .* literal"),
+	             ("out of range"),("unexpected .* literal"),
+	             ("out of range"),("out of range"),("out of range"),
+	             ("out of range"),("unexpected .* literal"),
+	             ("out of range"),("unexpected .* literal"); // 11 errors
+	MultiCatch01.jl7;
+	MultiCatch02.jl7 (Semantic);
+	MultiCatch03.jl7 (Semantic);
+	MultiCatch04.jl7 (Semantic);
+	MultiCatch05.jl7;
+	Rethrow01.jl7;
+	Rethrow02.jl7;
+	Rethrow03.jl7 (Semantic);
+	Switch01.jl7;
+	Switch02.jl7;
+	TryWithResources01.jl7;
+	TryWithResources02.jl7 (Semantic, "multiply defined");
+	TryWithResources03.jl7 (Semantic, "AutoCloseable");
+	TryWithResources04.jl7;
+	TryWithResources05.jl7;
+	TryWithResources06.jl7 (Semantic, "exception .* caught or declared");
+	TryWithResources07.jl7 (Semantic, "exception .* caught or declared");
+	TryWithResources08.jl7;
+}
