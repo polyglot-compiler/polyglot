@@ -4,6 +4,6 @@
 
 java -jar lib/google-java-format.jar \
   --aosp --skip-sorting-imports --skip-javadoc-formatting \
-  --dry-run \
+  --dry-run --set-exit-if-changed \
   $(git ls-tree -r HEAD --name-only src | grep -E '.*\.java') \
   $(git ls-tree -r HEAD --name-only tools | grep -E '.*\.java') 2> /dev/null

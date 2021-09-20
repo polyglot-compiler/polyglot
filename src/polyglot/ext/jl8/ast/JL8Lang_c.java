@@ -36,15 +36,13 @@ public class JL8Lang_c extends J7Lang_c implements JL8Lang {
         while (n != null) {
             Lang lang = n.lang();
             if (lang instanceof JL8Lang) return (JL8Lang) lang;
-            if (n instanceof Ext)
-                n = ((Ext) n).pred();
+            if (n instanceof Ext) n = ((Ext) n).pred();
             else return null;
         }
         throw new InternalCompilerError("Impossible to reach");
     }
 
-    protected JL8Lang_c() {
-    }
+    protected JL8Lang_c() {}
 
     protected static JL8Ext jl8Ext(Node n) {
         return JL8Ext.ext(n);

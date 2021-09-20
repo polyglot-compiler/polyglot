@@ -47,4 +47,27 @@ parser Grm extends polyglot.ext.jl7.parse.Grm  {:
 
 :};
 
+nonterminal lambda_expression;
+nonterminal inferred_formal_parameter_list;
+nonterminal lambda_body;
+
+terminal token ARROW;
+
 start with goal;
+
+extend expression ::= lambda_expression;
+
+lambda_expression ::=
+      IDENTIFIER ARROW lambda_body
+    | LPAREN RPAREN ARROW lambda_body
+;
+
+inferred_formal_parameter_list ::=
+      IDENTIFIER
+    | inferred_formal_parameter_list COMMA IDENTIFIER
+;
+
+lambda_body ::=
+      expression
+    | block
+;

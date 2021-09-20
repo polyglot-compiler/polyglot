@@ -38,8 +38,9 @@ public class JL8Ext extends Ext_c {
             e = e.ext();
         }
         if (e == null) {
-            throw new InternalCompilerError("No jl8 extension object for node "
-                    + n + " (" + n.getClass() + ")", n.position());
+            throw new InternalCompilerError(
+                    "No jl8 extension object for node " + n + " (" + n.getClass() + ")",
+                    n.position());
         }
         return (JL8Ext) e;
     }

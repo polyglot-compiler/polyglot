@@ -40,7 +40,6 @@ import polyglot.ext.jl8.types.JL8TypeSystem_c;
 import polyglot.frontend.CupParser;
 import polyglot.frontend.Parser;
 import polyglot.frontend.Source;
-import polyglot.lex.Lexer;
 import polyglot.main.Version;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
@@ -67,7 +66,9 @@ public class JL8ExtensionInfo extends JL7ExtensionInfo {
 
     @Override
     protected NodeFactory createNodeFactory() {
-        return new JL8NodeFactory_c(JL8Lang_c.instance, new JL8ExtFactory_c(new JL7ExtFactory_c(new JL5ExtFactory_c())));
+        return new JL8NodeFactory_c(
+                JL8Lang_c.instance,
+                new JL8ExtFactory_c(new JL7ExtFactory_c(new JL5ExtFactory_c())));
     }
 
     @Override
