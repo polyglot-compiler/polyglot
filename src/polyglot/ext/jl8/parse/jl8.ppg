@@ -52,22 +52,24 @@ nonterminal inferred_formal_parameter_list;
 nonterminal lambda_body;
 
 terminal token ARROW;
+terminal token RPAREN_ARROW;
 
 start with goal;
 
-extend expression ::= lambda_expression;
+extend expression_nn ::= lambda_expression;
 
 lambda_expression ::=
-      IDENTIFIER ARROW lambda_body
+      simple_name ARROW lambda_body
     | LPAREN RPAREN ARROW lambda_body
-;
+    | LPAREN inferred_formal_parameter_list RPAREN_ARROW lambda_body
+    ;
 
 inferred_formal_parameter_list ::=
-      IDENTIFIER
-    | inferred_formal_parameter_list COMMA IDENTIFIER
-;
+      simple_name
+    | inferred_formal_parameter_list COMMA simple_name
+    ;
 
 lambda_body ::=
       expression
     | block
-;
+    ;
