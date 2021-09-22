@@ -138,9 +138,13 @@ public class ExtFileManager extends ForwardingJavaFileManager<StandardJavaFileMa
     }
 
     private static void setupPackageCacheForBuiltinPackages() {
-        File builtinClasspathFile = new File(
-                System.getProperty("java.home") +
-                        separatorChar + "lib" + separatorChar + "classlist");
+        File builtinClasspathFile =
+                new File(
+                        System.getProperty("java.home")
+                                + separatorChar
+                                + "lib"
+                                + separatorChar
+                                + "classlist");
         if (builtinClasspathFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(builtinClasspathFile))) {
                 while (true) {
@@ -153,7 +157,8 @@ public class ExtFileManager extends ForwardingJavaFileManager<StandardJavaFileMa
                         index = line.indexOf('/', index + 1);
                     }
                 }
-            } catch (IOException e) { }
+            } catch (IOException e) {
+            }
         }
     }
 
