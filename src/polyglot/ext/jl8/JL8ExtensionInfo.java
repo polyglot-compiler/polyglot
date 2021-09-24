@@ -35,6 +35,7 @@ import polyglot.ext.jl8.ast.JL8ExtFactory_c;
 import polyglot.ext.jl8.ast.JL8Lang_c;
 import polyglot.ext.jl8.ast.JL8NodeFactory_c;
 import polyglot.ext.jl8.parse.Grm;
+import polyglot.ext.jl8.parse.JL8TokenCombiningLexer;
 import polyglot.ext.jl8.parse.Lexer_c;
 import polyglot.ext.jl8.types.JL8TypeSystem_c;
 import polyglot.frontend.CupParser;
@@ -80,7 +81,7 @@ public class JL8ExtensionInfo extends JL7ExtensionInfo {
     public Parser parser(Reader reader, Source source, ErrorQueue eq) {
         reader = new polyglot.lex.EscapedUnicodeReader(reader);
 
-        polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);
+        polyglot.lex.Lexer lexer = new JL8TokenCombiningLexer(reader, source, eq);
         polyglot.parse.BaseParser grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);
     }
