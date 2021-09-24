@@ -21,7 +21,7 @@ public class JL8TokenCombiningLexer extends Lexer_c implements Lexer {
         if (token.symbol() != sym.RPAREN) return token;
         Token nextToken = this.nextTokenUsingBuffer();
         if (nextToken.symbol() == sym.ARROW) {
-            Position positionUnion = new Position(token.getPosition(),nextToken.getPosition());
+            Position positionUnion = new Position(token.getPosition(), nextToken.getPosition());
             return new Operator(positionUnion, ") ->", sym.RPAREN_ARROW);
         } else {
             this.bufferedToken = nextToken;
