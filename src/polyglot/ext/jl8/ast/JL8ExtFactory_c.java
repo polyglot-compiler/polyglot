@@ -43,6 +43,18 @@ public final class JL8ExtFactory_c extends JL8AbstractExtFactory_c implements JL
         return new JL8Ext();
     }
 
-    // TODO: Override factory methods for new extension nodes in the current
-    // extension.
+    @Override
+    protected Ext extCastImpl() {
+        return new JL8Ext();
+    }
+
+    @Override
+    protected Ext extCallImpl() {
+        return new JL8CallExt();
+    }
+
+    @Override
+    protected Ext extNewImpl() {
+        return new JL8NewExt();
+    }
 }
