@@ -25,11 +25,15 @@
  ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
+import java.util.List;
+import polyglot.ast.Block;
+import polyglot.ast.Formal;
 import polyglot.ext.jl7.ast.JL7NodeFactory;
+import polyglot.util.Position;
 
 /**
  * NodeFactory for src/polyglot/ext/jl8 extension.
  */
 public interface JL8NodeFactory extends JL7NodeFactory {
-    // TODO: Declare any factory methods for new AST nodes.
+    Lambda Lambda(Position pos, List<Formal> formals, Block block);
 }

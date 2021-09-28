@@ -25,7 +25,11 @@
  ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
+import java.util.List;
+import polyglot.ast.Block;
+import polyglot.ast.Formal;
 import polyglot.ext.jl7.ast.JL7NodeFactory_c;
+import polyglot.util.Position;
 
 /**
  * NodeFactory for src/polyglot/ext/jl8 extension.
@@ -51,5 +55,10 @@ public class JL8NodeFactory_c extends JL7NodeFactory_c implements JL8NodeFactory
     @Override
     public JL8Lang lang() {
         return (JL8Lang) super.lang();
+    }
+
+    @Override
+    public Lambda Lambda(Position pos, List<Formal> formals, Block block) {
+        return new Lambda_c(pos, formals, block);
     }
 }
