@@ -99,6 +99,8 @@ public class Precedence extends Enum {
     public static final Precedence CONDITIONAL = new Precedence("?:", 140);
     /** The precedence of assignment expressions. */
     public static final Precedence ASSIGN = new Precedence("=", 150);
+    /** The precedence of assignment expressions. */
+    public static final Precedence LAMBDA = new Precedence("->", 160);
     /** The precedence of all other expressions. This has the lowest precedence to ensure the expression is parenthesized on output. */
     public static final Precedence UNKNOWN = new Precedence("unknown", 999);
 }
