@@ -93,3 +93,6 @@ jobs:
       - name: Run JL7 Tests
         run: ../bin/pth -ec pthScript-JL7
         working-directory: ./testsjl8
+      - name: Run JL8 Tests
+        run: ../bin/pth -ec pthScript
+        working-directory: ./testsjl8
