@@ -25,6 +25,7 @@
  ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
+import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
 import polyglot.ext.jl7.ast.JL7AbstractExtFactory_c;
 
@@ -42,4 +43,24 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
     // TODO: Implement factory methods for new extension nodes in future
     // extensions.  This entails calling the factory method for extension's
     // AST superclass.
+
+    @Override
+    public final Ext extLambdaNode() {
+        Ext e = extLambdaNodeImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2;
+            if (nextExtFactory() instanceof JL8ExtFactory) {
+                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaNode();
+            } else {
+                e2 = nextExtFactory().extExpr();
+            }
+            e = composeExts(e, e2);
+        }
+        return postExtMultiCatch(e);
+    }
+
+    protected Ext extLambdaNodeImpl() {
+        return extExpr();
+    }
 }
