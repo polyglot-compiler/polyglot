@@ -45,6 +45,10 @@ parser Grm extends polyglot.ext.jl7.parse.Grm  {:
 		nf = (JL8NodeFactory) n;
 	}
 
+	private TypeNode dummyIntType() {
+	    return nf.CanonicalTypeNode(position(), ts.Int());
+	}
+
 :};
 
 nonterminal Lambda lambda_expression;
@@ -56,16 +60,17 @@ terminal token RPAREN_ARROW;
 
 start with goal;
 
-extend expression_nn ::= lambda_expression;
+extend expression ::= lambda_expression:e {: RESULT = e; :};
+extend expression_nn ::= lambda_expression:e {: RESULT = e; :};
 
 lambda_expression ::=
       simple_name:n ARROW lambda_body:b
     {:
         List<Formal> formals = new ArrayList<>();
-        formals.add(parser.nf.Formal(n.pos, Flags.NONE, new ArrayList<AnnotationElem>(), null, n.name, false));
+        formals.add(parser.nf.Formal(n.pos, Flags.NONE, new ArrayList<AnnotationElem>(), dummyIntType(), n.name, false));
         RESULT = parser.nf.Lambda(parser.pos(n, b, b), formals, b);
     :}
-    | LPAREN:l RPAREN ARROW lambda_body:b
+    | LPAREN:l RPAREN_ARROW lambda_body:b
     {:
         RESULT = parser.nf.Lambda(parser.pos(l, b, b), new ArrayList<Formal>(), b);
     :}
@@ -79,12 +84,12 @@ inferred_formal_parameter_list ::=
       simple_name:n
     {:
         List<Formal> formals = new ArrayList<>();
-        formals.add(parser.nf.Formal(n.pos, Flags.NONE, new ArrayList<AnnotationElem>(), null, n.name, false));
+        formals.add(parser.nf.Formal(n.pos, Flags.NONE, new ArrayList<AnnotationElem>(), dummyIntType(), n.name, false));
         RESULT = formals;
     :}
     | inferred_formal_parameter_list:formals COMMA simple_name:n
     {:
-        formals.add(parser.nf.Formal(n.pos, Flags.NONE, new ArrayList<AnnotationElem>(), null, n.name, false));
+        formals.add(parser.nf.Formal(n.pos, Flags.NONE, new ArrayList<AnnotationElem>(), dummyIntType(), n.name, false));
         RESULT = formals;
     :}
     ;
