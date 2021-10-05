@@ -3,9 +3,12 @@ package polyglot.ext.jl8.ast;
 import polyglot.ast.ProcedureCall;
 import polyglot.ast.ProcedureCallOps;
 import polyglot.util.CodeWriter;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.PrettyPrinter;
 
 public abstract class JL8ProcedureCallExt extends JL8Ext implements ProcedureCallOps {
+    private static final long serialVersionUID = SerialVersionUID.generate();
+
     @Override
     public ProcedureCall node() {
         return (ProcedureCall) super.node();
