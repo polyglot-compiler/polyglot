@@ -1,20 +1,30 @@
 package polyglot.ext.jl8.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 import polyglot.ast.Block;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Ext;
 import polyglot.ast.Formal;
+import polyglot.ast.LocalDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Precedence;
 import polyglot.ast.Term;
+import polyglot.ext.jl8.types.JL8TypeSystem;
+import polyglot.types.CodeInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
+import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
@@ -24,7 +34,9 @@ public class Lambda_c extends Expr_c implements Lambda {
 
     protected List<Formal> formals;
     protected Block block;
-    private transient Type targetType = null;
+    private transient ReferenceType targetType = null;
+    // Single Abstract Method
+    private transient MethodInstance sam = null;
 
     //    @Deprecated
     Lambda_c(Position pos, List<Formal> formals, Block block) {
@@ -58,8 +70,41 @@ public class Lambda_c extends Expr_c implements Lambda {
     }
 
     @Override
+    public Term codeBody() {
+        return block;
+    }
+
+    @Override
+    public CodeInstance codeInstance() {
+        return sam;
+    }
+
+    @Override
     public Lambda block(Block block) {
         return block(this, block);
+    }
+
+    private MethodInstance getSAM(TypeSystem ts) {
+        if (sam != null) return sam;
+        return ts.methodInstance(position(), targetType, Flags.NONE, ts.unknownType(position()),
+                "", new ArrayList<Type>(), new ArrayList<Type>());
+    }
+
+    @Override
+    public void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem)
+            throws SemanticException {
+        if (targetType.isReference()) {
+            ReferenceType targetReferenceType = targetType.toReference();
+            List<MethodInstance> methods =
+                    jl8TypeSystem.nonObjectPublicAbstractMethods(targetReferenceType);
+            if (methods.size() == 1) {
+                this.targetType = targetReferenceType;
+                this.sam = methods.get(0);
+                System.out.println(sam);
+                return;
+            }
+        }
+        throw new SemanticException(targetType + " is not a functional interface.");
     }
 
     protected <N extends Lambda_c> N formals(N n, List<Formal> formals) {
@@ -93,8 +138,25 @@ public class Lambda_c extends Expr_c implements Lambda {
     }
 
     @Override
+    public Context enterScope(Context c) {
+        return c.pushCode(getSAM(c.typeSystem()));
+    }
+
+    @Override
+    public Node overrideContextVisit(Node parent, ContextVisitor visitor) throws SemanticException {
+        if (parent instanceof LocalDecl) {
+            LocalDecl localDecl = (LocalDecl) parent;
+            Type type = localDecl.declType();
+            if (type.isCanonical()) {
+                setTargetType(type, (JL8TypeSystem) visitor.context().typeSystem());
+            }
+        }
+        return super.overrideContextVisit(parent, visitor);
+    }
+
+    @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        throw new Error("TODO: not implemented.");
+        return type(this.targetType);
     }
 
     @Override
@@ -109,12 +171,14 @@ public class Lambda_c extends Expr_c implements Lambda {
 
     @Override
     public Term firstChild() {
-        return block;
+        return listChild(formals, null);
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        throw new Error("TODO: not implemented.");
+        v.visitCFGList(formals, block, ENTRY);
+        v.visitCFG(block, this, EXIT);
+        return succs;
     }
 
     @Override

@@ -25,8 +25,11 @@
  ******************************************************************************/
 package polyglot.ext.jl8.types;
 
+import java.util.List;
 import polyglot.ext.jl7.types.JL7TypeSystem;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
 
 public interface JL8TypeSystem extends JL7TypeSystem {
-    // TODO: declare any new methods needed
+    List<MethodInstance> nonObjectPublicAbstractMethods(ReferenceType referenceType);
 }
