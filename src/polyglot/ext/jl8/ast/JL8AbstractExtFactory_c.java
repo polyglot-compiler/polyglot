@@ -57,10 +57,30 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
             }
             e = composeExts(e, e2);
         }
-        return postExtMultiCatch(e);
+        return e;
     }
 
     protected Ext extLambdaNodeImpl() {
         return extExpr();
+    }
+
+    @Override
+    public final Ext extLambdCodeBlockNode() {
+        Ext e = extLambdCodeBlockNodeImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2;
+            if (nextExtFactory() instanceof JL8ExtFactory) {
+                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaNode();
+            } else {
+                e2 = nextExtFactory().extTerm();
+            }
+            e = composeExts(e, e2);
+        }
+        return e;
+    }
+
+    protected Ext extLambdCodeBlockNodeImpl() {
+        return extTerm();
     }
 }
