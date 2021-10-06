@@ -1,6 +1,5 @@
 package polyglot.ext.jl8.ast;
 
-import java.util.ArrayList;
 import java.util.List;
 import polyglot.ast.Block;
 import polyglot.ast.Expr_c;
@@ -14,7 +13,6 @@ import polyglot.ast.Term;
 import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.CodeInstance;
 import polyglot.types.Context;
-import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
@@ -33,10 +31,7 @@ public class Lambda_c extends Expr_c implements Lambda {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<Formal> formals;
-    protected Block block;
-    private transient ReferenceType targetType = null;
-    // Single Abstract Method
-    private transient MethodInstance sam = null;
+    protected LambdaCodeBlock block;
 
     //    @Deprecated
     Lambda_c(Position pos, List<Formal> formals, Block block) {
@@ -46,7 +41,7 @@ public class Lambda_c extends Expr_c implements Lambda {
     Lambda_c(Position pos, List<Formal> formals, Block block, Ext ext) {
         super(pos, ext);
         this.formals = formals;
-        this.block = block;
+        this.block = new LambdaCodeBlock(block);
     }
 
     @Override
@@ -65,52 +60,17 @@ public class Lambda_c extends Expr_c implements Lambda {
     }
 
     @Override
-    public Block block() {
+    public LambdaCodeBlock block() {
         return block;
     }
 
     @Override
-    public Term codeBody() {
-        return block;
-    }
-
-    @Override
-    public CodeInstance codeInstance() {
-        return sam;
-    }
-
-    @Override
-    public Lambda block(Block block) {
+    public Lambda block(LambdaCodeBlock block) {
         return block(this, block);
     }
 
     private MethodInstance getSAM(TypeSystem ts) {
-        if (sam != null) return sam;
-        return ts.methodInstance(
-                position(),
-                targetType,
-                Flags.NONE,
-                ts.unknownType(position()),
-                "",
-                new ArrayList<Type>(),
-                new ArrayList<Type>());
-    }
-
-    @Override
-    public void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem)
-            throws SemanticException {
-        if (targetType.isReference()) {
-            ReferenceType targetReferenceType = targetType.toReference();
-            List<MethodInstance> methods =
-                    jl8TypeSystem.nonObjectPublicAbstractMethods(targetReferenceType);
-            if (methods.size() == 1) {
-                this.targetType = targetReferenceType;
-                this.sam = methods.get(0);
-                System.out.println(sam);
-                return;
-            }
-        }
-        throw new SemanticException(targetType + " is not a functional interface.");
+        return block.getSAM(ts);
     }
 
     protected <N extends Lambda_c> N formals(N n, List<Formal> formals) {
@@ -120,7 +80,7 @@ public class Lambda_c extends Expr_c implements Lambda {
         return n;
     }
 
-    protected <N extends Lambda_c> N block(N n, Block block) {
+    protected <N extends Lambda_c> N block(N n, LambdaCodeBlock block) {
         if (n.block == block) return n;
         n = copyIfNeeded(n);
         n.block = block;
@@ -130,7 +90,7 @@ public class Lambda_c extends Expr_c implements Lambda {
     /**
      * Reconstruct the expression.
      */
-    protected <N extends Lambda_c> N reconstruct(N n, List<Formal> formals, Block block) {
+    protected <N extends Lambda_c> N reconstruct(N n, List<Formal> formals, LambdaCodeBlock block) {
         n = formals(n, formals);
         n = block(n, block);
         return n;
@@ -139,7 +99,7 @@ public class Lambda_c extends Expr_c implements Lambda {
     @Override
     public Node visitChildren(NodeVisitor v) {
         List<Formal> formals = visitList(this.formals, v);
-        Block block = visitChild(this.block, v);
+        LambdaCodeBlock block = visitChild(this.block, v);
         return reconstruct(this, formals, block);
     }
 
@@ -154,7 +114,7 @@ public class Lambda_c extends Expr_c implements Lambda {
             LocalDecl localDecl = (LocalDecl) parent;
             Type type = localDecl.declType();
             if (type.isCanonical()) {
-                setTargetType(type, (JL8TypeSystem) visitor.context().typeSystem());
+                this.block.setTargetType(type, (JL8TypeSystem) visitor.context().typeSystem());
             }
         }
         return super.overrideContextVisit(parent, visitor);
@@ -162,7 +122,7 @@ public class Lambda_c extends Expr_c implements Lambda {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return type(this.targetType);
+        return type(this.block.targetType);
     }
 
     @Override
@@ -177,19 +137,17 @@ public class Lambda_c extends Expr_c implements Lambda {
 
     @Override
     public Term firstChild() {
-        return listChild(formals, null);
+        return null;
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFGList(formals, block, ENTRY);
-        v.visitCFG(block, this, EXIT);
         return succs;
     }
 
     @Override
     public Node copy(NodeFactory nf) {
         JL8NodeFactory jl8NodeFactory = (JL8NodeFactory) nf;
-        return jl8NodeFactory.Lambda(this.position, this.formals, this.block);
+        return jl8NodeFactory.Lambda(this.position, this.formals, this.block.block);
     }
 }
