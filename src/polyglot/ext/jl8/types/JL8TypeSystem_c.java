@@ -25,9 +25,41 @@
  ******************************************************************************/
 package polyglot.ext.jl8.types;
 
+import java.util.ArrayList;
+import java.util.List;
 import polyglot.ext.jl7.types.JL7TypeSystem_c;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
 
 public class JL8TypeSystem_c extends JL7TypeSystem_c implements JL8TypeSystem {
-    // TODO: implement new methods in jl8TypeSystem.
-    // TODO: override methods as needed from TypeSystem_c.
+    @Override
+    public List<MethodInstance> nonObjectPublicAbstractMethods(ReferenceType referenceType) {
+        List<MethodInstance> objectPublicMethods = this.objectPublicMethods();
+        List<MethodInstance> nonObjectPublicAbstractMethods = new ArrayList<>();
+        for (MethodInstance m : referenceType.methods()) {
+            Flags flags = m.flags();
+            if (flags.isPublic() && flags.isAbstract()) {
+                boolean isObjectMethod = false;
+                for (MethodInstance objectMethod : objectPublicMethods) {
+                    if (m.isSameMethod(objectMethod)) {
+                        isObjectMethod = true;
+                        break;
+                    }
+                }
+                if (!isObjectMethod) nonObjectPublicAbstractMethods.add(m);
+            }
+        }
+        return nonObjectPublicAbstractMethods;
+    }
+
+    private List<MethodInstance> objectPublicMethods() {
+        List<MethodInstance> objectMethods = new ArrayList<>();
+        for (MethodInstance i : Object().methods()) {
+            if (i.flags().isPublic()) {
+                objectMethods.add(i);
+            }
+        }
+        return objectMethods;
+    }
 }
