@@ -44,6 +44,7 @@ import polyglot.util.SerialVersionUID;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.ConstantChecker;
+import polyglot.visit.ContextVisitor;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -142,6 +143,11 @@ public class JLDel_c implements JLDel, Serializable {
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return jl().buildTypes(tb);
+    }
+
+    @Override
+    public Node overrideContextVisit(Node parent, ContextVisitor visitor) throws SemanticException {
+        return jl().overrideContextVisit(parent, visitor);
     }
 
     @Override

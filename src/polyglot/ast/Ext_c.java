@@ -43,6 +43,7 @@ import polyglot.util.StringUtil;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.ConstantChecker;
+import polyglot.visit.ContextVisitor;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -191,6 +192,11 @@ public abstract class Ext_c implements Ext {
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return superLang().buildTypes(node(), tb);
+    }
+
+    @Override
+    public Node overrideContextVisit(Node parent, ContextVisitor visitor) throws SemanticException {
+        return superLang().overrideContextVisit(node(), parent, visitor);
     }
 
     @Override

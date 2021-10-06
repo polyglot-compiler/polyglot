@@ -34,6 +34,7 @@ import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
+import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
@@ -114,6 +115,26 @@ public interface Lang {
      * {@code TypeSystem}.
      */
     Node buildTypes(Node n, TypeBuilder tb) throws SemanticException;
+
+    /**
+     * Visit the context the AST.
+     *
+     * This method is called by the {@code override()} method of the
+     * visitor.  If this method returns non-null, the node's children
+     * will not be visited automatically.  Thus, the method should check
+     * both the node {@code this} and it's children, usually by
+     * invoking {@code visitChildren} with {@code tc} or
+     * with another visitor, returning a non-null node.  OR, the method
+     * should do nothing and simply return {@code null} to allow
+     * {@code enter}, {@code visitChildren}, and {@code leave}
+     * to be invoked on the node.
+     *
+     * The default implementation returns {@code null}.
+     * Overriding of this method is discouraged, but sometimes necessary.
+     *
+     * @param visitor The context visitor.
+     */
+    Node overrideContextVisit(Node n, Node parent, ContextVisitor visitor) throws SemanticException;
 
     /**
      * Type check the AST.

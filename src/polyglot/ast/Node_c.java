@@ -48,6 +48,7 @@ import polyglot.util.StringUtil;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.ConstantChecker;
+import polyglot.visit.ContextVisitor;
 import polyglot.visit.DumpAst;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
@@ -358,6 +359,11 @@ public abstract class Node_c implements Node {
     @Override
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return this;
+    }
+
+    @Override
+    public Node overrideContextVisit(Node parent, ContextVisitor visitor) throws SemanticException {
+        return null;
     }
 
     @Override

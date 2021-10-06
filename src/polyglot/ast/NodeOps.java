@@ -29,7 +29,6 @@ package polyglot.ast;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.List;
-
 import polyglot.frontend.ExtensionInfo;
 import polyglot.translate.ExtensionRewriter;
 import polyglot.types.Context;
@@ -40,6 +39,7 @@ import polyglot.util.CodeWriter;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.ConstantChecker;
+import polyglot.visit.ContextVisitor;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -150,8 +150,8 @@ public interface NodeOps {
     Node buildTypes(TypeBuilder tb) throws SemanticException;
 
     /**
-     * Disambiguate the AST.
-     *
+     * Visit the context.
+     * <p>
      * This method is called by the {@code override()} method of the
      * visitor.  If this method returns non-null, the node's children
      * will not be visited automatically.  Thus, the method should check
@@ -161,7 +161,27 @@ public interface NodeOps {
      * should do nothing and simply return {@code null} to allow
      * {@code enter}, {@code visitChildren}, and {@code leave}
      * to be invoked on the node.
+     * <p>
+     * The default implementation returns {@code null}.
+     * Overriding of this method is discouraged, but sometimes necessary.
      *
+     * @param visitor context visitor
+     */
+    Node overrideContextVisit(Node parent, ContextVisitor visitor) throws SemanticException;
+
+    /**
+     * Disambiguate the AST.
+     * <p>
+     * This method is called by the {@code override()} method of the
+     * visitor.  If this method returns non-null, the node's children
+     * will not be visited automatically.  Thus, the method should check
+     * both the node {@code this} and it's children, usually by
+     * invoking {@code visitChildren} with {@code tc} or
+     * with another visitor, returning a non-null node.  OR, the method
+     * should do nothing and simply return {@code null} to allow
+     * {@code enter}, {@code visitChildren}, and {@code leave}
+     * to be invoked on the node.
+     * <p>
      * The default implementation returns {@code null}.
      * Overriding of this method is discouraged, but sometimes necessary.
      *
