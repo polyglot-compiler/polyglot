@@ -86,8 +86,14 @@ public class Lambda_c extends Expr_c implements Lambda {
 
     private MethodInstance getSAM(TypeSystem ts) {
         if (sam != null) return sam;
-        return ts.methodInstance(position(), targetType, Flags.NONE, ts.unknownType(position()),
-                "", new ArrayList<Type>(), new ArrayList<Type>());
+        return ts.methodInstance(
+                position(),
+                targetType,
+                Flags.NONE,
+                ts.unknownType(position()),
+                "",
+                new ArrayList<Type>(),
+                new ArrayList<Type>());
     }
 
     @Override
