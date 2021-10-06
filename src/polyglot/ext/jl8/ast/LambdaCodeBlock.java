@@ -60,8 +60,7 @@ public class LambdaCodeBlock extends Term_c implements CodeNode {
                 new ArrayList<Type>());
     }
 
-    void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem)
-            throws SemanticException {
+    void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem) throws SemanticException {
         if (targetType.isReference()) {
             ReferenceType targetReferenceType = targetType.toReference();
             List<MethodInstance> methods =
