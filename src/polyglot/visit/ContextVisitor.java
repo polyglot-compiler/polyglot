@@ -34,8 +34,11 @@ import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import polyglot.types.Context;
+import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
+import polyglot.util.ErrorInfo;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /**
  * A visitor which maintains a context throughout the visitor's pass.  This is
@@ -110,6 +113,39 @@ public class ContextVisitor extends ErrorHandlingVisitor {
         ContextVisitor v = (ContextVisitor) this.copy();
         v.context = c;
         return v;
+    }
+
+    @Override
+    public Node override(Node parent, Node n) {
+        try {
+            if (Report.should_report(Report.visit, 2))
+                Report.report(2, ">> " + this + "::override " + n);
+
+            Node m = lang().overrideContextVisit(n, parent, this);
+
+            if (Report.should_report(Report.visit, 2))
+                Report.report(2, "<< " + this + "::override " + n + " -> " + m);
+            if (m == null) {
+                return super.override(parent, n);
+            } else {
+                return m;
+            }
+        } catch (SemanticException e) {
+            if (e.getMessage() != null) {
+                Position position = e.position();
+
+                if (position == null) {
+                    position = n.position();
+                }
+
+                this.errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
+            } else {
+                // silent error; these should be thrown only
+                // when the error has already been reported
+            }
+            return n;
+        }
+
     }
 
     /**

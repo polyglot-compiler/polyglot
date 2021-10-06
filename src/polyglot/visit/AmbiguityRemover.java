@@ -104,7 +104,11 @@ public class AmbiguityRemover extends DisambiguationDriver {
                                 + m
                                 + (m != null ? (" (" + m.getClass().getName() + ")") : ""));
 
-            return m;
+            if (m == null) {
+                return super.override(parent, n);
+            } else {
+                return m;
+            }
         } catch (MissingDependencyException e) {
             if (Report.should_report(Report.frontend, 3)) e.printStackTrace();
             Scheduler scheduler = job.extensionInfo().scheduler();

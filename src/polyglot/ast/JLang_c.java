@@ -46,6 +46,7 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.ConstantChecker;
+import polyglot.visit.ContextVisitor;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -134,6 +135,12 @@ public class JLang_c implements JLang {
     @Override
     public final Node buildTypes(Node n, TypeBuilder tb) throws SemanticException {
         return NodeOps(n).buildTypes(tb);
+    }
+
+    @Override
+    public Node overrideContextVisit(Node n, Node parent, ContextVisitor visitor)
+            throws SemanticException {
+        return NodeOps(n).overrideContextVisit(parent, visitor);
     }
 
     @Override

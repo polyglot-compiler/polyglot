@@ -67,7 +67,11 @@ public class TypeChecker extends DisambiguationDriver {
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, "<< " + this + "::override " + n + " -> " + m);
 
-            return m;
+            if (m == null) {
+                return super.override(parent, n);
+            } else {
+                return m;
+            }
         } catch (MissingDependencyException e) {
             if (Report.should_report(Report.frontend, 3)) e.printStackTrace();
             Scheduler scheduler = job.extensionInfo().scheduler();
