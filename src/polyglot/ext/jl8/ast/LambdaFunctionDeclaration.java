@@ -100,7 +100,7 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode {
                     throw new SemanticException(
                             String.format(
                                     "Incompatible parameter types in lambda expression: wrong"
-                                        + " number of parameters: expected %d but found %d",
+                                            + " number of parameters: expected %d but found %d",
                                     expectedSize, this.formals.size()),
                             position());
                 }
