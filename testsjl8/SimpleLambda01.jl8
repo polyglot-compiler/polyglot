@@ -1,0 +1,8 @@
+import java.util.function.Function;
+
+public class SimpleLambda01 {
+    void test() {
+        Function<Integer, Integer> negation = (i) -> -i;
+        negation.apply(3);
+    }
+}

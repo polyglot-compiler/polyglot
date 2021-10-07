@@ -46,7 +46,7 @@ parser Grm extends polyglot.ext.jl7.parse.Grm  {:
 	}
 
 	private TypeNode dummyIntType() {
-	    return nf.CanonicalTypeNode(position(), ts.Int());
+	    return nf.CanonicalTypeNode(Position.compilerGenerated(), ts.Int());
 	}
 
 :};
