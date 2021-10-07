@@ -58,10 +58,19 @@ public class JL8NodeFactory_c extends JL7NodeFactory_c implements JL8NodeFactory
     }
 
     @Override
-    public Lambda Lambda(Position pos, List<Formal> formals, Block block) {
-        Lambda lambda = new Lambda_c(pos, formals, block);
-        lambda = lambda.block(ext(lambda.block(), extFactory().extLambdCodeBlockNode()));
+    public Lambda Lambda(LambdaFunctionDeclaration declaration) {
+        Lambda lambda = new Lambda_c(declaration);
         lambda = ext(lambda, extFactory().extLambdaNode());
         return lambda;
+    }
+
+    @Override
+    public LambdaFunctionDeclaration LambdaFunctionDeclaration(
+            Position pos, List<Formal> formals, Block block) {
+        LambdaFunctionDeclaration lambdaFunctionDeclaration =
+                new LambdaFunctionDeclaration(pos, formals, block);
+        lambdaFunctionDeclaration =
+                ext(lambdaFunctionDeclaration, extFactory().extLambdaFunctionDeclarationNode());
+        return lambdaFunctionDeclaration;
     }
 }
