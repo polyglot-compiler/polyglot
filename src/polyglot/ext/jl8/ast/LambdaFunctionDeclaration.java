@@ -1,6 +1,7 @@
 package polyglot.ext.jl8.ast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import polyglot.ast.Block;
 import polyglot.ast.CodeNode;
@@ -121,7 +122,25 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode {
 
     @Override
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-        throw new Error("TODO: not implemented.");
+        w.begin(0);
+        w.begin(0);
+        w.write("(");
+        w.allowBreak(2, 2, "", 0);
+        w.begin(0);
+        for (Iterator<Formal> i = formals.iterator(); i.hasNext(); ) {
+            Formal f = i.next();
+            print(f, w, pp);
+
+            if (i.hasNext()) {
+                w.write(",");
+                w.allowBreak(0, " ");
+            }
+        }
+        w.end();
+        w.write(") ->");
+        w.end();
+        printSubStmt(this.block, w, pp);
+        w.end();
     }
 
     @Override
