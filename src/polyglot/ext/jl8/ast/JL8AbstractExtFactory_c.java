@@ -65,8 +65,8 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
     }
 
     @Override
-    public final Ext extLambdCodeBlockNode() {
-        Ext e = extLambdCodeBlockNodeImpl();
+    public final Ext extLambdaFunctionDeclarationNode() {
+        Ext e = extextLambdaFunctionDeclarationNodeImpl();
 
         if (nextExtFactory() != null) {
             Ext e2;
@@ -80,7 +80,7 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
         return e;
     }
 
-    protected Ext extLambdCodeBlockNodeImpl() {
+    protected Ext extextLambdaFunctionDeclarationNodeImpl() {
         return extTerm();
     }
 }

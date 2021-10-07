@@ -68,15 +68,15 @@ lambda_expression ::=
     {:
         List<Formal> formals = new ArrayList<>();
         formals.add(parser.nf.Formal(n.pos, Flags.NONE, new ArrayList<AnnotationElem>(), dummyIntType(), n.name, false));
-        RESULT = parser.nf.Lambda(parser.pos(n, b, b), formals, b);
+        RESULT = parser.nf.Lambda(parser.nf.LambdaFunctionDeclaration(parser.pos(n, b, b), formals, b));
     :}
     | LPAREN:l RPAREN_ARROW lambda_body:b
     {:
-        RESULT = parser.nf.Lambda(parser.pos(l, b, b), new ArrayList<Formal>(), b);
+        RESULT = parser.nf.Lambda(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), new ArrayList<Formal>(), b));
     :}
     | LPAREN:l inferred_formal_parameter_list:f RPAREN_ARROW lambda_body:b
     {:
-        RESULT = parser.nf.Lambda(parser.pos(l, b, b), f, b);
+        RESULT = parser.nf.Lambda(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b));
     :}
     ;
 
