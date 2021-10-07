@@ -69,7 +69,9 @@ public class Lambda_c extends Expr_c implements Lambda {
             Type type = localDecl.declType();
             if (type.isCanonical()) {
                 this.declaration.setTargetType(
-                        type, (JL8TypeSystem) visitor.context().typeSystem());
+                        type,
+                        (JL8TypeSystem) visitor.context().typeSystem(),
+                        visitor.nodeFactory());
             }
         }
         return super.overrideContextVisit(parent, visitor);

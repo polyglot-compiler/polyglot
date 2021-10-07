@@ -8,8 +8,10 @@ import polyglot.ast.CodeNode;
 import polyglot.ast.Ext;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.CodeInstance;
 import polyglot.types.Context;
@@ -82,18 +84,45 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode {
                 new ArrayList<Type>());
     }
 
-    void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem) throws SemanticException {
+    void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem, NodeFactory nodeFactory)
+            throws SemanticException {
         if (targetType.isReference()) {
             ReferenceType targetReferenceType = targetType.toReference();
             List<MethodInstance> methods =
                     jl8TypeSystem.nonObjectPublicAbstractMethods(targetReferenceType);
             if (methods.size() == 1) {
                 this.targetType = targetReferenceType;
-                this.sam = methods.get(0);
+                MethodInstance method = methods.get(0);
+                this.sam = method;
+                List<? extends Type> formalTypesFromTarget = method.formalTypes();
+                int expectedSize = formalTypesFromTarget.size();
+                if (expectedSize != this.formals.size()) {
+                    throw new SemanticException(
+                            String.format(
+                                    "Incompatible parameter types in lambda expression: wrong"
+                                        + " number of parameters: expected %d but found %d",
+                                    expectedSize, this.formals.size()),
+                            position());
+                }
+                for (int i = 0; i < expectedSize; i++) {
+                    Formal formal = this.formals.get(i);
+                    TypeNode formalType = formal.type();
+                    if (formalType.position().isCompilerGenerated()) {
+                        // It's a synthetic formal from inferred parameters
+                        this.formals.set(
+                                i,
+                                formal.type(
+                                        nodeFactory.CanonicalTypeNode(
+                                                Position.COMPILER_GENERATED,
+                                                formalTypesFromTarget.get(i))));
+                    } else {
+                        // TODO: validate types
+                    }
+                }
                 return;
             }
         }
-        throw new SemanticException(targetType + " is not a functional interface.");
+        throw new SemanticException(targetType + " is not a functional interface.", position());
     }
 
     protected <N extends LambdaFunctionDeclaration> N formals(N n, List<Formal> formals) {
