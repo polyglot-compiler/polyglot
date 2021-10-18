@@ -117,7 +117,15 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode {
                                                 Position.COMPILER_GENERATED,
                                                 formalTypeFromTarget)));
                     } else {
-                        // TODO: validate types
+                        Type declaredFormalType = formalType.type();
+                        if (!jl8TypeSystem.equals(declaredFormalType, formalTypeFromTarget)) {
+                            throw new SemanticException(
+                                    String.format(
+                                            "Incompatible parameter types in lambda expression:"
+                                                    + " expected %s but found %s",
+                                            formalTypeFromTarget, declaredFormalType),
+                                    formalType.position());
+                        }
                     }
                 }
                 return;
