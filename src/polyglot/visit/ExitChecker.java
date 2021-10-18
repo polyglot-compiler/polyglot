@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 import polyglot.ast.CodeNode;
-import polyglot.ast.MethodDecl;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Return;
 import polyglot.ast.Returnable;
