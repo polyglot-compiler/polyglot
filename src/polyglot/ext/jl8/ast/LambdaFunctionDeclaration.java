@@ -118,7 +118,7 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode {
                                                 formalTypeFromTarget)));
                     } else {
                         Type declaredFormalType = formalType.type();
-                        if (!declaredFormalType.equalsImpl(formalTypeFromTarget)) {
+                        if (!jl8TypeSystem.equals(declaredFormalType, formalTypeFromTarget)) {
                             throw new SemanticException(
                                     String.format(
                                             "Incompatible parameter types in lambda expression:"
