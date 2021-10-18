@@ -34,4 +34,7 @@
 polyglot.ext.jl8.JL8ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
 	FunctionInterfaceAnonynousClass.jl8;
 	SimpleLambda01.jl8;
+	SimpleLambda02.jl8;
+	SimpleLambdaInvalid01.jl8 (Semantic);
+	SimpleLambdaInvalid02.jl8 (Semantic);
 }

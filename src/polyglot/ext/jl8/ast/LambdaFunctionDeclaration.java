@@ -107,6 +107,7 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode {
                 for (int i = 0; i < expectedSize; i++) {
                     Formal formal = this.formals.get(i);
                     TypeNode formalType = formal.type();
+                    Type formalTypeFromTarget = formalTypesFromTarget.get(i);
                     if (formalType.position().isCompilerGenerated()) {
                         // It's a synthetic formal from inferred parameters
                         this.formals.set(
@@ -114,7 +115,7 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode {
                                 formal.type(
                                         nodeFactory.CanonicalTypeNode(
                                                 Position.COMPILER_GENERATED,
-                                                formalTypesFromTarget.get(i))));
+                                                formalTypeFromTarget)));
                     } else {
                         // TODO: validate types
                     }

@@ -1,0 +1,11 @@
+import java.util.function.Function;
+
+public class SimpleLambdaInvalid02 {
+    void test() {
+        Integer mutableInt = 2;
+        // Using mutable captured variables
+        Function<Integer, Integer> minus = (i) -> mutableInt - i;
+        mutableInt += 1;
+        minus.apply(3);
+    }
+}
