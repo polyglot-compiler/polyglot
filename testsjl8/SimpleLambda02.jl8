@@ -1,0 +1,9 @@
+import java.util.function.Function;
+
+public class SimpleLambda02 {
+    void test() {
+        final Integer immutableInt = 2;
+        Function<Integer, Integer> minus = (i) -> immutableInt - i;
+        minus.apply(3);
+    }
+}
