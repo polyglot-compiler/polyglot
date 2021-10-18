@@ -1,0 +1,9 @@
+import java.util.function.Function;
+
+public class SimpleLambda03 {
+    void test() {
+        // Lack of return
+        Function<Integer, Integer> minus = (i) -> {};
+        minus.apply(3);
+    }
+}

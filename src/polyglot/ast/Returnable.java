@@ -26,24 +26,9 @@
 
 package polyglot.ast;
 
-import polyglot.types.MethodInstance;
+import polyglot.types.Type;
 
-/**
- * A method declaration.
- */
-public interface MethodDecl extends ProcedureDecl, Returnable {
+public interface Returnable {
     /** The method's return type.  */
-    TypeNode returnType();
-
-    /** Set the method's return type.  */
-    MethodDecl returnType(TypeNode returnType);
-
-    /**
-     * The method type object.  This field may not be valid until
-     * after signature disambiguation.
-     */
-    MethodInstance methodInstance();
-
-    /** Set the method's type object. */
-    MethodDecl methodInstance(MethodInstance mi);
+    Type returnValueType();
 }

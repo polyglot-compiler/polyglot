@@ -9,6 +9,7 @@ import polyglot.ast.Ext;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.Returnable;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
@@ -27,7 +28,7 @@ import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
-public class LambdaFunctionDeclaration extends Term_c implements CodeNode {
+public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Returnable {
 
     protected List<Formal> formals;
     protected Block block;
@@ -66,6 +67,11 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode {
     @Override
     public CodeInstance codeInstance() {
         return sam;
+    }
+
+    @Override
+    public Type returnValueType() {
+        return sam.returnType();
     }
 
     public LambdaFunctionDeclaration block(Block block) {

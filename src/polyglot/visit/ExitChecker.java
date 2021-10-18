@@ -31,9 +31,9 @@ import java.util.Map;
 import java.util.Set;
 
 import polyglot.ast.CodeNode;
-import polyglot.ast.MethodDecl;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Return;
+import polyglot.ast.Returnable;
 import polyglot.ast.Term;
 import polyglot.frontend.Job;
 import polyglot.types.SemanticException;
@@ -56,9 +56,8 @@ public class ExitChecker extends DataFlow<ExitChecker.DataFlowItem> {
     protected FlowGraph<DataFlowItem> initGraph(CodeNode code, Term root) {
         this.code = code;
 
-        if (code instanceof MethodDecl) {
-            MethodDecl d = (MethodDecl) code;
-            if (!d.methodInstance().returnType().isVoid()) {
+        if (code instanceof Returnable) {
+            if (!((Returnable) code).returnValueType().isVoid()) {
                 return super.initGraph(code, root);
             }
         }

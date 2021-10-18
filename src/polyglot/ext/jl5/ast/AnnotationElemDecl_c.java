@@ -374,6 +374,11 @@ public class AnnotationElemDecl_c extends Term_c implements AnnotationElemDecl {
     }
 
     @Override
+    public Type returnValueType() {
+        return this.methodInstance().returnType();
+    }
+
+    @Override
     public TypeNode returnType() {
         return this.type();
     }
