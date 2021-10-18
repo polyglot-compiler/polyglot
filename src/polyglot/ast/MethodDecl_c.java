@@ -132,6 +132,11 @@ public class MethodDecl_c extends ProcedureDecl_c implements MethodDecl {
     }
 
     @Override
+    public Type returnValueType() {
+        return this.methodInstance().returnType();
+    }
+
+    @Override
     public TypeNode returnType() {
         return this.returnType;
     }
