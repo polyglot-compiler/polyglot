@@ -23,35 +23,14 @@
  *
  * See README for contributors.
  ******************************************************************************/
+package polyglot.ext.jl8;
 
-package polyglot.frontend;
+import polyglot.ext.jl7.JL7Scheduler;
+import polyglot.frontend.JLExtensionInfo;
 
-import polyglot.ast.Node;
-import polyglot.frontend.goals.Goal;
-import polyglot.util.InternalCompilerError;
-import polyglot.visit.Translator;
+public class JL8Scheduler extends JL7Scheduler {
 
-/** An output pass generates output code from the processed AST. */
-public class OutputPass extends AbstractPass {
-    protected Translator translator;
-
-    /**
-     * Create a Translator.  The output of the visitor is a collection of files
-     * whose names are added to the collection {@code outputFiles}.
-     */
-    public OutputPass(Goal goal, Translator translator) {
-        super(goal);
-        this.translator = translator;
-    }
-
-    @Override
-    public boolean run() {
-        Node ast = goal.job().ast();
-
-        if (ast == null) {
-            throw new InternalCompilerError("AST is null");
-        }
-
-        return translator.translate(ast);
+    public JL8Scheduler(JLExtensionInfo extInfo) {
+        super(extInfo);
     }
 }
