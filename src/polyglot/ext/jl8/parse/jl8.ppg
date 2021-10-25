@@ -60,8 +60,8 @@ terminal token RPAREN_ARROW;
 
 start with goal;
 
-extend expression ::= lambda_expression:e {: RESULT = e; :};
 extend expression_nn ::= lambda_expression:e {: RESULT = e; :};
+extend assignment_expression ::= lambda_expression:e {: RESULT = e; :};
 
 lambda_expression ::=
       simple_name:n ARROW lambda_body:b

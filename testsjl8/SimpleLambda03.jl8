@@ -1,0 +1,15 @@
+import java.util.function.Function;
+
+public class SimpleLambda03 {
+    Function<Integer, Integer> a;
+    Function<Integer, Integer>[] b;
+
+    Function<Integer, Integer> test() {
+        Function<Integer, Integer> negation = null;
+        negation = (i) -> -i;
+        negation.apply(3);
+        this.a = (i) -> i * 2;
+        this.b[0] = (i) -> i * 2;
+        return (i) -> i + 1;
+    }
+}
