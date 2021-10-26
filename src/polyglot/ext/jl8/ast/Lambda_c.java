@@ -28,18 +28,24 @@ package polyglot.ext.jl8.ast;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import polyglot.ast.Assign;
+import polyglot.ast.Cast;
 import polyglot.ast.ClassMember;
 import polyglot.ast.Expr;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Ext;
+import polyglot.ast.FieldDecl;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Precedence;
+import polyglot.ast.Return;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl8.types.JL8TypeSystem;
+import polyglot.types.CodeInstance;
+import polyglot.types.FunctionInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -47,7 +53,6 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
-import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
@@ -97,18 +102,45 @@ public class Lambda_c extends Expr_c implements Lambda {
     }
 
     @Override
-    public Node overrideContextVisit(Node parent, ContextVisitor visitor) throws SemanticException {
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        if (parent instanceof Return) {
+            CodeInstance ci = tc.context().currentCode();
+            if (ci instanceof FunctionInstance) {
+                Type type = ((FunctionInstance) ci).returnType();
+                if (!type.isCanonical()) return this;
+                setTargetType(type, tc);
+            }
+        }
+        if (parent instanceof Assign) {
+            Assign assign = (Assign) parent;
+            Type type = assign.left().type();
+            if (type == null || !type.isCanonical()) return this;
+            setTargetType(type, tc);
+        }
         if (parent instanceof LocalDecl) {
             LocalDecl localDecl = (LocalDecl) parent;
             Type type = localDecl.declType();
-            if (type.isCanonical()) {
-                this.declaration.setTargetType(
-                        type,
-                        (JL8TypeSystem) visitor.context().typeSystem(),
-                        visitor.nodeFactory());
-            }
+            if (!type.isCanonical()) return this;
+            setTargetType(type, tc);
         }
-        return super.overrideContextVisit(parent, visitor);
+        if (parent instanceof FieldDecl) {
+            FieldDecl fieldDecl = (FieldDecl) parent;
+            Type type = fieldDecl.type().type();
+            if (type == null || !type.isCanonical()) return this;
+            setTargetType(type, tc);
+        }
+        if (parent instanceof Cast) {
+            Cast cast = (Cast) parent;
+            Type type = cast.castType().type();
+            if (!type.isCanonical()) return this;
+            setTargetType(type, tc);
+        }
+        return super.typeCheckOverride(parent, tc);
+    }
+
+    private void setTargetType(Type type, TypeChecker tc) throws SemanticException {
+        this.declaration.setTargetType(
+                type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
     }
 
     @Override
