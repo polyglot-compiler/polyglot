@@ -108,39 +108,39 @@ public class Lambda_c extends Expr_c implements Lambda {
             if (ci instanceof FunctionInstance) {
                 Type type = ((FunctionInstance) ci).returnType();
                 if (!type.isCanonical()) return this;
-                this.declaration.setTargetType(
-                        type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
+                setTargetType(type, tc);
             }
         }
         if (parent instanceof Assign) {
             Assign assign = (Assign) parent;
             Type type = assign.left().type();
             if (type == null || !type.isCanonical()) return this;
-            this.declaration.setTargetType(
-                    type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
+            setTargetType(type, tc);
         }
         if (parent instanceof LocalDecl) {
             LocalDecl localDecl = (LocalDecl) parent;
             Type type = localDecl.declType();
             if (!type.isCanonical()) return this;
-            this.declaration.setTargetType(
-                    type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
+            setTargetType(type, tc);
         }
         if (parent instanceof FieldDecl) {
             FieldDecl fieldDecl = (FieldDecl) parent;
             Type type = fieldDecl.type().type();
             if (type == null || !type.isCanonical()) return this;
-            this.declaration.setTargetType(
-                    type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
+            setTargetType(type, tc);
         }
         if (parent instanceof Cast) {
             Cast cast = (Cast) parent;
             Type type = cast.castType().type();
             if (!type.isCanonical()) return this;
-            this.declaration.setTargetType(
-                    type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
+            setTargetType(type, tc);
         }
         return super.typeCheckOverride(parent, tc);
+    }
+
+    private void setTargetType(Type type, TypeChecker tc) throws SemanticException {
+        this.declaration.setTargetType(
+                type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
     }
 
     @Override
