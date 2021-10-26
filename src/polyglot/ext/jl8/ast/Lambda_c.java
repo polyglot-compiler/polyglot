@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.function.Function;
 import polyglot.ast.Assign;
 import polyglot.ast.Assign_c;
+import polyglot.ast.Cast;
 import polyglot.ast.ClassMember;
 import polyglot.ast.Expr;
 import polyglot.ast.Expr_c;
@@ -138,6 +139,15 @@ public class Lambda_c extends Expr_c implements Lambda {
             FieldDecl fieldDecl = (FieldDecl) parent;
             Type type = fieldDecl.type().type();
             if (type == null || !type.isCanonical()) return this;
+            this.declaration.setTargetType(
+                    type,
+                    (JL8TypeSystem) tc.context().typeSystem(),
+                    tc.nodeFactory());
+        }
+        if (parent instanceof Cast) {
+            Cast cast = (Cast) parent;
+            Type type = cast.castType().type();
+            if (!type.isCanonical()) return this;
             this.declaration.setTargetType(
                     type,
                     (JL8TypeSystem) tc.context().typeSystem(),
