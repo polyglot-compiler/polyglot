@@ -28,9 +28,7 @@ package polyglot.ext.jl8.ast;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import polyglot.ast.Assign;
-import polyglot.ast.Assign_c;
 import polyglot.ast.Cast;
 import polyglot.ast.ClassMember;
 import polyglot.ast.Expr;
@@ -55,7 +53,6 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
-import polyglot.visit.ContextVisitor;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
@@ -112,9 +109,7 @@ public class Lambda_c extends Expr_c implements Lambda {
                 Type type = ((FunctionInstance) ci).returnType();
                 if (!type.isCanonical()) return this;
                 this.declaration.setTargetType(
-                        type,
-                        (JL8TypeSystem) tc.context().typeSystem(),
-                        tc.nodeFactory());
+                        type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
             }
         }
         if (parent instanceof Assign) {
@@ -122,36 +117,28 @@ public class Lambda_c extends Expr_c implements Lambda {
             Type type = assign.left().type();
             if (type == null || !type.isCanonical()) return this;
             this.declaration.setTargetType(
-                    type,
-                    (JL8TypeSystem) tc.context().typeSystem(),
-                    tc.nodeFactory());
+                    type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
         }
         if (parent instanceof LocalDecl) {
             LocalDecl localDecl = (LocalDecl) parent;
             Type type = localDecl.declType();
             if (!type.isCanonical()) return this;
             this.declaration.setTargetType(
-                    type,
-                    (JL8TypeSystem) tc.context().typeSystem(),
-                    tc.nodeFactory());
+                    type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
         }
         if (parent instanceof FieldDecl) {
             FieldDecl fieldDecl = (FieldDecl) parent;
             Type type = fieldDecl.type().type();
             if (type == null || !type.isCanonical()) return this;
             this.declaration.setTargetType(
-                    type,
-                    (JL8TypeSystem) tc.context().typeSystem(),
-                    tc.nodeFactory());
+                    type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
         }
         if (parent instanceof Cast) {
             Cast cast = (Cast) parent;
             Type type = cast.castType().type();
             if (!type.isCanonical()) return this;
             this.declaration.setTargetType(
-                    type,
-                    (JL8TypeSystem) tc.context().typeSystem(),
-                    tc.nodeFactory());
+                    type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
         }
         return super.typeCheckOverride(parent, tc);
     }
