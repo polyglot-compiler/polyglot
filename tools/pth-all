@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+# To be run in repo root
+
+ant
+# JL
+cd ./tests
+../bin/pth -ec pthScript
+cd ..
+# JL5
+cd ./testsjl5
+../bin/pth -ec pthScript-JL pthScript
+cd ..
+# JL7
+cd ./testsjl7
+../bin/pth -ec pthScript-JL pthScript-JL5 pthScript
+cd ..
+# JL8
+cd ./testsjl8
+../bin/pth -ec pthScript-JL pthScript-JL5 pthScript-JL7 pthScript
+cd ..
