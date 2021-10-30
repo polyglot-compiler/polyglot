@@ -425,9 +425,6 @@ public class RemoveEnums extends ContextVisitor {
      * @return
      */
     private Node translateEnumConstantDecl(EnumConstantDecl ecd) {
-        //		System.err.println("Translate enum constant decl " + ecd);
-        //		System.err.println("  " + ecd.constructorInstance());
-        //		System.err.println("  " + ecd.ordinal());
         List<Expr> args = new ArrayList<>();
         // add the name and ordinal
         args.add(nf.StringLit(Position.compilerGenerated(), ecd.name().id()));

@@ -471,7 +471,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
 
     @Override
     public TypeVariable typeVariable(Position pos, String name, ReferenceType upperBound) {
-        //        System.err.println("JL5TS_c typevar created " + name + " " + bounds);
         return new TypeVariable_c(this, pos, name, upperBound);
     }
 
@@ -647,12 +646,8 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
         LinkedList<Type> typeQueue = new LinkedList<>();
         typeQueue.addLast(container);
 
-        //        System.err.println("JL5TS: findAcceptableMethods for " + name + " in " +
-        // container);
         while (!typeQueue.isEmpty()) {
             Type type = typeQueue.remove();
-
-            //            System.err.println("   looking at type " + type + " " + type.getClass());
             // Make sure each type is considered only once
             if (visitedTypes.contains(type)) continue;
             visitedTypes.add(type);
@@ -682,7 +677,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
 
                 // Method name must match
                 if (!mi.name().equals(name)) continue;
-                //                System.err.println("      checking " + mi);
 
                 JL5MethodInstance substMi =
                         methodCallValid(mi, name, argTypes, actualTypeArgs, expectedReturnType);
@@ -790,13 +784,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
             phase3methods.removeAll(mi.overrides());
         }
 
-        //        System.err.println("JL5ts_c: acceptable methods for " + name + argTypes
-        //                + " is " + phase1methods);
-        //        System.err.println("              " + phase2methods);
-        //        System.err.println("              " + phase3methods);
-        //        System.err.println("        phase1overridden is    " + phase1overridden);
-        //        System.err.println("        phase2overridden is    " + phase2overridden);
-        //        System.err.println("        phase3overridden is    " + phase3overridden);
         if (!phase1methods.isEmpty()) return phase1methods;
         if (!phase2methods.isEmpty()) return phase2methods;
         if (!phase3methods.isEmpty()) return phase3methods;
@@ -1363,16 +1350,12 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
 
     @Override
     public boolean descendsFrom(Type child, Type ancestor) {
-        //        System.err.println("jl5TS_C: descends from: " + child + " descended from " +
-        // ancestor);
         boolean b = super.descendsFrom(child, ancestor);
         if (b) return true;
-        //        System.err.println("   : descends from 0");
         if (ancestor instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) ancestor;
             // See JLS 3rd ed 4.10.2: type variable is a direct supertype of its lowerbound.
             if (tv.hasLowerBound()) {
-                //                System.err.println("   : descends from 1");
                 return isSubtype(child, tv.lowerBound());
             }
         }
@@ -1380,7 +1363,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
             WildCardType w = (WildCardType) ancestor;
             // See JLS 3rd ed 4.10.2: type variable is a direct supertype of its lowerbound.
             if (w.hasLowerBound()) {
-                //                System.err.println("   : descends from 2");
                 return isSubtype(child, w.lowerBound());
             }
         }
@@ -1391,7 +1373,6 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
                 if (descendsFrom(child, rt)) return true;
             }
         }
-        //        System.err.println("   : descends from 3");
         return false;
     }
 

@@ -92,11 +92,6 @@ public class InferenceSolver_c implements InferenceSolver {
         List<EqualConstraint> equals = new ArrayList<>();
         List<SubTypeConstraint> subs = new ArrayList<>();
         List<SuperTypeConstraint> supers = new ArrayList<>();
-        //        System.err.println("**** inference solver:");
-        //        System.err.println("      constraints : " + constraints);
-        //        System.err.println("      use subs? : " + useSubtypeConstraints
-        //                + "   use sups? : " + useSupertypeConstraints);
-        //        System.err.println("      variables : " + typeVariablesToSolve());
 
         while (!constraints.isEmpty()) {
             Constraint head = constraints.remove(0);
@@ -116,9 +111,6 @@ public class InferenceSolver_c implements InferenceSolver {
                 }
             }
         }
-        //        System.err.println("      a equals : " + equals);
-        //        System.err.println("      a subs   : " + subs);
-        //        System.err.println("      a supers : " + supers);
 
         Comparator<Constraint> comp =
                 new Comparator<Constraint>() {
@@ -131,10 +123,6 @@ public class InferenceSolver_c implements InferenceSolver {
         Collections.sort(equals, comp);
         Collections.sort(subs, comp);
         Collections.sort(supers, comp);
-
-        //        System.err.println("      equals : " + equals);
-        //        System.err.println("      subs   : " + subs);
-        //        System.err.println("      supers : " + supers);
 
         Type[] solution = new Type[typeVariablesToSolve().size()];
         for (EqualConstraint eq : equals) {
@@ -174,8 +162,6 @@ public class InferenceSolver_c implements InferenceSolver {
                 }
             }
         }
-
-        //        System.err.println("      Solution : " + Arrays.asList(solution));
 
         return solution;
     }
@@ -256,8 +242,6 @@ public class InferenceSolver_c implements InferenceSolver {
                 cons.add(new SuperConversionConstraint(expectedReturnType, returnType, this));
                 Type[] betterSolution = this.solve(cons, true, false);
                 if (betterSolution != null) {
-                    //                    System.err.println("Found a better solution: " +
-                    // Arrays.asList(betterSolution));
                     solution = betterSolution;
                 }
             }

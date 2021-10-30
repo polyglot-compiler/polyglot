@@ -71,8 +71,6 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c
     public boolean callValidImpl(List<? extends Type> argTypes) {
         List<Type> myFormalTypes = formalTypes;
 
-        // System.err.println("JL5MethodInstance_c callValid Impl " + this +
-        // " called with " +argTypes);
         // now compare myFormalTypes to argTypes
         if (!isVariableArity() && argTypes.size() != myFormalTypes.size()) {
             return false;
@@ -114,13 +112,9 @@ public class JL5ConstructorInstance_c extends ConstructorInstance_c
                 // or the array type.
                 ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 if (!ts.isImplicitCastValid(actual, arr)) {
-                    // System.err.println("     3: failed " + actual +
-                    // " to " +formal + " and " + actual + " to " + arr);
                     return false;
                 }
             } else {
-                // System.err.println("     4: failed " + actual + " to "
-                // +formal);
                 return false;
             }
         }

@@ -1,0 +1,41 @@
+import java.lang.annotation.Target;
+import java.util.function.Function;
+import static java.lang.annotation.ElementType.*;
+
+/** Mostly parsing tests for various lambda with explicit type annotations. */
+public class SimpleLambda04 {
+    void test1() {
+        Function<Integer, Integer> negation = (Integer i) -> -i;
+        negation = (final Integer i) -> -i;
+        negation = (@TestAnnotation Integer i) -> -i;
+        negation.apply(3);
+    }
+
+    void test2() {
+        Function<Function<Integer, Integer>, Integer> a = (Function<Integer, Integer> f) -> 0;
+        a = (@TestAnnotation Function<Integer, Integer> f) -> 0;
+    }
+
+    void test3() {
+        Function<Integer[], Integer> a = (Integer[] f) -> 0;
+        a = (Integer... f) -> 0;
+        a = (@TestAnnotation Integer[] f) -> 0;
+        a = (@TestAnnotation Integer... f) -> 0;
+    }
+
+    void test4() {
+        Function<int[], Integer> a = (int[] f) -> 0;
+        a = (int... f) -> 0;
+        a = (@TestAnnotation int[] f) -> 0;
+        a = (@TestAnnotation int... f) -> 0;
+    }
+
+    void test5() {
+        Function<int[][], Integer> a = (int[][] f) -> 0;
+        a = (int[]... f) -> 0;
+        a = (@TestAnnotation int[][] f) -> 0;
+        a = (@TestAnnotation int[]... f) -> 0;
+    }
+}
+
+@Target(value={ANNOTATION_TYPE, TYPE, LOCAL_VARIABLE, PARAMETER}) @interface TestAnnotation {}

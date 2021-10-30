@@ -340,7 +340,6 @@ public class JL5Signature extends Attribute {
     }
 
     public Result<List<TypeVariable>> formalTypeParamList(String value, int pos) {
-        // System.err.println("### Parsing formal type param list " + value.substring(pos));
         typeVars = null;
         int oldpos = pos;
         createTypeVars = true;
@@ -372,7 +371,6 @@ public class JL5Signature extends Attribute {
 
     // ID classBound interfaceBoundList(opt)
     public Result<TypeVariable> formalTypeParam(String value, int pos) {
-        // System.err.println("### Parsing formalTypeParam " + value.substring(pos));
         String id = "";
         char token = value.charAt(pos);
         while (token != COLON) {
@@ -394,7 +392,6 @@ public class JL5Signature extends Attribute {
             bounds.add(ires.result());
         }
         if (createTypeVars) {
-            // System.err.println("\ncreating type variable " + id + "\n");
             return new Result<>(
                     ts.typeVariable(position, id, ts.intersectionType(position, bounds)), pos);
         } else {
@@ -413,7 +410,6 @@ public class JL5Signature extends Attribute {
     // typeVarSig T...;
     // arrayTypeSig [...;
     public Result<? extends ReferenceType> fieldTypeSig(String value, int pos) {
-        // System.err.println("### Parsing field type sig " + value.substring(pos));
         char token = value.charAt(pos);
         switch (token) {
             case L:
@@ -458,12 +454,9 @@ public class JL5Signature extends Attribute {
                     }
                 case LEFT_ANGLE:
                     { // id is a className
-                        // System.err.println("Parsing type arg list " + value.substring(pos));
                         Result<List<ReferenceType>> tres = typeArgList(value, pos);
-                        // System.err.println("Got " + tres.result());
                         pos = tres.pos();
                         classArgsMap.put(id, tres.result());
-                        // System.err.println("Adding " + tres.result() + " to map for " + id);
                         token = value.charAt(pos);
                         break;
                     }
@@ -479,9 +472,6 @@ public class JL5Signature extends Attribute {
         className += id;
         ClassType ct = null;
         try {
-            // System.err.println("<><> " + className);
-            // ct = (ClassType) ts.typeForName(className);
-            // ct = cls.typeForName()
             ct = (ClassType) ts.systemResolver().find(className);
         } catch (SemanticException e) {
             throw new InternalCompilerError("could not load " + className, e);
@@ -489,13 +479,6 @@ public class JL5Signature extends Attribute {
         // look up in the map the last part of className, i.e., the part after the last '.'.
         // This means that java.util.Map$Entry will go to
         String lookupClassName = className.substring(className.lastIndexOf('.') + 1);
-        // System.err.println("Now looking up " + ct.name() + " with class name '" + className +"'
-        // in classArgsMap " + classArgsMap + "  " + classArgsMap.containsKey(className) + "  " +
-        // createTypeVars);
-        //        if (!className.equals(ct.name())) {
-        //            System.err.println("---- uh oh:   " + className + "   " + ct.name() +"   " +
-        // lookupClassName +"  " +classArgsMap);
-        //        }
         if (classArgsMap.containsKey(lookupClassName)) {
             JL5ParsedClassType pct = parsedClassTypeForClass(ct);
             if (!createTypeVars) {

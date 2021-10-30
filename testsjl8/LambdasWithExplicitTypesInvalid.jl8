@@ -1,0 +1,9 @@
+import java.util.function.Function;
+
+public class SimpleLambdaInvalid04 {
+    void test() {
+        // incompatible arg type
+        Function<Integer, Integer> minus = (String i) -> 3;
+        minus.apply(3);
+    }
+}
