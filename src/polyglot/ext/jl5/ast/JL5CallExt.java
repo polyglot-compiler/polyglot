@@ -179,21 +179,6 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
                                 ext.expectedReturnType(),
                                 !(n.target() instanceof Special));
 
-        //        System.err.println("\nJL5Call_c.typeCheck targettype is " + targetType);
-        //        System.err.println("  JL5Call_c.typeCheck target is " + this.target);
-        //        System.err.println("  JL5Call_c.typeCheck target type is "
-        //                + this.target.type());
-        //        if (this.target.type().isClass()) {
-        //            System.err.println("  JL5Call_c.typeCheck target type super is "
-        //                    + this.target.type().toClass().superType());
-        //        }
-        //        System.err.println("  JL5Call_c.expectedReturnType is "
-        //                + this.expectedReturnType);
-        //        System.err.println("  JL5Call_c.typeCheck arg types is " + argTypes);
-        //        System.err.println("  JL5Call_c.typeCheck mi is " + mi
-        //                + " return type is " + mi.returnType().getClass());
-        //        System.err.println("  JL5Call_c.typeCheck mi is " + mi
-        //                + " container is " + mi.container().getClass());
         if (staticContext && !mi.flags().isStatic()) {
             throw new SemanticException(
                     "Cannot call non-static method "
@@ -232,7 +217,6 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
                             Collections.singletonList(wt));
             n = (Call) n.type(instClass);
         }
-        //        System.err.println("JL5Call_c: " + this + " got mi " + mi);
 
         return n;
     }

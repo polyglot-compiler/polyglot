@@ -1,6 +1,6 @@
 import java.util.function.Function;
 
-public class SimpleLambda03 {
+public class SimpleLambdaInvalid03 {
     void test() {
         // Lack of return
         Function<Integer, Integer> minus = (i) -> {};

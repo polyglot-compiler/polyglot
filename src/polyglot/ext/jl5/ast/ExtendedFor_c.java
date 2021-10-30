@@ -142,10 +142,6 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
         Position position = n.position();
         // Check that the expr is an array or of type Iterable
         Type t = expr.type();
-        //        System.err.println(" t is a " + t.getClass());
-        //        System.err.println("    t is a " + ts.allAncestorsOf((ReferenceType) t));
-        //        System.err.println("    erasure(t) is " + ts.erasureType(t));
-        //        System.err.println("    iterable is a " + ts.Iterable().getClass());
         if (!expr.type().isArray()
                 && !t.isSubtype(ts.rawClass((JL5ParsedClassType) ts.Iterable()))) {
             throw new SemanticException(

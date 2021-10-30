@@ -1,11 +1,12 @@
 import java.util.function.Function;
 
+/** Mostly type checking tests for lambdas in all different positions, except in function call. */
 public class SimpleLambda03 {
     Function<Integer, Integer> a;
     Function<Integer, Integer>[] b;
 
     Function<Integer, Integer> test() {
-        Function<Integer, Integer> negation = null;
+        Function<Integer, Integer> negation = (i) -> -i;
         negation = (i) -> -i;
         negation.apply(3);
         ((Function<Integer, Integer>) (i -> i)).apply(3);

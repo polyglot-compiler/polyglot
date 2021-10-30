@@ -117,19 +117,6 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
         JL5ParsedClassType pct = handleBase(typeMap);
 
         Type baseType = base.type();
-        //        System.err.println("Base type is " + base);
-        //        System.err.println("typeArguments is " + typeArguments);
-        //        if (baseType instanceof JL5SubstClassType) {
-        //            System.err.println("  " + this.position);
-        //            System.err.println("    base type of " + this + " is " + base.type()+ " " +
-        // base.type().getClass());
-        //            System.err.println("   base type base is " +
-        // ((JL5SubstClassType)baseType).base());
-        //            System.err.println("   base type instantiation is " +
-        // ((JL5SubstClassType)baseType).subst() + "  " +
-        // ((JL5SubstClassType)baseType).subst().getClass());
-        //            System.err.println("   type args are is " + this.typeArguments);
-        //        }
 
         if (pct.pclass() == null || pct.pclass().formals().isEmpty()) {
             // The base class has no formals.
@@ -156,7 +143,6 @@ public class AmbTypeInstantiation extends TypeNode_c implements Ambiguous {
             typeMap.put(formals.get(i), t);
         }
 
-        //        System.err.println("Instantiating " + pct + " with " + typeMap);
         JL5TypeSystem ts = (JL5TypeSystem) sc.typeSystem();
         Type instantiated = ts.subst(pct, typeMap);
         return sc.nodeFactory().CanonicalTypeNode(position, instantiated);

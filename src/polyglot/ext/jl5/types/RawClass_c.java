@@ -222,17 +222,7 @@ public class RawClass_c extends JL5ClassType_c implements RawClass {
 
     @Override
     public boolean descendsFromImpl(Type ancestor) {
-        //        System.err.println("   Raw class " + this + " descends from " + ancestor + " ?
-        // interfaces is " + this.interfaces() + "  ::: " + super.descendsFromImpl(ancestor));
-        //        System.err.println("    base interfaces are "  + this.base.interfaces());
-        if (super.descendsFromImpl(ancestor)) {
-            return true;
-        }
-        //        Type ra = ((JL5TypeSystem)ts).toRawType(ancestor);
-        //        if (!ra.equals(ancestor)) {
-        //            return ts.isSubtype(this, ra);
-        //        }
-        return false;
+        return super.descendsFromImpl(ancestor);
     }
 
     @Override

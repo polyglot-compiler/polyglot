@@ -168,16 +168,10 @@ public class ParamTypeNode_c extends TypeNode_c implements ParamTypeNode {
                 // not disambiguated yet
                 ambiguous = true;
             }
-            //			if (!tn.type().isReference()) {
-            //			    throw new SemanticException("Cannot instantiate a type parameter with type " +
-            // tn.type());
-            //			}
             typeList.add(tn.type());
         }
         if (!ambiguous) {
             TypeVariable tv = (TypeVariable) n.type();
-            //		System.err.println("paramtypenode_c : dismab and setting bounds of " + tv + " to " +
-            // typeList);
             List<ReferenceType> refTypeList = new ArrayList<>();
             for (Type t : typeList) refTypeList.add((ReferenceType) t);
             tv.setUpperBound(ts.intersectionType(n.position(), refTypeList));

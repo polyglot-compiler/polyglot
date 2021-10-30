@@ -103,12 +103,8 @@ public class JL5ClassFileLazyClassInitializer extends ClassFileLazyClassInitiali
         // Create the ClassType.
         JL5ParsedClassType ct = (JL5ParsedClassType) super.createType();
 
-        // System.err.println("Added " + name + " " + ct +
-        // " to the system resolver.");
-
         JL5Signature signature = ((JL5ClassFile) clazz).getSignature();
         // Load the class signature
-        // System.err.println("    signature == null? " + (signature == null));
         if (signature != null) {
             MuPClass<TypeVariable, ReferenceType> pc =
                     ((JL5TypeSystem) ts).mutablePClass(ct.position());
@@ -131,32 +127,6 @@ public class JL5ClassFileLazyClassInitializer extends ClassFileLazyClassInitiali
 
             ct.superType(signature.classSignature.superType());
             ct.setInterfaces(signature.classSignature.interfaces());
-
-            /*
-             * System.err.println("Class signature type for " + name);
-             * System.err.println("    interfaces " +
-             * signature.classSignature.interfaces());
-             * System.err.println("    supertype " +
-             * signature.classSignature.superType());
-             * System.err.println("           " +
-             * signature.classSignature.superType().getClass());
-             * System.err.println("    typevars " +
-             * signature.classSignature.typeVars());
-             * System.err.println("  type vars " +
-             * signature.classSignature.typeVars() + " for class " + name);
-             *
-             * System.err.println("Class signature type for " + name);
-             * System.err.println("          " + ct.getClass());
-             * System.err.println("    interfaces " + ct.interfaces());
-             * System.err.println("    supertype " + ct.superType());
-             * System.err.println("           " + ct.superType().getClass());
-             * System.err.println("    typevars " + ct.typeVariables());
-             * System.err.println("  type vars " + ct.typeVariables() +
-             * " for class " + name);
-             */
-        } else {
-            // System.err.println("Class signature type for " + name +
-            // ": null signature");
         }
 
         return ct;
@@ -195,15 +165,6 @@ public class JL5ClassFileLazyClassInitializer extends ClassFileLazyClassInitiali
                 excTypes = tt;
             }
 
-            /*
-             * System.err.println("Method signature type for " + name);
-             * System.err.println("    returnType " +jl5RetType);
-             * System.err.println("    formalTypes "
-             * +signature.methodSignature.formalTypes);
-             * System.err.println("    typevars "
-             * +signature.methodSignature.typeVars);
-             * System.err.println("    throwTypes " +excTypes);
-             */
             mi =
                     ts.methodInstance(
                             ct.position(),
@@ -217,9 +178,6 @@ public class JL5ClassFileLazyClassInitializer extends ClassFileLazyClassInitiali
                             excTypes,
                             signature.methodSignature.typeVars());
         } else {
-            // System.err.println("Method signature type for " + name +
-            // " returnType: null signature");
-
             if (type.charAt(0) != '(') {
                 throw new ClassFormatError("Bad method type descriptor.");
             }

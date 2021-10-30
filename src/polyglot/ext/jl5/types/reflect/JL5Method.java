@@ -47,7 +47,6 @@ public class JL5Method extends Method {
 
     public JL5Method(DataInputStream in, ClassFile clazz) {
         super(in, clazz);
-        //        System.err.println("JL5Method created for " + clazz);
     }
 
     @Override
@@ -56,7 +55,6 @@ public class JL5Method extends Method {
 
         name = in.readUnsignedShort();
         type = in.readUnsignedShort();
-        //        System.err.println("JL5Method.initialize() for " + clazz );
 
         int numAttributes = in.readUnsignedShort();
 
@@ -67,7 +65,6 @@ public class JL5Method extends Method {
             int length = in.readInt();
 
             Constant name = clazz.getConstants()[nameIndex];
-            //            System.err.println("    " + name.value());
 
             if (name != null) {
                 if ("Exceptions".equals(name.value())) {

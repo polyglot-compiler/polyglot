@@ -204,16 +204,6 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
 
         JL5TypeSystem ts = (JL5TypeSystem) this.ts;
 
-        //        System.err.println("jl5substclasstype: descends from " + this + " <: " +
-        // ancestor);
-        //        System.err.println("    superclass of  " + this + " is " + this.superType());
-        //        System.err.println("    base class of  " + this + " is " + this.base());
-        //        System.err.println("       super of " + this.base() + " is " +
-        // this.base().superType());
-        //        System.err.println("    subst  of  " + this + " is " + this.subst());
-        //        System.err.println("   applying subst " + subst.substType(this.base()) + " super "
-        // + ((ReferenceType)subst.substType(this.base())).superType());
-
         // See JLS 3rd ed 4.10.2
         if (hasWildCardArg()) {
             Type captured;
@@ -240,17 +230,14 @@ public class JL5SubstClassType_c extends SubstClassType_c<TypeVariable, Referenc
         }
         if (ancestor instanceof JL5SubstClassType_c) {
             JL5SubstClassType_c anc = (JL5SubstClassType_c) ancestor;
-            //            System.err.println("      C");
             if (this.base.equals(anc.base)) {
-                //                System.err.println("      D");
                 // same base. check the params
                 // go through each type variable, and check containment
                 boolean allContained = true;
                 for (TypeVariable tv : ts.classAndEnclosingTypeVariables(base())) {
                     Type ti = this.subst.substType(tv);
                     Type si = anc.subst.substType(tv);
-                    //                    System.err.println("      E " + ti + " contained in "+si+"
-                    // ? " + ts.isContained(ti, si));
+
                     if (!ts.isContained(ti, si)) {
                         allContained = false;
                         break;

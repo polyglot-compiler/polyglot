@@ -304,16 +304,12 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
     public boolean callValidImpl(List<? extends Type> argTypes) {
         List<Type> myFormalTypes = formalTypes;
 
-        //         System.err.println("JL5MethodInstance_c callValid Impl " + this +" called with "
-        // +argTypes);
         // now compare myFormalTypes to argTypes
         if (!isVariableArity() && argTypes.size() != myFormalTypes.size()) {
-            //            System.err.println("     1");
             return false;
         }
         if (isVariableArity() && argTypes.size() < myFormalTypes.size() - 1) {
             // the last (variable) argument can consume 0 or more of the actual arguments.
-            //            System.err.println("     2");
             return false;
         }
 
@@ -349,13 +345,9 @@ public class JL5MethodInstance_c extends MethodInstance_c implements JL5MethodIn
                 // or the array type.
                 ArrayType arr = (ArrayType) myFormalTypes.get(myFormalTypes.size() - 1);
                 if (!ts.isImplicitCastValid(actual, arr)) {
-                    //                         System.err.println("     3: failed " + actual + " to
-                    // " +formal + " and " + actual + " to " + arr);
                     return false;
                 }
             } else {
-                //                     System.err.println("     4: failed " + actual + " to "
-                // +formal);
                 return false;
             }
         }
