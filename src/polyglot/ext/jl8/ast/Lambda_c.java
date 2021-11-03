@@ -138,7 +138,8 @@ public class Lambda_c extends Expr_c implements Lambda {
         return super.typeCheckOverride(parent, tc);
     }
 
-    private void setTargetType(Type type, TypeChecker tc) throws SemanticException {
+    @Override
+    public void setTargetType(Type type, TypeChecker tc) throws SemanticException {
         this.declaration.setTargetType(
                 type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
     }

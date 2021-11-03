@@ -31,8 +31,16 @@ import polyglot.ext.jl7.types.JL7TypeSystem_c;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
+import polyglot.types.Type;
+import polyglot.types.UnknownType;
 
 public class JL8TypeSystem_c extends JL7TypeSystem_c implements JL8TypeSystem {
+    @Override
+    public boolean isImplicitCastValid(Type fromType, Type toType) {
+        if (fromType instanceof UnknownType) return true;
+        return super.isImplicitCastValid(fromType, toType);
+    }
+
     @Override
     public List<MethodInstance> nonObjectPublicAbstractMethods(ReferenceType referenceType) {
         List<MethodInstance> objectPublicMethods = this.objectPublicMethods();

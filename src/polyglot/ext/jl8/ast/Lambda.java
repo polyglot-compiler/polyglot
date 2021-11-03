@@ -26,9 +26,14 @@
 package polyglot.ext.jl8.ast;
 
 import polyglot.ast.Expr;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.visit.TypeChecker;
 
 public interface Lambda extends Expr {
     LambdaFunctionDeclaration declaration();
 
     Lambda declaration(LambdaFunctionDeclaration declaration);
+
+    void setTargetType(Type type, TypeChecker tc) throws SemanticException;
 }
