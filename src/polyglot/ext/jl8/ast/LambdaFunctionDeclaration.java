@@ -52,6 +52,7 @@ import polyglot.util.Position;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Returnable {
 
@@ -162,6 +163,12 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
             }
         }
         throw new SemanticException(targetType + " is not a functional interface.", position());
+    }
+
+    @Override
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        if (this.targetType != null) return super.typeCheckOverride(parent, tc);
+        return this; // Not ready for type checking!
     }
 
     protected <N extends LambdaFunctionDeclaration> N formals(N n, List<Formal> formals) {

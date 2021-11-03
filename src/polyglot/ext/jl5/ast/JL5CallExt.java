@@ -80,7 +80,7 @@ public class JL5CallExt extends JL5ProcedureCallExt implements CallOps {
         return this.expectedReturnType;
     }
 
-    protected void setExpectedReturnType(Type type) {
+    public void setExpectedReturnType(Type type) {
         if (type == null || !type.isCanonical()) {
             expectedReturnType = null;
             return;

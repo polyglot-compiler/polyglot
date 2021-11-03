@@ -33,7 +33,7 @@ jobs:
         run: ant
       - name: Build Jar
         run: ant jar
-      - name: Run Base Tests
+      - name: Run Tests
         run: ../bin/pth -ec pthScript
         working-directory: ./tests
 
@@ -47,7 +47,7 @@ jobs:
           java-version: '11'
       - name: Build the base compiler
         run: ant
-      - name: Run Base Tests
+      - name: Run Tests
         run: ../bin/pth -ec pthScript-JL pthScript
         working-directory: ./testsjl5
 
@@ -61,7 +61,7 @@ jobs:
           java-version: '11'
       - name: Build the base compiler
         run: ant
-      - name: Run Base Tests
+      - name: Run Tests
         run: ../bin/pth -ec pthScript-JL pthScript-JL5 pthScript
         working-directory: ./testsjl7
 
@@ -75,6 +75,6 @@ jobs:
           java-version: '11'
       - name: Build the base compiler
         run: ant
-      - name: Run Base Tests
+      - name: Run Tests
         run: ../bin/pth -ec pthScript-JL pthScript-JL5 pthScript-JL7 pthScript
         working-directory: ./testsjl8

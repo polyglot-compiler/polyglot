@@ -321,7 +321,7 @@ polyglot.ext.jl8.JL8ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
 	BadReferences.jl (Semantic, "Member.*ambiguous");
 	BadReferences2.jl (Semantic, "Field.*ambiguous");
 	BadStaticContext.jl (Semantic);
-        BadSwitch1.jl (Semantic, "Case label must be an integral constant");
+    BadSwitch1.jl (Semantic, "Case label must be an integral constant");
 	BadSwitch2.jl (Semantic, "Duplicate case label");
 	Constants12.jl (Semantic, "Duplicate case label"),
                        (Semantic, "Duplicate case label"),
@@ -332,7 +332,7 @@ polyglot.ext.jl8.JL8ExtensionInfo ["../tests/"] "-sx jl -d out -classpath java-o
         CircularInheritance1.jl (Semantic, "Circular inheritance");
         CircularInheritance2.jl (Semantic, "Circular inheritance");
         CircularInheritance3.jl (Semantic, "Circular inheritance");
-	Errors.jl (Semantic, "Method.*cannot be called with arguments");
+	Errors.jl (Semantic, "Method.*cannot be called with arguments"), (Semantic);
 	Errors2.jl (Semantic, "Class .* not found");
 	LabeledBreak2.jl (Semantic, "Unreachable statement");
         InitCheckerBug.jl ;

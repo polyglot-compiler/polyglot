@@ -1,17 +1,140 @@
+/*******************************************************************************
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2012 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2012 IBM Corporation
+ * All rights reserved.
+ *
+ * This program and the accompanying materials are made available under
+ * the terms of the Eclipse Public License v1.0 which accompanies this
+ * distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * This program and the accompanying materials are made available under
+ * the terms of the Lesser GNU Public License v2.0 which accompanies this
+ * distribution.
+ *
+ * The development of the Polyglot project has been supported by a
+ * number of funding sources, including DARPA Contract F30602-99-1-0533,
+ * monitored by USAF Rome Laboratory, ONR Grants N00014-01-1-0968 and
+ * N00014-09-1-0652, NSF Grants CNS-0208642, CNS-0430161, CCF-0133302,
+ * and CCF-1054172, AFRL Contract FA8650-10-C-7022, an Alfred P. Sloan
+ * Research Fellowship, and an Intel Research Ph.D. Fellowship.
+ *
+ * See README for contributors.
+ ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
+import java.util.ArrayList;
+import java.util.List;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
 import polyglot.ast.ProcedureCall;
 import polyglot.ast.ProcedureCallOps;
+import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.ast.JL5Ext;
+import polyglot.ext.jl5.ast.JL5ProcedureCallExt;
+import polyglot.ext.jl5.types.JL5Flags;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.Type;
 import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.ListUtil;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 
 public abstract class JL8ProcedureCallExt extends JL8Ext implements ProcedureCallOps {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
+    protected List<TypeNode> typeArgs;
+
+    public JL8ProcedureCallExt(List<TypeNode> typeArgs) {
+        this.typeArgs = ListUtil.copy(typeArgs, true);
+    }
+
     @Override
     public ProcedureCall node() {
         return (ProcedureCall) super.node();
+    }
+
+    public List<TypeNode> typeArgs() {
+        return this.typeArgs;
+    }
+
+    public ProcedureCall typeArgs(List<TypeNode> typeArgs) {
+        return typeArgs(node(), typeArgs);
+    }
+
+    protected <N extends Node> N typeArgs(N n, List<TypeNode> typeArgs) {
+        JL8ProcedureCallExt ext = (JL8ProcedureCallExt) JL8Ext.ext(n);
+        if (CollectionUtil.equals(ext.typeArgs, typeArgs)) return n;
+        if (n == node) {
+            n = Copy.Util.copy(n);
+            ext = (JL8ProcedureCallExt) JL8Ext.ext(n);
+        }
+        ext.typeArgs = ListUtil.copy(typeArgs, true);
+        return n;
+    }
+
+    private Node reconstruct(Node n, List<TypeNode> typeArgs) {
+        n = typeArgs(n, typeArgs);
+        return n;
+    }
+
+    @Override
+    public Node visitChildren(NodeVisitor v) {
+        List<TypeNode> typeArgs = visitList(this.typeArgs, v);
+        Node n = superLang().visitChildren(node(), v);
+        return reconstruct(n, typeArgs);
+    }
+
+    protected List<ReferenceType> actualTypeArgs() {
+        ProcedureCall n = this.node();
+        JL5ProcedureCallExt ext = (JL5ProcedureCallExt) JL5Ext.ext(n);
+        List<ReferenceType> actualTypeArgs = new ArrayList<>(ext.typeArgs().size());
+        for (TypeNode tn : ext.typeArgs()) {
+            actualTypeArgs.add((ReferenceType) tn.type());
+        }
+        return actualTypeArgs;
+    }
+
+    @Override
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        ProcedureCall n = node();
+        ProcedureInstance pi = n.procedureInstance();
+
+        // Update for vararg calls only.
+        if (!JL5Flags.isVarArgs(pi.flags())) return super.childExpectedType(child, av);
+
+        int lastFormalIdx = pi.formalTypes().size() - 1;
+        Type lastFormalType = pi.formalTypes().get(lastFormalIdx);
+        if (!lastFormalType.isArray())
+            throw new InternalCompilerError("Vararg parameter is not an array type");
+
+        for (int i = 0; i < n.arguments().size(); i++) {
+            Expr e = n.arguments().get(i);
+            if (e == child) {
+                if (i < lastFormalIdx) {
+                    // Normal parameter.
+                    return pi.formalTypes().get(i);
+                }
+                int childDims = child.type().isArray() ? child.type().toArray().dims() : 0;
+                if (childDims == lastFormalType.toArray().dims()) {
+                    // Vararg passed as array.
+                    return lastFormalType;
+                } else {
+                    // Vararg passed as element.
+                    return lastFormalType.toArray().base();
+                }
+            }
+        }
+
+        return super.childExpectedType(child, av);
     }
 
     @Override

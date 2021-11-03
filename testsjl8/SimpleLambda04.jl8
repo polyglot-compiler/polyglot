@@ -1,0 +1,12 @@
+import java.util.function.Function;
+
+/** Mostly type checking tests for lambdas in all different positions, except in function call. */
+public class SimpleLambda04 {
+    void expectLambda(Function<Integer, Integer> f) {}
+
+    Function<Integer, Integer> test() {
+        this.expectLambda((i) -> -i);
+        expectLambda((i) -> -i);
+        return i -> 1;
+    }
+}

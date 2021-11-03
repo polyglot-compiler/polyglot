@@ -1,0 +1,10 @@
+import java.util.function.Function;
+
+public class SimpleLambdaInvalid04 {
+    void expectLambda(Function<Integer, Integer> f) {}
+
+    void test() {
+        this.expectLambda((String i) -> i);
+        expectLambda((String i) -> i);
+    }
+}
