@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.ast.ConstructorCall;
-import polyglot.ast.ConstructorCall_c;
 import polyglot.ast.Expr;
 import polyglot.ast.IntLit;
 import polyglot.ast.Node;
@@ -45,7 +44,6 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
-import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
@@ -111,9 +109,28 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        ConstructorCall_c n = (ConstructorCall_c) node();
+        ConstructorCall n = node();
 
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        Context c = tc.context();
+        ClassType ct = c.currentClass();
+        ConstructorCall.Kind kind = n.kind();
+
+        List<Type> argTypes = new LinkedList<>();
+        for (Expr e : n.arguments()) {
+            if (!e.isDisambiguated()) return n;
+            argTypes.add(e.type());
+        }
+
+        if (kind == SUPER) ct = ct.superType().toClass();
+
+        ConstructorInstance ci =
+                ts.findConstructor(ct, argTypes, actualTypeArgs(), c.currentClass(), false);
+
+        return typeCheck(tc, n.constructorInstance(ci));
+    }
+
+    public Node typeCheck(TypeChecker tc, ConstructorCall n) throws SemanticException {
         Context c = tc.context();
 
         ClassType ct = c.currentClass();
@@ -121,8 +138,6 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
 
         Expr qualifier = n.qualifier();
         ConstructorCall.Kind kind = n.kind();
-
-        List<ReferenceType> actualTypeArgs = actualTypeArgs();
 
         // The qualifier specifies the enclosing instance of this inner class.
         // The type of the qualifier must be the outer class of this
@@ -219,22 +234,7 @@ public class JL5ConstructorCallExt extends JL5ProcedureCallExt {
             // the qualifier
         }
 
-        List<Type> argTypes = new LinkedList<>();
-
-        for (Expr e : n.arguments()) {
-            if (!e.isDisambiguated()) {
-                return n;
-            }
-            argTypes.add(e.type());
-        }
-
-        if (kind == SUPER) {
-            ct = ct.superType().toClass();
-        }
-
-        ConstructorInstance ci =
-                ts.findConstructor(ct, argTypes, actualTypeArgs, c.currentClass(), false);
-        return n.constructorInstance(ci);
+        return n;
     }
 
     @Override
