@@ -49,6 +49,11 @@ public final class JL8ExtFactory_c extends JL8AbstractExtFactory_c implements JL
     }
 
     @Override
+    protected Ext extConstructorCallImpl() {
+        return new JL8ConstructorCallExt();
+    }
+
+    @Override
     protected Ext extNewImpl() {
         return new JL8NewExt();
     }

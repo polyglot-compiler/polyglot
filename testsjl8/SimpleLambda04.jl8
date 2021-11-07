@@ -2,6 +2,11 @@ import java.util.function.Function;
 
 /** Mostly type checking tests for lambdas in all different positions, except in function call. */
 public class SimpleLambda04 {
+    SimpleLambda04(Function<Integer, Integer> f) {}
+    SimpleLambda04() {
+        this(i -> i);
+    }
+
     void expectLambda(Function<Integer, Integer> f) {}
 
     Function<Integer, Integer> test() {
