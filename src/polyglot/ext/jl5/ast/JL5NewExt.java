@@ -139,10 +139,14 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        New n = this.node();
+        return typeCheck(tc, this.node());
+    }
+
+    public Node typeCheck(TypeChecker tc, New n) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
 
         if (!n.objectType().type().isClass()) {
+            System.out.println(n.objectType().type());
             throw new SemanticException("Must have a class for a new expression.", n.position());
         }
 
@@ -154,8 +158,8 @@ public class JL5NewExt extends JL5ProcedureCallExt implements NewOps {
 
         List<ReferenceType> actualTypeArgs = actualTypeArgs();
 
-        superLang().typeCheckFlags(this.node(), tc);
-        superLang().typeCheckNested(this.node(), tc);
+        superLang().typeCheckFlags(n, tc);
+        superLang().typeCheckNested(n, tc);
 
         if (n.body() != null) {
             ts.checkClassConformance(n.anonType());

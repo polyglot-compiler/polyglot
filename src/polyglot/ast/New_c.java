@@ -816,11 +816,31 @@ public class New_c extends Expr_c implements New, NewOps {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
-        New_c nn = this;
+    public Node typeCheckOverride(final Node parent, TypeChecker tc) throws SemanticException {
+        return typeCheckOverride(
+                this,
+                parent,
+                tc,
+                new NewChildVisitor() {
+                    @Override
+                    public New visitArguments(New nn, TypeChecker tc) {
+                        return nn.arguments(nn.visitList(nn.arguments(), tc));
+                    }
+
+                    @Override
+                    public New typeCheck(New n, New old, TypeChecker tc) throws SemanticException {
+                        return (New_c) tc.leave(parent, old, n, tc);
+                    }
+                });
+    }
+
+    public static New_c typeCheckOverride(
+            New_c n, Node parent, TypeChecker tc, NewChildVisitor newChildVisitor)
+            throws SemanticException {
+        New_c nn = n;
         New old = nn;
 
-        NodeVisitor childv = tc.enter(parent, this);
+        NodeVisitor childv = tc.enter(parent, n);
 
         if (childv instanceof PruningVisitor) {
             return nn;
@@ -829,7 +849,7 @@ public class New_c extends Expr_c implements New, NewOps {
         TypeChecker childtc = (TypeChecker) childv;
 
         if (nn.qualifier() != null) {
-            nn = qualifier(nn, nn.visitChild(nn.qualifier(), childtc));
+            nn = n.qualifier(nn, nn.visitChild(nn.qualifier(), childtc));
 
             if (!nn.qualifier().type().isCanonical()) {
                 return nn;
@@ -845,18 +865,24 @@ public class New_c extends Expr_c implements New, NewOps {
         }
 
         // Now type check the rest of the children.
-        nn = objectType(nn, nn.visitChild(nn.objectType(), childtc));
+        nn = n.objectType(nn, nn.visitChild(nn.objectType(), childtc));
         if (!nn.objectType().type().isCanonical()) return nn;
 
-        nn = arguments(nn, nn.visitList(nn.arguments(), childtc));
-        nn = body(nn, nn.visitChild(nn.body(), childtc));
-        nn = (New_c) tc.leave(parent, old, nn, childtc);
+        nn = (New_c) newChildVisitor.visitArguments(nn, childtc);
+        nn = n.body(nn, nn.visitChild(nn.body(), childtc));
+        nn = (New_c) newChildVisitor.typeCheck(nn, old, childtc);
 
         ConstantChecker cc = new ConstantChecker(tc.job(), tc.typeSystem(), tc.nodeFactory());
         cc = (ConstantChecker) cc.context(childtc.context());
         nn = (New_c) tc.lang().checkConstants(nn, cc);
 
         return nn;
+    }
+
+    public interface NewChildVisitor {
+        New visitArguments(New n, TypeChecker tc);
+
+        New typeCheck(New n, New old, TypeChecker tc) throws SemanticException;
     }
 
     @Override

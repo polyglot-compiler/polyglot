@@ -73,7 +73,7 @@ public abstract class JL5ProcedureCallExt extends JL5TermExt
         return typeArgs(node(), typeArgs);
     }
 
-    protected <N extends Node> N typeArgs(N n, List<TypeNode> typeArgs) {
+    public <N extends Node> N typeArgs(N n, List<TypeNode> typeArgs) {
         JL5ProcedureCallExt ext = (JL5ProcedureCallExt) JL5Ext.ext(n);
         if (CollectionUtil.equals(ext.typeArgs, typeArgs)) return n;
         if (n == node) {
