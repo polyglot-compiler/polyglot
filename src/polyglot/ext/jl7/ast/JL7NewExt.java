@@ -70,6 +70,11 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
 
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        if (!setExpectedObjectTypeFromParent(parent, tc)) return this.node();
+        return superLang().typeCheckOverride(node(), parent, tc);
+    }
+
+    public boolean setExpectedObjectTypeFromParent(Node parent, TypeChecker tc) {
         if (parent instanceof Return) {
             CodeInstance ci = tc.context().currentCode();
             if (ci instanceof FunctionInstance) {
@@ -82,7 +87,7 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
                 Type type = a.left().type();
                 if (type == null || !type.isCanonical()) {
                     // not ready yet
-                    return this.node();
+                    return false;
                 }
                 setExpectedObjectType(type);
             }
@@ -92,7 +97,7 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
             Type type = ld.type().type();
             if (type == null || !type.isCanonical()) {
                 // not ready yet
-                return this.node();
+                return false;
             }
             setExpectedObjectType(type);
         }
@@ -101,12 +106,11 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
             Type type = fd.type().type();
             if (type == null || !type.isCanonical()) {
                 // not ready yet
-                return this.node();
+                return false;
             }
             setExpectedObjectType(type);
         }
-
-        return superLang().typeCheckOverride(node(), parent, tc);
+        return true;
     }
 
     private transient Type expectedObjectType = null;
@@ -125,13 +129,17 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        New n = this.node();
+        return typeCheck(tc, this.node());
+    }
+
+    public Node typeCheck(TypeChecker tc, New n) throws SemanticException {
         TypeNode objectType = n.objectType();
-        if (!(objectType.type() instanceof DiamondType))
-            return superLang().typeCheck(this.node(), tc);
+        JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
+        if (!(objectType.type() instanceof DiamondType)) {
+            return ext5.typeCheck(tc, n);
+        }
 
         // Type check instance creation expressions using diamond.
-        JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
         List<TypeNode> typeArgs = ext5.typeArgs();
         if (!typeArgs.isEmpty())
             throw new SemanticException(
@@ -152,8 +160,8 @@ public class JL7NewExt extends JL7ProcedureCallExt implements NewOps {
             argTypes.add(e.type());
         }
 
-        superLang().typeCheckFlags(this.node(), tc);
-        superLang().typeCheckNested(this.node(), tc);
+        superLang().typeCheckFlags(n, tc);
+        superLang().typeCheckNested(n, tc);
 
         // Perform overload resolution and type argument inference as specified
         // in JLS SE 7 | 15.9.3.

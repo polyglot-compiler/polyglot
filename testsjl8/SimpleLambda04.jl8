@@ -7,7 +7,10 @@ public class SimpleLambda04 {
         this(i -> i);
     }
 
-    void expectLambda(Function<Integer, Integer> f) {}
+    void expectLambda(Function<Integer, Integer> f) {
+        new SimpleLambda04(i -> 1);
+        new SimpleLambda04(i -> -i + 2);
+    }
 
     Function<Integer, Integer> test() {
         this.expectLambda((i) -> -i);

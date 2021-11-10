@@ -25,9 +25,25 @@
  ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
+import java.util.ArrayList;
 import java.util.List;
+import polyglot.ast.Expr;
+import polyglot.ast.New;
+import polyglot.ast.New_c;
+import polyglot.ast.New_c.NewChildVisitor;
+import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.ast.JL5Ext;
+import polyglot.ext.jl5.ast.JL5NewExt;
+import polyglot.ext.jl7.ast.JL7Ext;
+import polyglot.ext.jl7.ast.JL7NewExt;
+import polyglot.ext.jl8.types.JL8TypeSystem;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
+import polyglot.visit.TypeChecker;
 
 public class JL8NewExt extends JL8ProcedureCallExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
@@ -38,5 +54,63 @@ public class JL8NewExt extends JL8ProcedureCallExt {
 
     public JL8NewExt(List<TypeNode> typeArgs) {
         super(typeArgs);
+    }
+
+    @Override
+    public New node() {
+        return (New) super.node();
+    }
+
+    @Override
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        final New n = this.node();
+        final JL7NewExt ext7 = (JL7NewExt) JL7Ext.ext(n);
+        final JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
+        final JL8TypeSystem ts = (JL8TypeSystem) tc.typeSystem();
+        if (!ext7.setExpectedObjectTypeFromParent(parent, tc)) return n;
+        return New_c.typeCheckOverride(
+                (New_c) ext5.typeArgs(n, visitList(ext5.typeArgs(), tc)),
+                parent,
+                tc,
+                new NewChildVisitor() {
+                    @Override
+                    public New visitArguments(New n, TypeChecker tc) {
+                        List<Expr> partiallyTypeCheckedArguments =
+                                new ArrayList<>(n.arguments().size());
+                        for (Expr argument : n.arguments()) {
+                            Expr checked;
+                            if (argument instanceof Lambda) {
+                                checked =
+                                        argument.type(ts.unknownType(Position.COMPILER_GENERATED));
+                            } else {
+                                checked = tc.visitEdge(n, argument);
+                            }
+                            partiallyTypeCheckedArguments.add(checked);
+                        }
+                        return n.arguments(partiallyTypeCheckedArguments);
+                    }
+
+                    @Override
+                    public New typeCheck(New n, New old, TypeChecker tc) throws SemanticException {
+                        n = (New) ext7.typeCheck(tc, n);
+                        List<Expr> fullyTypeCheckedArguments =
+                                new ArrayList<>(n.arguments().size());
+                        ConstructorInstance ci = n.constructorInstance();
+                        for (int i = 0; i < n.arguments().size(); i++) {
+                            Expr argument = n.arguments().get(i);
+                            if (argument instanceof Lambda) {
+                                Lambda lambda = (Lambda) argument;
+                                Type lambdaTargetType = ci.formalTypes().get(i);
+                                lambda.setTargetType(lambdaTargetType, tc);
+                                fullyTypeCheckedArguments.add(
+                                        tc.rethrowMissingDependencies(true).visitEdge(n, lambda));
+                            } else {
+                                fullyTypeCheckedArguments.add(argument);
+                            }
+                        }
+                        n = n.arguments(fullyTypeCheckedArguments);
+                        return n;
+                    }
+                });
     }
 }
