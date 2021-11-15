@@ -81,7 +81,7 @@ public class JL8NewExt extends JL8ProcedureCallExt {
                             Expr checked;
                             if (argument instanceof Lambda) {
                                 checked =
-                                        argument.type(ts.unknownType(Position.COMPILER_GENERATED));
+                                        argument.type(((Lambda) argument).temporaryTypeBeforeTypeChecking(ts));
                             } else {
                                 checked = tc.visitEdge(n, argument);
                             }

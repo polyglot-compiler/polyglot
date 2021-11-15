@@ -23,15 +23,21 @@
  *
  * See README for contributors.
  ******************************************************************************/
+
 package polyglot.ext.jl8.types;
 
 import java.util.List;
-import polyglot.ext.jl7.types.JL7TypeSystem;
-import polyglot.types.MethodInstance;
-import polyglot.types.ReferenceType;
 import polyglot.types.Type;
 
-public interface JL8TypeSystem extends JL7TypeSystem {
-    FunctionType functionType(List<? extends Type> formalTypes, Type returnType);
-    List<MethodInstance> nonObjectPublicAbstractMethods(ReferenceType referenceType);
+/** A placeholder for lambda expressions with known types before resolved into a reference type. */
+public interface FunctionType extends Type {
+    /**
+     * List of formal parameter types.
+     * @return A list of {@code Type}.
+     * @see polyglot.types.Type
+     */
+    List<? extends Type> formalTypes();
+
+    /** The functions's return type. */
+    Type returnType();
 }

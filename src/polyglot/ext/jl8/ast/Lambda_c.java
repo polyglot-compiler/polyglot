@@ -35,6 +35,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Ext;
 import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.New;
 import polyglot.ast.Node;
@@ -43,12 +44,14 @@ import polyglot.ast.Precedence;
 import polyglot.ast.Return;
 import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl8.types.FunctionType;
 import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.CodeInstance;
 import polyglot.types.FunctionInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
@@ -86,6 +89,20 @@ public class Lambda_c extends Expr_c implements Lambda {
     @Override
     public Lambda declaration(LambdaFunctionDeclaration declaration) {
         return reconstruct(this, declaration);
+    }
+
+    @Override
+    public FunctionType temporaryTypeBeforeTypeChecking(JL8TypeSystem ts) {
+        List<Formal> formals = this.declaration.formals;
+        List<Type> formalTypes = new ArrayList<>(formals.size());
+        for (Formal formal : formals) {
+            if (formal.position().isCompilerGenerated()) {
+                formalTypes.add(ts.unknownType(Position.COMPILER_GENERATED));
+            } else {
+                formalTypes.add(formal.declType());
+            }
+        }
+        return ts.functionType(formalTypes, null);
     }
 
     protected <N extends Lambda_c> N reconstruct(N n, LambdaFunctionDeclaration declaration) {

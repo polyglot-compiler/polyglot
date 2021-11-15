@@ -1,0 +1,9 @@
+import java.util.function.Function;
+
+public class SimpleLambdaInvalid05 {
+    void test() {
+        // Invalid parameter type
+        Function<Integer, String> negation = (String i) -> -i;
+        negation.apply(3);
+    }
+}

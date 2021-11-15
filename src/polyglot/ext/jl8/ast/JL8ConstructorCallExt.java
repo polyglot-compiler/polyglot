@@ -77,7 +77,7 @@ public class JL8ConstructorCallExt extends JL8ProcedureCallExt {
         for (Expr argument : call.arguments()) {
             Expr checked;
             if (argument instanceof Lambda) {
-                checked = argument.type(ts.unknownType(Position.COMPILER_GENERATED));
+                checked = argument.type(((Lambda) argument).temporaryTypeBeforeTypeChecking(ts));
             } else {
                 checked = tc.rethrowMissingDependencies(true).visitEdge(call, argument);
                 if (!checked.isDisambiguated()) return call;
