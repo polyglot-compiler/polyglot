@@ -39,7 +39,6 @@ import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
@@ -77,7 +76,7 @@ public class JL8ConstructorCallExt extends JL8ProcedureCallExt {
         for (Expr argument : call.arguments()) {
             Expr checked;
             if (argument instanceof Lambda) {
-                checked = argument.type(ts.unknownType(Position.COMPILER_GENERATED));
+                checked = argument.type(((Lambda) argument).temporaryTypeBeforeTypeChecking(ts));
             } else {
                 checked = tc.rethrowMissingDependencies(true).visitEdge(call, argument);
                 if (!checked.isDisambiguated()) return call;

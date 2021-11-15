@@ -38,7 +38,29 @@ public class JL8TypeSystem_c extends JL7TypeSystem_c implements JL8TypeSystem {
     @Override
     public boolean isImplicitCastValid(Type fromType, Type toType) {
         if (fromType instanceof UnknownType) return true;
+        if (fromType instanceof FunctionType && toType instanceof ReferenceType) {
+            List<MethodInstance> methods = nonObjectPublicAbstractMethods((ReferenceType) toType);
+            if (methods.size() != 1) return false;
+            MethodInstance method = methods.get(0);
+            FunctionType functionType = (FunctionType) fromType;
+            List<? extends Type> methodFormalTypes = method.formalTypes();
+            List<? extends Type> functionFormalTypes = functionType.formalTypes();
+            if (methodFormalTypes.size() != functionFormalTypes.size()) return false;
+            for (int i = 0; i < methodFormalTypes.size(); i++) {
+                if (!isImplicitCastValid(functionFormalTypes.get(i), methodFormalTypes.get(i))) {
+                    return false;
+                }
+            }
+            Type functionReturnType = functionType.returnType();
+            if (functionReturnType == null) functionReturnType = unknownType;
+            return isImplicitCastValid(functionReturnType, method.returnType());
+        }
         return super.isImplicitCastValid(fromType, toType);
+    }
+
+    @Override
+    public FunctionType functionType(List<? extends Type> formalTypes, Type returnType) {
+        return new FunctionType_c(this, formalTypes, returnType);
     }
 
     @Override

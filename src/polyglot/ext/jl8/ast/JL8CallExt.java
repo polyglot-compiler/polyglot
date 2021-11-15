@@ -54,7 +54,6 @@ import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
@@ -90,7 +89,7 @@ public class JL8CallExt extends JL8ProcedureCallExt implements CallOps {
         for (Expr argument : node.arguments()) {
             Expr checked =
                     argument instanceof Lambda
-                            ? argument.type(ts.unknownType(Position.COMPILER_GENERATED))
+                            ? argument.type(((Lambda) argument).temporaryTypeBeforeTypeChecking(ts))
                             : tc.rethrowMissingDependencies(true).visitEdge(node, argument);
             partiallyTypeCheckedArguments.add(checked);
             argTypes.add(checked.type());
