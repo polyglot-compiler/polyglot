@@ -30,7 +30,6 @@ import polyglot.ext.jl8.types.FunctionType;
 import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.types.TypeSystem;
 import polyglot.visit.TypeChecker;
 
 public interface Lambda extends Expr {

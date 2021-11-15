@@ -5,7 +5,6 @@ import polyglot.types.Resolver;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.types.Type_c;
-import polyglot.types.UnknownType_c;
 import polyglot.util.SerialVersionUID;
 
 public class FunctionType_c extends Type_c implements FunctionType {

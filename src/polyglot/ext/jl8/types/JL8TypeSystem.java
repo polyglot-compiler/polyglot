@@ -33,5 +33,6 @@ import polyglot.types.Type;
 
 public interface JL8TypeSystem extends JL7TypeSystem {
     FunctionType functionType(List<? extends Type> formalTypes, Type returnType);
+
     List<MethodInstance> nonObjectPublicAbstractMethods(ReferenceType referenceType);
 }

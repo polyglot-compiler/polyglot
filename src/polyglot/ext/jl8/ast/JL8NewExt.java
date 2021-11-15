@@ -41,7 +41,6 @@ import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
@@ -81,7 +80,9 @@ public class JL8NewExt extends JL8ProcedureCallExt {
                             Expr checked;
                             if (argument instanceof Lambda) {
                                 checked =
-                                        argument.type(((Lambda) argument).temporaryTypeBeforeTypeChecking(ts));
+                                        argument.type(
+                                                ((Lambda) argument)
+                                                        .temporaryTypeBeforeTypeChecking(ts));
                             } else {
                                 checked = tc.visitEdge(n, argument);
                             }

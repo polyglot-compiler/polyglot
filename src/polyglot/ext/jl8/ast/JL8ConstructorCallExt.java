@@ -39,7 +39,6 @@ import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.TypeChecker;
 
