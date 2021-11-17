@@ -190,6 +190,6 @@ inferred_formal_parameter_list ::=
     ;
 
 lambda_body ::=
-      expression:e {: RESULT = nf.Block(e.position(), nf.Return(e.position(), e)); :}
+      expression:e {: RESULT = nf.Block(Position.compilerGenerated(), nf.Return(e.position(), e)); :}
     | block:b {: RESULT = b; :}
     ;

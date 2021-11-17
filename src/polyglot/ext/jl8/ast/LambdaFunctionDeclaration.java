@@ -26,15 +26,19 @@
 package polyglot.ext.jl8.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import polyglot.ast.Block;
 import polyglot.ast.CodeNode;
+import polyglot.ast.Expr;
 import polyglot.ast.Ext;
 import polyglot.ast.Formal;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.Return;
 import polyglot.ast.Returnable;
+import polyglot.ast.Stmt;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
@@ -158,6 +162,16 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
                                     formalType.position());
                         }
                     }
+                }
+                // When the return type is void,
+                // lambda () -> e should be interpreted as () -> { e; }
+                if (this.block.position().equals(Position.COMPILER_GENERATED)
+                        && method.returnType().equals(jl8TypeSystem.Void())) {
+                    Expr e = ((Return) this.block().statements().get(0)).expr();
+                    this.block =
+                            this.block.statements(
+                                    Collections.<Stmt>singletonList(
+                                            nodeFactory.Eval(e.position(), e)));
                 }
                 return;
             }

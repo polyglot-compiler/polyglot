@@ -1,0 +1,12 @@
+import java.util.function.Function;
+
+/** Lambda with void return type. */
+public class SimpleLambda05 {
+    void test() {
+        VoidReturnF f = (a) -> System.out.println(a);
+    }
+
+    interface VoidReturnF {
+      void printInt(int a);
+    }
+}
