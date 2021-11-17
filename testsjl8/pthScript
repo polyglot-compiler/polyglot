@@ -39,6 +39,7 @@ polyglot.ext.jl8.JL8ExtensionInfo "-d out -classpath java-out -assert -noserial 
 	SimpleLambda02.jl8;
 	SimpleLambda03.jl8;
 	SimpleLambda04.jl8;
+	SimpleLambda05.jl8;
 	SimpleLambdaInvalid01.jl8 (Semantic);
 	SimpleLambdaInvalid02.jl8 (Semantic);
 	SimpleLambdaInvalid03.jl8 (Semantic);
