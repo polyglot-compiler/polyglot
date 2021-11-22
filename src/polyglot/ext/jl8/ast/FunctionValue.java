@@ -32,10 +32,14 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.visit.TypeChecker;
 
-public interface Lambda extends Expr {
-    LambdaFunctionDeclaration declaration();
+/**
+ * A function value represents a container of an expression that is a function that will be compiled down to an anonymous class.
+ * It is the container for lambda and method references.
+ */
+public interface FunctionValue extends Expr {
+    FunctionSpec functionSpec();
 
-    Lambda declaration(LambdaFunctionDeclaration declaration);
+    FunctionValue functionSpec(FunctionSpec functionSpec);
 
     void setTargetType(Type type, TypeChecker tc) throws SemanticException;
 

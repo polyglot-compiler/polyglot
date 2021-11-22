@@ -25,34 +25,25 @@
  ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import polyglot.ast.Assign;
 import polyglot.ast.Cast;
-import polyglot.ast.ClassMember;
-import polyglot.ast.Expr;
 import polyglot.ast.Expr_c;
 import polyglot.ast.Ext;
 import polyglot.ast.FieldDecl;
-import polyglot.ast.Formal;
 import polyglot.ast.LocalDecl;
-import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Precedence;
 import polyglot.ast.Return;
 import polyglot.ast.Term;
-import polyglot.ast.TypeNode;
 import polyglot.ext.jl8.types.FunctionType;
 import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.CodeInstance;
 import polyglot.types.FunctionInstance;
-import polyglot.types.MethodInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
-import polyglot.util.Position;
 import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -60,19 +51,19 @@ import polyglot.visit.PrettyPrinter;
 import polyglot.visit.Translator;
 import polyglot.visit.TypeChecker;
 
-public class Lambda_c extends Expr_c implements Lambda {
+public class FunctionValue_c extends Expr_c implements FunctionValue {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    protected LambdaFunctionDeclaration declaration;
+    protected FunctionSpec functionSpec;
 
     //    @Deprecated
-    Lambda_c(LambdaFunctionDeclaration declaration) {
-        this(declaration, null);
+    FunctionValue_c(FunctionSpec functionSpec) {
+        this(functionSpec, null);
     }
 
-    Lambda_c(LambdaFunctionDeclaration declaration, Ext ext) {
-        super(declaration.position(), ext);
-        this.declaration = declaration;
+    FunctionValue_c(FunctionSpec functionSpec, Ext ext) {
+        super(functionSpec.position(), ext);
+        this.functionSpec = functionSpec;
     }
 
     @Override
@@ -81,39 +72,30 @@ public class Lambda_c extends Expr_c implements Lambda {
     }
 
     @Override
-    public LambdaFunctionDeclaration declaration() {
-        return this.declaration;
+    public FunctionSpec functionSpec() {
+        return this.functionSpec;
     }
 
     @Override
-    public Lambda declaration(LambdaFunctionDeclaration declaration) {
-        return reconstruct(this, declaration);
+    public FunctionValue functionSpec(FunctionSpec functionSpec) {
+        return reconstruct(this, functionSpec);
     }
 
     @Override
     public FunctionType temporaryTypeBeforeTypeChecking(JL8TypeSystem ts) {
-        List<Formal> formals = this.declaration.formals;
-        List<Type> formalTypes = new ArrayList<>(formals.size());
-        for (Formal formal : formals) {
-            if (formal.position().isCompilerGenerated()) {
-                formalTypes.add(ts.unknownType(Position.COMPILER_GENERATED));
-            } else {
-                formalTypes.add(formal.declType());
-            }
-        }
-        return ts.functionType(formalTypes, null);
+        return this.functionSpec.temporaryTypeBeforeTypeChecking(ts);
     }
 
-    protected <N extends Lambda_c> N reconstruct(N n, LambdaFunctionDeclaration declaration) {
-        if (n.declaration == declaration) return n;
+    protected <N extends FunctionValue_c> N reconstruct(N n, FunctionSpec functionSpec) {
+        if (n.functionSpec == functionSpec) return n;
         n = copyIfNeeded(n);
-        n.declaration = declaration;
+        n.functionSpec = functionSpec;
         return n;
     }
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        LambdaFunctionDeclaration declaration = visitChild(this.declaration, v);
+        FunctionSpec declaration = visitChild(this.functionSpec, v);
         return reconstruct(this, declaration);
     }
 
@@ -156,39 +138,18 @@ public class Lambda_c extends Expr_c implements Lambda {
 
     @Override
     public void setTargetType(Type type, TypeChecker tc) throws SemanticException {
-        this.declaration.setTargetType(
+        this.functionSpec.setTargetType(
                 type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
     }
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        return type(this.declaration.targetType);
-    }
-
-    private New equivalentNewCode(NodeFactory nf) {
-        MethodInstance sam = this.declaration.sam;
-        return nf.New(
-                Position.COMPILER_GENERATED,
-                nf.CanonicalTypeNode(Position.COMPILER_GENERATED, this.declaration.targetType),
-                new ArrayList<Expr>(),
-                nf.ClassBody(
-                        Position.COMPILER_GENERATED,
-                        Collections.<ClassMember>singletonList(
-                                nf.MethodDecl(
-                                        Position.COMPILER_GENERATED,
-                                        sam.flags().clearAbstract(),
-                                        nf.CanonicalTypeNode(
-                                                Position.COMPILER_GENERATED, sam.returnType()),
-                                        nf.Id(Position.COMPILER_GENERATED, sam.name()),
-                                        this.declaration.formals(),
-                                        new ArrayList<TypeNode>(),
-                                        this.declaration.block,
-                                        null))));
+        return type(this.functionSpec.targetType());
     }
 
     @Override
     public void translate(CodeWriter w, Translator tr) {
-        lang().translate(this.equivalentNewCode(tr.nodeFactory()), w, tr);
+        lang().translate(this.functionSpec.equivalentNewCode(tr.nodeFactory()), w, tr);
     }
 
     @Override
@@ -197,12 +158,12 @@ public class Lambda_c extends Expr_c implements Lambda {
             this.translate(w, (Translator) pp);
             return;
         }
-        this.declaration.prettyPrint(w, pp);
+        this.functionSpec.prettyPrint(w, pp);
     }
 
     @Override
     public String toString() {
-        return this.declaration.toString();
+        return this.functionSpec.toString();
     }
 
     @Override
@@ -218,6 +179,6 @@ public class Lambda_c extends Expr_c implements Lambda {
     @Override
     public Node copy(NodeFactory nf) {
         JL8NodeFactory jl8NodeFactory = (JL8NodeFactory) nf;
-        return jl8NodeFactory.Lambda(this.declaration);
+        return jl8NodeFactory.FunctionValue(this.functionSpec);
     }
 }

@@ -35,8 +35,7 @@ import polyglot.util.Position;
  * NodeFactory for src/polyglot/ext/jl8 extension.
  */
 public interface JL8NodeFactory extends JL7NodeFactory {
-    Lambda Lambda(LambdaFunctionDeclaration declaration);
+    FunctionValue FunctionValue(FunctionSpec functionSpec);
 
-    LambdaFunctionDeclaration LambdaFunctionDeclaration(
-            Position pos, List<Formal> formals, Block block);
+    LambdaExpression LambdaExpression(Position pos, List<Formal> formals, Block block);
 }

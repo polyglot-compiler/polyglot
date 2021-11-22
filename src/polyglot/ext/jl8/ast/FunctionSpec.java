@@ -25,14 +25,29 @@
  ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
-import polyglot.ast.Ext;
-import polyglot.ext.jl7.ast.JL7ExtFactory;
+import polyglot.ast.CodeNode;
+import polyglot.ast.New;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Returnable;
+import polyglot.ast.Term;
+import polyglot.ast.TermOps;
+import polyglot.ext.jl8.types.FunctionType;
+import polyglot.ext.jl8.types.JL8TypeSystem;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
 
 /**
- * Extension factory for src/polyglot/ext/jl8 extension.
+ * A function spec represents an expression that is a function that will be compiled down to an anonymous class.
+ * It is common interface for lambda and method references.
  */
-public interface JL8ExtFactory extends JL7ExtFactory {
-    Ext extFunctionValueNode();
+public interface FunctionSpec extends Term, TermOps, CodeNode, Returnable {
+    ReferenceType targetType();
 
-    Ext extLambdaFunctionDeclarationNode();
+    FunctionType temporaryTypeBeforeTypeChecking(JL8TypeSystem ts);
+
+    void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem, NodeFactory nodeFactory)
+            throws SemanticException;
+
+    New equivalentNewCode(NodeFactory nf);
 }

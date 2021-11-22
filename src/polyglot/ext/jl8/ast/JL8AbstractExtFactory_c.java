@@ -45,13 +45,13 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
     // AST superclass.
 
     @Override
-    public final Ext extLambdaNode() {
-        Ext e = extLambdaNodeImpl();
+    public final Ext extFunctionValueNode() {
+        Ext e = extFunctionValueNodeImpl();
 
         if (nextExtFactory() != null) {
             Ext e2;
             if (nextExtFactory() instanceof JL8ExtFactory) {
-                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaNode();
+                e2 = ((JL8ExtFactory) nextExtFactory()).extFunctionValueNode();
             } else {
                 e2 = nextExtFactory().extExpr();
             }
@@ -60,7 +60,7 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
         return e;
     }
 
-    protected Ext extLambdaNodeImpl() {
+    protected Ext extFunctionValueNodeImpl() {
         return extExpr();
     }
 
@@ -71,7 +71,7 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
         if (nextExtFactory() != null) {
             Ext e2;
             if (nextExtFactory() instanceof JL8ExtFactory) {
-                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaNode();
+                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaFunctionDeclarationNode();
             } else {
                 e2 = nextExtFactory().extTerm();
             }

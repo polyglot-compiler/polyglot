@@ -78,10 +78,10 @@ public class JL8NewExt extends JL8ProcedureCallExt {
                                 new ArrayList<>(n.arguments().size());
                         for (Expr argument : n.arguments()) {
                             Expr checked;
-                            if (argument instanceof Lambda) {
+                            if (argument instanceof FunctionValue) {
                                 checked =
                                         argument.type(
-                                                ((Lambda) argument)
+                                                ((FunctionValue) argument)
                                                         .temporaryTypeBeforeTypeChecking(ts));
                             } else {
                                 checked = tc.visitEdge(n, argument);
@@ -99,8 +99,8 @@ public class JL8NewExt extends JL8ProcedureCallExt {
                         ConstructorInstance ci = n.constructorInstance();
                         for (int i = 0; i < n.arguments().size(); i++) {
                             Expr argument = n.arguments().get(i);
-                            if (argument instanceof Lambda) {
-                                Lambda lambda = (Lambda) argument;
+                            if (argument instanceof FunctionValue) {
+                                FunctionValue lambda = (FunctionValue) argument;
                                 Type lambdaTargetType = ci.formalTypes().get(i);
                                 lambda.setTargetType(lambdaTargetType, tc);
                                 fullyTypeCheckedArguments.add(
