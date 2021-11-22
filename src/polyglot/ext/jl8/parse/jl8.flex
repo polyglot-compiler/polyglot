@@ -424,6 +424,7 @@ OctalEscape = \\ [0-7]
     ">>"   { return op(sym.RSHIFT);     }
     ">>>"  { return op(sym.URSHIFT);    }
     "->"   { return op(sym.ARROW);      }
+    "::"   { return op(sym.COLONCOLON); }
     "+="   { return op(sym.PLUSEQ);     }
     "-="   { return op(sym.MINUSEQ);    }
     "*="   { return op(sym.MULTEQ);     }
