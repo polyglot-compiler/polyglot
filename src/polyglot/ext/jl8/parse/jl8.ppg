@@ -63,6 +63,7 @@ parser Grm extends polyglot.ext.jl7.parse.Grm  {:
 
 :};
 
+nonterminal method_reference;
 nonterminal Lambda lambda_expression;
 nonterminal List<Formal> inferred_formal_parameter_list, comma_start_formal_parameter_list_opt;
 nonterminal Block lambda_body;
@@ -70,11 +71,31 @@ nonterminal TypeInCastWithLPAREN type_in_cast_with_lparen;
 
 terminal token ARROW;
 terminal token RPAREN_ARROW;
+terminal token COLONCOLON;
 
 start with goal;
 
 extend expression_nn ::= lambda_expression:e {: RESULT = e; :};
 extend assignment_expression ::= lambda_expression:e {: RESULT = e; :};
+
+method_reference ::=
+      primary:e COLONCOLON type_arguments_opt:args simple_name:n
+    {: :}
+    | SUPER:sup COLONCOLON type_arguments_opt:args simple_name:n
+    // TODO: handle super case
+    | name:name COLONCOLON type_arguments_opt:args simple_name:n
+    {: Expr e = name.toExpr(); :}
+    | name:name DOT SUPER COLONCOLON type_arguments_opt:args simple_name:n
+    // TODO: handle super case
+    | name:name COLONCOLON type_arguments_opt:args NEW:n
+    {: TypeNode typeNode = name.toType(); :}
+    | primitive_type:t dims:d COLONCOLON NEW:n
+    {: TypeNode typeNode = parser.array(t, d.intValue()); :}
+    | name:name dims:d COLONCOLON NEW:n
+    {: TypeNode typeNode = parser.array(name.toType(), d.intValue()); :}
+    ;
+
+extend primary_no_new_array ::= method_reference;
 
 lambda_expression ::=
       simple_name:n ARROW lambda_body:b
