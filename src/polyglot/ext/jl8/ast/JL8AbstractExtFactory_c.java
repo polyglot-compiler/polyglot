@@ -40,10 +40,6 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
         super(nextExtFactory);
     }
 
-    // TODO: Implement factory methods for new extension nodes in future
-    // extensions.  This entails calling the factory method for extension's
-    // AST superclass.
-
     @Override
     public final Ext extFunctionValueNode() {
         Ext e = extFunctionValueNodeImpl();
@@ -86,7 +82,7 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
 
     @Override
     public final Ext extInstanceMethodReferenceNode() {
-        Ext e = extLambdaExpressionNodeImpl();
+        Ext e = extInstanceMethodReferenceNodeImpl();
 
         if (nextExtFactory() != null) {
             Ext e2;

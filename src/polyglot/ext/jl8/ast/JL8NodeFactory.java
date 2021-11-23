@@ -42,5 +42,5 @@ public interface JL8NodeFactory extends JL7NodeFactory {
     LambdaExpression LambdaExpression(Position pos, List<Formal> formals, Block block);
 
     InstanceMethodReference InstanceMethodReference(
-            Position position, Expr target, List<TypeNode> typeArgs, String methodName);
+            Position position, Expr receiver, List<TypeNode> typeArgs, String methodName);
 }

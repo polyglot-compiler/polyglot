@@ -102,7 +102,7 @@ method_reference ::=
     {: TypeNode typeNode = parser.array(name.toType(), d.intValue()); :}
     ;
 
-extend primary_no_new_array ::= method_reference;
+extend primary_no_new_array ::= method_reference:e {: RESULT = e; :};
 
 lambda_expression ::=
       simple_name:n ARROW lambda_body:b

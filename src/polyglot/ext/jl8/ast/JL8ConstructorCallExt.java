@@ -76,9 +76,10 @@ public class JL8ConstructorCallExt extends JL8ProcedureCallExt {
         for (Expr argument : call.arguments()) {
             Expr checked;
             if (argument instanceof FunctionValue) {
+                FunctionValue functionValue = (FunctionValue) argument;
                 checked =
                         argument.type(
-                                ((FunctionValue) argument).temporaryTypeBeforeTypeChecking(ts));
+                                functionValue.functionSpec().temporaryTypeBeforeTypeChecking(ts));
             } else {
                 checked = tc.rethrowMissingDependencies(true).visitEdge(call, argument);
                 if (!checked.isDisambiguated()) return call;

@@ -26,8 +26,6 @@
 package polyglot.ext.jl8.ast;
 
 import polyglot.ast.Expr;
-import polyglot.ext.jl8.types.FunctionType;
-import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.visit.TypeChecker;
@@ -42,7 +40,4 @@ public interface FunctionValue extends Expr {
     FunctionValue functionSpec(FunctionSpec functionSpec);
 
     void setTargetType(Type type, TypeChecker tc) throws SemanticException;
-
-    /** Either unknown type or function type before lambda is resolved to a known reference type. */
-    FunctionType temporaryTypeBeforeTypeChecking(JL8TypeSystem ts);
 }

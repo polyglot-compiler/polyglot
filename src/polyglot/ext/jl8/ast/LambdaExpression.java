@@ -31,19 +31,24 @@ import java.util.Iterator;
 import java.util.List;
 import polyglot.ast.Block;
 import polyglot.ast.ClassMember;
+import polyglot.ast.CodeNode;
 import polyglot.ast.Expr;
 import polyglot.ast.Ext;
 import polyglot.ast.Formal;
+import polyglot.ast.Lang;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Return;
+import polyglot.ast.Returnable;
+import polyglot.ast.Special;
 import polyglot.ast.Stmt;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl8.types.FunctionType;
 import polyglot.ext.jl8.types.JL8TypeSystem;
+import polyglot.types.ClassType;
 import polyglot.types.CodeInstance;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -59,7 +64,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class LambdaExpression extends Term_c implements FunctionSpec {
+public class LambdaExpression extends Term_c implements FunctionSpec, CodeNode, Returnable {
 
     protected List<Formal> formals;
     protected Block block;
@@ -123,8 +128,31 @@ public class LambdaExpression extends Term_c implements FunctionSpec {
         return ts.functionType(formalTypes, null);
     }
 
+    public static Node replaceThisWithQualifiedThis(
+            Node node, Lang lang, final NodeFactory nodeFactory, final ClassType currentClass) {
+        return node.visit(
+                new NodeVisitor(lang) {
+                    @Override
+                    public Node override(Node parent, Node n) {
+                        if (n instanceof Special) {
+                            Special special = (Special) n;
+                            if (special.qualifier() == null) {
+                                return special.qualifier(
+                                        nodeFactory.CanonicalTypeNode(
+                                                Position.COMPILER_GENERATED, currentClass));
+                            }
+                        }
+                        return null;
+                    }
+                });
+    }
+
     @Override
-    public void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem, NodeFactory nodeFactory)
+    public FunctionSpec withTargetType(
+            Type targetType,
+            JL8TypeSystem jl8TypeSystem,
+            NodeFactory nodeFactory,
+            ClassType currentClass)
             throws SemanticException {
         if (targetType.isReference()) {
             ReferenceType targetReferenceType = targetType.toReference();
@@ -144,13 +172,14 @@ public class LambdaExpression extends Term_c implements FunctionSpec {
                                     expectedSize, this.formals.size()),
                             position());
                 }
+                List<Formal> newFormals = new ArrayList<>(expectedSize);
                 for (int i = 0; i < expectedSize; i++) {
                     Formal formal = this.formals.get(i);
                     TypeNode formalType = formal.type();
                     Type formalTypeFromTarget = formalTypesFromTarget.get(i);
                     if (formalType.position().isCompilerGenerated()) {
                         // It's a synthetic formal from inferred parameters
-                        this.formals.set(
+                        newFormals.add(
                                 i,
                                 formal.type(
                                         nodeFactory.CanonicalTypeNode(
@@ -166,19 +195,25 @@ public class LambdaExpression extends Term_c implements FunctionSpec {
                                             formalTypeFromTarget, declaredFormalType),
                                     formalType.position());
                         }
+                        newFormals.add(formal);
                     }
                 }
+                Block newBlock = this.block;
                 // When the return type is void,
                 // lambda () -> e should be interpreted as () -> { e; }
                 if (this.block.position().equals(Position.COMPILER_GENERATED)
                         && method.returnType().equals(jl8TypeSystem.Void())) {
                     Expr e = ((Return) this.block.statements().get(0)).expr();
-                    this.block =
+                    newBlock =
                             this.block.statements(
                                     Collections.<Stmt>singletonList(
                                             nodeFactory.Eval(e.position(), e)));
                 }
-                return;
+                newBlock =
+                        (Block)
+                                replaceThisWithQualifiedThis(
+                                        newBlock, lang(), nodeFactory, currentClass);
+                return block(formals(this, newFormals), newBlock);
             }
         }
         throw new SemanticException(targetType + " is not a functional interface.", position());

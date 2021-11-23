@@ -25,14 +25,12 @@
  ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
-import polyglot.ast.CodeNode;
 import polyglot.ast.New;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.Returnable;
 import polyglot.ast.Term;
 import polyglot.ast.TermOps;
-import polyglot.ext.jl8.types.FunctionType;
 import polyglot.ext.jl8.types.JL8TypeSystem;
+import polyglot.types.ClassType;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -41,12 +39,16 @@ import polyglot.types.Type;
  * A function spec represents an expression that is a function that will be compiled down to an anonymous class.
  * It is common interface for lambda and method references.
  */
-public interface FunctionSpec extends Term, TermOps, CodeNode, Returnable {
+public interface FunctionSpec extends Term, TermOps {
     ReferenceType targetType();
 
-    FunctionType temporaryTypeBeforeTypeChecking(JL8TypeSystem ts);
+    Type temporaryTypeBeforeTypeChecking(JL8TypeSystem ts);
 
-    void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem, NodeFactory nodeFactory)
+    FunctionSpec withTargetType(
+            Type targetType,
+            JL8TypeSystem jl8TypeSystem,
+            NodeFactory nodeFactory,
+            ClassType currentClass)
             throws SemanticException;
 
     New equivalentNewCode(NodeFactory nf);

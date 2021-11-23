@@ -26,25 +26,29 @@
 package polyglot.ext.jl8.ast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import polyglot.ast.Block;
+import polyglot.ast.Call;
+import polyglot.ast.ClassMember;
 import polyglot.ast.Expr;
 import polyglot.ast.Ext;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
-import polyglot.ext.jl8.types.FunctionType;
+import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.ext.jl8.types.JL8TypeSystem;
-import polyglot.types.CodeInstance;
-import polyglot.types.Context;
+import polyglot.types.ClassType;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.CFGBuilder;
@@ -54,7 +58,7 @@ import polyglot.visit.TypeChecker;
 
 public class InstanceMethodReference extends Term_c implements FunctionSpec {
 
-    protected Expr target;
+    protected Expr receiver;
     protected List<TypeNode> typeArgs;
     protected String methodName;
     protected ReferenceType targetType = null;
@@ -62,26 +66,16 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
 
     //    @Deprecated
     InstanceMethodReference(
-            Position position, Expr target, List<TypeNode> typeArgs, String methodName) {
-        this(position, target, typeArgs, methodName, null);
+            Position position, Expr receiver, List<TypeNode> typeArgs, String methodName) {
+        this(position, receiver, typeArgs, methodName, null);
     }
 
     public InstanceMethodReference(
-            Position position, Expr target, List<TypeNode> typeArgs, String methodName, Ext ext) {
+            Position position, Expr receiver, List<TypeNode> typeArgs, String methodName, Ext ext) {
         super(position, ext);
-        this.target = target;
+        this.receiver = receiver;
         this.typeArgs = typeArgs;
         this.methodName = methodName;
-    }
-
-    @Override
-    public Term codeBody() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public CodeInstance codeInstance() {
-        return sam;
     }
 
     @Override
@@ -90,29 +84,16 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
     }
 
     @Override
-    public Type returnValueType() {
-        return sam.returnType();
-    }
-
-    private MethodInstance getSAM(TypeSystem ts) {
-        if (sam != null) return sam;
-        return ts.methodInstance(
-                position(),
-                targetType,
-                Flags.NONE,
-                ts.unknownType(position()),
-                "",
-                new ArrayList<Type>(),
-                new ArrayList<Type>());
+    public Type temporaryTypeBeforeTypeChecking(JL8TypeSystem ts) {
+        return ts.unknownType(Position.COMPILER_GENERATED);
     }
 
     @Override
-    public FunctionType temporaryTypeBeforeTypeChecking(JL8TypeSystem ts) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem, NodeFactory nodeFactory)
+    public FunctionSpec withTargetType(
+            Type targetType,
+            JL8TypeSystem jl8TypeSystem,
+            NodeFactory nodeFactory,
+            ClassType currentClass)
             throws SemanticException {
         if (targetType.isReference()) {
             ReferenceType targetReferenceType = targetType.toReference();
@@ -120,9 +101,12 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
                     jl8TypeSystem.nonObjectPublicAbstractMethods(targetReferenceType);
             if (methods.size() == 1) {
                 this.targetType = targetReferenceType;
-                MethodInstance method = methods.get(0);
-                this.sam = method;
-                throw new UnsupportedOperationException();
+                this.sam = methods.get(0);
+                this.receiver =
+                        (Expr)
+                                LambdaExpression.replaceThisWithQualifiedThis(
+                                        this.receiver, lang(), nodeFactory, currentClass);
+                return this;
             }
         }
         throw new SemanticException(targetType + " is not a functional interface.", position());
@@ -134,10 +118,10 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
         return this; // Not ready for type checking!
     }
 
-    protected <N extends InstanceMethodReference> N target(N n, Expr target) {
-        if (n.target == target) return n;
+    protected <N extends InstanceMethodReference> N receiver(N n, Expr receiver) {
+        if (n.receiver == receiver) return n;
         n = copyIfNeeded(n);
-        n.target = target;
+        n.receiver = receiver;
         return n;
     }
 
@@ -150,17 +134,65 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
 
     @Override
     public Term firstChild() {
-        return target;
+        return receiver;
     }
 
     @Override
-    public Context enterScope(Context c) {
-        return c.pushCode(getSAM(c.typeSystem()));
-    }
+    public New equivalentNewCode(NodeFactory nodeFactory) {
+        MethodInstance method = this.sam;
+        String uniqueNameSuffix = "__" + System.currentTimeMillis();
+        List<? extends Type> formalTypes = method.formalTypes();
+        List<Formal> formals = new ArrayList<>(formalTypes.size());
+        List<Expr> args = new ArrayList<>(formalTypes.size());
+        for (int i = 0; i < formalTypes.size(); i++) {
+            Id argName = nodeFactory.Id(Position.COMPILER_GENERATED, "arg" + i + uniqueNameSuffix);
+            formals.add(
+                    nodeFactory.Formal(
+                            this.position,
+                            Flags.NONE,
+                            nodeFactory.CanonicalTypeNode(
+                                    Position.COMPILER_GENERATED, formalTypes.get(i)),
+                            argName));
+            args.add(nodeFactory.Local(Position.COMPILER_GENERATED, argName));
+        }
+        Call syntheticCall =
+                ((JL5NodeFactory) nodeFactory)
+                        .Call(
+                                Position.COMPILER_GENERATED,
+                                this.receiver,
+                                this.typeArgs,
+                                nodeFactory.Id(Position.COMPILER_GENERATED, this.methodName),
+                                args);
+        Block block;
+        if (method.returnType().equals(method.typeSystem().Void())) {
+            block =
+                    nodeFactory.Block(
+                            Position.COMPILER_GENERATED,
+                            nodeFactory.Eval(Position.COMPILER_GENERATED, syntheticCall));
+        } else {
+            block =
+                    nodeFactory.Block(
+                            Position.COMPILER_GENERATED,
+                            nodeFactory.Return(Position.COMPILER_GENERATED, syntheticCall));
+        }
 
-    @Override
-    public New equivalentNewCode(NodeFactory nf) {
-        throw new UnsupportedOperationException();
+        return nodeFactory.New(
+                Position.COMPILER_GENERATED,
+                nodeFactory.CanonicalTypeNode(Position.COMPILER_GENERATED, this.targetType),
+                new ArrayList<Expr>(),
+                nodeFactory.ClassBody(
+                        Position.COMPILER_GENERATED,
+                        Collections.<ClassMember>singletonList(
+                                nodeFactory.MethodDecl(
+                                        Position.COMPILER_GENERATED,
+                                        sam.flags().clearAbstract(),
+                                        nodeFactory.CanonicalTypeNode(
+                                                Position.COMPILER_GENERATED, sam.returnType()),
+                                        nodeFactory.Id(Position.COMPILER_GENERATED, sam.name()),
+                                        formals,
+                                        new ArrayList<TypeNode>(),
+                                        block,
+                                        null))));
     }
 
     @Override
@@ -170,21 +202,21 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr target = visitChild(this.target, v);
+        Expr receiver = visitChild(this.receiver, v);
         List<TypeNode> typeArgs = visitList(this.typeArgs, v);
-        return typeArgs(target(this, target), typeArgs);
+        return typeArgs(receiver(this, receiver), typeArgs);
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFGList(this.typeArgs, this.target, ENTRY);
-        v.visitCFG(this.target, this, EXIT);
+        v.visitCFGList(this.typeArgs, this.receiver, ENTRY);
+        v.visitCFG(this.receiver, this, EXIT);
         return succs;
     }
 
     @Override
     public String toString() {
-        if (typeArgs.isEmpty()) return target + "::" + methodName;
+        if (typeArgs.isEmpty()) return receiver + "::" + methodName;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < typeArgs.size(); i++) {
             sb.append(typeArgs.get(i));
@@ -192,6 +224,6 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
                 sb.append(", ");
             }
         }
-        return target + "::<" + sb + ">" + methodName;
+        return receiver + "::<" + sb + ">" + methodName;
     }
 }

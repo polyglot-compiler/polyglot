@@ -87,11 +87,15 @@ public class JL8CallExt extends JL8ProcedureCallExt implements CallOps {
         List<Expr> partiallyTypeCheckedArguments = new ArrayList<>(node.arguments().size());
         List<Type> argTypes = new ArrayList<>(node.arguments().size());
         for (Expr argument : node.arguments()) {
-            Expr checked =
-                    argument instanceof FunctionValue
-                            ? argument.type(
-                                    ((FunctionValue) argument).temporaryTypeBeforeTypeChecking(ts))
-                            : tc.rethrowMissingDependencies(true).visitEdge(node, argument);
+            Expr checked;
+            if (argument instanceof FunctionValue) {
+                FunctionValue functionValue = (FunctionValue) argument;
+                checked =
+                        argument.type(
+                                functionValue.functionSpec().temporaryTypeBeforeTypeChecking(ts));
+            } else {
+                checked = tc.rethrowMissingDependencies(true).visitEdge(node, argument);
+            }
             partiallyTypeCheckedArguments.add(checked);
             argTypes.add(checked.type());
         }

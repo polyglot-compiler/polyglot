@@ -61,7 +61,7 @@ public class JL8NewExt extends JL8ProcedureCallExt {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+    public Node typeCheckOverride(Node parent, final TypeChecker tc) throws SemanticException {
         final New n = this.node();
         final JL7NewExt ext7 = (JL7NewExt) JL7Ext.ext(n);
         final JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
@@ -79,9 +79,11 @@ public class JL8NewExt extends JL8ProcedureCallExt {
                         for (Expr argument : n.arguments()) {
                             Expr checked;
                             if (argument instanceof FunctionValue) {
+                                FunctionValue functionValue = (FunctionValue) argument;
                                 checked =
                                         argument.type(
-                                                ((FunctionValue) argument)
+                                                functionValue
+                                                        .functionSpec()
                                                         .temporaryTypeBeforeTypeChecking(ts));
                             } else {
                                 checked = tc.visitEdge(n, argument);

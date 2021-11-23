@@ -37,7 +37,6 @@ import polyglot.ast.NodeFactory;
 import polyglot.ast.Precedence;
 import polyglot.ast.Return;
 import polyglot.ast.Term;
-import polyglot.ext.jl8.types.FunctionType;
 import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.CodeInstance;
 import polyglot.types.FunctionInstance;
@@ -79,11 +78,6 @@ public class FunctionValue_c extends Expr_c implements FunctionValue {
     @Override
     public FunctionValue functionSpec(FunctionSpec functionSpec) {
         return reconstruct(this, functionSpec);
-    }
-
-    @Override
-    public FunctionType temporaryTypeBeforeTypeChecking(JL8TypeSystem ts) {
-        return this.functionSpec.temporaryTypeBeforeTypeChecking(ts);
     }
 
     protected <N extends FunctionValue_c> N reconstruct(N n, FunctionSpec functionSpec) {
@@ -138,8 +132,12 @@ public class FunctionValue_c extends Expr_c implements FunctionValue {
 
     @Override
     public void setTargetType(Type type, TypeChecker tc) throws SemanticException {
-        this.functionSpec.setTargetType(
-                type, (JL8TypeSystem) tc.context().typeSystem(), tc.nodeFactory());
+        this.functionSpec =
+                this.functionSpec.withTargetType(
+                        type,
+                        (JL8TypeSystem) tc.context().typeSystem(),
+                        tc.nodeFactory(),
+                        tc.context().currentClass());
     }
 
     @Override
