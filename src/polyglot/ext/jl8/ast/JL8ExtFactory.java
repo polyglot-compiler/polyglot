@@ -32,7 +32,9 @@ import polyglot.ext.jl7.ast.JL7ExtFactory;
  * Extension factory for src/polyglot/ext/jl8 extension.
  */
 public interface JL8ExtFactory extends JL7ExtFactory {
-    Ext extLambdaNode();
+    Ext extFunctionValueNode();
 
-    Ext extLambdaFunctionDeclarationNode();
+    Ext extLambdaExpressionNode();
+
+    Ext extInstanceMethodReferenceNode();
 }

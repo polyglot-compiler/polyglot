@@ -25,22 +25,19 @@
  ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
-import java.util.List;
-import polyglot.ast.Block;
 import polyglot.ast.Expr;
-import polyglot.ast.Formal;
-import polyglot.ast.TypeNode;
-import polyglot.ext.jl7.ast.JL7NodeFactory;
-import polyglot.util.Position;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.visit.TypeChecker;
 
 /**
- * NodeFactory for src/polyglot/ext/jl8 extension.
+ * A function value represents a container of an expression that is a function that will be compiled down to an anonymous class.
+ * It is the container for lambda and method references.
  */
-public interface JL8NodeFactory extends JL7NodeFactory {
-    FunctionValue FunctionValue(FunctionSpec functionSpec);
+public interface FunctionValue extends Expr {
+    FunctionSpec functionSpec();
 
-    LambdaExpression LambdaExpression(Position pos, List<Formal> formals, Block block);
+    FunctionValue functionSpec(FunctionSpec functionSpec);
 
-    InstanceMethodReference InstanceMethodReference(
-            Position position, Expr receiver, List<TypeNode> typeArgs, String methodName);
+    void setTargetType(Type type, TypeChecker tc) throws SemanticException;
 }

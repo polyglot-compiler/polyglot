@@ -40,18 +40,14 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
         super(nextExtFactory);
     }
 
-    // TODO: Implement factory methods for new extension nodes in future
-    // extensions.  This entails calling the factory method for extension's
-    // AST superclass.
-
     @Override
-    public final Ext extLambdaNode() {
-        Ext e = extLambdaNodeImpl();
+    public final Ext extFunctionValueNode() {
+        Ext e = extFunctionValueNodeImpl();
 
         if (nextExtFactory() != null) {
             Ext e2;
             if (nextExtFactory() instanceof JL8ExtFactory) {
-                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaNode();
+                e2 = ((JL8ExtFactory) nextExtFactory()).extFunctionValueNode();
             } else {
                 e2 = nextExtFactory().extExpr();
             }
@@ -60,18 +56,18 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
         return e;
     }
 
-    protected Ext extLambdaNodeImpl() {
+    protected Ext extFunctionValueNodeImpl() {
         return extExpr();
     }
 
     @Override
-    public final Ext extLambdaFunctionDeclarationNode() {
-        Ext e = extextLambdaFunctionDeclarationNodeImpl();
+    public final Ext extLambdaExpressionNode() {
+        Ext e = extLambdaExpressionNodeImpl();
 
         if (nextExtFactory() != null) {
             Ext e2;
             if (nextExtFactory() instanceof JL8ExtFactory) {
-                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaNode();
+                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaExpressionNode();
             } else {
                 e2 = nextExtFactory().extTerm();
             }
@@ -80,7 +76,27 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
         return e;
     }
 
-    protected Ext extextLambdaFunctionDeclarationNodeImpl() {
+    protected Ext extLambdaExpressionNodeImpl() {
+        return extTerm();
+    }
+
+    @Override
+    public final Ext extInstanceMethodReferenceNode() {
+        Ext e = extInstanceMethodReferenceNodeImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2;
+            if (nextExtFactory() instanceof JL8ExtFactory) {
+                e2 = ((JL8ExtFactory) nextExtFactory()).extInstanceMethodReferenceNode();
+            } else {
+                e2 = nextExtFactory().extTerm();
+            }
+            e = composeExts(e, e2);
+        }
+        return e;
+    }
+
+    protected Ext extInstanceMethodReferenceNodeImpl() {
         return extTerm();
     }
 }

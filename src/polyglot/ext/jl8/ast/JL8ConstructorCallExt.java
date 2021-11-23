@@ -75,8 +75,11 @@ public class JL8ConstructorCallExt extends JL8ProcedureCallExt {
         List<Type> argTypes = new ArrayList<>(call.arguments().size());
         for (Expr argument : call.arguments()) {
             Expr checked;
-            if (argument instanceof Lambda) {
-                checked = argument.type(((Lambda) argument).temporaryTypeBeforeTypeChecking(ts));
+            if (argument instanceof FunctionValue) {
+                FunctionValue functionValue = (FunctionValue) argument;
+                checked =
+                        argument.type(
+                                functionValue.functionSpec().temporaryTypeBeforeTypeChecking(ts));
             } else {
                 checked = tc.rethrowMissingDependencies(true).visitEdge(call, argument);
                 if (!checked.isDisambiguated()) return call;
@@ -99,8 +102,8 @@ public class JL8ConstructorCallExt extends JL8ProcedureCallExt {
                 new ArrayList<>(partiallyTypeCheckedArguments.size());
         for (int i = 0; i < partiallyTypeCheckedArguments.size(); i++) {
             Expr argument = partiallyTypeCheckedArguments.get(i);
-            if (argument instanceof Lambda) {
-                Lambda lambda = (Lambda) argument;
+            if (argument instanceof FunctionValue) {
+                FunctionValue lambda = (FunctionValue) argument;
                 Type lambdaTargetType = ci.formalTypes().get(i);
                 lambda.setTargetType(lambdaTargetType, tc);
                 fullyTypeCheckedArguments.add(

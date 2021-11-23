@@ -1,0 +1,11 @@
+import java.util.function.Function;
+
+public class InstanceMethodReferenceInvalid {
+    Integer intF(Integer m) { return m; }
+
+    void test() {
+        // Invalid return type
+        Function<Integer, String> negation = this::intF;
+        negation.apply(3);
+    }
+}

@@ -25,20 +25,31 @@
  ******************************************************************************/
 package polyglot.ext.jl8.ast;
 
-import polyglot.ast.Expr;
-import polyglot.ext.jl8.types.FunctionType;
+import polyglot.ast.New;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Term;
+import polyglot.ast.TermOps;
 import polyglot.ext.jl8.types.JL8TypeSystem;
+import polyglot.types.ClassType;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
-import polyglot.visit.TypeChecker;
 
-public interface Lambda extends Expr {
-    LambdaFunctionDeclaration declaration();
+/**
+ * A function spec represents an expression that is a function that will be compiled down to an anonymous class.
+ * It is common interface for lambda and method references.
+ */
+public interface FunctionSpec extends Term, TermOps {
+    ReferenceType targetType();
 
-    Lambda declaration(LambdaFunctionDeclaration declaration);
+    Type temporaryTypeBeforeTypeChecking(JL8TypeSystem ts);
 
-    void setTargetType(Type type, TypeChecker tc) throws SemanticException;
+    FunctionSpec withTargetType(
+            Type targetType,
+            JL8TypeSystem jl8TypeSystem,
+            NodeFactory nodeFactory,
+            ClassType currentClass)
+            throws SemanticException;
 
-    /** Either unknown type or function type before lambda is resolved to a known reference type. */
-    FunctionType temporaryTypeBeforeTypeChecking(JL8TypeSystem ts);
+    New equivalentNewCode(NodeFactory nf);
 }

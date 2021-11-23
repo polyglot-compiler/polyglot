@@ -30,19 +30,25 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import polyglot.ast.Block;
+import polyglot.ast.ClassMember;
 import polyglot.ast.CodeNode;
 import polyglot.ast.Expr;
 import polyglot.ast.Ext;
 import polyglot.ast.Formal;
+import polyglot.ast.Lang;
+import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Return;
 import polyglot.ast.Returnable;
+import polyglot.ast.Special;
 import polyglot.ast.Stmt;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl8.types.FunctionType;
 import polyglot.ext.jl8.types.JL8TypeSystem;
+import polyglot.types.ClassType;
 import polyglot.types.CodeInstance;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -58,7 +64,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Returnable {
+public class LambdaExpression extends Term_c implements FunctionSpec, CodeNode, Returnable {
 
     protected List<Formal> formals;
     protected Block block;
@@ -66,31 +72,19 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
     protected MethodInstance sam = null;
 
     //    @Deprecated
-    LambdaFunctionDeclaration(Position pos, List<Formal> formals, Block block) {
+    LambdaExpression(Position pos, List<Formal> formals, Block block) {
         this(pos, formals, block, null);
     }
 
-    public LambdaFunctionDeclaration(Position pos, List<Formal> formals, Block block, Ext ext) {
+    public LambdaExpression(Position pos, List<Formal> formals, Block block, Ext ext) {
         super(pos, ext);
         this.formals = formals;
         this.block = block;
     }
 
-    public List<Formal> formals() {
-        return formals;
-    }
-
-    public LambdaFunctionDeclaration formals(List<Formal> formals) {
-        return formals(this, formals);
-    }
-
-    public Block block() {
-        return block;
-    }
-
     @Override
     public Term codeBody() {
-        return block();
+        return block;
     }
 
     @Override
@@ -99,12 +93,13 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
     }
 
     @Override
-    public Type returnValueType() {
-        return sam.returnType();
+    public ReferenceType targetType() {
+        return targetType;
     }
 
-    public LambdaFunctionDeclaration block(Block block) {
-        return block(this, block);
+    @Override
+    public Type returnValueType() {
+        return sam.returnType();
     }
 
     private MethodInstance getSAM(TypeSystem ts) {
@@ -119,7 +114,45 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
                 new ArrayList<Type>());
     }
 
-    void setTargetType(Type targetType, JL8TypeSystem jl8TypeSystem, NodeFactory nodeFactory)
+    @Override
+    public FunctionType temporaryTypeBeforeTypeChecking(JL8TypeSystem ts) {
+        List<Formal> formals = this.formals;
+        List<Type> formalTypes = new ArrayList<>(formals.size());
+        for (Formal formal : formals) {
+            if (formal.position().isCompilerGenerated()) {
+                formalTypes.add(ts.unknownType(Position.COMPILER_GENERATED));
+            } else {
+                formalTypes.add(formal.declType());
+            }
+        }
+        return ts.functionType(formalTypes, null);
+    }
+
+    public static Node replaceThisWithQualifiedThis(
+            Node node, Lang lang, final NodeFactory nodeFactory, final ClassType currentClass) {
+        return node.visit(
+                new NodeVisitor(lang) {
+                    @Override
+                    public Node override(Node parent, Node n) {
+                        if (n instanceof Special) {
+                            Special special = (Special) n;
+                            if (special.qualifier() == null) {
+                                return special.qualifier(
+                                        nodeFactory.CanonicalTypeNode(
+                                                Position.COMPILER_GENERATED, currentClass));
+                            }
+                        }
+                        return null;
+                    }
+                });
+    }
+
+    @Override
+    public FunctionSpec withTargetType(
+            Type targetType,
+            JL8TypeSystem jl8TypeSystem,
+            NodeFactory nodeFactory,
+            ClassType currentClass)
             throws SemanticException {
         if (targetType.isReference()) {
             ReferenceType targetReferenceType = targetType.toReference();
@@ -139,13 +172,14 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
                                     expectedSize, this.formals.size()),
                             position());
                 }
+                List<Formal> newFormals = new ArrayList<>(expectedSize);
                 for (int i = 0; i < expectedSize; i++) {
                     Formal formal = this.formals.get(i);
                     TypeNode formalType = formal.type();
                     Type formalTypeFromTarget = formalTypesFromTarget.get(i);
                     if (formalType.position().isCompilerGenerated()) {
                         // It's a synthetic formal from inferred parameters
-                        this.formals.set(
+                        newFormals.add(
                                 i,
                                 formal.type(
                                         nodeFactory.CanonicalTypeNode(
@@ -161,19 +195,25 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
                                             formalTypeFromTarget, declaredFormalType),
                                     formalType.position());
                         }
+                        newFormals.add(formal);
                     }
                 }
+                Block newBlock = this.block;
                 // When the return type is void,
                 // lambda () -> e should be interpreted as () -> { e; }
                 if (this.block.position().equals(Position.COMPILER_GENERATED)
                         && method.returnType().equals(jl8TypeSystem.Void())) {
-                    Expr e = ((Return) this.block().statements().get(0)).expr();
-                    this.block =
+                    Expr e = ((Return) this.block.statements().get(0)).expr();
+                    newBlock =
                             this.block.statements(
                                     Collections.<Stmt>singletonList(
                                             nodeFactory.Eval(e.position(), e)));
                 }
-                return;
+                newBlock =
+                        (Block)
+                                replaceThisWithQualifiedThis(
+                                        newBlock, lang(), nodeFactory, currentClass);
+                return block(formals(this, newFormals), newBlock);
             }
         }
         throw new SemanticException(targetType + " is not a functional interface.", position());
@@ -185,14 +225,14 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
         return this; // Not ready for type checking!
     }
 
-    protected <N extends LambdaFunctionDeclaration> N formals(N n, List<Formal> formals) {
+    protected <N extends LambdaExpression> N formals(N n, List<Formal> formals) {
         if (n.formals == formals) return n;
         n = copyIfNeeded(n);
         n.formals = formals;
         return n;
     }
 
-    protected <N extends LambdaFunctionDeclaration> N block(N n, Block block) {
+    protected <N extends LambdaExpression> N block(N n, Block block) {
         if (n.block == block) return n;
         n = copyIfNeeded(n);
         n.block = block;
@@ -201,12 +241,34 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
 
     @Override
     public Term firstChild() {
-        return listChild(formals(), block());
+        return listChild(formals, block);
     }
 
     @Override
     public Context enterScope(Context c) {
         return c.pushCode(getSAM(c.typeSystem()));
+    }
+
+    @Override
+    public New equivalentNewCode(NodeFactory nf) {
+        MethodInstance sam = this.sam;
+        return nf.New(
+                Position.COMPILER_GENERATED,
+                nf.CanonicalTypeNode(Position.COMPILER_GENERATED, this.targetType),
+                new ArrayList<Expr>(),
+                nf.ClassBody(
+                        Position.COMPILER_GENERATED,
+                        Collections.<ClassMember>singletonList(
+                                nf.MethodDecl(
+                                        Position.COMPILER_GENERATED,
+                                        sam.flags().clearAbstract(),
+                                        nf.CanonicalTypeNode(
+                                                Position.COMPILER_GENERATED, sam.returnType()),
+                                        nf.Id(Position.COMPILER_GENERATED, sam.name()),
+                                        this.formals,
+                                        new ArrayList<TypeNode>(),
+                                        this.block,
+                                        null))));
     }
 
     @Override
@@ -234,15 +296,15 @@ public class LambdaFunctionDeclaration extends Term_c implements CodeNode, Retur
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        List<Formal> formals = visitList(formals(), v);
-        Block block = visitChild(block(), v);
+        List<Formal> formals = visitList(this.formals, v);
+        Block block = visitChild(this.block, v);
         return block(formals(this, formals), block);
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFGList(formals(), block(), ENTRY);
-        v.visitCFG(block(), this, EXIT);
+        v.visitCFGList(this.formals, this.block, ENTRY);
+        v.visitCFG(this.block, this, EXIT);
         return succs;
     }
 

@@ -61,7 +61,7 @@ public class JL8NewExt extends JL8ProcedureCallExt {
     }
 
     @Override
-    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+    public Node typeCheckOverride(Node parent, final TypeChecker tc) throws SemanticException {
         final New n = this.node();
         final JL7NewExt ext7 = (JL7NewExt) JL7Ext.ext(n);
         final JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
@@ -78,10 +78,12 @@ public class JL8NewExt extends JL8ProcedureCallExt {
                                 new ArrayList<>(n.arguments().size());
                         for (Expr argument : n.arguments()) {
                             Expr checked;
-                            if (argument instanceof Lambda) {
+                            if (argument instanceof FunctionValue) {
+                                FunctionValue functionValue = (FunctionValue) argument;
                                 checked =
                                         argument.type(
-                                                ((Lambda) argument)
+                                                functionValue
+                                                        .functionSpec()
                                                         .temporaryTypeBeforeTypeChecking(ts));
                             } else {
                                 checked = tc.visitEdge(n, argument);
@@ -99,8 +101,8 @@ public class JL8NewExt extends JL8ProcedureCallExt {
                         ConstructorInstance ci = n.constructorInstance();
                         for (int i = 0; i < n.arguments().size(); i++) {
                             Expr argument = n.arguments().get(i);
-                            if (argument instanceof Lambda) {
-                                Lambda lambda = (Lambda) argument;
+                            if (argument instanceof FunctionValue) {
+                                FunctionValue lambda = (FunctionValue) argument;
                                 Type lambdaTargetType = ci.formalTypes().get(i);
                                 lambda.setTargetType(lambdaTargetType, tc);
                                 fullyTypeCheckedArguments.add(

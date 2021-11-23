@@ -27,8 +27,11 @@ package polyglot.ext.jl8.ast;
 
 import java.util.List;
 import polyglot.ast.Block;
+import polyglot.ast.Expr;
 import polyglot.ast.Formal;
+import polyglot.ast.TypeNode;
 import polyglot.ext.jl7.ast.JL7NodeFactory_c;
+import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 
 /**
@@ -58,19 +61,28 @@ public class JL8NodeFactory_c extends JL7NodeFactory_c implements JL8NodeFactory
     }
 
     @Override
-    public Lambda Lambda(LambdaFunctionDeclaration declaration) {
-        Lambda lambda = new Lambda_c(declaration);
-        lambda = ext(lambda, extFactory().extLambdaNode());
-        return lambda;
+    public FunctionValue FunctionValue(FunctionSpec functionSpec) {
+        FunctionValue functionValue = new FunctionValue_c(functionSpec);
+        functionValue = ext(functionValue, extFactory().extFunctionValueNode());
+        return functionValue;
     }
 
     @Override
-    public LambdaFunctionDeclaration LambdaFunctionDeclaration(
-            Position pos, List<Formal> formals, Block block) {
-        LambdaFunctionDeclaration lambdaFunctionDeclaration =
-                new LambdaFunctionDeclaration(pos, formals, block);
+    public LambdaExpression LambdaExpression(Position pos, List<Formal> formals, Block block) {
+        LambdaExpression lambdaFunctionDeclaration = new LambdaExpression(pos, formals, block);
         lambdaFunctionDeclaration =
-                ext(lambdaFunctionDeclaration, extFactory().extLambdaFunctionDeclarationNode());
+                ext(lambdaFunctionDeclaration, extFactory().extLambdaExpressionNode());
         return lambdaFunctionDeclaration;
+    }
+
+    @Override
+    public InstanceMethodReference InstanceMethodReference(
+            Position position, Expr receiver, List<TypeNode> typeArgs, String methodName) {
+        InstanceMethodReference instanceMethodReference =
+                new InstanceMethodReference(
+                        position, receiver, CollectionUtil.nonNullList(typeArgs), methodName);
+        instanceMethodReference =
+                ext(instanceMethodReference, extFactory().extInstanceMethodReferenceNode());
+        return instanceMethodReference;
     }
 }
