@@ -38,21 +38,16 @@ import polyglot.ast.Id;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ast.ProcedureCall;
 import polyglot.ast.Receiver;
 import polyglot.ast.Special;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
-import polyglot.ext.jl5.ast.JL5CallExt;
-import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
-import polyglot.ext.jl5.ast.JL5ProcedureCallExt;
 import polyglot.ext.jl5.types.JL5MethodInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl8.types.JL8TypeSystem;
-import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -62,12 +57,14 @@ import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
-public class InstanceMethodReference extends Term_c implements FunctionSpec {
+public class MethodReference extends Term_c implements FunctionSpec {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Receiver receiver;
     protected List<TypeNode> typeArgs;
@@ -76,13 +73,17 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
     protected MethodInstance sam = null;
 
     //    @Deprecated
-    InstanceMethodReference(
+    MethodReference(
             Position position, Receiver receiver, List<TypeNode> typeArgs, String methodName) {
         this(position, receiver, typeArgs, methodName, null);
     }
 
-    public InstanceMethodReference(
-            Position position, Receiver receiver, List<TypeNode> typeArgs, String methodName, Ext ext) {
+    public MethodReference(
+            Position position,
+            Receiver receiver,
+            List<TypeNode> typeArgs,
+            String methodName,
+            Ext ext) {
         super(position, ext);
         this.receiver = receiver;
         this.typeArgs = typeArgs;
@@ -163,7 +164,11 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
                         this.receiver.position());
             }
             throw new SemanticException(
-                    "Cannot invoke method \"" + this.methodName + "\" on non-reference type " + t + ".",
+                    "Cannot invoke method \""
+                            + this.methodName
+                            + "\" on non-reference type "
+                            + t
+                            + ".",
                     this.receiver.position());
         }
     }
@@ -252,14 +257,14 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
         return this;
     }
 
-    protected <N extends InstanceMethodReference> N receiver(N n, Receiver receiver) {
+    protected <N extends MethodReference> N receiver(N n, Receiver receiver) {
         if (n.receiver == receiver) return n;
         n = copyIfNeeded(n);
         n.receiver = receiver;
         return n;
     }
 
-    protected <N extends InstanceMethodReference> N typeArgs(N n, List<TypeNode> typeArgs) {
+    protected <N extends MethodReference> N typeArgs(N n, List<TypeNode> typeArgs) {
         if (n.typeArgs == typeArgs) return n;
         n = copyIfNeeded(n);
         n.typeArgs = typeArgs;

@@ -1,10 +1,10 @@
 import java.util.function.Function;
 
-public class InstanceMethodReference {
+public class MethodReference {
     Integer test(Integer nnn) {
         Function<Integer, Integer> negation = this::test;
         expectFunction(this::test);
-        InstanceMethodReference t = this;
+        MethodReference t = this;
         negation = t::test;
         negation = (Function<Integer, Integer>) B::test;
         return 0;
@@ -16,7 +16,7 @@ public class InstanceMethodReference {
        static Integer test(Integer n) { return n; }
     }
 
-    class C extends InstanceMethodReference {
+    class C extends MethodReference {
        void test() {
          Function<Integer, Integer> negation = super::test;
          negation = C.super::test;

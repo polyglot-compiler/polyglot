@@ -65,8 +65,8 @@ parser Grm extends polyglot.ext.jl7.parse.Grm  {:
         return nf.FunctionValue(nf.LambdaExpression(p, f, b));
     }
 
-    private FunctionValue instanceMethodReference(Position p, Receiver t, List<TypeNode> args, String n) {
-        return nf.FunctionValue(nf.InstanceMethodReference(p, t, args, n));
+    private FunctionValue methodReference(Position p, Receiver t, List<TypeNode> args, String n) {
+        return nf.FunctionValue(nf.MethodReference(p, t, args, n));
     }
 
 :};
@@ -87,31 +87,22 @@ extend assignment_expression ::= lambda_expression:e {: RESULT = e; :};
 
 method_reference ::=
       primary:e COLONCOLON type_arguments_opt:args simple_name:n
-    {: RESULT = instanceMethodReference(parser.pos(e, n, n), e, args, n.toString()); :}
+    {: RESULT = methodReference(parser.pos(e, n, n), e, args, n.toString()); :}
     | SUPER:sup COLONCOLON type_arguments_opt:args simple_name:n
-    {:
-        Special s = parser.nf.Special(parser.pos(sup), Special.SUPER, null);
-        RESULT = instanceMethodReference(parser.pos(sup, n, n), s, args, n.toString());
-    :}
+    {: RESULT = methodReference(parser.pos(sup, n, n), parser.nf.Special(parser.pos(sup), Special.SUPER, null), args, n.toString()); :}
     | name:name COLONCOLON type_arguments_opt:args simple_name:n
-    {: RESULT = instanceMethodReference(parser.pos(name, n, n), name.toReceiver(), args, n.toString()); :}
+    {: RESULT = methodReference(parser.pos(name, n, n), name.toReceiver(), args, n.toString()); :}
     | name:name DOT SUPER:sup COLONCOLON type_arguments_opt:args simple_name:n
     {:
         Special s = parser.nf.Special(parser.pos(name, sup, sup), Special.SUPER, name.toType());
-        RESULT = instanceMethodReference(parser.pos(name, n, n), s, args, n.toString());
+        RESULT = methodReference(parser.pos(name, n, n), s, args, n.toString());
     :}
     | name:name COLONCOLON type_arguments_opt:args NEW:n
-    {: RESULT = instanceMethodReference(parser.pos(name, n, n), name.toReceiver(), args, "new"); :}
+    {: RESULT = methodReference(parser.pos(name, n, n), name.toReceiver(), args, "new"); :}
     | primitive_type:t dims:d COLONCOLON NEW:n
-    {:
-        TypeNode typeNode = parser.array(t, d.intValue());
-        RESULT = instanceMethodReference(parser.pos(t, n, n), typeNode, null, "new");
-    :}
+    {: RESULT = methodReference(parser.pos(t, n, n), parser.array(t, d.intValue()), null, "new"); :}
     | name:name dims:d COLONCOLON NEW:n
-    {:
-        TypeNode typeNode = parser.array(name.toType(), d.intValue());
-        RESULT = instanceMethodReference(parser.pos(name, n, n), typeNode, null, "new");
-    :}
+    {: RESULT = methodReference(parser.pos(name, n, n), parser.array(name.toType(), d.intValue()), null, "new"); :}
     ;
 
 extend primary_no_new_array ::= method_reference:e {: RESULT = e; :};

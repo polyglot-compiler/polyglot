@@ -36,5 +36,5 @@ public interface JL8ExtFactory extends JL7ExtFactory {
 
     Ext extLambdaExpressionNode();
 
-    Ext extInstanceMethodReferenceNode();
+    Ext extMethodReferenceNode();
 }

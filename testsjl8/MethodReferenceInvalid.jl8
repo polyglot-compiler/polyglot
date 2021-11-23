@@ -1,6 +1,6 @@
 import java.util.function.Function;
 
-public class InstanceMethodReferenceInvalid {
+public class MethodReferenceInvalid {
     Integer intF(Integer m) { return m; }
 
     void test() {

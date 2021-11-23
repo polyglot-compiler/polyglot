@@ -27,7 +27,6 @@ package polyglot.ext.jl8.ast;
 
 import java.util.List;
 import polyglot.ast.Block;
-import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Receiver;
 import polyglot.ast.TypeNode;
@@ -42,6 +41,6 @@ public interface JL8NodeFactory extends JL7NodeFactory {
 
     LambdaExpression LambdaExpression(Position pos, List<Formal> formals, Block block);
 
-    InstanceMethodReference InstanceMethodReference(
+    MethodReference MethodReference(
             Position position, Receiver receiver, List<TypeNode> typeArgs, String methodName);
 }

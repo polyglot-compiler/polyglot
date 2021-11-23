@@ -81,13 +81,13 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
     }
 
     @Override
-    public final Ext extInstanceMethodReferenceNode() {
-        Ext e = extInstanceMethodReferenceNodeImpl();
+    public final Ext extMethodReferenceNode() {
+        Ext e = extMethodReferenceNodeImpl();
 
         if (nextExtFactory() != null) {
             Ext e2;
             if (nextExtFactory() instanceof JL8ExtFactory) {
-                e2 = ((JL8ExtFactory) nextExtFactory()).extInstanceMethodReferenceNode();
+                e2 = ((JL8ExtFactory) nextExtFactory()).extMethodReferenceNode();
             } else {
                 e2 = nextExtFactory().extTerm();
             }
@@ -96,7 +96,7 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
         return e;
     }
 
-    protected Ext extInstanceMethodReferenceNodeImpl() {
+    protected Ext extMethodReferenceNodeImpl() {
         return extTerm();
     }
 }
