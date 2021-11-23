@@ -4,8 +4,22 @@ public class InstanceMethodReference {
     Integer test(Integer nnn) {
         Function<Integer, Integer> negation = this::test;
         expectFunction(this::test);
+        InstanceMethodReference t = this;
+        negation = t::test;
+        negation = (Function<Integer, Integer>) B::test;
         return 0;
     }
 
     void expectFunction(Function<Integer, Integer> f) {}
+
+    static class B {
+       static Integer test(Integer n) { return n; }
+    }
+
+    class C extends InstanceMethodReference {
+       void test() {
+         Function<Integer, Integer> negation = super::test;
+         negation = C.super::test;
+       }
+    }
 }

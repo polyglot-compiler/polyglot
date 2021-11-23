@@ -114,7 +114,7 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
                 this.targetType = targetReferenceType;
                 this.sam = methods.get(0);
                 this.receiver =
-                        (Expr)
+                        (Receiver)
                                 LambdaExpression.replaceThisWithQualifiedThis(
                                         this.receiver, lang(), nodeFactory, currentClass);
                 return this;
