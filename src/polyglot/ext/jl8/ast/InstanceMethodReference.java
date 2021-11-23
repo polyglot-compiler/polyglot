@@ -38,12 +38,23 @@ import polyglot.ast.Id;
 import polyglot.ast.New;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.ProcedureCall;
+import polyglot.ast.Receiver;
+import polyglot.ast.Special;
 import polyglot.ast.Term;
 import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
+import polyglot.ext.jl5.ast.JL5CallExt;
+import polyglot.ext.jl5.ast.JL5Ext;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
+import polyglot.ext.jl5.ast.JL5ProcedureCallExt;
+import polyglot.ext.jl5.types.JL5MethodInstance;
+import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl8.types.JL8TypeSystem;
+import polyglot.translate.ExtensionRewriter;
 import polyglot.types.ClassType;
+import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
@@ -58,7 +69,7 @@ import polyglot.visit.TypeChecker;
 
 public class InstanceMethodReference extends Term_c implements FunctionSpec {
 
-    protected Expr receiver;
+    protected Receiver receiver;
     protected List<TypeNode> typeArgs;
     protected String methodName;
     protected ReferenceType targetType = null;
@@ -66,12 +77,12 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
 
     //    @Deprecated
     InstanceMethodReference(
-            Position position, Expr receiver, List<TypeNode> typeArgs, String methodName) {
+            Position position, Receiver receiver, List<TypeNode> typeArgs, String methodName) {
         this(position, receiver, typeArgs, methodName, null);
     }
 
     public InstanceMethodReference(
-            Position position, Expr receiver, List<TypeNode> typeArgs, String methodName, Ext ext) {
+            Position position, Receiver receiver, List<TypeNode> typeArgs, String methodName, Ext ext) {
         super(position, ext);
         this.receiver = receiver;
         this.typeArgs = typeArgs;
@@ -118,7 +129,130 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
         return this; // Not ready for type checking!
     }
 
-    protected <N extends InstanceMethodReference> N receiver(N n, Expr receiver) {
+    private List<ReferenceType> actualTypeArgs() {
+        List<ReferenceType> actualTypeArgs = new ArrayList<>(this.typeArgs.size());
+        for (TypeNode tn : this.typeArgs) {
+            actualTypeArgs.add((ReferenceType) tn.type());
+        }
+        return actualTypeArgs;
+    }
+
+    private ReferenceType findTargetType() throws SemanticException {
+        Type t = this.receiver.type();
+        if (t.isReference()) {
+            return t.toReference();
+        } else {
+            // trying to invoke a method on a non-reference type.
+            // let's pull out an appropriate error message.
+            if (this.receiver instanceof Expr) {
+                throw new SemanticException(
+                        "Cannot invoke method \""
+                                + this.methodName
+                                + "\" on "
+                                + "an expression of non-reference type "
+                                + t
+                                + ".",
+                        this.receiver.position());
+            } else if (this.receiver instanceof TypeNode) {
+                throw new SemanticException(
+                        "Cannot invoke static method \""
+                                + this.methodName
+                                + "\" on non-reference type "
+                                + t
+                                + ".",
+                        this.receiver.position());
+            }
+            throw new SemanticException(
+                    "Cannot invoke method \"" + this.methodName + "\" on non-reference type " + t + ".",
+                    this.receiver.position());
+        }
+    }
+
+    @Override
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        Context c = tc.context();
+        List<Type> argTypes = new ArrayList<>(this.sam.formalTypes());
+
+        if (!this.receiver.type().isCanonical()) return this;
+
+        List<ReferenceType> actualTypeArgs = actualTypeArgs();
+
+        ReferenceType targetType = findTargetType();
+
+        /* This call is in a static context if and only if
+         * the target (possibly implicit) is a type node.
+         */
+        boolean staticContext = (this.receiver instanceof TypeNode);
+
+        if (staticContext && targetType instanceof RawClass) {
+            targetType = ((RawClass) targetType).base();
+        }
+
+        JL5MethodInstance mi =
+                (JL5MethodInstance)
+                        ts.findMethod(
+                                targetType,
+                                this.methodName,
+                                argTypes,
+                                actualTypeArgs,
+                                c.currentClass(),
+                                this.sam.returnType(),
+                                !(this.receiver instanceof Special));
+
+        if (staticContext && !mi.flags().isStatic()) {
+            throw new SemanticException(
+                    "Cannot call non-static method "
+                            + this.methodName
+                            + " of "
+                            + this.receiver.type()
+                            + " in static "
+                            + "context.",
+                    this.position());
+        }
+
+        // If the target is super, but the method is abstract, then complain.
+        if (this.receiver instanceof Special
+                && ((Special) this.receiver).kind() == Special.SUPER
+                && mi.flags().isAbstract()) {
+            throw new SemanticException(
+                    "Cannot call an abstract method " + "of the super class", this.position());
+        }
+
+        int expectedSize = argTypes.size();
+        if (expectedSize != mi.formalTypes().size()) {
+            throw new SemanticException(
+                    String.format(
+                            "Incompatible parameter types in lambda expression: wrong"
+                                    + " number of parameters: expected %d but found %d",
+                            expectedSize, mi.formalTypes().size()),
+                    position());
+        }
+        for (int i = 0; i < expectedSize; i++) {
+            Type expectedType = argTypes.get(i);
+            Type actualType = mi.formalTypes().get(i);
+            if (!ts.equals(actualType, expectedType)) {
+                throw new SemanticException(
+                        String.format(
+                                "Incompatible parameter types in lambda expression:"
+                                        + " expected %s but found %s",
+                                expectedType, actualType),
+                        position());
+            }
+        }
+        if (!ts.equals(mi.returnType(), this.sam.returnType())) {
+            throw new SemanticException(
+                    String.format(
+                            "Incompatible parameter types in lambda expression:"
+                                    + " expected %s but found %s",
+                            this.sam.returnType(), mi.returnType()),
+                    position());
+        }
+
+        return this;
+    }
+
+    protected <N extends InstanceMethodReference> N receiver(N n, Receiver receiver) {
         if (n.receiver == receiver) return n;
         n = copyIfNeeded(n);
         n.receiver = receiver;
@@ -134,7 +268,8 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
 
     @Override
     public Term firstChild() {
-        return receiver;
+        if (this.receiver instanceof Term) return (Term) this.receiver;
+        return null;
     }
 
     @Override
@@ -202,15 +337,20 @@ public class InstanceMethodReference extends Term_c implements FunctionSpec {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        Expr receiver = visitChild(this.receiver, v);
+        Receiver receiver = visitChild(this.receiver, v);
         List<TypeNode> typeArgs = visitList(this.typeArgs, v);
         return typeArgs(receiver(this, receiver), typeArgs);
     }
 
     @Override
     public <T> List<T> acceptCFG(CFGBuilder<?> v, List<T> succs) {
-        v.visitCFGList(this.typeArgs, this.receiver, ENTRY);
-        v.visitCFG(this.receiver, this, EXIT);
+        if (this.receiver instanceof Term) {
+            Term receiver = (Term) this.receiver;
+            v.visitCFGList(this.typeArgs, receiver, ENTRY);
+            v.visitCFG(receiver, this, EXIT);
+        } else {
+            v.visitCFGList(this.typeArgs, this, EXIT);
+        }
         return succs;
     }
 

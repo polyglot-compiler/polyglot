@@ -29,6 +29,7 @@ import java.util.List;
 import polyglot.ast.Block;
 import polyglot.ast.Expr;
 import polyglot.ast.Formal;
+import polyglot.ast.Receiver;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl7.ast.JL7NodeFactory_c;
 import polyglot.util.CollectionUtil;
@@ -77,7 +78,7 @@ public class JL8NodeFactory_c extends JL7NodeFactory_c implements JL8NodeFactory
 
     @Override
     public InstanceMethodReference InstanceMethodReference(
-            Position position, Expr receiver, List<TypeNode> typeArgs, String methodName) {
+            Position position, Receiver receiver, List<TypeNode> typeArgs, String methodName) {
         InstanceMethodReference instanceMethodReference =
                 new InstanceMethodReference(
                         position, receiver, CollectionUtil.nonNullList(typeArgs), methodName);

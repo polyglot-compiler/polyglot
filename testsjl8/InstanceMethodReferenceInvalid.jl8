@@ -6,6 +6,8 @@ public class InstanceMethodReferenceInvalid {
     void test() {
         // Invalid return type
         Function<Integer, String> negation = this::intF;
+        // Invalid param type
+        Function<String, Integer> negation2 = this::intF;
         negation.apply(3);
     }
 }
