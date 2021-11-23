@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import polyglot.ast.Block;
-import polyglot.ast.Call;
 import polyglot.ast.ClassMember;
 import polyglot.ast.Expr;
 import polyglot.ast.Ext;
@@ -49,6 +48,7 @@ import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
@@ -177,9 +177,81 @@ public class MethodReference extends Term_c implements FunctionSpec {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
         Context c = tc.context();
-        List<Type> argTypes = new ArrayList<>(this.sam.formalTypes());
 
         if (!this.receiver.type().isCanonical()) return this;
+        List<Type> argTypes = new ArrayList<>(this.sam.formalTypes());
+
+        if (this.methodName.equals("new")) {
+            if (!(this.receiver instanceof TypeNode)) {
+                throw new SemanticException("Receiver is not a type.", this.receiver.position());
+            }
+            TypeNode typeNodeReceiver = (TypeNode) this.receiver;
+            if (typeNodeReceiver.type().isArray()) {
+                if (argTypes.size() != 1) {
+                    throw new SemanticException(
+                            String.format(
+                                    "Incompatible parameter types in method: wrong"
+                                            + " number of parameters: expected %d but found 1",
+                                    argTypes.size()),
+                            position());
+                }
+                Type expectedArgType = argTypes.get(0);
+                if (!ts.isImplicitCastValid(ts.Int(), expectedArgType)) {
+                    throw new SemanticException(
+                            String.format(
+                                    "Incompatible parameter types in method reference:"
+                                            + " expected %s but found %s",
+                                    expectedArgType, ts.Int()),
+                            position());
+                }
+                if (!ts.equals(typeNodeReceiver.type(), this.sam.returnType())) {
+                    throw new SemanticException(
+                            String.format(
+                                    "Incompatible return type in method reference:"
+                                            + " expected %s but found %s",
+                                    this.sam.returnType(), typeNodeReceiver.type()),
+                            position());
+                }
+            } else if (typeNodeReceiver.type().isClass()) {
+                ClassType ct = typeNodeReceiver.type().toClass();
+                ConstructorInstance ci =
+                        ts.findConstructor(ct, argTypes, actualTypeArgs(), c.currentClass(), true);
+
+                int expectedSize = argTypes.size();
+                if (expectedSize != ci.formalTypes().size()) {
+                    throw new SemanticException(
+                            String.format(
+                                    "Incompatible parameter types in lambda expression: wrong"
+                                            + " number of parameters: expected %d but found %d",
+                                    expectedSize, ci.formalTypes().size()),
+                            position());
+                }
+                for (int i = 0; i < expectedSize; i++) {
+                    Type expectedType = argTypes.get(i);
+                    Type actualType = ci.formalTypes().get(i);
+                    if (!ts.equals(actualType, expectedType)) {
+                        throw new SemanticException(
+                                String.format(
+                                        "Incompatible parameter types in method reference:"
+                                                + " expected %s but found %s",
+                                        expectedType, actualType),
+                                position());
+                    }
+                }
+                if (!ts.equals(ci.container(), this.sam.returnType())) {
+                    throw new SemanticException(
+                            String.format(
+                                    "Incompatible return type in method reference:"
+                                            + " expected %s but found %s",
+                                    this.sam.returnType(), ci.container()),
+                            position());
+                }
+            } else {
+                throw new SemanticException(
+                        "Receiver is not a class or array type.", this.receiver.position());
+            }
+            return this;
+        }
 
         List<ReferenceType> actualTypeArgs = actualTypeArgs();
 
@@ -239,7 +311,7 @@ public class MethodReference extends Term_c implements FunctionSpec {
             if (!ts.equals(actualType, expectedType)) {
                 throw new SemanticException(
                         String.format(
-                                "Incompatible parameter types in lambda expression:"
+                                "Incompatible parameter types in method reference:"
                                         + " expected %s but found %s",
                                 expectedType, actualType),
                         position());
@@ -248,7 +320,7 @@ public class MethodReference extends Term_c implements FunctionSpec {
         if (!ts.equals(mi.returnType(), this.sam.returnType())) {
             throw new SemanticException(
                     String.format(
-                            "Incompatible parameter types in lambda expression:"
+                            "Incompatible return type in method reference:"
                                     + " expected %s but found %s",
                             this.sam.returnType(), mi.returnType()),
                     position());
@@ -295,14 +367,36 @@ public class MethodReference extends Term_c implements FunctionSpec {
                             argName));
             args.add(nodeFactory.Local(Position.COMPILER_GENERATED, argName));
         }
-        Call syntheticCall =
-                ((JL5NodeFactory) nodeFactory)
-                        .Call(
+        Expr syntheticCall;
+        if (this.methodName.equals("new")) {
+            if (this.receiver.type().isArray()) {
+                syntheticCall =
+                        nodeFactory.NewArray(
                                 Position.COMPILER_GENERATED,
-                                this.receiver,
-                                this.typeArgs,
-                                nodeFactory.Id(Position.COMPILER_GENERATED, this.methodName),
-                                args);
+                                nodeFactory.CanonicalTypeNode(
+                                        Position.COMPILER_GENERATED,
+                                        this.receiver.type().toArray().base()),
+                                Collections.<Expr>singletonList(args.get(0)));
+            } else {
+                syntheticCall =
+                        ((JL5NodeFactory) nodeFactory)
+                                .New(
+                                        Position.COMPILER_GENERATED,
+                                        this.typeArgs,
+                                        (TypeNode) this.receiver,
+                                        args,
+                                        null);
+            }
+        } else {
+            syntheticCall =
+                    ((JL5NodeFactory) nodeFactory)
+                            .Call(
+                                    Position.COMPILER_GENERATED,
+                                    this.receiver,
+                                    this.typeArgs,
+                                    nodeFactory.Id(Position.COMPILER_GENERATED, this.methodName),
+                                    args);
+        }
         Block block;
         if (method.returnType().equals(method.typeSystem().Void())) {
             block =

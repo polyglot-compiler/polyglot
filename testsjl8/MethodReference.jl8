@@ -7,12 +7,15 @@ public class MethodReference {
         MethodReference t = this;
         negation = t::test;
         negation = (Function<Integer, Integer>) B::test;
+        Function<Integer, int[]> newArray = int[]::new;
+        Function<Integer, B> newClass = B::new;
         return 0;
     }
 
     void expectFunction(Function<Integer, Integer> f) {}
 
     static class B {
+       B(Integer i) {}
        static Integer test(Integer n) { return n; }
     }
 
