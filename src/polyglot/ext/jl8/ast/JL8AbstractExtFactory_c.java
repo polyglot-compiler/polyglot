@@ -65,13 +65,13 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
     }
 
     @Override
-    public final Ext extLambdaFunctionDeclarationNode() {
-        Ext e = extextLambdaFunctionDeclarationNodeImpl();
+    public final Ext extLambdaExpressionNode() {
+        Ext e = extLambdaExpressionNodeImpl();
 
         if (nextExtFactory() != null) {
             Ext e2;
             if (nextExtFactory() instanceof JL8ExtFactory) {
-                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaFunctionDeclarationNode();
+                e2 = ((JL8ExtFactory) nextExtFactory()).extLambdaExpressionNode();
             } else {
                 e2 = nextExtFactory().extTerm();
             }
@@ -80,7 +80,27 @@ public abstract class JL8AbstractExtFactory_c extends JL7AbstractExtFactory_c
         return e;
     }
 
-    protected Ext extextLambdaFunctionDeclarationNodeImpl() {
+    protected Ext extLambdaExpressionNodeImpl() {
+        return extTerm();
+    }
+
+    @Override
+    public final Ext extInstanceMethodReferenceNode() {
+        Ext e = extLambdaExpressionNodeImpl();
+
+        if (nextExtFactory() != null) {
+            Ext e2;
+            if (nextExtFactory() instanceof JL8ExtFactory) {
+                e2 = ((JL8ExtFactory) nextExtFactory()).extInstanceMethodReferenceNode();
+            } else {
+                e2 = nextExtFactory().extTerm();
+            }
+            e = composeExts(e, e2);
+        }
+        return e;
+    }
+
+    protected Ext extInstanceMethodReferenceNodeImpl() {
         return extTerm();
     }
 }

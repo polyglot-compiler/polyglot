@@ -61,10 +61,17 @@ parser Grm extends polyglot.ext.jl7.parse.Grm  {:
         }
     }
 
+    private FunctionValue lambda(Position p, List<Formal> f, Block b) {
+        return nf.FunctionValue(nf.LambdaExpression(p, f, b));
+    }
+
+    private FunctionValue instanceMethodReference(Position p, Expr t, List<TypeNode> args, String n) {
+        return nf.FunctionValue(nf.InstanceMethodReference(p, t, args, n));
+    }
+
 :};
 
-nonterminal method_reference;
-nonterminal FunctionValue lambda_expression;
+nonterminal FunctionValue lambda_expression, method_reference;
 nonterminal List<Formal> inferred_formal_parameter_list, comma_start_formal_parameter_list_opt;
 nonterminal Block lambda_body;
 nonterminal TypeInCastWithLPAREN type_in_cast_with_lparen;
@@ -80,7 +87,7 @@ extend assignment_expression ::= lambda_expression:e {: RESULT = e; :};
 
 method_reference ::=
       primary:e COLONCOLON type_arguments_opt:args simple_name:n
-    {: :}
+    {: RESULT = instanceMethodReference(parser.pos(e, n, n), e, args, n.toString()); :}
     | SUPER:sup COLONCOLON type_arguments_opt:args simple_name:n
     // TODO: handle super case
     | name:name COLONCOLON type_arguments_opt:args simple_name:n
@@ -102,56 +109,54 @@ lambda_expression ::=
     {:
         List<Formal> formals = new ArrayList<>();
         formals.add(parser.nf.Formal(n.pos, Flags.NONE, new ArrayList<AnnotationElem>(), dummyIntType(), n.name, false));
-        RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(n, b, b), formals, b));
+        RESULT = lambda(parser.pos(n, b, b), formals, b);
     :}
-    | LPAREN:l RPAREN_ARROW lambda_body:b
-    {: RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), new ArrayList<Formal>(), b)); :}
-    | LPAREN:l inferred_formal_parameter_list:f RPAREN_ARROW lambda_body:b
-    {: RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b)); :}
+    | LPAREN:l RPAREN_ARROW lambda_body:b {: RESULT = lambda(parser.pos(l, b, b), new ArrayList<Formal>(), b); :}
+    | LPAREN:l inferred_formal_parameter_list:f RPAREN_ARROW lambda_body:b {: RESULT = lambda(parser.pos(l, b, b), f, b); :}
     | LPAREN:l modifiers_or_annotations:m type:t variable_declarator_id:c comma_start_formal_parameter_list_opt:f RPAREN_ARROW lambda_body:b
     {:
         f.add(0, parser.nf.Formal(parser.pos(t, c, c), m.flags(), m.annotations(), parser.array(t, c.dims), c.name));
-        RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b));
+        RESULT = lambda(parser.pos(l, b, b), f, b);
     :}
     | LPAREN:l modifiers_or_annotations:m type:t ELLIPSIS IDENTIFIER:d comma_start_formal_parameter_list_opt:f RPAREN_ARROW lambda_body:b
     {:
         ArrayTypeNode typeNode = parser.nf.ArrayTypeNode(parser.pos(t), t);
         Id id = parser.nf.Id(parser.pos(d), d.getIdentifier());
         f.add(0, parser.nf.Formal(parser.pos(t, d, d), m.flags(), m.annotations(), typeNode, id, true));
-        RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b));
+        RESULT = lambda(parser.pos(l, b, b), f, b);
     :}
     | LPAREN:l primitive_type:a dims_opt:dims variable_declarator_id:c comma_start_formal_parameter_list_opt:f RPAREN_ARROW lambda_body:b
     {:
         TypeNode t = parser.array(a, dims.intValue());
         f.add(0, parser.nf.Formal(parser.pos(a, c, c), Flags.NONE, new ArrayList<AnnotationElem>(), t, c.name));
-        RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b));
+        RESULT = lambda(parser.pos(l, b, b), f, b);
     :}
     | LPAREN:l primitive_type:a dims_opt:dims ELLIPSIS IDENTIFIER:d comma_start_formal_parameter_list_opt:f RPAREN_ARROW lambda_body:b
     {:
         ArrayTypeNode typeNode = parser.nf.ArrayTypeNode(parser.pos(a), parser.array(a, dims.intValue()));
         Id id = parser.nf.Id(parser.pos(d), d.getIdentifier());
         f.add(0, parser.nf.Formal(parser.pos(a, d, d), Flags.NONE, new ArrayList<AnnotationElem>(), typeNode, id, true));
-        RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b));
+        RESULT = lambda(parser.pos(l, b, b), f, b);
     :}
     | LPAREN:l name:n variable_declarator_id:c comma_start_formal_parameter_list_opt:f RPAREN_ARROW lambda_body:b
     {:
         TypeNode t = parser.array(n.toType(), c.dims);
         f.add(0, parser.nf.Formal(parser.pos(n, c, c), Flags.NONE, new ArrayList<AnnotationElem>(), t, c.name));
-        RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b));
+        RESULT = lambda(parser.pos(l, b, b), f, b);
     :}
     | LPAREN:l name:n ELLIPSIS IDENTIFIER:d comma_start_formal_parameter_list_opt:f RPAREN_ARROW lambda_body:b
     {:
         ArrayTypeNode typeNode = parser.nf.ArrayTypeNode(parser.pos(n), n.toType());
         Id id = parser.nf.Id(parser.pos(d), d.getIdentifier());
         f.add(0, parser.nf.Formal(parser.pos(n, d, d), Flags.NONE, new ArrayList<AnnotationElem>(), typeNode, id, true));
-        RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b));
+        RESULT = lambda(parser.pos(l, b, b), f, b);
     :}
     | type_in_cast_with_lparen:tl variable_declarator_id:c comma_start_formal_parameter_list_opt:f RPAREN_ARROW lambda_body:b
     {:
         Token l = tl.LPARENToken;
         TypeNode t = parser.array(tl.type, c.dims);
         f.add(0, parser.nf.Formal(parser.pos(l, c, c), Flags.NONE, new ArrayList<AnnotationElem>(), t, c.name));
-        RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b));
+        RESULT = lambda(parser.pos(l, b, b), f, b);
     :}
     | type_in_cast_with_lparen:tl ELLIPSIS IDENTIFIER:d comma_start_formal_parameter_list_opt:f RPAREN_ARROW lambda_body:b
     {:
@@ -159,7 +164,7 @@ lambda_expression ::=
         ArrayTypeNode typeNode = parser.nf.ArrayTypeNode(parser.pos(tl.type), tl.type);
         Id id = parser.nf.Id(parser.pos(d), d.getIdentifier());
         f.add(0, parser.nf.Formal(parser.pos(l, d, d), Flags.NONE, new ArrayList<AnnotationElem>(), typeNode, id, true));
-        RESULT = parser.nf.FunctionValue(parser.nf.LambdaFunctionDeclaration(parser.pos(l, b, b), f, b));
+        RESULT = lambda(parser.pos(l, b, b), f, b);
     :}
     ;
 

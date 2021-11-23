@@ -34,5 +34,7 @@ import polyglot.ext.jl7.ast.JL7ExtFactory;
 public interface JL8ExtFactory extends JL7ExtFactory {
     Ext extFunctionValueNode();
 
-    Ext extLambdaFunctionDeclarationNode();
+    Ext extLambdaExpressionNode();
+
+    Ext extInstanceMethodReferenceNode();
 }
