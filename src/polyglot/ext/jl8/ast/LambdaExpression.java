@@ -59,12 +59,14 @@ import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class LambdaExpression extends Term_c implements FunctionSpec, CodeNode, Returnable {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected List<Formal> formals;
     protected Block block;

@@ -1,0 +1,29 @@
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+public class MethodReferenceInvalid {
+    Integer intF(Integer m) { return m; }
+
+    void test() {
+        // Invalid return type
+        Function<Integer, String> negation = this::intF;
+        // Invalid param type
+        Function<String, Integer> negation2 = this::intF;
+        negation.apply(3);
+        // param mismatch
+        Function<Integer, boolean[]> newArray1 = int[]::new;
+        Supplier<int[]> newArray2 = int[]::new;
+        // param mismatch
+        Function<Integer, B> newClass1 = B::new;
+        // result mismatch
+        Function<Integer, B> newClass2 = C::new;
+    }
+
+    static class B {
+        B(String i) {}
+    }
+
+    static class C {
+        C(Integer i) {}
+    }
+}

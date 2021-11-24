@@ -1,0 +1,28 @@
+import java.util.function.Function;
+
+public class MethodReference {
+    Integer test(Integer nnn) {
+        Function<Integer, Integer> negation = this::test;
+        expectFunction(this::test);
+        MethodReference t = this;
+        negation = t::test;
+        negation = (Function<Integer, Integer>) B::test;
+        Function<Integer, int[]> newArray = int[]::new;
+        Function<Integer, B> newClass = B::new;
+        return 0;
+    }
+
+    void expectFunction(Function<Integer, Integer> f) {}
+
+    static class B {
+       B(Integer i) {}
+       static Integer test(Integer n) { return n; }
+    }
+
+    class C extends MethodReference {
+       void test() {
+         Function<Integer, Integer> negation = super::test;
+         negation = C.super::test;
+       }
+    }
+}
