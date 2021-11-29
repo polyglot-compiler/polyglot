@@ -269,7 +269,7 @@ public abstract class Type_c extends TypeObject_c implements Type {
     @Deprecated
     @Override
     public boolean numericConversionValidImpl(long value) {
-        return numericConversionValidImpl(new Long(value));
+        return numericConversionValidImpl(value);
     }
 
     @Override

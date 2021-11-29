@@ -312,16 +312,16 @@ public class JL5ClassFileLazyClassInitializer extends ClassFileLazyClassInitiali
                         o = field.getString();
                         break;
                     case Constant.INTEGER:
-                        o = new Integer(field.getInt());
+                        o = field.getInt();
                         break;
                     case Constant.LONG:
-                        o = new Long(field.getLong());
+                        o = field.getLong();
                         break;
                     case Constant.FLOAT:
-                        o = new Float(field.getFloat());
+                        o = field.getFloat();
                         break;
                     case Constant.DOUBLE:
-                        o = new Double(field.getDouble());
+                        o = field.getDouble();
                         break;
                 }
             } catch (SemanticException e) {

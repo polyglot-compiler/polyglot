@@ -233,8 +233,8 @@
     </target>
 
     <target name="serialuid" description="Build polyglot.util.SerialVersionUID">
-        <javac source="1.7"
-                target="1.7"
+        <javac source="1.8"
+                target="1.8"
                 srcdir="${src}"
                 destdir="${classes}"
                 debug="on"
@@ -486,8 +486,8 @@
 
     <!-- compile the base compiler except for the quasiquoter and generated parser -->
     <target name="compile-base" depends="init,base-parser">
-        <javac source="1.7"
-                target="1.7"
+        <javac source="8"
+                target="1.8"
                 srcdir="${src}"
                 destdir="${classes}"
                 debug="on"
@@ -497,8 +497,8 @@
             <classpath refid="standard.classpath"/>
         </javac>
         <!-- Compile the JL5 code -->
-        <javac source="1.7"
-                target="1.7"
+        <javac source="1.8"
+                target="1.8"
                 srcdir="${src}"
                 destdir="${classes}"
                 debug="on"
@@ -508,8 +508,8 @@
             <classpath refid="standard.classpath"/>
         </javac>
         <!-- Compile the JL7 code -->
-        <javac source="1.7"
-               target="1.7"
+        <javac source="1.8"
+               target="1.8"
                srcdir="${src}"
                destdir="${classes}"
                debug="on"
@@ -519,8 +519,8 @@
             <classpath refid="standard.classpath"/>
         </javac>
         <!-- Compile the JL8 code -->
-        <javac source="1.7"
-               target="1.7"
+        <javac source="1.8"
+               target="1.8"
                srcdir="${src}"
                destdir="${classes}"
                debug="on"
@@ -545,8 +545,8 @@
             <param name="parser.class" value="parser"/>
             <param name="symbol.class" value="sym"/>
         </antcall>
-        <javac source="1.7"
-                target="1.7"
+        <javac source="1.8"
+                target="1.8"
                 srcdir="${cup.src}"
                 destdir="${cup.classes}"
                 debug="on"
@@ -759,8 +759,8 @@
             <param name="parser.class" value="Grm"/>
             <param name="symbol.class" value="sym"/>
         </antcall>
-        <javac source="1.7"
-                target="1.7"
+        <javac source="1.8"
+                target="1.8"
                 srcdir="${src}"
                 destdir="${classes}"
                 debug="on"
@@ -789,8 +789,8 @@
                 todir="${classes}/polyglot/ext/jl5/parse"/>
         <copy file="${src}/polyglot/ext/jl5/parse/jl5_ppg.cup"
                 todir="${classes}/polyglot/ext/jl5/parse"/>
-        <javac source="1.7"
-                target="1.7"
+        <javac source="1.8"
+                target="1.8"
                 srcdir="${src}"
                 destdir="${classes}"
                 debug="on"
@@ -808,8 +808,8 @@
             <param name="parser.class" value="Grm"/>
             <param name="symbol.class" value="sym"/>
         </antcall>
-        <javac source="1.7"
-                target="1.7"
+        <javac source="1.8"
+                target="1.8"
                 srcdir="${src}"
                 destdir="${classes}"
                 debug="on"
@@ -843,8 +843,8 @@
               todir="${classes}/polyglot/ext/jl7/parse"/>
         <copy file="${src}/polyglot/ext/jl7/parse/jl7_ppg.cup"
               todir="${classes}/polyglot/ext/jl7/parse"/>
-        <javac source="1.7"
-               target="1.7"
+        <javac source="1.8"
+               target="1.8"
                srcdir="${src}"
                destdir="${classes}"
                debug="on"
@@ -878,8 +878,8 @@
               todir="${classes}/polyglot/ext/jl8/parse"/>
         <copy file="${src}/polyglot/ext/jl8/parse/jl8_ppg.cup"
               todir="${classes}/polyglot/ext/jl8/parse"/>
-        <javac source="1.7"
-               target="1.7"
+        <javac source="1.8"
+               target="1.8"
                srcdir="${src}"
                destdir="${classes}"
                debug="on"
@@ -945,8 +945,8 @@
         </antcall>
         <copy file="${pth.src}/polyglot/pth/script.cup"
                 todir="${pth.classes}/polyglot/pth"/>
-        <javac source="1.7"
-                target="1.7"
+        <javac source="1.8"
+                target="1.8"
                 srcdir="${pth.src}"
                 destdir="${pth.classes}"
                 debug="on"
@@ -983,8 +983,8 @@
             <param name="symbol.class" value="Constant"/>
             <param name="cup.file" value="ppg.cup"/>
         </antcall>
-        <javac source="1.7"
-                target="1.7"
+        <javac source="1.8"
+                target="1.8"
                 srcdir="${ppg.src}"
                 destdir="${ppg.classes}"
                 debug="on"
@@ -1031,8 +1031,8 @@
             <param name="parser.class" value="Grm"/>
             <param name="symbol.class" value="sym"/>
         </antcall>
-        <javac source="1.7"
-                target="1.7"
+        <javac source="1.8"
+                target="1.8"
                 srcdir="${efg.src}"
                 destdir="${efg.classes}"
                 debug="on"

@@ -166,7 +166,7 @@ public class Report {
     public static void addTopic(String topic, int level) {
         Integer i = reportTopics.get(topic);
         if (i == null || i.intValue() < level) {
-            reportTopics.put(topic, new Integer(level));
+            reportTopics.put(topic, level);
         }
         noReporting = false;
     }

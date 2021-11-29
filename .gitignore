@@ -7,6 +7,7 @@ cup-classes
 dist
 .classpath
 .project
+.vscode
 SyncToy*
 /bin_
 polyglot-?.?.?-src*

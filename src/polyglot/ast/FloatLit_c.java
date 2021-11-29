@@ -120,9 +120,9 @@ public class FloatLit_c extends Lit_c implements FloatLit {
     @Override
     public Object constantValue(Lang lang) {
         if (kind == FLOAT) {
-            return new Float(value);
+            return (float) value;
         } else {
-            return new Double(value);
+            return (double) value;
         }
     }
 

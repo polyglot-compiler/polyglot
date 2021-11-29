@@ -272,7 +272,7 @@ public class ClassFile_c implements ClassFile {
             case Constant.CLASS:
             case Constant.STRING:
             case Constant.METHOD_TYPE:
-                value = new Integer(in.readUnsignedShort());
+                value = in.readUnsignedShort();
                 break;
             case Constant.FIELD_REF:
             case Constant.METHOD_REF:
@@ -291,18 +291,18 @@ public class ClassFile_c implements ClassFile {
                 ((int[]) value)[1] = in.readUnsignedShort();
                 break;
             case Constant.INTEGER:
-                value = new Integer(in.readInt());
+                value = in.readInt();
                 break;
             case Constant.FLOAT:
-                value = new Float(in.readFloat());
+                value = in.readFloat();
                 break;
             case Constant.LONG:
                 // Longs take up 2 constant pool entries.
-                value = new Long(in.readLong());
+                value = in.readLong();
                 break;
             case Constant.DOUBLE:
                 // Doubles take up 2 constant pool entries.
-                value = new Double(in.readDouble());
+                value = in.readDouble();
                 break;
             case Constant.UTF8:
                 value = in.readUTF();

@@ -37,7 +37,7 @@ public class non_terminal extends symbol {
         _index = next_index++;
 
         /* add to by_index set */
-        _all_by_index.put(new Integer(_index), this);
+        _all_by_index.put(_index, this);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -84,9 +84,7 @@ public class non_terminal extends symbol {
 
     /** Lookup a non terminal by index. */
     public static non_terminal find(int indx) {
-        Integer the_indx = new Integer(indx);
-
-        return _all_by_index.get(the_indx);
+        return _all_by_index.get(indx);
     }
 
     /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
