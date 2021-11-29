@@ -2,7 +2,13 @@
 
 # To be run in repo root
 
-java -jar lib/google-java-format.jar \
+java \
+  --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED \
+  -jar lib/google-java-format.jar \
   --aosp --skip-sorting-imports --skip-javadoc-formatting \
   --dry-run --set-exit-if-changed \
   $(git ls-tree -r HEAD --name-only src | grep -E '.*\.java') \

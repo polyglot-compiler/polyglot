@@ -28,7 +28,7 @@ package polyglot.ext.jl8.ast;
 import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
 
-public final class JL8ExtFactory_c extends JL8AbstractExtFactory_c implements JL8ExtFactory {
+public final class JL8ExtFactory_c extends JL8AbstractExtFactory_c {
 
     public JL8ExtFactory_c() {
         super();

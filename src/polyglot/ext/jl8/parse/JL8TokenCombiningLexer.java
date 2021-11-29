@@ -27,13 +27,12 @@ package polyglot.ext.jl8.parse;
 
 import java.io.IOException;
 import polyglot.frontend.Source;
-import polyglot.lex.Lexer;
 import polyglot.lex.Operator;
 import polyglot.lex.Token;
 import polyglot.util.ErrorQueue;
 import polyglot.util.Position;
 
-public class JL8TokenCombiningLexer extends Lexer_c implements Lexer {
+public class JL8TokenCombiningLexer extends Lexer_c {
     private Token bufferedToken = null;
 
     public JL8TokenCombiningLexer(java.io.Reader reader, Source file, ErrorQueue eq) {

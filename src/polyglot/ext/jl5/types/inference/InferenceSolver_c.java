@@ -113,13 +113,9 @@ public class InferenceSolver_c implements InferenceSolver {
         }
 
         Comparator<Constraint> comp =
-                new Comparator<Constraint>() {
-                    @Override
-                    public int compare(Constraint o1, Constraint o2) {
-                        return typeVariablesToSolve().indexOf(o1.formal)
+                (o1, o2) ->
+                        typeVariablesToSolve().indexOf(o1.formal)
                                 - typeVariablesToSolve().indexOf(o2.formal);
-                    }
-                };
         Collections.sort(equals, comp);
         Collections.sort(subs, comp);
         Collections.sort(supers, comp);

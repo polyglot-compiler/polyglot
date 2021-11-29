@@ -27,10 +27,9 @@ package polyglot.ext.jl5.types;
 
 import java.util.List;
 
-import polyglot.types.MemberInstance;
 import polyglot.types.ProcedureInstance;
 
-public interface JL5ProcedureInstance extends ProcedureInstance, MemberInstance {
+public interface JL5ProcedureInstance extends ProcedureInstance {
     boolean isVariableArity();
 
     void setTypeParams(List<TypeVariable> typeParams);

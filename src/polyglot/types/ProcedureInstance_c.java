@@ -64,6 +64,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c implements Proced
         this.throwTypes = ListUtil.copy(excTypes, true);
     }
 
+    @Override
     public ReferenceType container() {
         return container;
     }
@@ -86,6 +87,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c implements Proced
     /**
      * @param container The container to set.
      */
+    @Override
     public void setContainer(ReferenceType container) {
         this.container = container;
     }
@@ -93,6 +95,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c implements Proced
     /**
      * @param flags The flags to set.
      */
+    @Override
     public void setFlags(Flags flags) {
         this.flags = flags;
     }

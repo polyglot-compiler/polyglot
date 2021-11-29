@@ -32,7 +32,7 @@ import java.util.List;
  * A {@code MethodInstance} represents the type information for a Java
  * method.
  */
-public interface MethodInstance extends FunctionInstance, MemberInstance, Declaration {
+public interface MethodInstance extends FunctionInstance, Declaration {
     /**
      * The method's name.
      */
