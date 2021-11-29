@@ -367,7 +367,7 @@ public class Main {
 
             Object extobj;
             try {
-                extobj = extClass.newInstance();
+                extobj = extClass.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new InternalCompilerError(
                         "Extension "

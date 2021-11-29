@@ -68,7 +68,6 @@ public class TypeDumper {
         dontExpand = new java.util.HashSet<>(java.util.Arrays.asList(primitiveLike));
 
         dontExpand.add(Position.class);
-        dontExpand.add(Compiler.class);
     }
 
     TypeObject theType;

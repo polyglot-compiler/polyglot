@@ -1196,7 +1196,7 @@ block_statements ::=
 
 block_statement ::=
     local_variable_declaration_statement:a {:
-                                           RESULT = new LinkedList<Stmt>(a);
+                                           RESULT = new LinkedList<>(a);
                                            :}
  |  statement:a {:
                 List<Stmt> l = new LinkedList<>();
@@ -1427,7 +1427,7 @@ for_init_opt ::=
  |  for_init:a {:  RESULT = a;  :};
 
 for_init ::=
-    statement_expression_list:a {:  RESULT = new LinkedList<ForInit>(a);  :}
+    statement_expression_list:a {:  RESULT = new LinkedList<>(a);  :}
  |  local_variable_declaration:a {:
                                  List<ForInit> l = new LinkedList<>();
                l.addAll(a);
@@ -1439,7 +1439,7 @@ for_update_opt ::=
  |  for_update:a {:  RESULT = a;  :};
 
 for_update ::=
-    statement_expression_list:a {:  RESULT = new LinkedList<ForUpdate>(a);  :};
+    statement_expression_list:a {:  RESULT = new LinkedList<>(a);  :};
 
 statement_expression_list ::=
     statement_expression:a {:

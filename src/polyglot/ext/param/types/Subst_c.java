@@ -88,12 +88,7 @@ public class Subst_c<Formal extends Param, Actual extends TypeObject>
 
     @Override
     public Iterable<Entry<Formal, Actual>> is_entry() {
-        return new Iterable<Entry<Formal, Actual>>() {
-            @Override
-            public Iterator<Entry<Formal, Actual>> iterator() {
-                return entries();
-            }
-        };
+        return () -> entries();
     }
 
     @Override

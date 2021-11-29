@@ -474,7 +474,7 @@ public class InnerClassRemover extends ContextVisitor {
                 ConstructorInstance ci = constructorCall.constructorInstance();
                 if (constructorCall.kind() == ConstructorCall.THIS) {
                     // Not a super call.  Pass the locals as arguments.
-                    List<Expr> arguments = new ArrayList<Expr>(localVars);
+                    List<Expr> arguments = new ArrayList<>(localVars);
 
                     // Modify the CI if it is a copy of the declaration CI.
                     // If not a copy, it will get modified at the declaration.

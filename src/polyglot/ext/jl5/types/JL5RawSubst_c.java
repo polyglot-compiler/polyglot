@@ -181,10 +181,5 @@ public class JL5RawSubst_c extends JL5Subst_c {
 
     /** Function object for transforming types. */
     private final Transformation<Type, Type> TypeErase =
-            new Transformation<Type, Type>() {
-                @Override
-                public Type transform(Type o) {
-                    return ((JL5TypeSystem) typeSystem()).erasureType(o);
-                }
-            };
+            o -> ((JL5TypeSystem) typeSystem()).erasureType(o);
 }

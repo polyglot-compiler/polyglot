@@ -194,18 +194,6 @@ public class NestedMap<K, V> extends AbstractMap<K, V> {
     private int nShadowed;
     private Set<Entry<K, V>> setView; // the set view of this.
     private Map<K, V> superMap;
-    private Predicate<Entry<K, V>> entryKeyNotInMyMap =
-            new Predicate<Entry<K, V>>() {
-                @Override
-                public boolean isTrue(Entry<K, V> ent) {
-                    return !myMap.containsKey(ent.getKey());
-                }
-            };
-    private Predicate<K> keyNotInMyMap =
-            new Predicate<K>() {
-                @Override
-                public boolean isTrue(K o) {
-                    return !myMap.containsKey(o);
-                }
-            };
+    private Predicate<Entry<K, V>> entryKeyNotInMyMap = (ent) -> !myMap.containsKey(ent.getKey());
+    private Predicate<K> keyNotInMyMap = o -> !myMap.containsKey(o);
 }

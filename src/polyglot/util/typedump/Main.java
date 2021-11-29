@@ -76,7 +76,7 @@ public class Main {
         }
 
         try {
-            extInfo = (ExtensionInfo) extClass.newInstance();
+            extInfo = (ExtensionInfo) extClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             System.err.println(
                     "Extension "

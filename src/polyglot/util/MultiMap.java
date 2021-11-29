@@ -120,6 +120,7 @@ public class MultiMap<K, V> extends AbstractMap<K, Set<V>> {
         return original;
     }
 
+    @Override
     public boolean remove(Object key, Object value) {
         Set<V> values = map.get(key);
         if (values == null) {
