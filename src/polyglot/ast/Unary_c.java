@@ -279,43 +279,43 @@ public class Unary_c extends Expr_c implements Unary {
         }
         if (v instanceof Double) {
             double vv = ((Double) v).doubleValue();
-            if (op == POS) return new Double(+vv);
-            if (op == NEG) return new Double(-vv);
+            if (op == POS) return (double) +vv;
+            if (op == NEG) return (double) -vv;
         }
         if (v instanceof Float) {
             float vv = ((Float) v).floatValue();
-            if (op == POS) return new Float(+vv);
-            if (op == NEG) return new Float(-vv);
+            if (op == POS) return (float) +vv;
+            if (op == NEG) return (float) -vv;
         }
         if (v instanceof Long) {
             long vv = ((Long) v).longValue();
-            if (op == BIT_NOT) return new Long(~vv);
-            if (op == POS) return new Long(+vv);
-            if (op == NEG) return new Long(-vv);
+            if (op == BIT_NOT) return (long) ~vv;
+            if (op == POS) return (long) +vv;
+            if (op == NEG) return (long) -vv;
         }
         if (v instanceof Integer) {
             int vv = ((Integer) v).intValue();
-            if (op == BIT_NOT) return new Integer(~vv);
-            if (op == POS) return new Integer(+vv);
-            if (op == NEG) return new Integer(-vv);
+            if (op == BIT_NOT) return (int) ~vv;
+            if (op == POS) return (int) +vv;
+            if (op == NEG) return (int) -vv;
         }
         if (v instanceof Character) {
             char vv = ((Character) v).charValue();
-            if (op == BIT_NOT) return new Integer(~vv);
-            if (op == POS) return new Integer(+vv);
-            if (op == NEG) return new Integer(-vv);
+            if (op == BIT_NOT) return (int) ~vv;
+            if (op == POS) return (int) +vv;
+            if (op == NEG) return (int) -vv;
         }
         if (v instanceof Short) {
             short vv = ((Short) v).shortValue();
-            if (op == BIT_NOT) return new Integer(~vv);
-            if (op == POS) return new Integer(+vv);
-            if (op == NEG) return new Integer(-vv);
+            if (op == BIT_NOT) return (int) ~vv;
+            if (op == POS) return (int) +vv;
+            if (op == NEG) return (int) -vv;
         }
         if (v instanceof Byte) {
             byte vv = ((Byte) v).byteValue();
-            if (op == BIT_NOT) return new Integer(~vv);
-            if (op == POS) return new Integer(+vv);
-            if (op == NEG) return new Integer(-vv);
+            if (op == BIT_NOT) return (int) ~vv;
+            if (op == POS) return (int) +vv;
+            if (op == NEG) return (int) -vv;
         }
 
         // not a constant

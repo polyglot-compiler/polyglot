@@ -789,7 +789,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
         @Override
         public Arg<Integer> defaultArg() {
             if (defaultValue == null) return null;
-            return createDefault(new Integer(defaultValue));
+            return createDefault(Integer.parseInt(defaultValue));
         }
 
         public IntFlag(
@@ -841,7 +841,7 @@ public abstract class OptFlag<T> implements Comparable<OptFlag<T>> {
         @Override
         public Arg<Double> defaultArg() {
             if (defaultValue == null) return null;
-            return createDefault(new Double(defaultValue));
+            return createDefault(Double.parseDouble(defaultValue));
         }
 
         public DoubleFlag(

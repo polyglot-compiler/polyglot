@@ -171,7 +171,7 @@ public class ClassSerializer extends NodeVisitor {
             newMembers.add(f);
 
             fi = ts.fieldInstance(pos, ct, flags, ts.Long(), "jlc$SourceLastModified$" + suffix);
-            fi.setConstantValue(new Long(time));
+            fi.setConstantValue(time);
             ii = ts.initializerInstance(pos, ct, Flags.STATIC);
             f =
                     nf.FieldDecl(

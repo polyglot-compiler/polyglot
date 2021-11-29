@@ -431,7 +431,7 @@ public class TypeSystem_c implements TypeSystem {
     @Deprecated
     @Override
     public boolean numericConversionValid(Type t, long value) {
-        return numericConversionValid(t, new Long(value));
+        return numericConversionValid(t, value);
     }
 
     ////

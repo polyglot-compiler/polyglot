@@ -310,7 +310,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
             //   we're not allowed (by contract) to do.  So hash them all.
             for (lalr_item e : this) result ^= e.hashCode();
 
-            hashcode_cache = new Integer(result);
+            hashcode_cache = result;
         }
 
         return hashcode_cache.intValue();

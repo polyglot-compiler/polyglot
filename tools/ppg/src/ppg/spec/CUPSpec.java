@@ -76,7 +76,7 @@ public class CUPSpec extends Spec {
         Production prod;
         for (int i = 0; i < productions.size(); i++) {
             prod = productions.elementAt(i);
-            ntProds.put(prod.getLHS().getName(), new Integer(i));
+            ntProds.put(prod.getLHS().getName(), i);
         }
     }
 
@@ -232,7 +232,7 @@ public class CUPSpec extends Spec {
         int pos = findNonterminal(nt);
         if (pos == NT_NOT_FOUND) {
             // add a hash mapping for this entry
-            ntProds.put(nt.getName(), new Integer(productions.size()));
+            ntProds.put(nt.getName(), productions.size());
             // just append to our list
             productions.addElement(p);
         } else {

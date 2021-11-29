@@ -5,7 +5,7 @@
  * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
  *
  * This file is based on:
- * Java 1.4 parser for CUP.  
+ * Java 1.4 parser for CUP.
  * Copyright (C) 2002-2003 C. Scott Ananian <cananian@alumni.princeton.edu>
  * This program is released under the terms of the GPL; see the file
  * COPYING for more details.  There is NO WARRANTY on this code.
@@ -1398,16 +1398,16 @@ dim_expr ::=
     ;
 dims_opt ::=
                     // Integer
-            {: RESULT = new Integer(0); :}
+            {: RESULT = 0; :}
     |   dims:a
             {: RESULT = a; :}
     ;
 dims ::=
                     // Integer
         LBRACK RBRACK
-            {: RESULT = new Integer(1); :}
+            {: RESULT = 1; :}
     |   dims:a LBRACK RBRACK
-            {: RESULT = new Integer(a.intValue() + 1); :}
+            {: RESULT = a + 1; :}
     ;
 field_access ::=
                     // Field

@@ -450,7 +450,7 @@ public class emit {
         out.println(
                 "    public final java_cup.runtime.Symbol "
                         + pre("do_action_part")
-                        + String.format("%08d", new Integer(suffix))
+                        + String.format("%08d", suffix)
                         + "(");
         emit_do_action_signature(out);
         out.println("            /* Symbol object for return from actions */");
@@ -686,7 +686,7 @@ public class emit {
         out.println(
                 "            return "
                         + pre("do_action_part")
-                        + String.format("%08d", new Integer(suffix))
+                        + String.format("%08d", suffix)
                         + "(");
         out.println("                           " + pre("act_num,"));
         out.println("                           " + pre("parser,"));
@@ -1174,7 +1174,7 @@ public class emit {
             out.println(
                     "  public final java_cup.runtime.Symbol "
                             + pre("do_action_part")
-                            + String.format("%08d", new Integer(instancecounter))
+                            + String.format("%08d", instancecounter)
                             + "(");
             out.println("    int                        " + pre("act_num,"));
             out.println("    java_cup.runtime.lr_parser " + pre("parser,"));
@@ -1337,7 +1337,7 @@ public class emit {
             out.println(
                     "              return "
                             + pre("do_action_part")
-                            + String.format("%08d", new Integer(0))
+                            + String.format("%08d", 0)
                             + "(");
             out.println("                               " + pre("act_num,"));
             out.println("                               " + pre("parser,"));
@@ -1373,7 +1373,7 @@ public class emit {
             out.println(
                     "              return "
                             + pre("do_action_part")
-                            + String.format("%08d", new Integer(instancecounter))
+                            + String.format("%08d", instancecounter)
                             + "(");
             out.println("                               " + pre("act_num,"));
             out.println("                               " + pre("parser,"));

@@ -485,7 +485,7 @@ public abstract class lr_parser {
         for (int i = 0; i < row.length; i += 2) {
             if (row[i] == -1) continue;
             if (!validate_expected_symbol(row[i])) continue;
-            ret.add(new Integer(row[i]));
+            ret.add((int) row[i]);
         }
         return ret;
     }

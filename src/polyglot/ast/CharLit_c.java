@@ -85,7 +85,7 @@ public class CharLit_c extends NumLit_c implements CharLit {
 
     @Override
     public Object constantValue(Lang lang) {
-        return new Character((char) value);
+        return (char) value;
     }
 
     @Override
