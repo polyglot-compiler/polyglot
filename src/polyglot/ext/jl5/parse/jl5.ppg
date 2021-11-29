@@ -734,8 +734,7 @@ override class_instance_creation_expression ::=//**
 	|	primary:a DOT NEW type_arguments_opt:d IDENTIFIER:e type_arguments:f LPAREN argument_list_opt:h RPAREN class_body_opt:j
         // Instantiating type arguments
         {: TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();
-           TypeNode tn = parser.nf.AmbTypeInstantiation(parser.pos(e, f), aa, f);
-           RESULT = parser.nf.New(parser.pos(a), a, d, tn, h, j); :}
+           RESULT = parser.nf.New(parser.pos(a), a, d, parser.nf.AmbTypeInstantiation(parser.pos(e, f), aa, f), h, j); :}
 	|	name:a DOT NEW type_arguments_opt:d IDENTIFIER:e type_arguments:f LPAREN argument_list_opt:h RPAREN class_body_opt:j
 	    // Instantiating type arguments
         {: TypeNode aa = (new JL5Name(parser.nf, parser.ts, parser.pos(e), parser.nf.Id(parser.pos(e), e.getIdentifier()))).toType();

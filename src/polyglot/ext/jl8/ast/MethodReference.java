@@ -44,7 +44,6 @@ import polyglot.ast.Term_c;
 import polyglot.ast.TypeNode;
 import polyglot.ext.jl5.ast.JL5NodeFactory;
 import polyglot.ext.jl5.types.JL5MethodInstance;
-import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.ext.jl5.types.RawClass;
 import polyglot.ext.jl8.types.JL8TypeSystem;
 import polyglot.types.ClassType;
@@ -71,6 +70,8 @@ public class MethodReference extends Term_c implements FunctionSpec {
     protected String methodName;
     protected ReferenceType targetType = null;
     protected MethodInstance sam = null;
+
+    private boolean includeReceiverAsParameter = false;
 
     //    @Deprecated
     MethodReference(
@@ -175,7 +176,7 @@ public class MethodReference extends Term_c implements FunctionSpec {
 
     @Override
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        JL5TypeSystem ts = (JL5TypeSystem) tc.typeSystem();
+        JL8TypeSystem ts = (JL8TypeSystem) tc.typeSystem();
         Context c = tc.context();
 
         if (!this.receiver.type().isCanonical()) return this;
@@ -268,7 +269,7 @@ public class MethodReference extends Term_c implements FunctionSpec {
 
         JL5MethodInstance mi =
                 (JL5MethodInstance)
-                        ts.findMethod(
+                        ts.findMethodForMethodReference(
                                 targetType,
                                 this.methodName,
                                 argTypes,
@@ -277,16 +278,7 @@ public class MethodReference extends Term_c implements FunctionSpec {
                                 this.sam.returnType(),
                                 !(this.receiver instanceof Special));
 
-        if (staticContext && !mi.flags().isStatic()) {
-            throw new SemanticException(
-                    "Cannot call non-static method "
-                            + this.methodName
-                            + " of "
-                            + this.receiver.type()
-                            + " in static "
-                            + "context.",
-                    this.position());
-        }
+        this.includeReceiverAsParameter = staticContext && !mi.flags().isStatic();
 
         // If the target is super, but the method is abstract, then complain.
         if (this.receiver instanceof Special
@@ -297,6 +289,10 @@ public class MethodReference extends Term_c implements FunctionSpec {
         }
 
         int expectedSize = argTypes.size();
+        if (this.includeReceiverAsParameter) {
+            expectedSize -= 1;
+            argTypes.remove(0);
+        }
         if (expectedSize != mi.formalTypes().size()) {
             throw new SemanticException(
                     String.format(
@@ -387,6 +383,15 @@ public class MethodReference extends Term_c implements FunctionSpec {
                                         args,
                                         null);
             }
+        } else if (this.includeReceiverAsParameter) {
+            syntheticCall =
+                    ((JL5NodeFactory) nodeFactory)
+                            .Call(
+                                    Position.COMPILER_GENERATED,
+                                    args.get(0),
+                                    this.typeArgs,
+                                    nodeFactory.Id(Position.COMPILER_GENERATED, this.methodName),
+                                    args.subList(1, args.size()));
         } else {
             syntheticCall =
                     ((JL5NodeFactory) nodeFactory)

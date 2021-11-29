@@ -179,7 +179,8 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess {
 
     @Override
     public List<Type> throwTypes(TypeSystem ts) {
-        return CollectionUtil.list((Type) ts.OutOfBoundsException(), ts.NullPointerException());
+        return CollectionUtil.<Type>list(
+                (Type) ts.OutOfBoundsException(), ts.NullPointerException());
     }
 
     @Override

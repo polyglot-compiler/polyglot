@@ -27,12 +27,25 @@ package polyglot.ext.jl8.types;
 
 import java.util.List;
 import polyglot.ext.jl7.types.JL7TypeSystem;
+import polyglot.types.ClassType;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 
 public interface JL8TypeSystem extends JL7TypeSystem {
     FunctionType functionType(List<? extends Type> formalTypes, Type returnType);
 
     List<MethodInstance> nonObjectPublicAbstractMethods(ReferenceType referenceType);
+
+    /** Allows Class.instanceMethod call by considering receiver as special first parameter. */
+    MethodInstance findMethodForMethodReference(
+            ReferenceType container,
+            java.lang.String name,
+            List<? extends Type> argTypes,
+            List<? extends ReferenceType> typeArgs,
+            ClassType currClass,
+            Type expectedReturnType,
+            boolean fromClient)
+            throws SemanticException;
 }

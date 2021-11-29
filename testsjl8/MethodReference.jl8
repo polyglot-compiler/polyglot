@@ -3,6 +3,7 @@ import java.util.function.Function;
 public class MethodReference {
     Integer test(Integer nnn) {
         Function<Integer, Integer> negation = this::test;
+        Function<MethodReference, String> toStr = MethodReference::toString;
         expectFunction(this::test);
         MethodReference t = this;
         negation = t::test;
