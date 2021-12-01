@@ -66,7 +66,9 @@ public class JL8NewExt extends JL8ProcedureCallExt {
         final JL7NewExt ext7 = (JL7NewExt) JL7Ext.ext(n);
         final JL5NewExt ext5 = (JL5NewExt) JL5Ext.ext(n);
         final JL8TypeSystem ts = (JL8TypeSystem) tc.typeSystem();
-        if (!ext7.setExpectedObjectTypeFromParent(parent, tc)) return n;
+        if (!ext7.setExpectedObjectTypeFromParent(parent, tc)) {
+            return n;
+        }
         return New_c.typeCheckOverride(
                 (New_c) ext5.typeArgs(n, visitList(ext5.typeArgs(), tc)),
                 parent,
@@ -86,7 +88,8 @@ public class JL8NewExt extends JL8ProcedureCallExt {
                                                         .functionSpec()
                                                         .temporaryTypeBeforeTypeChecking(ts));
                             } else {
-                                checked = tc.visitEdge(n, argument);
+                                checked =
+                                        tc.rethrowMissingDependencies(true).visitEdge(n, argument);
                             }
                             partiallyTypeCheckedArguments.add(checked);
                         }
@@ -102,11 +105,11 @@ public class JL8NewExt extends JL8ProcedureCallExt {
                         for (int i = 0; i < n.arguments().size(); i++) {
                             Expr argument = n.arguments().get(i);
                             if (argument instanceof FunctionValue) {
-                                FunctionValue lambda = (FunctionValue) argument;
+                                FunctionValue f = (FunctionValue) argument;
                                 Type lambdaTargetType = ci.formalTypes().get(i);
-                                lambda.setTargetType(lambdaTargetType, tc);
+                                f.setTargetType(lambdaTargetType, tc);
                                 fullyTypeCheckedArguments.add(
-                                        tc.rethrowMissingDependencies(true).visitEdge(n, lambda));
+                                        tc.rethrowMissingDependencies(true).visitEdge(n, f));
                             } else {
                                 fullyTypeCheckedArguments.add(argument);
                             }

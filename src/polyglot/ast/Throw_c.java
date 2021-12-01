@@ -145,7 +145,7 @@ public class Throw_c extends Stmt_c implements Throw {
         // then a NullPointerException will be thrown.
         if (expr.type().typeEquals(ts.Null()))
             return Collections.<Type>singletonList(ts.NullPointerException());
-        return CollectionUtil.list(expr.type(), ts.NullPointerException());
+        return CollectionUtil.<Type>list(expr.type(), ts.NullPointerException());
     }
 
     @Override

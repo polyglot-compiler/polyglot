@@ -26,11 +26,16 @@
 package polyglot.ext.jl8.types;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import polyglot.ext.jl7.types.JL7TypeSystem_c;
+import polyglot.types.ClassType;
 import polyglot.types.Flags;
 import polyglot.types.MethodInstance;
+import polyglot.types.NoMemberException;
 import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.UnknownType;
 
@@ -91,5 +96,95 @@ public class JL8TypeSystem_c extends JL7TypeSystem_c implements JL8TypeSystem {
             }
         }
         return objectMethods;
+    }
+
+    @Override
+    public MethodInstance findMethodForMethodReference(
+            ReferenceType container,
+            java.lang.String name,
+            List<? extends Type> argTypes,
+            List<? extends ReferenceType> typeArgs,
+            ClassType currClass,
+            Type expectedReturnType,
+            boolean fromClient)
+            throws SemanticException {
+
+        assert_(container);
+        assert_(argTypes);
+
+        List<MethodInstance> acceptable = new ArrayList<>();
+        try {
+            acceptable.addAll(
+                    findAcceptableMethods(
+                            container,
+                            name,
+                            argTypes,
+                            typeArgs,
+                            currClass,
+                            expectedReturnType,
+                            fromClient));
+        } catch (NoMemberException e) {
+            // No nothing.
+        }
+
+        if (argTypes.size() > 0 && equals(container, argTypes.get(0))) {
+            List<? extends Type> argTypesWithoutReceiver = argTypes.subList(1, argTypes.size());
+            try {
+                acceptable.addAll(
+                        findAcceptableMethods(
+                                container,
+                                name,
+                                argTypesWithoutReceiver,
+                                typeArgs,
+                                currClass,
+                                expectedReturnType,
+                                fromClient));
+            } catch (NoMemberException e) {
+                // No nothing.
+            }
+        }
+
+        if (acceptable.size() == 0) {
+            throw new NoMemberException(
+                    NoMemberException.METHOD,
+                    "No valid method call found for "
+                            + name
+                            + "("
+                            + listToString(argTypes)
+                            + ")"
+                            + " in "
+                            + container
+                            + ".");
+        }
+
+        Collection<? extends MethodInstance> maximal = findMostSpecificProcedures(acceptable);
+
+        if (maximal.size() > 1) {
+            StringBuffer sb = new StringBuffer();
+            for (Iterator<? extends MethodInstance> i = maximal.iterator(); i.hasNext(); ) {
+                MethodInstance ma = i.next();
+                sb.append(ma.returnType());
+                sb.append(" ");
+                sb.append(ma.container());
+                sb.append(".");
+                sb.append(ma.signature());
+                if (i.hasNext()) {
+                    if (maximal.size() == 2) {
+                        sb.append(" and ");
+                    } else {
+                        sb.append(", ");
+                    }
+                }
+            }
+
+            throw new SemanticException(
+                    "Reference to "
+                            + name
+                            + " is ambiguous, multiple methods match: "
+                            + sb.toString());
+        }
+
+        MethodInstance mi = maximal.iterator().next();
+        return mi;
     }
 }

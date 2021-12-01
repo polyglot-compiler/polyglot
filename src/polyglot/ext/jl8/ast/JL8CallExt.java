@@ -81,7 +81,11 @@ public class JL8CallExt extends JL8ProcedureCallExt implements CallOps {
         Context c = tc.context();
 
         Call node = (Call) typeArgs(visitList(typeArgs(), tc));
-        node = node.target() == null ? node : node.target(tc.visitEdge(node, node.target()));
+        node =
+                node.target() == null
+                        ? node
+                        : node.target(
+                                tc.rethrowMissingDependencies(true).visitEdge(node, node.target()));
         JL8CallExt ext = (JL8CallExt) JL8Ext.ext(node);
         JL5CallExt jl5CallExt = (JL5CallExt) JL5Ext.ext(node);
         List<Expr> partiallyTypeCheckedArguments = new ArrayList<>(node.arguments().size());
@@ -170,10 +174,10 @@ public class JL8CallExt extends JL8ProcedureCallExt implements CallOps {
         for (int i = 0; i < partiallyTypeCheckedArguments.size(); i++) {
             Expr argument = partiallyTypeCheckedArguments.get(i);
             if (argument instanceof FunctionValue) {
-                FunctionValue lambda = (FunctionValue) argument;
-                Type lambdaTargetType = mi.formalTypes().get(i);
-                lambda.setTargetType(lambdaTargetType, tc);
-                fullyTypeCheckedArguments.add((Expr) lambda.visit(tc));
+                FunctionValue f = (FunctionValue) argument;
+                f.setTargetType(mi.formalTypes().get(i), tc);
+                fullyTypeCheckedArguments.add(
+                        tc.rethrowMissingDependencies(true).visitEdge(node, f));
             } else {
                 fullyTypeCheckedArguments.add(argument);
             }

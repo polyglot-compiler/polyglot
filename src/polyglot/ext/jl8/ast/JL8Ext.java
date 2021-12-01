@@ -49,6 +49,4 @@ public class JL8Ext extends Ext_c {
     public final JL8Lang lang() {
         return JL8Lang_c.instance;
     }
-
-    // TODO:  Override operation methods for overridden AST operations.
 }

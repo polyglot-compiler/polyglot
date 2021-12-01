@@ -121,7 +121,7 @@ public class LambdaExpression extends Term_c implements FunctionSpec, CodeNode, 
         List<Formal> formals = this.formals;
         List<Type> formalTypes = new ArrayList<>(formals.size());
         for (Formal formal : formals) {
-            if (formal.position().isCompilerGenerated()) {
+            if (formal.type().position().isCompilerGenerated()) {
                 formalTypes.add(ts.unknownType(Position.COMPILER_GENERATED));
             } else {
                 formalTypes.add(formal.declType());
@@ -181,12 +181,14 @@ public class LambdaExpression extends Term_c implements FunctionSpec, CodeNode, 
                     Type formalTypeFromTarget = formalTypesFromTarget.get(i);
                     if (formalType.position().isCompilerGenerated()) {
                         // It's a synthetic formal from inferred parameters
-                        newFormals.add(
-                                i,
+                        Formal newFormal =
                                 formal.type(
                                         nodeFactory.CanonicalTypeNode(
-                                                Position.COMPILER_GENERATED,
-                                                formalTypeFromTarget)));
+                                                formal.position(), formalTypeFromTarget));
+                        if (newFormal.localInstance() != null) {
+                            newFormal.localInstance().setType(formalTypeFromTarget);
+                        }
+                        newFormals.add(i, newFormal);
                     } else {
                         Type declaredFormalType = formalType.type();
                         if (!jl8TypeSystem.equals(declaredFormalType, formalTypeFromTarget)) {
@@ -215,7 +217,9 @@ public class LambdaExpression extends Term_c implements FunctionSpec, CodeNode, 
                         (Block)
                                 replaceThisWithQualifiedThis(
                                         newBlock, lang(), nodeFactory, currentClass);
-                return block(formals(this, newFormals), newBlock);
+                this.formals = newFormals;
+                this.block = newBlock;
+                return this;
             }
         }
         throw new SemanticException(targetType + " is not a functional interface.", position());
@@ -223,8 +227,8 @@ public class LambdaExpression extends Term_c implements FunctionSpec, CodeNode, 
 
     @Override
     public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
-        if (this.targetType != null) return super.typeCheckOverride(parent, tc);
-        return this; // Not ready for type checking!
+        if (this.targetType == null) return this; // Not ready for type checking!
+        return super.typeCheckOverride(parent, tc);
     }
 
     protected <N extends LambdaExpression> N formals(N n, List<Formal> formals) {

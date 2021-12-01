@@ -103,11 +103,11 @@ public class JL8ConstructorCallExt extends JL8ProcedureCallExt {
         for (int i = 0; i < partiallyTypeCheckedArguments.size(); i++) {
             Expr argument = partiallyTypeCheckedArguments.get(i);
             if (argument instanceof FunctionValue) {
-                FunctionValue lambda = (FunctionValue) argument;
+                FunctionValue f = (FunctionValue) argument;
                 Type lambdaTargetType = ci.formalTypes().get(i);
-                lambda.setTargetType(lambdaTargetType, tc);
+                f.setTargetType(lambdaTargetType, tc);
                 fullyTypeCheckedArguments.add(
-                        tc.rethrowMissingDependencies(true).visitEdge(call, lambda));
+                        tc.rethrowMissingDependencies(true).visitEdge(call, f));
             } else {
                 fullyTypeCheckedArguments.add(argument);
             }

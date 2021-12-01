@@ -52,7 +52,4 @@ public class JL8Lang_c extends J7Lang_c implements JL8Lang {
     protected NodeOps NodeOps(Node n) {
         return jl8Ext(n);
     }
-
-    // TODO:  Implement dispatch methods for new AST operations.
-    // TODO:  Override *Ops methods for AST nodes with new extension nodes.
 }

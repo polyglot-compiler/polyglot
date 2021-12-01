@@ -4,7 +4,9 @@ public class SimpleLambda01 {
     int a = 0;
 
     void test() {
+        Function<String, Integer> length = (s) -> s.length();
         Function<Integer, Integer> negation = (i) -> -i;
+        negation = (i) -> -i.intValue();
         negation = (Integer i) -> -i;
         negation.apply(3);
         negation = (i) -> this.a;

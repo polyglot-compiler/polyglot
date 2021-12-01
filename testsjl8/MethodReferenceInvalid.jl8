@@ -9,6 +9,8 @@ public class MethodReferenceInvalid {
         Function<Integer, String> negation = this::intF;
         // Invalid param type
         Function<String, Integer> negation2 = this::intF;
+        // ambiguous
+        Function<Integer, String> amb = Integer::toString;
         negation.apply(3);
         // param mismatch
         Function<Integer, boolean[]> newArray1 = int[]::new;
