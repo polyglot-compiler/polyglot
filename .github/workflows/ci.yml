@@ -29,7 +29,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Build the base compiler
+      - name: Build the compiler
         run: ant
       - name: Build Jar
         run: ant jar
@@ -45,7 +45,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Build the base compiler
+      - name: Build the compiler
         run: ant
       - name: Run Tests
         run: ../bin/pth -ec pthScript-JL pthScript
@@ -59,7 +59,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Build the base compiler
+      - name: Build the compiler
         run: ant
       - name: Run Tests
         run: ../bin/pth -ec pthScript-JL pthScript-JL5 pthScript
@@ -73,8 +73,21 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Build the base compiler
+      - name: Build the compiler
         run: ant
       - name: Run Tests
         run: ../bin/pth -ec pthScript-JL pthScript-JL5 pthScript-JL7 pthScript
         working-directory: ./testsjl8
+
+  compile-itself:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Build the compiler
+        run: ant
+      - name: Compile itself
+        run: ./bin/jl8c -j "-Xss40m" -sourcepath src -D temp -assert src/polyglot/ext/jl8/JL8ExtensionInfo.java src/polyglot/main/Main.java
