@@ -87,7 +87,5 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Build the compiler
-        run: ant
-      - name: Compile itself
-        run: ./bin/jl8c -j "-Xss40m" -sourcepath src -D temp -assert src/polyglot/ext/jl8/JL8ExtensionInfo.java src/polyglot/main/Main.java
+      - name: Compile itself consistency test
+        run: ./tools/compile-itself-consistency-test

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+# Build
+ant clean
+ant
+
+# Compile itself using classes built by ant
+./bin/jl8c -j "-Xss40m" \
+  -sourcepath src -D compiled-src-1 -d compiled-classes-1 \
+  -assert -noserial -postopts \"-Xlint\\:-options\" src/polyglot/ext/jl8/JL8ExtensionInfo.java src/polyglot/main/Main.java
+jar cf polyglot.jar -C compiled-classes-1 . -C tools/java_cup/classes .
+
+# Compile itself using classes built by polyglot
+java -ea -Xss40m -cp polyglot.jar polyglot.main.Main -extclass polyglot.ext.jl8.JL8ExtensionInfo \
+  -sourcepath src -D compiled-src-2 -d compiled-classes-2 \
+  -assert -noserial -postopts \"-Xlint\\:-options\" src/polyglot/ext/jl8/JL8ExtensionInfo.java src/polyglot/main/Main.java
+
+# Compare compilation result
+diff -r compiled-classes-1 compiled-classes-2
+
+# Final Cleanup
+rm -rf compiled-classes-1 compiled-classes-2 compiled-src-1 compiled-src-2
