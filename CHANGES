@@ -10,6 +10,9 @@ December x, 2021: Polyglot 2.8.0
 
 - Added JL8 extension (polyglot.ext.jl8) to support a subset of new Java 8
   language features, including lambda expressions and method references.
+  Note that not all of Java 8 support is implemented. Notably, support for
+  effectively final variables and annotations on generic type parameters are
+  missing.
 
 - The polyglot compiler is now compiled with JDK 8 and can compile itself.
 
