@@ -120,7 +120,7 @@ To compile using the base compiler, just leave out the -ext option:
 This should produce a file called File.java that is almost identical to
 File.jl.
 
-Java 5 and Java 7 language extensions
+Java 5, 7, 8 language extensions
 -------------------------------------
 
 Polyglot supports Java 5 language extensions with a Polyglot compiler
@@ -149,7 +149,8 @@ of enumeration classes. See $POLYGLOT/testsjl5/java-src/MyEnum.java
 for an example of a suitable class to use as the superclass of
 enumeration classes.
 
-Similarly, the script "jl7c" can be used to compile Java 7 programs.
+Similarly, the script "jl7c" and "jl8c" can be used to compile Java 7
+and Java 8 programs respectively.
 
 Building Polyglot
 -----------------
@@ -217,7 +218,7 @@ including:
         Aleksey Kliger          Yizhou Zhang
         Samarth Lad             Lantian Zheng
         Jed Liu                 Xin Zheng
-        Nick Mathewson
+        Nick Mathewson          Sam Zhou
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
 is derived from code written for the BLOAT bytecode optimizer written

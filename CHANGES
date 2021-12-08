@@ -5,7 +5,22 @@ This file documents changes between releases of Polyglot. More information
 about some releases may be found in the appropriate directory
 doc/release-notes-<version>.
 
-June 23, 2015: Polyglot 2.7.1
+December x, 2021: Polyglot 2.8.0
+================================
+
+- Added JL8 extension (polyglot.ext.jl8) to support a subset of new Java 8
+  language features, including lambda expressions and method references.
+  Note that not all of Java 8 support is implemented. Notably, support for
+  effectively final variables and annotations on generic type parameters are
+  missing.
+
+- The polyglot compiler is now compiled with JDK 8 and can compile itself.
+
+- The polyglot compiler project can now run on JDK newer than JDK 8.
+
+- Fixed most of the failing test cases.
+
+June 23, 2016: Polyglot 2.7.1
 =============================
 
 - Non-backward compatible change: 'super' is now a keyword in PPG.
@@ -73,8 +88,8 @@ fields.
 December 3, 2013 : Polyglot 2.5.4rc1
 ====================================
 
-Changed signature of polyglot.visit.Dataflow to use Peer instead 
-of (Node,boolean) pairs. This change is not backward compatible. 
+Changed signature of polyglot.visit.Dataflow to use Peer instead
+of (Node,boolean) pairs. This change is not backward compatible.
 For example, the signature of flow changed from
     flow(FlowItem in, FlowGraph<FlowItem> graph, Term n, boolean entry, Set<EdgeKey> edgeKeys)
 to
@@ -83,13 +98,13 @@ and the signature of confluence changed from
     confluence(List<FlowItem> items, List<EdgeKey> itemKeys, Term node, boolean entry, FlowGraph<FlowItem> graph)
 to
     confluence(List<FlowItem> items, List<EdgeKey> itemKeys, Peer<FlowItem> peer, FlowGraph<FlowItem> graph).
-From a Peer object p, the AST node can be obtained with p.node() and the 
-boolean indicating whether the dataflow is for entry or exit to the node 
+From a Peer object p, the AST node can be obtained with p.node() and the
+boolean indicating whether the dataflow is for entry or exit to the node
 can be obtained with p.isEntry(). Edge keys for edges to successor nodes
-is available via p.succEdgeKeys(). 
+is available via p.succEdgeKeys().
 
-polyglot.ast.JL renamed to polyglot.ast.JLDel and polyglot.ast.JL_c renamed 
-to polyglot.ast.JLDel_c. This is intended to clarify the use of the 
+polyglot.ast.JL renamed to polyglot.ast.JLDel and polyglot.ast.JL_c renamed
+to polyglot.ast.JLDel_c. This is intended to clarify the use of the
 delegate pattern in Polyglot.
 
 polyglot.ast.JLDel_c (the base class for JL delegate objects, formerly
@@ -127,9 +142,9 @@ in-memory files should be performed via the core API.
 August 10, 2012 : Polyglot 2.5.0
 ================================
 
-Added JL5 extension (polyglot.ext.jl5) to support Java 1.5 language features. 
-Based on the "Polyglot for Java 5" project by Milan Stanojevic and Todd 
-Millstein (http://www.cs.ucla.edu/~todd/research/polyglot5.html), with 
+Added JL5 extension (polyglot.ext.jl5) to support Java 1.5 language features.
+Based on the "Polyglot for Java 5" project by Milan Stanojevic and Todd
+Millstein (http://www.cs.ucla.edu/~todd/research/polyglot5.html), with
 additional input from Vincent Cavé. The extension currently
 supports all Java 5 langage features, except for annotations.
 
@@ -153,7 +168,7 @@ Parsing of command line options has been overhauled.  These changes bring more
 flexibility to configuring multiple extensions in a pipeline using ExtensionRewriters.
 
 Precedence of = vs. ?: fixed.
- 
+
 The -mergestrings option was added.
 
 Class polyglot.visit.DataFlow refactored to allow detection of back
@@ -245,7 +260,7 @@ break if they access the old String fields directly rather than through
 accessors.  Be especially careful to check visitChildren and calls to equals
 on the old String field.
 
-Added NamedVariable super-interface of Field and Local. 
+Added NamedVariable super-interface of Field and Local.
 
 Miscellaneous bug fixes.
 
