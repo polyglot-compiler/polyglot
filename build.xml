@@ -927,6 +927,7 @@
                 <include name="polyglot/efg/**"/>
             </packageset>
             <classpath refid="standard.classpath"/>
+            <classpath refid="pth.classpath"/>
         </javadoc>
     </target>
 
