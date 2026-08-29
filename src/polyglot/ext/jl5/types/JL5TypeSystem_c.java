@@ -1181,10 +1181,23 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c<TypeVariable, ReferenceTy
         // No method is declared and implemented in ct, so we must find an
         // implementation of the method that is inherited from ct's superclass.
         ClassType superClass = ct.superType() == null ? null : ct.superType().toClass();
-        if (superClass == null) return null;
+        if (superClass != null) {
+            MethodInstance mj = findImplementingMethod(superClass, mi);
+            if (mj != null) return mj;
+        }
 
-        MethodInstance mj = findImplementingMethod(superClass, mi);
-        return mj;
+        // The method may also be implemented by a non-abstract method inherited from an
+        // interface. No language Polyglot compiles can declare such a method: MethodDecl_c
+        // makes every interface method declared in source abstract. But a class library
+        // compiled for Java 8 or later contains default methods, and a class that inherits
+        // one does implement the method.
+        for (ReferenceType rt : ct.interfaces()) {
+            if (!rt.isClass()) continue;
+            MethodInstance mj = findImplementingMethod(rt.toClass(), mi);
+            if (mj != null) return mj;
+        }
+
+        return null;
     }
 
     @Override

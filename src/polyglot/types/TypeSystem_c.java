@@ -2488,6 +2488,13 @@ public class TypeSystem_c implements TypeSystem {
                             }
                         } else signatureMap.put(signature, mi);
                     }
+                } else if (isInheritedDefaultMethod(mj)) {
+                    // mj is a non-abstract method inherited from an interface, so it comes
+                    // from a class library compiled for Java 8 or later; see
+                    // findImplementingMethod. The override relationship between mj and mi was
+                    // checked when that library was compiled, and it may rely on language
+                    // features, such as covariant return types, that this compiler's source
+                    // language does not have. Re-checking it here would reject the library.
                 } else if (!equals(ct, mj.container()) && !equals(ct, mi.container())) {
                     try {
                         // check that mj can override mi, which
@@ -2506,6 +2513,18 @@ public class TypeSystem_c implements TypeSystem {
                 }
             }
         }
+    }
+
+    /**
+     * Is {@code mj} a default method, that is, a method inherited from an interface that is not
+     * abstract? Such a method cannot be declared in any language this compiler accepts, since
+     * MethodDecl makes every interface method declared in source abstract, so it can only have
+     * been read from a class file.
+     */
+    protected boolean isInheritedDefaultMethod(MethodInstance mj) {
+        if (mj.flags().isAbstract()) return false;
+        ReferenceType container = mj.container();
+        return container.isClass() && container.toClass().flags().isInterface();
     }
 
     protected boolean returnTypesConsistent(MethodInstance mi, MethodInstance mj) {
@@ -2551,10 +2570,23 @@ public class TypeSystem_c implements TypeSystem {
         // No method is declared and implemented in ct, so we must find an
         // implementation of the method that is inherited from ct's superclass.
         ClassType superClass = ct.superType() == null ? null : ct.superType().toClass();
-        if (superClass == null) return null;
+        if (superClass != null) {
+            MethodInstance mj = findImplementingMethod(superClass, mi);
+            if (mj != null) return mj;
+        }
 
-        MethodInstance mj = findImplementingMethod(superClass, mi);
-        return mj;
+        // The method may also be implemented by a non-abstract method inherited from an
+        // interface. No language Polyglot compiles can declare such a method: MethodDecl_c
+        // makes every interface method declared in source abstract. But a class library
+        // compiled for Java 8 or later contains default methods, and a class that inherits
+        // one does implement the method.
+        for (ReferenceType rt : ct.interfaces()) {
+            if (!rt.isClass()) continue;
+            MethodInstance mj = findImplementingMethod(rt.toClass(), mi);
+            if (mj != null) return mj;
+        }
+
+        return null;
     }
 
     @Override

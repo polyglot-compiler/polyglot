@@ -368,6 +368,8 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
             // To and From are both interfaces.
             // If To and From contain methods with the same signature but
             // different return types, then a compile-time error occurs.
+            // Methods where one overrides the other are exempt; see
+            // oneOverridesTheOther.
             Map<String, MethodInstance> signatureMap = new HashMap<>();
             List<ReferenceType> typeList = new LinkedList<>();
             typeList.add(this);
@@ -378,7 +380,8 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
                     String signature = mi.signature();
                     if (signatureMap.containsKey(signature)) {
                         MethodInstance mj = signatureMap.get(signature);
-                        if (!ts.typeEquals(mi.returnType(), mj.returnType())) {
+                        if (!ts.typeEquals(mi.returnType(), mj.returnType())
+                                && !oneOverridesTheOther(mi, mj)) {
                             return false;
                         }
                     } else signatureMap.put(signature, mi);
@@ -387,6 +390,19 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType {
             }
             return true;
         }
+    }
+
+    /**
+     * Does one of {@code mi} and {@code mj} override the other, because the type declaring one is
+     * a subtype of the type declaring the other? Whether such an override is legal is a property
+     * of those two declaring types, and is settled where they are declared: by canOverrideImpl for
+     * a type compiled from source, and by whatever compiler produced the class file otherwise.
+     * This rule is concerned instead with unrelated types that no single class could implement.
+     */
+    protected boolean oneOverridesTheOther(MethodInstance mi, MethodInstance mj) {
+        ReferenceType ci = mi.container();
+        ReferenceType cj = mj.container();
+        return ts.isSubtype(ci, cj) || ts.isSubtype(cj, ci);
     }
 
     @Override
