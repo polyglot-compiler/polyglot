@@ -1,0 +1,58 @@
+interface EFFn2 {
+    int get();
+}
+
+// A local variable referred to from a lambda expression or an inner class must
+// be effectively final: it must not be assigned anywhere it might already have
+// a value, whether before or after the expression that refers to it.
+public class EffectivelyFinalInvalid02 {
+
+    EFFn2 assignedAfter() {
+        int n = 3;
+        EFFn2 f = () -> n;
+        n = 4;
+        return f;
+    }
+
+    EFFn2 assignedBefore() {
+        int n = 3;
+        n = 4;
+        return () -> n;
+    }
+
+    EFFn2 assignedInLoop(boolean c) {
+        int n = 0;
+        while (c) n = 4;
+        return () -> n;
+    }
+
+    EFFn2 incrementedAfter() {
+        int n = 3;
+        EFFn2 f = () -> n;
+        n++;
+        return f;
+    }
+
+    EFFn2 capturedByAnonymousClass() {
+        int n = 3;
+        EFFn2 f =
+                new EFFn2() {
+                    public int get() {
+                        return n;
+                    }
+                };
+        n = 4;
+        return f;
+    }
+
+    EFFn2 loopIndex() {
+        EFFn2 f = null;
+        for (int i = 0; i < 3; i++) f = () -> i;
+        return f;
+    }
+
+    EFFn2 reassignedFormal(int n) {
+        n = 4;
+        return () -> n;
+    }
+}

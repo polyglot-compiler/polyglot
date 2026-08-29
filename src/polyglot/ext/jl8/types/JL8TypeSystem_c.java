@@ -32,14 +32,21 @@ import java.util.List;
 import polyglot.ext.jl7.types.JL7TypeSystem_c;
 import polyglot.types.ClassType;
 import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.NoMemberException;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.UnknownType;
+import polyglot.util.Position;
 
 public class JL8TypeSystem_c extends JL7TypeSystem_c implements JL8TypeSystem {
+    @Override
+    public LocalInstance localInstance(Position pos, Flags flags, Type type, String name) {
+        return new JL8LocalInstance_c(this, pos, flags, type, name);
+    }
+
     @Override
     public boolean isImplicitCastValid(Type fromType, Type toType) {
         if (fromType instanceof UnknownType) return true;

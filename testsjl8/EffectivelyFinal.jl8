@@ -1,0 +1,53 @@
+interface EFFn {
+    int get();
+}
+
+// Java 8 lets a lambda expression or an inner class refer to a local variable of
+// an enclosing method that is effectively final, rather than one that must be
+// declared final (JLS 4.12.4).
+public class EffectivelyFinal {
+
+    // A local that is never assigned after its declaration.
+    EFFn neverReassigned() {
+        int n = 3;
+        return () -> n;
+    }
+
+    // A local declared without an initializer, but assigned exactly once on
+    // every path that reaches the lambda expression.
+    EFFn assignedOnEveryPath(boolean c) {
+        int n;
+        if (c) n = 1;
+        else n = 2;
+        return () -> n;
+    }
+
+    // The rule applies to inner classes as well as to lambda expressions.
+    EFFn anonymousClass() {
+        int n = 3;
+        return new EFFn() {
+            public int get() {
+                return n;
+            }
+        };
+    }
+
+    // The variable of an enhanced for statement is fresh on each iteration, so
+    // the assignments the loop performs do not make it not effectively final.
+    EFFn enhancedFor(int[] a) {
+        EFFn f = null;
+        for (int x : a) f = () -> x;
+        return f;
+    }
+
+    // A formal parameter that is never assigned is effectively final.
+    EFFn formal(int n) {
+        return () -> n;
+    }
+
+    // Declaring the variable final is still allowed.
+    EFFn declaredFinal() {
+        final int n = 3;
+        return () -> n;
+    }
+}

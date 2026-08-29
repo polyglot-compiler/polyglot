@@ -1,0 +1,35 @@
+interface EFFn1 {
+    int get();
+}
+
+// A local variable of an enclosing method may be read from a lambda expression
+// or an inner class, but never assigned: assigning to it would mean it is not
+// effectively final.
+public class EffectivelyFinalInvalid01 {
+
+    EFFn1 assignedInLambda() {
+        int n = 3;
+        return () -> {
+            n = 5;
+            return n;
+        };
+    }
+
+    EFFn1 incrementedInLambda() {
+        int n = 3;
+        return () -> {
+            n++;
+            return n;
+        };
+    }
+
+    EFFn1 assignedInAnonymousClass() {
+        int n = 3;
+        return new EFFn1() {
+            public int get() {
+                n = 5;
+                return n;
+            }
+        };
+    }
+}

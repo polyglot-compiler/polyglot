@@ -23,53 +23,31 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.ext.jl8.ast;
+package polyglot.ext.jl8.types;
 
-import polyglot.ast.Ext;
-import polyglot.ast.ExtFactory;
+import polyglot.ext.jl5.types.JL5LocalInstance_c;
+import polyglot.types.Flags;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.Position;
+import polyglot.util.SerialVersionUID;
 
-public final class JL8ExtFactory_c extends JL8AbstractExtFactory_c {
+public class JL8LocalInstance_c extends JL5LocalInstance_c implements JL8LocalInstance {
+    private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public JL8ExtFactory_c() {
-        super();
-    }
+    protected Position capturedAt;
 
-    public JL8ExtFactory_c(ExtFactory nextExtFactory) {
-        super(nextExtFactory);
-    }
-
-    @Override
-    protected Ext extNodeImpl() {
-        return new JL8Ext();
-    }
-
-    @Override
-    protected Ext extCallImpl() {
-        return new JL8CallExt();
+    public JL8LocalInstance_c(TypeSystem ts, Position pos, Flags flags, Type type, String name) {
+        super(ts, pos, flags, type, name);
     }
 
     @Override
-    protected Ext extConstructorCallImpl() {
-        return new JL8ConstructorCallExt();
+    public Position capturedAt() {
+        return this.capturedAt;
     }
 
     @Override
-    protected Ext extNewImpl() {
-        return new JL8NewExt();
-    }
-
-    @Override
-    protected Ext extLocalImpl() {
-        return new JL8LocalExt();
-    }
-
-    @Override
-    protected Ext extLocalAssignImpl() {
-        return new JL8LocalAssignExt();
-    }
-
-    @Override
-    protected Ext extUnaryImpl() {
-        return new JL8UnaryExt();
+    public void setCapturedAt(Position pos) {
+        if (this.capturedAt == null) this.capturedAt = pos;
     }
 }

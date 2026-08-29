@@ -32,6 +32,22 @@
 #}
 
 polyglot.ext.jl8.JL8ExtensionInfo "-d out -classpath java-out -assert -noserial -postopts \"-Xlint\\:-options\" -morepermissiveinference" {
+	EffectivelyFinal.jl8;
+	EffectivelyFinalInvalid01.jl8
+	  (Semantic, "cannot be assigned to here"),
+	  (Semantic, "cannot be assigned to here"),
+	  (Semantic, "cannot be assigned to here");
+	EffectivelyFinalInvalid02.jl8
+	  (Semantic, "must be effectively final"),
+	  (Semantic, "must be effectively final"),
+	  (Semantic, "must be effectively final"),
+	  (Semantic, "must be effectively final"),
+	  (Semantic, "must be effectively final"),
+	  (Semantic, "must be effectively final"),
+	  (Semantic, "must be effectively final");
+	EffectivelyFinalInvalid03.jl8
+	  (Semantic, "may not have been initialized"),
+	  (Semantic, "may not have been initialized");
 	FunctionInterfaceAnonymousClass.jl8;
 	LambdasWithExplicitTypes.jl8;
 	LambdasWithExplicitTypesInvalid.jl8 (Semantic);

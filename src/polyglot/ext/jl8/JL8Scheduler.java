@@ -25,12 +25,39 @@
  ******************************************************************************/
 package polyglot.ext.jl8;
 
+import polyglot.ast.NodeFactory;
 import polyglot.ext.jl7.JL7Scheduler;
+import polyglot.ext.jl8.visit.JL8DefiniteAssignmentChecker;
+import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.JLExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.VisitorGoal;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 
 public class JL8Scheduler extends JL7Scheduler {
 
     public JL8Scheduler(JLExtensionInfo extInfo) {
         super(extInfo);
+    }
+
+    /**
+     * Java 8 requires a local variable referred to from a nested class body or
+     * lambda expression to be effectively final, which is a condition on the
+     * assignments to that variable, so it is checked here rather than while type
+     * checking the reference. See JL8DefiniteAssignmentChecker.
+     */
+    @Override
+    public Goal InitializationsChecked(Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = new VisitorGoal(job, new JL8DefiniteAssignmentChecker(job, ts, nf));
+        try {
+            g.addPrerequisiteGoal(ReachabilityChecked(job), this);
+        } catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return internGoal(g);
     }
 }

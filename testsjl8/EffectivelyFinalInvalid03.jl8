@@ -1,0 +1,21 @@
+interface EFFn3 {
+    int get();
+}
+
+// A local variable referred to from a lambda expression must be definitely
+// assigned where the lambda expression appears, just as one referred to from an
+// inner class must be.
+public class EffectivelyFinalInvalid03 {
+
+    EFFn3 neverAssigned() {
+        int n;
+        return () -> n;
+    }
+
+    EFFn3 assignedAfterTheLambda() {
+        int n;
+        EFFn3 f = () -> n;
+        n = 5;
+        return f;
+    }
+}
