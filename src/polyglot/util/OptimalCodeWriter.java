@@ -31,12 +31,15 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The pretty-printing algorithm is loosely based on the Modula-3
@@ -329,10 +332,89 @@ class ConsList<T> {
     }
 }
 
+/**
+ * State of a formatting search.
+ *
+ * <p>
+ * Breaks may be broken up to level {@code maxbr}, which is set whenever a
+ * break is not broken. Not breaking an ordinary break means that equal or
+ * higher-level breaks in all contained blocks must not be broken either,
+ * and breaks of strictly higher level in the same block must not be
+ * broken.  Not breaking a unified break means that breaks of the same
+ * level in the same block must not also be broken. The field
+ * {@code maxbi} controls the {@code maxbr} in nested blocks; it is equal to
+ * either {@code maxbr} or {@code maxbr}-1.
+ * </p>
+ *
+ * <dl>
+ * <dt>Example 1:</dt>
+ * <dd>Suppose we have a current {@code maxbr} of 4, and an ordinary,
+ * non-unified break of level 2 is not broken. Then for that block,
+ * {@code maxbr} is set to 2 and {@code maxbi} is set to 1. This permits
+ * further breaks of level 1 or 2 in the same block, but only level-1 breaks
+ * in inner blocks.</dd>
+ *
+ * <dt>Example 2:</dt>
+ * <dd>Suppose we have a current {@code maxbr} of 4, and a unified break of
+ * level 2 is not broken. Then for that block, {@code maxbr} and
+ * {@code maxbi} are set to 1. This permits no breaks in this block or in
+ * any nested blocks.</dd>
+ * </dl>
+ *
+ * <p>
+ * When a break is broken in a nested block, it means that all equal or
+ * higher-level breaks in containing blocks must be broken. However, these
+ * breaks may be encountered after the nested block. The field
+ * {@code minbr} is used to communicate the level of breaks broken
+ * in nested blocks (and earlier in the current block). Any break of level
+ * &lt;= {@code minbr} <em>must</em> be broken. The field
+ * {@code minbu} is the minimum level at which unified breaks must
+ * be broken.  {@code minbu} is equal to either {@code minbr} or
+ * {@code minbr}+1.
+ * </p>
+ *
+ * <dl>
+ * <dt>Example 3:</dt>
+ * <dd>Suppose we have a current {@code maxbr} of 4, and a break of level 2
+ * is broken. Then for its block, {@code minbr} is at least 1, and
+ * {@code minbu} is at least 2. For containing blocks, {@code minbr} is at
+ * least 2.</dd>
+ * </dl>
+ *
+ * <p>
+ * <b>Note: </b> It is important that formatN not necessarily convert
+ * overruns in its final position into exceptions. This allows the calling
+ * routine to distinguish between 'internal' overruns and ones that it can
+ * tack on a conservative estimate of how much formatting the rest of the
+ * list will make the overrun go up by. Also, it simplifies the coding of
+ * formatN.
+ * </p>
+ *
+ * <p>
+ * Requires: lmargin &ge; 0, lmargin &lt; rmargin, pos &le; rmargin
+ * </p>
+ */
 class SearchState implements Cloneable {
 
-    int lmargin, rmargin, pos;
-    int minbr, minbu, minbo, maxbr, maxbi;
+    /** The current left margin. */
+    int lmargin;
+    /** The current right margin. */
+    int rmargin;
+    /** The current cursor position. */
+    int pos;
+    /** The minimum level at which breaks must be broken. */
+    int minbr;
+    /** The minimum level at which unified breaks must be broken. */
+    int minbu;
+    /**
+     * The minimum level at which breaks must be broken in the containing
+     * block, because of breaks broken in this block.
+     */
+    int minbo;
+    /** The maximum level at which breaks may be broken in the current block. */
+    int maxbr;
+    /** The maximum level at which breaks may be broken in nested blocks. */
+    int maxbi;
     boolean forward;
     boolean findminovf;
     int minovf;
@@ -438,13 +520,11 @@ abstract class OCItem {
     }
 
     /**
-     * Try to format a whole sequence of items in the manner of formatN. Unlike
-     * for formatN, The initial position may be an overrun (this is the only
+     * Try to format a whole sequence of items.
+     * The initial position may be an overrun (this is the only
      * way that overruns are checked!). The item {@code it} may be also
      * null, signifying an empty list. Requires: lmargin &lt; rmargin, pos &le;
      * rmargin, lmargin &ge; 0.
-     *
-     * @see formatN
      */
     static Map<AllowBreak, Boolean> format(OCItem it, int rmargin) {
         SearchState s =
@@ -512,91 +592,11 @@ abstract class OCItem {
         return s.brkAssignment;
     }
 
-    /**
-     * Try to format this item.
-     *
-     * @param lmargin
-     *            is the current left margin.
-     * @param pos
-     *            is the current cursor position.
-     * @param rmargin
-     *            is the current right margin.
-     * @param fin
-     *            is a bound on the final cursor position after formatting the
-     *            whole item.
-     * @param maxLevel
-     *            is the maximum level at which breaks may be broken in the
-     *            current block.
-     * @param maxLevelInner
-     *            is the maximum level at which breaks may be broken in nested
-     *            blocks.
-     * @param minLevel
-     *            is the minimum level at which breaks must be broken.
-     * @param minLevelUnified
-     *            is the minimum level at which unified breaks must be broken.
-     *
-     * <p>
-     * Breaks may be broken up to level maxLevel, which is set whenever a break
-     * is not broken. Not breaking an ordinary break means that equal or
-     * higher-level breaks in all contained blocks must not be broken either,
-     * and breaks of strictly higher level in the same block must not be
-     * broken.  Not breaking a unified break means that breaks of the same
-     * level in the same block must not also be broken. The parameter
-     * maxLevelInner controls the maxLevel in nested blocks; it is equal to
-     * either maxLevel or maxLevel-1.
-     *
-     * <p>
-     * <dl>
-     * <dt>Example 1:
-     * <dd>Suppose we have a current maxLevel of 4, and an ordinary,
-     * non-unified break of level 2 is not broken. Then for that block,
-     * maxLevel is set to 2 and maxLevelInner is set to 1. This permits further
-     * breaks of level 1 or 2 in the same block, but only level-1 breaks in
-     * inner blocks.
-     *
-     * <dt>Example 2:</dt>
-     * <dd>Suppose we have a current maxLevel of 4, and a unified break of
-     * level 2 is not broken. Then for that block, maxLevel and maxLevelInner
-     * are set to 1. This permits no breaks in this block or in any nested
-     * blocks.</dd>
-     * </dl>
-     *
-     * <p>
-     * When a break is broken in a nested block, it means that all equal or
-     * higher-level breaks in containing blocks must be broken. However, these
-     * breaks may be encountered after the nested block. The parameter
-     * {@code minLevel} is used to communicate the level of breaks broken
-     * in nested blocks (and earlier in the current block). Any break of level
-     * <= minLevel <em>must</em> be broken. The parameter
-     * {@code minLevelUnified} is the minimum level at which unified breaks must
-     * be broken.  minLevelUnified is equal to either minLevel or minLevel+1.
-     * </p>
-     *
-     * <dl>
-     * <dt>Example 3:
-     * <dd>Suppose we have a current maxLevel of 4, and a break of level 2 is
-     * broken. Then for its block, minLevel is at least 1, and minLevelUnified
-     * is at least 2. For containing blocks, minLevel is at least 2.</dd>
-     * </dl>
-     *
-     * <b>Note: </b> It is important that formatN not necessarily convert
-     * overruns in its final position into exceptions. This allows the calling
-     * routine to distinguish between 'internal' overruns and ones that it can
-     * tack on a conservative estimate of how much formatting the rest of the
-     * list will make the overrun go up by. Also, it simplifies the coding of
-     * formatN.
-     * </p>
-     *
-     * Requires: rmargin &lt; lmargin, pos &lt;= rmargin, lmargin &lt; rmargin,
-     * pos &le; rmargin, lmargin &ge; 0
-     */
     abstract void selfFormat(SearchState s);
 
     /**
      * Send the output associated with this item to {@code out}, using the
      * given break settings.
-     *
-     * @param success
      */
     abstract int sendOutput(
             PrintWriter out, int lmargin, int pos, Map<AllowBreak, Boolean> brkAssignment);
@@ -707,43 +707,88 @@ class AllowBreak extends OCItem {
     int minovf;
     ConsList<Boolean> afterBrkAssignment;
 
-    /* maxbr -> maxbi -> pos -> minovf * afterBrkAssignment */
-    Map<Integer, Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>>> cache =
-            new HashMap<>();
+    static final class FormatResult {
+        private final int minOverflow;
+        private final ConsList<Boolean> afterBrkAssignment;
 
-    /** Get results from state s into cache */
-    Pair<Integer, ConsList<Boolean>> cacheGet(SearchState s) {
-        if (cache.containsKey(s.maxbr)) {
-            Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache =
-                    cache.get(s.maxbr);
-            if (brCache.containsKey(s.maxbi)) {
-                Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache = brCache.get(s.maxbi);
-                if (biCache.containsKey(s.pos)) {
-                    Pair<Integer, ConsList<Boolean>> result = biCache.get(s.pos);
-                    return result;
+        FormatResult(int minOverflow, ConsList<Boolean> afterBrkAssignment) {
+            this.minOverflow = minOverflow;
+            this.afterBrkAssignment = afterBrkAssignment;
+        }
+
+        int minOverflow() {
+            return minOverflow;
+        }
+
+        ConsList<Boolean> afterBrkAssignment() {
+            return afterBrkAssignment;
+        }
+    }
+
+    /*
+     * The result of formatting from this break onward depends on the entire
+     * search state other than the assignments to earlier breaks, including
+     * the state saved for the containing blocks, so all of it is part of the
+     * key. (The right margin is the same for all blocks.)
+     */
+    static final class CacheKey {
+        private final int pos, lmargin, minbr, minbu, minbo, maxbr, maxbi;
+        private final List<Integer> outer;
+
+        CacheKey(SearchState s) {
+            this.pos = s.pos;
+            this.lmargin = s.lmargin;
+            this.minbr = s.minbr;
+            this.minbu = s.minbu;
+            this.minbo = s.minbo;
+            this.maxbr = s.maxbr;
+            this.maxbi = s.maxbi;
+            this.outer = outerState(s);
+        }
+
+        private static List<Integer> outerState(SearchState s) {
+            List<Integer> result = new ArrayList<>();
+            for (ConsList<Integer> l :
+                    Arrays.asList(s.lmargins, s.minbrs, s.minbus, s.minbos, s.maxbrs, s.maxbis)) {
+                for (ConsList<Integer> c = l; !c.isEmpty(); c = c.next) {
+                    result.add(c.elem);
                 }
             }
+            return result;
         }
-        return null;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof CacheKey)) return false;
+            CacheKey k = (CacheKey) o;
+            return pos == k.pos
+                    && lmargin == k.lmargin
+                    && minbr == k.minbr
+                    && minbu == k.minbu
+                    && minbo == k.minbo
+                    && maxbr == k.maxbr
+                    && maxbi == k.maxbi
+                    && outer.equals(k.outer);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(pos, lmargin, minbr, minbu, minbo, maxbr, maxbi, outer);
+        }
+    }
+
+    Map<CacheKey, FormatResult> cache = new HashMap<>();
+
+    /** Get results from state s into cache */
+    FormatResult cacheGet(SearchState s) {
+        return cache.get(new CacheKey(s));
     }
 
     /** Put results of state s into cache */
     void cachePut(SearchState s) {
         // Memoize overflow results before backtracking.
-        Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> brCache;
-        if (cache.containsKey(s.maxbr)) brCache = cache.get(s.maxbr);
-        else {
-            brCache = new HashMap<>();
-            cache.put(s.maxbr, brCache);
-        }
-        Map<Integer, Pair<Integer, ConsList<Boolean>>> biCache;
-        if (brCache.containsKey(s.maxbi)) biCache = brCache.get(s.maxbi);
-        else {
-            biCache = new HashMap<>();
-            brCache.put(s.maxbi, biCache);
-        }
-        Pair<Integer, ConsList<Boolean>> result = new Pair<>(s.minovf, s.afterBrkAssignment);
-        biCache.put(s.pos, result);
+        cache.put(new CacheKey(s), new FormatResult(s.minovf, s.afterBrkAssignment));
     }
 
     @Override
@@ -756,11 +801,11 @@ class AllowBreak extends OCItem {
                 // First, check the cache if we have tried the given
                 // search parameters.  If so, just return the memoized
                 // result and backtrack.
-                Pair<Integer, ConsList<Boolean>> result = cacheGet(s);
+                FormatResult result = cacheGet(s);
                 if (result != null) {
                     s.forward = false;
-                    s.minovf = result.part1();
-                    s.afterBrkAssignment = result.part2();
+                    s.minovf = result.minOverflow();
+                    s.afterBrkAssignment = result.afterBrkAssignment();
                     return;
                 }
             }
